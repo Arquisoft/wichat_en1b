@@ -19,6 +19,9 @@ This is a base project for the Software Architecture course in 2024/2025. It is 
 
 Both the user and auth service share a Mongo database that is accessed with mongoose.
 
+## Team members
+- **Br1NKOL** Alberto Cuervo Arias, UO289088@uniovi.es
+
 ## Quick start guide
 
 First, clone the project:
