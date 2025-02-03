@@ -20,11 +20,11 @@ This is a base project for the Software Architecture course in 2024/2025. It is 
 Both the user and auth service share a Mongo database that is accessed with mongoose.
 
 ## Team members
--**Br1NKOL** Alberto Cuervo Arias, [UO289088@uniovi.es](mailto:uo289088@uniovi.es)
--**Rolitoansu** Raúl Antuña Suárez, [UO294202@uniovi.es](mailto:uo294202@uniovi.es)
--**UO288583** Fernando Sutil Fernández, [UO288583@uniovi.es](mailto:uo288583@uniovi.es)
--**orvizz** Mario Orviz Viesca, [UO295180@uniovi.es](mailto:UO295180@uniovi.es)
--**UO294936** Saúl Martín Fernández, [UO294936@uniovi.es](mailto:UO294936@uniovi.es)
+- **Br1NKOL** Alberto Cuervo Arias, [UO289088@uniovi.es](mailto:uo289088@uniovi.es)
+- **Rolitoansu** Raúl Antuña Suárez, [UO294202@uniovi.es](mailto:uo294202@uniovi.es)
+- **UO288583** Fernando Sutil Fernández, [UO288583@uniovi.es](mailto:uo288583@uniovi.es)
+- **orvizz** Mario Orviz Viesca, [UO295180@uniovi.es](mailto:UO295180@uniovi.es)
+- **UO294936** Saúl Martín Fernández, [UO294936@uniovi.es](mailto:UO294936@uniovi.es)
 
 ## Quick start guide
 
