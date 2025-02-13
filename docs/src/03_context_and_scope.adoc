@@ -24,25 +24,22 @@ The WIChat application interacts with the following communication partners:
 - **Empathy API**: Generates conversational hints for users based on the question data.
 
 // PlantUML diagram: System Context
-[plantuml, context-diagram, svg]
+[plantuml,"System Context Diagram",png]
 ----
-left to right direction
-
+actor User
 rectangle "WIChat System" {
-  component "Web Frontend" as frontend
-  component "Backend Server" as backend
-  database "MongoDB" as db
+  component "Web Frontend" as Frontend
+  component "Backend Server" as Backend
+  database "MongoDB" as Database
 }
+cloud "Wikidata" as Wikidata
+cloud "Empathy API" as Empathy
 
-actor "User" as user
-cloud "Wikidata" as wikidata
-cloud "Empathy API" as empathy
-
-user --> frontend : Interacts with\n(answers, hints)
-frontend --> backend : API calls\n(HTTP/HTTPS)
-backend --> wikidata : Fetches question data\n(MediaWiki Action API)
-backend --> empathy : Requests hints\n(REST API)
-backend --> db : Stores/retrieves\nuser data
+User <--> Frontend : Interacts with\n(answers, hints)
+Frontend <--> Backend : API calls\n(HTTP/HTTPS)
+Backend <--> Wikidata : Fetches question data\n(MediaWiki Action API)
+Backend <--> Empathy : Requests hints\n(REST API)
+Backend <--> Database : Stores/retrieves\nuser data
 ----
 //#caption: System Context Diagram
 
@@ -66,28 +63,26 @@ The technical interfaces and communication channels for the WIChat application a
 - **LLM Integration**: **Empathy API** is used for generating hints.
 
 // PlantUML diagram: Deployment View
-[plantuml, deployment-diagram, svg]
+[plantuml,"Deployment Diagram",png]
 ----
-left to right direction
-
-node "User's Web Browser" as browser {
-  component "React Frontend" as react
+node "User's Web Browser" as Browser {
+  component "React Frontend" as React
 }
 
-node "Application Server" as server {
-  component "Node.js + Express" as node
-  database "MongoDB" as mongo
+node "Application Server" as Server {
+  component "Node.js + Express" as Node
+  database "MongoDB" as MongoDB
 }
 
-cloud "External APIs" as apis {
-  component "Wikidata" as wikidata
-  component "Empathy API" as empathy
+cloud "External APIs" as APIs {
+  component "Wikidata" as Wikidata
+  component "Empathy API" as Empathy
 }
 
-browser --> server : HTTP/HTTPS\n(API calls)
-server --> wikidata : MediaWiki Action API\n(HTTP/HTTPS)
-server --> empathy : REST API\n(HTTP/HTTPS)
-server --> mongo : Database operations
+Browser --> Server : HTTP/HTTPS\n(API calls)
+Server --> Wikidata : MediaWiki Action API\n(HTTP/HTTPS)
+Server --> Empathy : REST API\n(HTTP/HTTPS)
+Server --> MongoDB : Database operations
 ----
 //#caption: Deployment Diagram
 
