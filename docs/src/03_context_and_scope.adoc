@@ -53,6 +53,7 @@ endif::arc42help[]
 
 **Business Context Diagram**
 [plantuml]
+----
 
 @startuml
 
@@ -107,6 +108,7 @@ endif::arc42help[]
 
 Technical Context Diagram
 [plantuml]
+----
 
 @startuml
 
