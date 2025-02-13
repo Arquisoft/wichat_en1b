@@ -3,144 +3,72 @@ ifndef::imagesdir[:imagesdir: ../images]
 [[section-context-and-scope]]
 == Context and Scope
 
-
-ifdef::arc42help[]
-[role="arc42help"]
-****
-.Contents
-Context and scope - as the name suggests - delimits your system (i.e. your scope) from all its communication partners
-(neighboring systems and users, i.e. the context of your system). It thereby specifies the external interfaces.
-
-If necessary, differentiate the business context (domain specific inputs and outputs) from the technical context (channels, protocols, hardware).
-
-.Motivation
-The domain interfaces and technical interfaces to communication partners are among your system's most critical aspects. Make sure that you completely understand them.
-
-.Form
-Various options:
-
-* Context diagrams
-* Lists of communication partners and their interfaces.
-
-
-.Further Information
-
-See https://docs.arc42.org/section-3/[Context and Scope] in the arc42 documentation.
-
-****
-endif::arc42help[]
+This section defines the boundaries of the **WIChat** application, its communication partners, and the technologies used to interact with them. The system is designed to provide an interactive quiz experience, leveraging **Wikidata** for question generation and an **Empathy API** for LLM-based hints.
 
 === Business Context
 
-ifdef::arc42help[]
-[role="arc42help"]
-****
-.Contents
-Specification of *all* communication partners (users, IT-systems, ...) with explanations of domain specific inputs and outputs or interfaces.
-Optionally you can add domain specific formats or communication protocols.
+The WIChat application interacts with the following communication partners:
 
-.Motivation
-All stakeholders should understand which data are exchanged with the environment of the system.
-
-.Form
-All kinds of diagrams that show the system as a black box and specify the domain interfaces to communication partners.
-
-Alternatively (or additionally) you can use a table.
-The title of the table is the name of your system, the three columns contain the name of the communication partner, the inputs, and the outputs.
-
-****
-endif::arc42help[]
-
-**Business Context Diagram**
-[plantuml]
-----
-
-@startuml
-
-actor User
-actor Admin
-
-rectangle "WIChat System" {
-rectangle "Web Frontend" as FE
-rectangle "Backend" as BE
-}
-
-rectangle "External Services" {
-rectangle "Wikidata" as WD
-rectangle "LLM API" as LLM
-}
-
-User -- FE : "Interacts with UI"
-FE -- BE : "Processes requests"
-BE -- WD : "Fetches questions & images"
-BE -- LLM : "Requests hints"
-Admin -- BE : "Manages users & content"
-@enduml
-
-**External Domain Interfaces**
-
+[cols="1,2,2", options="header"]
 |===
 | Communication Partner | Inputs | Outputs
-
-| User | Login credentials, Answers, Hint requests | Quiz questions, Score updates, Hints
-| Admin | User management actions | System reports, User statistics
-| Wikidata | Query parameters for questions | Generated quiz questions and images
-| LLM API | Question details | Hints about the question
+| User | Answers to quiz questions, requests for hints | Quiz questions, hints, feedback (correct/incorrect answers), historical data
+| Wikidata (via MediaWiki Action API) | Requests for question data (e.g., images, correct answers, distractors) | Question data (e.g., images, correct answers, distractors)
+| Empathy API | Requests for hints based on question data | Generated hints for quiz questions
 |===
+
+**Explanation of External Domain Interfaces**:
+- **Users**: Interact with the system via a web frontend, answering questions and requesting hints.
+- **Wikidata**: Provides structured data for generating quiz questions and answers.
+- **Empathy API**: Generates conversational hints for users based on the question data.
 
 === Technical Context
 
-ifdef::arc42help[]
-[role="arc42help"]
-****
-.Contents
-Technical interfaces (channels and transmission media) linking your system to its environment. In addition a mapping of domain specific input/output to the channels, i.e. an explanation which I/O uses which channel.
+The technical interfaces and communication channels for the WIChat application are as follows:
 
-.Motivation
-Many stakeholders make architectural decision based on the technical interfaces between the system and its context. Especially infrastructure or hardware designers decide these technical interfaces.
-
-.Form
-E.g. UML deployment diagram describing channels to neighboring systems,
-together with a mapping table showing the relationships between channels and input/output.
-
-****
-endif::arc42help[]
-
-Technical Context Diagram
-----[plantuml, technical-context, svg]
-----
-@startuml
-
-node "User" {
-  interface "Web Browser"
-}
-
-node "WIChat System" {
-  node "Frontend" as FE
-  node "Backend" as BE
-}
-
-node "External Services" {
-  node "Wikidata API" as WD
-  node "LLM API" as LLM
-}
-
-"Web Browser" --> FE : "HTTPS Requests"
-FE --> BE : "REST API Calls"
-BE --> WD : "Fetch questions/images"
-BE --> LLM : "Fetch hints"
-
-@enduml
-----
-
-**Mapping Input/Output to Channels**
-
+[cols="1,2,2", options="header"]
 |===
-| Input/Output | Channel
-| User interaction | HTTPS (Web UI)
-| API requests from frontend | REST over HTTPS
-| Data retrieval from Wikidata | REST API
-| Hint generation from LLM | REST API
+| Communication Partner | Channel/Protocol | Input/Output Mapping
+| User | HTTP/HTTPS (Web Browser) | User interactions (answers, hint requests) and system responses (questions, hints)
+| Wikidata | HTTP/HTTPS (MediaWiki Action API) | API requests for question data and API responses with structured data
+| Empathy API | HTTP/HTTPS (REST API) | API requests for hints and API responses with generated hints
 |===
 
-This section defines the business and technical context of WIChat, outlining key interfaces and interactions with external systems.
+**Explanation of Technical Interfaces**:
+- **Frontend**: Built with **React**, communicates with the backend via HTTP/HTTPS.
+- **Backend**: Built with **NodeJS + Express**, handles API requests to Wikidata and Empathy, and manages user data in **MongoDB**.
+- **Database**: **MongoDB** stores user data, including historical performance and game statistics.
+- **LLM Integration**: **Empathy API** is used for generating hints, with potential future consideration of **Gemini** for more complex tasks.
+
+**Mapping Input/Output to Channels**:
+- User inputs (answers, hint requests) are sent via HTTP/HTTPS to the backend.
+- The backend sends API requests to Wikidata and Empathy, and processes their responses.
+- The backend sends quiz questions, hints, and feedback to the user via HTTP/HTTPS.
+
+=== System Scope
+
+The WIChat application includes the following components:
+1. **Frontend**: A React-based web application for user interaction.
+2. **Backend**: A NodeJS + Express server for handling business logic and API integrations.
+3. **Database**: MongoDB for storing user data and game statistics.
+4. **External APIs**:
+   - **Wikidata**: For generating quiz questions and answers.
+   - **Empathy API**: For generating conversational hints.
+
+The system does **not** include:
+- Development of the LLM (Empathy or Gemini) itself.
+- Hosting or maintenance of Wikidata.
+
+=== Team Context
+
+The project is being developed by a team of 5 students* with the following responsibilities:
+1. **Frontend Development**: Implementation of the React-based user interface.
+2. **Backend Development**: Implementation of the NodeJS + Express server and API integrations.
+3. **Database Management**: Design and maintenance of the MongoDB database.
+4. **Testing and Quality Assurance**: Ensuring the system meets functional and non-functional requirements.
+5. **Documentation and Deployment**: Compiling documentation using AsciiDoc and PlantUML, and deploying the application to GitHub Pages.
+
+=== Summary
+
+The WIChat application is a web-based quiz system that integrates with **Wikidata** for question generation and **Empathy API** for hint generation. The system is built using modern web technologies (React, NodeJS, MongoDB) and follows the **Arc42** template for documentation. 
+Our team is responsible for all aspects of development, testing, and deployment.
