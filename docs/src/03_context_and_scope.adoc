@@ -12,12 +12,13 @@ The WIChat application interacts with the following communication partners:
 [cols="1,2,2", options="header"]
 |===
 | Communication Partner | Inputs | Outputs
-| User | Answers to quiz questions, requests for hints | Quiz questions, hints, feedback (correct/incorrect answers), historical data
+| User | Answers to quiz questions, requests for hints | Quiz questions, hints, feedback (correct/incorrect answers)
 | Wikidata (via MediaWiki Action API) | Requests for question data (e.g., images, correct answers, distractors) | Question data (e.g., images, correct answers, distractors)
 | Empathy API | Requests for hints based on question data | Generated hints for quiz questions
 |===
 
 **Explanation of External Domain Interfaces**:
+ 
 - **Users**: Interact with the system via a web frontend, answering questions and requesting hints.
 - **Wikidata**: Provides structured data for generating quiz questions and answers.
 - **Empathy API**: Generates conversational hints for users based on the question data.
@@ -35,12 +36,14 @@ The technical interfaces and communication channels for the WIChat application a
 |===
 
 **Explanation of Technical Interfaces**:
+
 - **Frontend**: Built with **React**, communicates with the backend via HTTP/HTTPS.
 - **Backend**: Built with **NodeJS + Express**, handles API requests to Wikidata and Empathy, and manages user data in **MongoDB**.
 - **Database**: **MongoDB** stores user data, including historical performance and game statistics.
 - **LLM Integration**: **Empathy API** is used for generating hints, with potential future consideration of **Gemini** for more complex tasks.
 
 **Mapping Input/Output to Channels**:
+
 - User inputs (answers, hint requests) are sent via HTTP/HTTPS to the backend.
 - The backend sends API requests to Wikidata and Empathy, and processes their responses.
 - The backend sends quiz questions, hints, and feedback to the user via HTTP/HTTPS.
@@ -48,6 +51,7 @@ The technical interfaces and communication channels for the WIChat application a
 === System Scope
 
 The WIChat application includes the following components:
+
 1. **Frontend**: A React-based web application for user interaction.
 2. **Backend**: A NodeJS + Express server for handling business logic and API integrations.
 3. **Database**: MongoDB for storing user data and game statistics.
@@ -62,6 +66,7 @@ The system does **not** include:
 === Team Context
 
 The project is being developed by a team of 5 students* with the following responsibilities:
+
 1. **Frontend Development**: Implementation of the React-based user interface.
 2. **Backend Development**: Implementation of the NodeJS + Express server and API integrations.
 3. **Database Management**: Design and maintenance of the MongoDB database.
