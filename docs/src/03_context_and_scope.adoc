@@ -23,6 +23,29 @@ The WIChat application interacts with the following communication partners:
 - **Wikidata**: Provides structured data for generating quiz questions and answers.
 - **Empathy API**: Generates conversational hints for users based on the question data.
 
+// PlantUML diagram: System Context
+[plantuml, context-diagram, svg]
+----
+left to right direction
+
+rectangle "WIChat System" {
+  component "Web Frontend" as frontend
+  component "Backend Server" as backend
+  database "MongoDB" as db
+}
+
+actor "User" as user
+cloud "Wikidata" as wikidata
+cloud "Empathy API" as empathy
+
+user --> frontend : Interacts with\n(answers, hints)
+frontend --> backend : API calls\n(HTTP/HTTPS)
+backend --> wikidata : Fetches question data\n(MediaWiki Action API)
+backend --> empathy : Requests hints\n(REST API)
+backend --> db : Stores/retrieves\nuser data
+----
+//#caption: System Context Diagram
+
 === Technical Context
 
 The technical interfaces and communication channels for the WIChat application are as follows:
@@ -41,6 +64,32 @@ The technical interfaces and communication channels for the WIChat application a
 - **Backend**: Built with **NodeJS + Express**, handles API requests to Wikidata and Empathy, and manages user data in **MongoDB**.
 - **Database**: **MongoDB** stores user data, including historical performance and game statistics.
 - **LLM Integration**: **Empathy API** is used for generating hints, with potential future consideration of **Gemini** for more complex tasks.
+
+// PlantUML diagram: Deployment View
+[plantuml, deployment-diagram, svg]
+----
+left to right direction
+
+node "User's Web Browser" as browser {
+  component "React Frontend" as react
+}
+
+node "Application Server" as server {
+  component "Node.js + Express" as node
+  database "MongoDB" as mongo
+}
+
+cloud "External APIs" as apis {
+  component "Wikidata" as wikidata
+  component "Empathy API" as empathy
+}
+
+browser --> server : HTTP/HTTPS\n(API calls)
+server --> wikidata : MediaWiki Action API\n(HTTP/HTTPS)
+server --> empathy : REST API\n(HTTP/HTTPS)
+server --> mongo : Database operations
+----
+//#caption: Deployment Diagram
 
 **Mapping Input/Output to Channels**:
 
