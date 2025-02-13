@@ -24,7 +24,7 @@ Both the user and auth service share a Mongo database that is accessed with mong
 - **Rolitoansu** Raúl Antuña Suárez, [UO294202@uniovi.es](mailto:uo294202@uniovi.es)
 - **UO288583** Fernando Sutil Fernández, [UO288583@uniovi.es](mailto:uo288583@uniovi.es)
 - **orvizz** Mario Orviz Viesca, [UO295180@uniovi.es](mailto:UO295180@uniovi.es)
-- **UO294936** Saúl Martín Fernández, [UO294936@uniovi.es](mailto:UO294936@uniovi.es)
+- **saulmf** Saúl Martín Fernández, [UO294936@uniovi.es](mailto:UO294936@uniovi.es)
 
 ## Quick start guide
 
