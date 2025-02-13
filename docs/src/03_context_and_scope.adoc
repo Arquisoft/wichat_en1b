@@ -63,7 +63,7 @@ The technical interfaces and communication channels for the WIChat application a
 - **Frontend**: Built with **React**, communicates with the backend via HTTP/HTTPS.
 - **Backend**: Built with **NodeJS + Express**, handles API requests to Wikidata and Empathy, and manages user data in **MongoDB**.
 - **Database**: **MongoDB** stores user data, including historical performance and game statistics.
-- **LLM Integration**: **Empathy API** is used for generating hints, with potential future consideration of **Gemini** for more complex tasks.
+- **LLM Integration**: **Empathy API** is used for generating hints.
 
 // PlantUML diagram: Deployment View
 [plantuml, deployment-diagram, svg]
@@ -109,12 +109,13 @@ The WIChat application includes the following components:
    - **Empathy API**: For generating conversational hints.
 
 The system does **not** include:
-- Development of the LLM (Empathy or Gemini) itself.
+
+- Development of the LLM (Empathy) itself.
 - Hosting or maintenance of Wikidata.
 
 === Team Context
 
-The project is being developed by a team of 5 students* with the following responsibilities:
+The project is being developed by a team of 5 students with the following responsibilities:
 
 1. **Frontend Development**: Implementation of the React-based user interface.
 2. **Backend Development**: Implementation of the NodeJS + Express server and API integrations.
