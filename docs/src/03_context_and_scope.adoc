@@ -107,30 +107,31 @@ together with a mapping table showing the relationships between channels and inp
 endif::arc42help[]
 
 Technical Context Diagram
-[plantuml]
+----[plantuml, technical-context, svg]
 ----
-
 @startuml
 
 node "User" {
-interface "Web Browser"
+  interface "Web Browser"
 }
 
 node "WIChat System" {
-node "Frontend" as FE
-node "Backend" as BE
+  node "Frontend" as FE
+  node "Backend" as BE
 }
 
 node "External Services" {
-node "Wikidata API" as WD
-node "LLM API" as LLM
+  node "Wikidata API" as WD
+  node "LLM API" as LLM
 }
 
-"Web Browser" --> FE : "HTTP Requests"
+"Web Browser" --> FE : "HTTPS Requests"
 FE --> BE : "REST API Calls"
 BE --> WD : "Fetch questions/images"
 BE --> LLM : "Fetch hints"
+
 @enduml
+----
 
 **Mapping Input/Output to Channels**
 
