@@ -20,10 +20,53 @@ If needed you can subdivide them into
 technical constraints, organizational and political constraints and
 conventions (e.g. programming or versioning guidelines, documentation or naming conventions)
 
-
-.Further Information
-
-See https://docs.arc42.org/section-2/[Architecture Constraints] in the arc42 documentation.
-
-****
 endif::arc42help[]
+
+
+=== Technical constraints
+
+[cols="1,2", options="header"]
+|===
+| Constraint | Description
+| Performance | The system must be usable and handle a reasonable amount of users at the same time and ensure fast responses (specially from the LLM)
+| Wikidata | The system must integrate with Wikidata as it's going to be the main data souce for the questions.
+| LLM Integration | The system must handle the interaction of a user with a LLM chat
+| Data Storage | The system will use a database to store data about the users. The nature of this database is not decided yet
+| Deployment | The system must be accesible via web and it must be deployed using GitHub actions
+|===
+
+
+=== Organizational constraints
+
+[cols="1,2", options="header"]
+|===
+| Constraint | Description
+| Development Process | This product will be built following Scrum/Kanban methodologies
+| GitHub Issues | The team will work using GitHub Issues as a way of documenting what is done in the project and to distribute the work among the team members
+| Pull requests | The team will use pull requests in order to integrate their work with the main one. Each pull request must be reviewed by another team member
+| Time | This application should be developed in a couple of months
+| Team meetings | The team will have at least 1 weekly meeting
+| Continuous integration | This project will use continuous integration using Github Actions
+| Testing | The system must have robust and meaningful tests to make the application as secure as possible
+|===
+
+=== Political constraints
+[cols="1,2", options="header"]
+|===
+| Constraint | Description
+| Data protection | The information about the useres must be properly stored and secured
+| Open source | This project is an open source project, and it could use other pieces of open source code of another related code
+| Code reuse | In case that this system requires to use code from other project, this must be specified in the documentation
+|===
+
+=== Conventions
+
+[cols="1,2", options="header"]
+|===
+| Constraint | Description
+| English | The members of the team will use english as main language to communicate and write documentation
+| ARC42 | The documentation will be written using ARC42 technology
+| Branching strategy | Each issue will require a branch that must be merged with the main project using pull requests
+|===
+
+
