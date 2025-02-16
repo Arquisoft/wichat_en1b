@@ -93,9 +93,21 @@ Table with role names, person names, and their expectations with respect to the 
 ****
 endif::arc42help[]
 
-[options="header",cols="1,2,2"]
+[options="header",cols="1,1,1"]
 |===
 |Role/Name|Contact|Expectations
-| _<Role-1>_ | _<Contact-1>_ | _<Expectation-1>_
-| _<Role-2>_ | _<Contact-2>_ | _<Expectation-2>_
+| _RTVE_ | _link:mailto:rtve.dircom@rtve.es[rtve.dircom@rtve.es]_ | A web application that mimics the popular Spanish TV show _"Saber y Ganar"_.
+| _ChattySw_ | _TBD_ | An outstanding and highly detailed application that meets with the requirements and constraints required by the product owner _(RTVE)_.
+| _Professors_ a|
+- link:mailto:labra@uniovi.es[Jose Emilio Labra Gayo]
+- link:mailto:gonzalezgpablo@uniovi.es[Pablo González]
+| Perform the role of the product owner _(RTVE)_ as well as helping with doubts related with the application development. They expect an application developed following a highly structured process, documenting as much as necessary and following the requirements imposed by the product owner.
+| _Application Users_ | | A quiz game that, with some help provided by the clues that an AI model provides, is easy to use and understand. Meeting modern quality standards and ensuring a good usability overall.
+| _Development Team_ a|
+- Alberto Cuervo Arias (link:mailto:uo289088@uniovi.es[UO289088@uniovi.es])
+- Raúl Antuña Suárez (link:mailto:uo294202@uniovi.es[UO294202@uniovi.es])
+- Fernando Sutil Fernández (link:mailto:uo288583@uniovi.es[UO288583@uniovi.es])
+- Mario Orviz Viesca (link:mailto:uo295180@uniovi.es[UO295180@uniovi.es])
+- Saúl Martín Fernández (link:mailto:uo294936@uniovi.es[UO294936@uniovi.es])
+| A good and well documented code, as well as following proper design and architectural patterns that ensure an easy code maintainability and extensibility. Also, fulfilling the application requirements and achieving a good usability.
 |===
