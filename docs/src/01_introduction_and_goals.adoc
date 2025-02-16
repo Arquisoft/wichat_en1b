@@ -17,6 +17,8 @@ These include
 ****
 endif::arc42help[]
 
+RTVE has hired the company ChattySw composed of students from the Oviedo School of Software Engineering (EII), to update a game-show like web application that was developed last year by the HappySw company. This application will be called WIChat, where users will be able to register and login to play. The basic game will consist of a game that shows a picture and the users have to guess what it is about. The users will have to answer a list of questions about those pictures from different domains obtaining points for each correct guess. This years update in the game-show will be the posibility of obtaining hints about the picture in  a conversational way from an external LLM. 
+
 === Requirements Overview
 
 ifdef::arc42help[]
@@ -45,6 +47,20 @@ See https://docs.arc42.org/section-1/[Introduction and Goals] in the arc42 docum
 ****
 endif::arc42help[]
 
+* The system must provide non-registered users with the option to sign up.
+* The system must provide registered but not identified users with the option to log in.
+* The system must only be used by registered users.
+* The system will have at least a Web frontend which will show the pictures and answers as well as the hint system where the users can interact with the system to obtain hints about the pictures.
+* The Web application should be deployed and accessible through the web.
+* Users will be able to register to the system and obtain the historical data from their participation: number of games, questions passed and failed and times.
+* Information about the questions will be automatically generated from Wikidata. 
+* It should be possible to interact with the application in each question to obtain hints about the questions. For that, an LLM will be used which will be accessible through an API.
+* It should be possible to use an approach to generate hints from Wikidata that mitigates the generation of incorrect answers or hallucinations. 
+* The questions should be answered before some specific time.
+* Each question should have a correct answer and several incorrect ones or distractors. The right answer and the distractors should be automatically generated.
+* The system will give access to the information about the users through an API which should be documented.
+* The system will give access to information about the generated questions through an API.
+
 === Quality Goals
 
 ifdef::arc42help[]
@@ -68,6 +84,18 @@ If you as an architect do not know how the quality of your work will be judged..
 A table with quality goals and concrete scenarios, ordered by priorities
 ****
 endif::arc42help[]
+[options="header",cols="1,1"]
+|===
+|Goal|Description
+|Functional suitability|The system must fulfill its intended purpose effectively and efficiently, allowing users to register, log in, play the quiz, access their user statistics and get aid from the LLM during the questions.
+|Reliability|The system should be reliable in generating questions from Wikidata, ensuring that questions are accurate and diverse. The LLM implemented in the system must be reliable and well trained to be able to help the users in answering the questions. The system shall handle user registrations, logins, and game data storage without errors.
+|Availability|The system shall be available 99% of the time a user tries to access it.
+|Maitainability|The system shall be designed and implemented in a way that facilitates easy maintenance and updates.
+|Performance efficiency|The system shall deliver optimal performance, ensuring responsive interactions for users. The automatic generation of questions from Wikidata and the LLM responses with a real-time gameplay shall be efficient. The system shall handle 1000 concurrent users.
+|Usability|The system shall provide a user-friendly interface, making it easy for users to register, log in, and play the game. The system learning time for a user should be less than 3 hours.
+|Portability|The system shall be portable to various web browsers and devices, ensuring a seamless experience for users regardless of their platform. It has to be optimized for different screen sizes and functionalities.
+|Security|The system shall prioritize user data security. It must implement robust authentication mechanisms for user registration and login. The API access points for user information and generated questions must be secured with proper authorization.
+|===
 
 === Stakeholders
 
