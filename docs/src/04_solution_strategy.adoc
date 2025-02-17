@@ -31,4 +31,20 @@ Refer to details in the following sections.
 See https://docs.arc42.org/section-4/[Solution Strategy] in the arc42 documentation.
 
 ****
+
+=== Technologies
+
+- **Frontend**
+	- *React* : React will simplify the task build reusable and modular UI elements for our application thanks to its component-based structure. It also allows us to use JSX, which is a syntax extension for JavaScript that allows us to write HTML elements inside our JavaScript code. This will make our code more readable and easier to debug.
+
+- **Backend**
+	- *Express* : Web application framework for Node.js which will simplify development on the server side. There is also available a wide range of third-party middlewares that we could include on our application.
+	- *TypeScript* : Since we will be using JavaScript and are more familiar with statically typed languages we will use TypeScript for the services of our application. This will also reduce the likelihood of some unexpected errors at runtime.
+
+- **Database**
+	- *MongoDB* : No-SQL database based on flexible schemas, native support for JSON and simple query language
+
+- **Deployment**
+	- *Docker*: Handy portability and perfect integration with microservices applications. 
+
 endif::arc42help[]
