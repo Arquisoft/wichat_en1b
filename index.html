@@ -452,7 +452,65 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <li><a href="#_stakeholders">1.3. Stakeholders</a></li>
 </ul>
 </li>
-<li><a href="#section-architecture-constraints">2. Architecture Constraints</a></li>
+<li><a href="#section-architecture-constraints">2. Architecture Constraints</a>
+<ul class="sectlevel2">
+<li><a href="#_technical_constraints">2.1. Technical constraints</a></li>
+<li><a href="#_organizational_constraints">2.2. Organizational constraints</a></li>
+<li><a href="#_political_constraints">2.3. Political constraints</a></li>
+<li><a href="#_conventions">2.4. Conventions</a></li>
+</ul>
+</li>
+<li><a href="#section-context-and-scope">3. Context and Scope</a>
+<ul class="sectlevel2">
+<li><a href="#_business_context">3.1. Business Context</a></li>
+<li><a href="#_technical_context">3.2. Technical Context</a></li>
+<li><a href="#_system_scope">3.3. System Scope</a></li>
+<li><a href="#_team_context">3.4. Team Context</a></li>
+<li><a href="#_summary">3.5. Summary</a></li>
+</ul>
+</li>
+<li><a href="#section-solution-strategy">4. Solution Strategy</a>
+<ul class="sectlevel2">
+<li><a href="#_technologies">4.1. Technologies</a></li>
+</ul>
+</li>
+<li><a href="#section-building-block-view">5. Building Block View</a>
+<ul class="sectlevel2">
+<li><a href="#_whitebox_overall_system">5.1. Whitebox Overall System</a></li>
+<li><a href="#_level_2">5.2. Level 2</a></li>
+<li><a href="#_level_3">5.3. Level 3</a></li>
+</ul>
+</li>
+<li><a href="#section-runtime-view">6. Runtime View</a>
+<ul class="sectlevel2">
+<li><a href="#_runtime_scenario_1">6.1. &lt;Runtime Scenario 1&gt;</a></li>
+<li><a href="#_runtime_scenario_2">6.2. &lt;Runtime Scenario 2&gt;</a></li>
+<li><a href="#">6.3. &#8230;&#8203;</a></li>
+<li><a href="#_runtime_scenario_n">6.4. &lt;Runtime Scenario n&gt;</a></li>
+</ul>
+</li>
+<li><a href="#section-deployment-view">7. Deployment View</a>
+<ul class="sectlevel2">
+<li><a href="#_infrastructure_level_1">7.1. Infrastructure Level 1</a></li>
+<li><a href="#_infrastructure_level_2">7.2. Infrastructure Level 2</a></li>
+</ul>
+</li>
+<li><a href="#section-concepts">8. Cross-cutting Concepts</a>
+<ul class="sectlevel2">
+<li><a href="#_concept_1">8.1. <em>&lt;Concept 1&gt;</em></a></li>
+<li><a href="#_concept_2">8.2. <em>&lt;Concept 2&gt;</em></a></li>
+<li><a href="#_concept_n">8.3. <em>&lt;Concept n&gt;</em></a></li>
+</ul>
+</li>
+<li><a href="#section-design-decisions">9. Architecture Decisions</a></li>
+<li><a href="#section-quality-scenarios">10. Quality Requirements</a>
+<ul class="sectlevel2">
+<li><a href="#_quality_tree">10.1. Quality Tree</a></li>
+<li><a href="#_quality_scenarios">10.2. Quality Scenarios</a></li>
+</ul>
+</li>
+<li><a href="#section-technical-risks">11. Risks and Technical Debts</a></li>
+<li><a href="#section-glossary">12. Glossary</a></li>
 </ul>
 </div>
 </div>
@@ -820,9 +878,10 @@ If needed you can subdivide them into
 technical constraints, organizational and political constraints and
 conventions (e.g. programming or versioning guidelines, documentation or naming conventions)</p>
 </div>
-<div class="paragraph">
-<p>=== Technical constraints</p>
 </div>
+</div>
+<div class="sect2">
+<h3 id="_technical_constraints">2.1. Technical constraints</h3>
 <table class="tableblock frame-all grid-all stretch">
 <colgroup>
 <col style="width: 33.3333%;">
@@ -857,9 +916,9 @@ conventions (e.g. programming or versioning guidelines, documentation or naming 
 </tr>
 </tbody>
 </table>
-<div class="paragraph">
-<p>=== Organizational constraints</p>
 </div>
+<div class="sect2">
+<h3 id="_organizational_constraints">2.2. Organizational constraints</h3>
 <table class="tableblock frame-all grid-all stretch">
 <colgroup>
 <col style="width: 33.3333%;">
@@ -902,9 +961,9 @@ conventions (e.g. programming or versioning guidelines, documentation or naming 
 </tr>
 </tbody>
 </table>
-<div class="paragraph">
-<p>=== Political constraints</p>
 </div>
+<div class="sect2">
+<h3 id="_political_constraints">2.3. Political constraints</h3>
 <table class="tableblock frame-all grid-all stretch">
 <colgroup>
 <col style="width: 33.3333%;">
@@ -931,9 +990,9 @@ conventions (e.g. programming or versioning guidelines, documentation or naming 
 </tr>
 </tbody>
 </table>
-<div class="paragraph">
-<p>=== Conventions</p>
 </div>
+<div class="sect2">
+<h3 id="_conventions">2.4. Conventions</h3>
 <table class="tableblock frame-all grid-all stretch">
 <colgroup>
 <col style="width: 33.3333%;">
@@ -961,15 +1020,17 @@ conventions (e.g. programming or versioning guidelines, documentation or naming 
 </tbody>
 </table>
 <div style="page-break-after: always;"></div>
-<div id="section-context-and-scope" class="paragraph">
-<p>== Context and Scope</p>
 </div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="section-context-and-scope">3. Context and Scope</h2>
+<div class="sectionbody">
 <div class="paragraph">
 <p>This section defines the boundaries of the <strong>WIChat</strong> application, its communication partners, and the technologies used to interact with them. The system is designed to provide an interactive quiz experience, leveraging <strong>Wikidata</strong> for question generation and an <strong>Empathy API</strong> for LLM-based hints.</p>
 </div>
-<div class="paragraph">
-<p>=== Business Context</p>
-</div>
+<div class="sect2">
+<h3 id="_business_context">3.1. Business Context</h3>
 <div class="paragraph">
 <p>The WIChat application interacts with the following communication partners:</p>
 </div>
@@ -1022,12 +1083,12 @@ conventions (e.g. programming or versioning guidelines, documentation or naming 
 </div>
 <div class="imageblock">
 <div class="content">
-<img src="./images/System%20Context%20Diagram.png" alt="System Context Diagram" width="715" height="638">
+<img src="./images/System%20Context%20Diagram.png" alt="System Context Diagram" width="694" height="638">
 </div>
 </div>
-<div class="paragraph">
-<p>=== Technical Context</p>
 </div>
+<div class="sect2">
+<h3 id="_technical_context">3.2. Technical Context</h3>
 <div class="paragraph">
 <p>The technical interfaces and communication channels for the WIChat application are as follows:</p>
 </div>
@@ -1083,7 +1144,7 @@ conventions (e.g. programming or versioning guidelines, documentation or naming 
 </div>
 <div class="imageblock">
 <div class="content">
-<img src="./images/Deployment%20Diagram.png" alt="Deployment Diagram" width="689" height="638">
+<img src="./images/Deployment%20Diagram.png" alt="Deployment Diagram" width="701" height="638">
 </div>
 </div>
 <div class="paragraph">
@@ -1102,9 +1163,9 @@ conventions (e.g. programming or versioning guidelines, documentation or naming 
 </li>
 </ul>
 </div>
-<div class="paragraph">
-<p>=== System Scope</p>
 </div>
+<div class="sect2">
+<h3 id="_system_scope">3.3. System Scope</h3>
 <div class="paragraph">
 <p>The WIChat application includes the following components:</p>
 </div>
@@ -1147,9 +1208,9 @@ conventions (e.g. programming or versioning guidelines, documentation or naming 
 </li>
 </ul>
 </div>
-<div class="paragraph">
-<p>=== Team Context</p>
 </div>
+<div class="sect2">
+<h3 id="_team_context">3.4. Team Context</h3>
 <div class="paragraph">
 <p>The project is being developed by a team of 5 students with the following responsibilities:</p>
 </div>
@@ -1172,19 +1233,22 @@ conventions (e.g. programming or versioning guidelines, documentation or naming 
 </li>
 </ol>
 </div>
-<div class="paragraph">
-<p>=== Summary</p>
 </div>
+<div class="sect2">
+<h3 id="_summary">3.5. Summary</h3>
 <div class="paragraph">
 <p>The WIChat application is a web-based quiz system that integrates with <strong>Wikidata</strong> for question generation and <strong>Empathy API</strong> for hint generation. The system is built using modern web technologies (React, NodeJS, MongoDB) and follows the <strong>Arc42</strong> template for documentation.
 Our team is responsible for all aspects of development, testing, and deployment.</p>
 </div>
 <div style="page-break-after: always;"></div>
-<div id="section-solution-strategy" class="paragraph">
-<p>== Solution Strategy</p>
 </div>
 </div>
 </div>
+<div class="sect1">
+<h2 id="section-solution-strategy">4. Solution Strategy</h2>
+<div class="sectionbody">
+<div class="sidebarblock arc42help">
+<div class="content">
 <div class="paragraph">
 <div class="title">Contents</div>
 <p>A short summary and explanation of the fundamental decisions and solution strategies, that shape system architecture. It includes</p>
@@ -1222,14 +1286,50 @@ Refer to details in the following sections.</p>
 <div class="title">Further Information</div>
 <p>See <a href="https://docs.arc42.org/section-4/">Solution Strategy</a> in the arc42 documentation.</p>
 </div>
-<div class="sidebarblock">
-<div class="content">
+</div>
+</div>
+<div class="sect2">
+<h3 id="_technologies">4.1. Technologies</h3>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Frontend</strong></p>
+</li>
+<li>
+<p><strong>React</strong> : React will simplify the task build reusable and modular UI elements for our application thanks to its component-based structure. It also allows us to use JSX, which is a syntax extension for JavaScript that allows us to write HTML elements inside our JavaScript code. This will make our code more readable and easier to debug.</p>
+</li>
+<li>
+<p><strong>Backend</strong></p>
+</li>
+<li>
+<p><strong>Express</strong> : Web application framework for Node.js which will simplify development on the server side. There is also available a wide range of third-party middlewares that we could include on our application.</p>
+</li>
+<li>
+<p><strong>TypeScript</strong> : Since we will be using JavaScript and are more familiar with statically typed languages we will use TypeScript for the services of our application. This will also reduce the likelihood of some unexpected errors at runtime.</p>
+</li>
+<li>
+<p><strong>Database</strong></p>
+</li>
+<li>
+<p><strong>MongoDB</strong> : No-SQL database based on flexible schemas, native support for JSON and simple query language</p>
+</li>
+<li>
+<p><strong>Deployment</strong></p>
+</li>
+<li>
+<p><strong>Docker</strong>: Handy portability and perfect integration with microservices applications.</p>
+</li>
+</ul>
+</div>
 <div style="page-break-after: always;"></div>
-<div id="section-building-block-view" class="paragraph">
-<p>== Building Block View</p>
 </div>
 </div>
 </div>
+<div class="sect1">
+<h2 id="section-building-block-view">5. Building Block View</h2>
+<div class="sectionbody">
+<div class="sidebarblock arc42help">
+<div class="content">
 <div class="paragraph">
 <div class="title">Content</div>
 <p>The building block view shows the static decomposition of the system into building blocks (modules, components, subsystems, classes, interfaces, packages, libraries, frameworks, layers, partitions, tiers, functions, macros, operations, data structures, &#8230;&#8203;) as well as their dependencies (relationships, associations, &#8230;&#8203;)</p>
@@ -1271,13 +1371,12 @@ Thus it contains the white box description of selected building blocks of level 
 <div class="title">Further Information</div>
 <p>See <a href="https://docs.arc42.org/section-5/">Building Block View</a> in the arc42 documentation.</p>
 </div>
-<div class="sidebarblock">
+</div>
+</div>
+<div class="sect2">
+<h3 id="_whitebox_overall_system">5.1. Whitebox Overall System</h3>
+<div class="sidebarblock arc42help">
 <div class="content">
-<div class="paragraph">
-<p>=== Whitebox Overall System</p>
-</div>
-</div>
-</div>
 <div class="paragraph">
 <p>Here you describe the decomposition of the overall system using the following white box template. It contains</p>
 </div>
@@ -1312,8 +1411,8 @@ In the best case you will get away with examples or simple signatures.</p>
 </li>
 </ul>
 </div>
-<div class="sidebarblock">
-<div class="content">
+</div>
+</div>
 <div class="paragraph">
 <p><em><strong>&lt;Overview Diagram&gt;</strong></em></p>
 </div>
@@ -1333,8 +1432,8 @@ In the best case you will get away with examples or simple signatures.</p>
 </dd>
 </dl>
 </div>
-</div>
-</div>
+<div class="sidebarblock arc42help">
+<div class="content">
 <div class="paragraph">
 <p>Insert your explanations of black boxes from level 1:</p>
 </div>
@@ -1368,13 +1467,12 @@ responsibility according to the following schema:</p>
 <p>If you use a list of black box descriptions then you fill in a separate black box template for every important building block .
 Its headline is the name of the black box.</p>
 </div>
-<div class="sidebarblock">
+</div>
+</div>
+<div class="sect3">
+<h4 id="_name_black_box_1">5.1.1. &lt;Name black box 1&gt;</h4>
+<div class="sidebarblock arc42help">
 <div class="content">
-<div class="paragraph">
-<p>==== &lt;Name black box 1&gt;</p>
-</div>
-</div>
-</div>
 <div class="paragraph">
 <p>Here you describe &lt;black box 1&gt;
 according the the following black box template:</p>
@@ -1401,8 +1499,8 @@ according the the following black box template:</p>
 </li>
 </ul>
 </div>
-<div class="sidebarblock">
-<div class="content">
+</div>
+</div>
 <div class="paragraph">
 <p><em>&lt;Purpose/Responsibility&gt;</em></p>
 </div>
@@ -1421,32 +1519,34 @@ according the the following black box template:</p>
 <div class="paragraph">
 <p><em>&lt;(optional) Open Issues/Problems/Risks&gt;</em></p>
 </div>
-<div class="paragraph">
-<p>==== &lt;Name black box 2&gt;</p>
 </div>
-<div class="paragraph">
-<p><em>&lt;black box template&gt;</em></p>
-</div>
-<div class="paragraph">
-<p>==== &lt;Name black box n&gt;</p>
-</div>
+<div class="sect3">
+<h4 id="_name_black_box_2">5.1.2. &lt;Name black box 2&gt;</h4>
 <div class="paragraph">
 <p><em>&lt;black box template&gt;</em></p>
 </div>
-<div class="paragraph">
-<p>==== &lt;Name interface 1&gt;</p>
 </div>
+<div class="sect3">
+<h4 id="_name_black_box_n">5.1.3. &lt;Name black box n&gt;</h4>
+<div class="paragraph">
+<p><em>&lt;black box template&gt;</em></p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_name_interface_1">5.1.4. &lt;Name interface 1&gt;</h4>
 <div class="paragraph">
 <p>&#8230;&#8203;</p>
 </div>
-<div class="paragraph">
-<p>==== &lt;Name interface m&gt;</p>
 </div>
-<div class="paragraph">
-<p>=== Level 2</p>
-</div>
+<div class="sect3">
+<h4 id="_name_interface_m">5.1.5. &lt;Name interface m&gt;</h4>
+
 </div>
 </div>
+<div class="sect2">
+<h3 id="_level_2">5.2. Level 2</h3>
+<div class="sidebarblock arc42help">
+<div class="content">
 <div class="paragraph">
 <p>Here you can specify the inner structure of (some) building blocks from level 1 as white boxes.</p>
 </div>
@@ -1455,41 +1555,41 @@ according the the following black box template:</p>
 Please prefer relevance over completeness. Specify important, surprising, risky, complex or volatile building blocks.
 Leave out normal, simple, boring or standardized parts of your system</p>
 </div>
-<div class="sidebarblock">
+</div>
+</div>
+<div class="sect3">
+<h4 id="_white_box_building_block_1">5.2.1. White Box <em>&lt;building block 1&gt;</em></h4>
+<div class="sidebarblock arc42help">
 <div class="content">
-<div class="paragraph">
-<p>==== White Box <em>&lt;building block 1&gt;</em></p>
-</div>
-</div>
-</div>
 <div class="paragraph">
 <p>&#8230;&#8203;describes the internal structure of <em>building block 1</em>.</p>
 </div>
-<div class="sidebarblock">
-<div class="content">
+</div>
+</div>
 <div class="paragraph">
 <p><em>&lt;white box template&gt;</em></p>
 </div>
-<div class="paragraph">
-<p>==== White Box <em>&lt;building block 2&gt;</em></p>
 </div>
+<div class="sect3">
+<h4 id="_white_box_building_block_2">5.2.2. White Box <em>&lt;building block 2&gt;</em></h4>
 <div class="paragraph">
 <p><em>&lt;white box template&gt;</em></p>
 </div>
 <div class="paragraph">
 <p>&#8230;&#8203;</p>
 </div>
-<div class="paragraph">
-<p>==== White Box <em>&lt;building block m&gt;</em></p>
 </div>
+<div class="sect3">
+<h4 id="_white_box_building_block_m">5.2.3. White Box <em>&lt;building block m&gt;</em></h4>
 <div class="paragraph">
 <p><em>&lt;white box template&gt;</em></p>
 </div>
-<div class="paragraph">
-<p>=== Level 3</p>
 </div>
 </div>
-</div>
+<div class="sect2">
+<h3 id="_level_3">5.3. Level 3</h3>
+<div class="sidebarblock arc42help">
+<div class="content">
 <div class="paragraph">
 <p>Here you can specify the inner structure of (some) building blocks from level 2 as white boxes.</p>
 </div>
@@ -1497,39 +1597,42 @@ Leave out normal, simple, boring or standardized parts of your system</p>
 <p>When you need more detailed levels of your architecture please copy this
 part of arc42 for additional levels.</p>
 </div>
-<div class="sidebarblock">
+</div>
+</div>
+<div class="sect3">
+<h4 id="_white_box_building_block_x_1">5.3.1. White Box &lt;_building block x.1_&gt;</h4>
+<div class="sidebarblock arc42help">
 <div class="content">
-<div class="paragraph">
-<p>==== White Box &lt;_building block x.1_&gt;</p>
-</div>
-</div>
-</div>
 <div class="paragraph">
 <p>Specifies the internal structure of <em>building block x.1</em>.</p>
 </div>
-<div class="sidebarblock">
-<div class="content">
-<div class="paragraph">
-<p><em>&lt;white box template&gt;</em></p>
 </div>
-<div class="paragraph">
-<p>==== White Box &lt;_building block x.2_&gt;</p>
 </div>
 <div class="paragraph">
 <p><em>&lt;white box template&gt;</em></p>
 </div>
-<div class="paragraph">
-<p>==== White Box &lt;_building block y.1_&gt;</p>
 </div>
+<div class="sect3">
+<h4 id="_white_box_building_block_x_2">5.3.2. White Box &lt;_building block x.2_&gt;</h4>
+<div class="paragraph">
+<p><em>&lt;white box template&gt;</em></p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_white_box_building_block_y_1">5.3.3. White Box &lt;_building block y.1_&gt;</h4>
 <div class="paragraph">
 <p><em>&lt;white box template&gt;</em></p>
 </div>
 <div style="page-break-after: always;"></div>
-<div id="section-runtime-view" class="paragraph">
-<p>== Runtime View</p>
 </div>
 </div>
 </div>
+</div>
+<div class="sect1">
+<h2 id="section-runtime-view">6. Runtime View</h2>
+<div class="sectionbody">
+<div class="sidebarblock arc42help">
+<div class="content">
 <div class="paragraph">
 <div class="title">Contents</div>
 <p>The runtime view describes concrete behavior and interactions of the system’s building blocks in form of scenarios from the following areas:</p>
@@ -1588,11 +1691,10 @@ You will mainly capture scenarios in your documentation to communicate your arch
 <div class="title">Further Information</div>
 <p>See <a href="https://docs.arc42.org/section-6/">Runtime View</a> in the arc42 documentation.</p>
 </div>
-<div class="sidebarblock">
-<div class="content">
-<div class="paragraph">
-<p>=== &lt;Runtime Scenario 1&gt;</p>
 </div>
+</div>
+<div class="sect2">
+<h3 id="_runtime_scenario_1">6.1. &lt;Runtime Scenario 1&gt;</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -1612,21 +1714,26 @@ building block instances depicted in this diagram.&gt;</em></p>
 <img src="./images/Sequence%20diagram.png" alt="Sequence diagram" width="332" height="335">
 </div>
 </div>
-<div class="paragraph">
-<p>=== &lt;Runtime Scenario 2&gt;</p>
 </div>
-<div class="paragraph">
-<p>=== &#8230;&#8203;</p>
+<div class="sect2">
+<h3 id="_runtime_scenario_2">6.2. &lt;Runtime Scenario 2&gt;</h3>
+
 </div>
-<div class="paragraph">
-<p>=== &lt;Runtime Scenario n&gt;</p>
+<div class="sect2">
+<h3 id="">6.3. &#8230;&#8203;</h3>
+
 </div>
+<div class="sect2">
+<h3 id="_runtime_scenario_n">6.4. &lt;Runtime Scenario n&gt;</h3>
 <div style="page-break-after: always;"></div>
-<div id="section-deployment-view" class="paragraph">
-<p>== Deployment View</p>
 </div>
 </div>
 </div>
+<div class="sect1">
+<h2 id="section-deployment-view">7. Deployment View</h2>
+<div class="sectionbody">
+<div class="sidebarblock arc42help">
+<div class="content">
 <div class="paragraph">
 <div class="title">Content</div>
 <p>The deployment view describes:</p>
@@ -1677,13 +1784,12 @@ when your infrastructure is more complex.</p>
 <div class="title">Further Information</div>
 <p>See <a href="https://docs.arc42.org/section-7/">Deployment View</a> in the arc42 documentation.</p>
 </div>
-<div class="sidebarblock">
+</div>
+</div>
+<div class="sect2">
+<h3 id="_infrastructure_level_1">7.1. Infrastructure Level 1</h3>
+<div class="sidebarblock arc42help">
 <div class="content">
-<div class="paragraph">
-<p>=== Infrastructure Level 1</p>
-</div>
-</div>
-</div>
 <div class="paragraph">
 <p>Describe (usually in a combination of diagrams, tables, and text):</p>
 </div>
@@ -1706,8 +1812,8 @@ when your infrastructure is more complex.</p>
 <div class="paragraph">
 <p>For multiple environments or alternative deployments please copy and adapt this section of arc42 for all relevant environments.</p>
 </div>
-<div class="sidebarblock">
-<div class="content">
+</div>
+</div>
 <div class="paragraph">
 <p><em><strong>&lt;Overview Diagram&gt;</strong></em></p>
 </div>
@@ -1727,46 +1833,49 @@ when your infrastructure is more complex.</p>
 </dd>
 </dl>
 </div>
-<div class="paragraph">
-<p>=== Infrastructure Level 2</p>
 </div>
-</div>
-</div>
+<div class="sect2">
+<h3 id="_infrastructure_level_2">7.2. Infrastructure Level 2</h3>
+<div class="sidebarblock arc42help">
+<div class="content">
 <div class="paragraph">
 <p>Here you can include the internal structure of (some) infrastructure elements from level 1.</p>
 </div>
 <div class="paragraph">
 <p>Please copy the structure from level 1 for each selected element.</p>
 </div>
-<div class="sidebarblock">
-<div class="content">
-<div class="paragraph">
-<p>==== <em>&lt;Infrastructure Element 1&gt;</em></p>
 </div>
+</div>
+<div class="sect3">
+<h4 id="_infrastructure_element_1">7.2.1. <em>&lt;Infrastructure Element 1&gt;</em></h4>
 <div class="paragraph">
 <p><em>&lt;diagram + explanation&gt;</em></p>
 </div>
-<div class="paragraph">
-<p>==== <em>&lt;Infrastructure Element 2&gt;</em></p>
 </div>
+<div class="sect3">
+<h4 id="_infrastructure_element_2">7.2.2. <em>&lt;Infrastructure Element 2&gt;</em></h4>
 <div class="paragraph">
 <p><em>&lt;diagram + explanation&gt;</em></p>
 </div>
 <div class="paragraph">
 <p>&#8230;&#8203;</p>
 </div>
-<div class="paragraph">
-<p>==== <em>&lt;Infrastructure Element n&gt;</em></p>
 </div>
+<div class="sect3">
+<h4 id="_infrastructure_element_n">7.2.3. <em>&lt;Infrastructure Element n&gt;</em></h4>
 <div class="paragraph">
 <p><em>&lt;diagram + explanation&gt;</em></p>
 </div>
 <div style="page-break-after: always;"></div>
-<div id="section-concepts" class="paragraph">
-<p>== Cross-cutting Concepts</p>
 </div>
 </div>
 </div>
+</div>
+<div class="sect1">
+<h2 id="section-concepts">8. Cross-cutting Concepts</h2>
+<div class="sectionbody">
+<div class="sidebarblock arc42help">
+<div class="content">
 <div class="paragraph">
 <div class="title">Content</div>
 <p>This section describes overall, principal regulations and solution ideas that are relevant in multiple parts (= cross-cutting) of your system.
@@ -1862,35 +1971,37 @@ on this list.</p>
 <div class="title">Further Information</div>
 <p>See <a href="https://docs.arc42.org/section-8/">Concepts</a> in the arc42 documentation.</p>
 </div>
-<div class="sidebarblock">
-<div class="content">
-<div class="paragraph">
-<p>=== <em>&lt;Concept 1&gt;</em></p>
 </div>
+</div>
+<div class="sect2">
+<h3 id="_concept_1">8.1. <em>&lt;Concept 1&gt;</em></h3>
 <div class="paragraph">
 <p><em>&lt;explanation&gt;</em></p>
 </div>
-<div class="paragraph">
-<p>=== <em>&lt;Concept 2&gt;</em></p>
 </div>
+<div class="sect2">
+<h3 id="_concept_2">8.2. <em>&lt;Concept 2&gt;</em></h3>
 <div class="paragraph">
 <p><em>&lt;explanation&gt;</em></p>
 </div>
 <div class="paragraph">
 <p>&#8230;&#8203;</p>
 </div>
-<div class="paragraph">
-<p>=== <em>&lt;Concept n&gt;</em></p>
 </div>
+<div class="sect2">
+<h3 id="_concept_n">8.3. <em>&lt;Concept n&gt;</em></h3>
 <div class="paragraph">
 <p><em>&lt;explanation&gt;</em></p>
 </div>
 <div style="page-break-after: always;"></div>
-<div id="section-design-decisions" class="paragraph">
-<p>== Architecture Decisions</p>
 </div>
 </div>
 </div>
+<div class="sect1">
+<h2 id="section-design-decisions">9. Architecture Decisions</h2>
+<div class="sectionbody">
+<div class="sidebarblock arc42help">
+<div class="content">
 <div class="paragraph">
 <div class="title">Contents</div>
 <p>Important, expensive, large scale or risky architecture decisions including rationales.
@@ -1931,14 +2042,16 @@ Refer to section 4, where you already captured the most important decisions of y
 <p>See <a href="https://docs.arc42.org/section-9/">Architecture Decisions</a> in the arc42 documentation.
 There you will find links and examples about ADR.</p>
 </div>
-<div class="sidebarblock">
-<div class="content">
+</div>
+</div>
 <div style="page-break-after: always;"></div>
-<div id="section-quality-scenarios" class="paragraph">
-<p>== Quality Requirements</p>
 </div>
 </div>
-</div>
+<div class="sect1">
+<h2 id="section-quality-scenarios">10. Quality Requirements</h2>
+<div class="sectionbody">
+<div class="sidebarblock arc42help">
+<div class="content">
 <div class="paragraph">
 <div class="title">Content</div>
 <p>This section contains all quality requirements as quality tree with scenarios. The most important ones have already been described in section 1.2. (quality goals)</p>
@@ -1957,13 +2070,12 @@ concrete and measurable.</p>
 <div class="title">Further Information</div>
 <p>See <a href="https://docs.arc42.org/section-10/">Quality Requirements</a> in the arc42 documentation.</p>
 </div>
-<div class="sidebarblock">
+</div>
+</div>
+<div class="sect2">
+<h3 id="_quality_tree">10.1. Quality Tree</h3>
+<div class="sidebarblock arc42help">
 <div class="content">
-<div class="paragraph">
-<p>=== Quality Tree</p>
-</div>
-</div>
-</div>
 <div class="paragraph">
 <div class="title">Content</div>
 <p>The quality tree (as defined in ATAM – Architecture Tradeoff Analysis Method) with quality/evaluation scenarios as leafs.</p>
@@ -1989,13 +2101,13 @@ concrete and measurable.</p>
 <div class="paragraph">
 <p>In any case the tree should include links to the scenarios of the following section.</p>
 </div>
-<div class="sidebarblock">
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_quality_scenarios">10.2. Quality Scenarios</h3>
+<div class="sidebarblock arc42help">
 <div class="content">
-<div class="paragraph">
-<p>=== Quality Scenarios</p>
-</div>
-</div>
-</div>
 <div class="paragraph">
 <div class="title">Contents</div>
 <p>Concretization of (sometimes vague or implicit) quality requirements using (quality) scenarios.</p>
@@ -2030,14 +2142,17 @@ more precisely down to a level of scenarios that can be discussed and evaluated.
 <div class="title">Form</div>
 <p>Tabular or free form text.</p>
 </div>
-<div class="sidebarblock">
-<div class="content">
+</div>
+</div>
 <div style="page-break-after: always;"></div>
-<div id="section-technical-risks" class="paragraph">
-<p>== Risks and Technical Debts</p>
 </div>
 </div>
 </div>
+<div class="sect1">
+<h2 id="section-technical-risks">11. Risks and Technical Debts</h2>
+<div class="sectionbody">
+<div class="sidebarblock arc42help">
+<div class="content">
 <div class="paragraph">
 <div class="title">Contents</div>
 <p>A list of identified technical risks or technical debts, ordered by priority</p>
@@ -2057,14 +2172,16 @@ more precisely down to a level of scenarios that can be discussed and evaluated.
 <div class="title">Further Information</div>
 <p>See <a href="https://docs.arc42.org/section-11/">Risks and Technical Debt</a> in the arc42 documentation.</p>
 </div>
-<div class="sidebarblock">
-<div class="content">
+</div>
+</div>
 <div style="page-break-after: always;"></div>
-<div id="section-glossary" class="paragraph">
-<p>== Glossary</p>
 </div>
 </div>
-</div>
+<div class="sect1">
+<h2 id="section-glossary">12. Glossary</h2>
+<div class="sectionbody">
+<div class="sidebarblock arc42help">
+<div class="content">
 <div class="paragraph">
 <div class="title">Contents</div>
 <p>The most important domain and technical terms that your stakeholders use when discussing the system.</p>
@@ -2097,8 +2214,8 @@ more precisely down to a level of scenarios that can be discussed and evaluated.
 <div class="title">Further Information</div>
 <p>See <a href="https://docs.arc42.org/section-12/">Glossary</a> in the arc42 documentation.</p>
 </div>
-<div class="sidebarblock">
-<div class="content">
+</div>
+</div>
 <table class="tableblock frame-all grid-all stretch">
 <colgroup>
 <col style="width: 33.3333%;">
@@ -2121,8 +2238,6 @@ more precisely down to a level of scenarios that can be discussed and evaluated.
 </tr>
 </tbody>
 </table>
-</div>
-</div>
 </div>
 </div>
 </div>
