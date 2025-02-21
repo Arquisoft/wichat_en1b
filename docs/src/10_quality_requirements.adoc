@@ -3,113 +3,96 @@ ifndef::imagesdir[:imagesdir: ../images]
 [[section-quality-scenarios]]
 == Quality Requirements
 
-This section defines the quality requirements for the **WIChat** application, structured as a **Quality Tree** and detailed with **Quality Scenarios**. 
-These requirements directly align with the prioritized quality goals from section 1.2.
-
 === Quality Tree
 
-[plantuml,"Quality Tree",png]
-----
-@startuml
+[plantuml, quality-tree, png]
 left to right direction
+skinparam nodesep 10
+skinparam ranksep 50
 
-rectangle "Quality" {
-  rectangle "1. Functional Suitability" as func
-  rectangle "2. Reliability" as rel
-  rectangle "3. Availability" as avail
-  rectangle "4. Maintainability" as maint
-  rectangle "5. Performance Efficiency" as perf
-  rectangle "6. Usability" as usa
-  rectangle "7. Portability" as port
-  rectangle "8. Security" as sec
+rectangle "Quality" as root {
+  rectangle "1. Functional Suitability" as q1
+  rectangle "2. Reliability" as q2
+  rectangle "3. Performance Efficiency" as q3
+  rectangle "Secondary Qualities" as secondary {
+    rectangle "4. Maintainability" as q4
+    rectangle "5. Usability" as q5
+    rectangle "6. Portability" as q6
+    rectangle "7. Security" as q7
+  }
 }
 
-func --> rel
-rel --> avail
-avail --> maint
-maint --> perf
-perf --> usa
-usa --> port
-port --> sec
-@enduml
-----
-//#caption: Quality Tree Prioritized by Stakeholder Goals
+q1 --> q2
+q1 --> q3
+root --> secondary
 
 === Quality Scenarios
 
-[cols="1,2,2,2", options="header"]
+[cols="1,3,2", options="header"]
 |===
-| Scenario ID | Stimulus | System Response | Metric
-| **Functional Suitability** 
-| FS-1 | User interacts with core features (register, login, play quiz, access stats) | System enables all functionalities without errors | 100% feature coverage
-| FS-2 | User requests an LLM hint | System provides contextually relevant hints | Hint relevance ≥ 90% (user-rated)
+| ID | Scenario | Test Criteria
 
-| **Reliability**
-| RL-1 | System generates questions from Wikidata | Questions are accurate and diverse | Error rate ≤ 1% (invalid questions)
-| RL-2 | User registers/logs in | Data is stored without corruption | Data integrity = 100%
-| RL-3 | LLM processes hint request | Output avoids hallucinations | Hallucination rate ≤ 5%
+| FS-1
+| Stimulus: User requests a hint during a quiz question
+|Response: System provides a relevant hint from the LLM within 3 seconds
+|Measurement: 95% of hints are factually correct and derived from Wikidata
 
-| **Availability**
-| AV-1 | User accesses the system | System is operational | Uptime ≥ 99%
+| FS-2
+| Stimulus: User registers and logs into the system
+|Response: User data is saved and accessible across sessions
+|Measurement: MongoDB confirms 100% successful user data persistence
 
-| **Maintainability**
-| MN-1 | Developer updates question-generation logic | Changes deployed within 2 hours | Mean time to update (MTTU) ≤ 2h
+| REL-1
+| Stimulus: System generates a quiz question from Wikidata
+|Response: Question includes one correct answer and three plausible distractors
+|Measurement: SPARQL query validation ensures answer accuracy
 
-| **Performance Efficiency**
-| PE-1 | 1000 users play concurrently | System responds within 2 seconds | Response time ≤ 2s at 1000 users
-| PE-2 | Wikidata generates questions | Questions load in ≤ 1.5s | Generation time ≤ 1.5s
+| REL-2
+| Stimulus: LLM processes a hint request
+|Response: No hallucinations or incorrect information in 90% of responses
+|Measurement: Manual validation of 50 random hints against Wikidata facts
 
-| **Usability**
-| US-1 | New user starts gameplay | User learns core features in <3 hours | Learning time <3h (user-reported)
-| US-2 | User navigates interface | Intuitive UI/UX with minimal clicks | Task success rate ≥ 95%
+| PE-1
+| Stimulus: 100 concurrent users play the quiz simultaneously
+|Response: Average API response time remains under 1.5 seconds
+|Measurement: Load testing with Locust.io simulating peak traffic
 
-| **Portability**
-| PT-1 | User accesses via Chrome/Firefox/Safari | Consistent experience across browsers | Compatibility = 100%
-| PT-2 | User plays on mobile/desktop | Responsive design adapts to screen size | Mobile usability score ≥ 90/100
+| PE-2
+| Stimulus: System queries Wikidata for question generation
+|Response: Question generation completes in under 2 seconds
+|Measurement: Cached queries and response time metrics
 
-| **Security**
-| SC-1 | User registers/logs in | Authentication succeeds with encryption | 100% HTTPS compliance
-| SC-2 | API requests user/question data | Authorization tokens validated | Unauthorized access rate = 0%
+| MNT-1
+| Stimulus: A new question category is added to the system
+|Response: Implementation is completed within 2 hours by any team member
+|Measurement: Modular code structure with clear documentation
+
+| USAB-1
+| Stimulus: A first-time user starts the game
+|Response: User successfully completes a quiz within 5 minutes
+|Measurement: User testing with 5 novice participants
+
+| SEC-1
+| Stimulus: Brute-force login attempt detected
+|Response: Account is locked after 5 failed attempts
+|Measurement: Penetration testing with OWASP ZAP confirms security
 |===
 
-=== Explanation of Key Quality Attributes
+==== Key Constraints & Rationale
 
-==== 1. Functional Suitability
-- **Core Features**: Registration, login, quiz gameplay, user stats, and LLM hints must work flawlessly.
-- **LLM Integration**: Hints must align with Wikidata-generated questions to avoid misleading users.
+    Academic Focus: Prioritized scenarios that align with course objectives, such as API integration, modularity, and testing.
 
-==== 2. Reliability
-- **Wikidata Accuracy**: Automated validation checks ensure questions meet accuracy thresholds.
-- **LLM Training**: Fine-tuning with Wikidata context reduces hallucination risks.
+    Resource Limits: Assumes free-tier cloud hosting (e.g., Heroku Student) and limited LLM API quotas.
 
-==== 3. Availability
-- **Uptime**: Achieved via load balancing (e.g., cloud hosting) and redundant backups.
+    Team Skills: Chose React, Node.js, and MongoDB for alignment with the team’s curriculum and skill set.
 
-==== 4. Maintainability
-- **Modular Design**: Decoupled frontend/backend and clear API contracts enable rapid updates.
-- **Documentation**: ADRs (Architecture Decision Records) and Arc42 templates ensure knowledge retention.
+    Timebox: Scenarios are achievable within a 12-week academic timeline with 5 developers.
 
-==== 5. Performance Efficiency
-- **Concurrency**: Horizontal scaling (NodeJS clusters) and MongoDB optimizations (indexing) handle 1000+ users.
-- **Caching**: Frequently used Wikidata queries cached to reduce latency.
-
-==== 6. Usability
-- **Onboarding**: Interactive tutorials and tooltips reduce learning time.
-- **UI Consistency**: React component library ensures uniform design.
-
-==== 7. Portability
-- **Responsive Design**: Bootstrap/CSS Grid adapts layouts to devices.
-- **Cross-Browser Testing**: Automated tools (e.g., Selenium) validate compatibility.
-
-==== 8. Security
-- **Authentication**: JWT tokens with OAuth2 for user sessions.
-- **API Security**: Rate-limiting and role-based access control (RBAC) for endpoints.
-
-=== Trade-offs
-- **Empathy API vs. Gemini**: Simpler integration (Empathy) prioritized over advanced NLP capabilities.
-- **MongoDB Flexibility vs. ACID Compliance**: Schema flexibility chosen over transactional rigor for MVP speed.
-
-=== Summary
-These quality requirements ensure WIChat meets stakeholder priorities: 
-**functional completeness**, **reliable question/hint generation**, **high availability**, and **secure user interactions**. 
-Metrics are designed to be measurable, enabling objective validation during testing.
+==== Trade-off Decisions
+[cols="1,3,1"]
+|===
+| Factor | Decision | Impact
+| LLM Accuracy vs Cost | Use Empathy API for basic hints | May require manual validation to ensure accuracy
+| Fresh Data vs Performance | Cache Wikidata queries for 1 hour | Accept stale data during gameplay to improve performance
+| Security vs Complexity | Implement JWT authentication without OAuth | Reduced implementation time but lower security
+|===
