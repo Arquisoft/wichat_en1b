@@ -483,10 +483,10 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 </li>
 <li><a href="#section-runtime-view">6. Runtime View</a>
 <ul class="sectlevel2">
-<li><a href="#_runtime_scenario_1">6.1. &lt;Runtime Scenario 1&gt;</a></li>
-<li><a href="#_runtime_scenario_2">6.2. &lt;Runtime Scenario 2&gt;</a></li>
-<li><a href="#">6.3. &#8230;&#8203;</a></li>
-<li><a href="#_runtime_scenario_n">6.4. &lt;Runtime Scenario n&gt;</a></li>
+<li><a href="#_user_authentication_flow">6.1. User Authentication Flow</a></li>
+<li><a href="#_quiz_question_retrieval_flow">6.2. Quiz Question Retrieval Flow</a></li>
+<li><a href="#_llm_chat_interaction_flow">6.3. LLM Chat Interaction Flow</a></li>
+<li><a href="#_error_handling_scenario">6.4. Error Handling Scenario</a></li>
 </ul>
 </li>
 <li><a href="#section-deployment-view">7. Deployment View</a>
@@ -497,9 +497,12 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 </li>
 <li><a href="#section-concepts">8. Cross-cutting Concepts</a>
 <ul class="sectlevel2">
-<li><a href="#_concept_1">8.1. <em>&lt;Concept 1&gt;</em></a></li>
-<li><a href="#_concept_2">8.2. <em>&lt;Concept 2&gt;</em></a></li>
-<li><a href="#_concept_n">8.3. <em>&lt;Concept n&gt;</em></a></li>
+<li><a href="#_architecture_and_design_patterns">8.1. Architecture and design patterns:</a></li>
+<li><a href="#_safety_and_security_concepts">8.2. Safety and Security concepts:</a></li>
+<li><a href="#_development_concepts">8.3. Development concepts:</a></li>
+<li><a href="#_user_experience">8.4. User Experience:</a></li>
+<li><a href="#_robustness">8.5. Robustness:</a></li>
+<li><a href="#_under_the_hood">8.6. Under-the-hood:</a></li>
 </ul>
 </li>
 <li><a href="#section-design-decisions">9. Architecture Decisions</a>
@@ -1092,7 +1095,7 @@ conventions (e.g. programming or versioning guidelines, documentation or naming 
 </div>
 <div class="imageblock">
 <div class="content">
-<img src="./images/System%20Context%20Diagram.png" alt="System Context Diagram" width="1013" height="593">
+<img src="./images/System%20Context%20Diagram.png" alt="System Context Diagram" width="487" height="538">
 </div>
 </div>
 </div>
@@ -1153,7 +1156,7 @@ conventions (e.g. programming or versioning guidelines, documentation or naming 
 </div>
 <div class="imageblock">
 <div class="content">
-<img src="./images/Deployment%20Diagram.png" alt="Deployment Diagram" width="1035" height="593">
+<img src="./images/Deployment%20Diagram.png" alt="Deployment Diagram" width="688" height="436">
 </div>
 </div>
 <div class="paragraph">
@@ -1302,28 +1305,13 @@ Refer to details in the following sections.</p>
 <div class="ulist">
 <ul>
 <li>
-<p><strong>Frontend</strong></p>
-</li>
-<li>
-<p><strong>React</strong> : React will simplify the task build reusable and modular UI elements for our application thanks to its component-based structure. It also allows us to use JSX, which is a syntax extension for JavaScript that allows us to write HTML elements inside our JavaScript code. This will make our code more readable and easier to debug.</p>
-</li>
-<li>
-<p><strong>Backend</strong></p>
+<p><strong>React</strong> : React will simplify the task build reusable and modular UI elements for our application thanks to its component-based structure. It also allows us to use JSX, which is a syntax extension for JavaScript that allows us to write HTML elements inside our JavaScript code.</p>
 </li>
 <li>
 <p><strong>Express</strong> : Web application framework for Node.js which will simplify development on the server side. There is also available a wide range of third-party middlewares that we could include on our application.</p>
 </li>
 <li>
-<p><strong>TypeScript</strong> : Since we will be using JavaScript and are more familiar with statically typed languages we will use TypeScript for the services of our application. This will also reduce the likelihood of some unexpected errors at runtime.</p>
-</li>
-<li>
-<p><strong>Database</strong></p>
-</li>
-<li>
 <p><strong>MongoDB</strong> : No-SQL database based on flexible schemas, native support for JSON and simple query language</p>
-</li>
-<li>
-<p><strong>Deployment</strong></p>
 </li>
 <li>
 <p><strong>Docker</strong>: Handy portability and perfect integration with microservices applications.</p>
@@ -1422,22 +1410,16 @@ In the best case you will get away with examples or simple signatures.</p>
 </div>
 </div>
 </div>
-<div class="paragraph">
-<p><em><strong>&lt;Overview Diagram&gt;</strong></em></p>
+<div class="imageblock">
+<div class="content">
+<img src="./images/05_building_blocks-EN_1.png" alt="Building block level 1">
+</div>
 </div>
 <div class="dlist">
 <dl>
 <dt class="hdlist1">Motivation</dt>
 <dd>
-<p><em>&lt;text explanation&gt;</em></p>
-</dd>
-<dt class="hdlist1">Contained Building Blocks</dt>
-<dd>
-<p><em>&lt;Description of contained building block (black boxes)&gt;</em></p>
-</dd>
-<dt class="hdlist1">Important Interfaces</dt>
-<dd>
-<p><em>&lt;Description of important interfaces&gt;</em></p>
+<p>In this level we represent the general overview of the system from a high level point of view. This level represents the general idea in which the application is based.</p>
 </dd>
 </dl>
 </div>
@@ -1479,7 +1461,7 @@ Its headline is the name of the black box.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_name_black_box_1">5.1.1. &lt;Name black box 1&gt;</h4>
+<h4 id="_wichat">5.1.1. WIChat</h4>
 <div class="sidebarblock arc42help">
 <div class="content">
 <div class="paragraph">
@@ -1510,46 +1492,37 @@ according the the following black box template:</p>
 </div>
 </div>
 </div>
+<div class="sect4">
+<h5 id="_responsibility">Responsibility</h5>
 <div class="paragraph">
-<p><em>&lt;Purpose/Responsibility&gt;</em></p>
+<p>Represents the whole system. It is in charge of managing the different modules that compose the application, as well as communicating with the LLM provider and Wikidata.</p>
 </div>
-<div class="paragraph">
-<p><em>&lt;Interface(s)&gt;</em></p>
 </div>
-<div class="paragraph">
-<p><em>&lt;(Optional) Quality/Performance Characteristics&gt;</em></p>
+<div class="sect4">
+<h5 id="_interfaces">Interfaces</h5>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Wikidata</strong>: Retrieve questions and answers.</p>
+</li>
+<li>
+<p><strong>LLM Provider</strong>: Retrieve hints for the user.</p>
+</li>
+</ul>
 </div>
-<div class="paragraph">
-<p><em>&lt;(Optional) Directory/File Location&gt;</em></p>
-</div>
-<div class="paragraph">
-<p><em>&lt;(Optional) Fulfilled Requirements&gt;</em></p>
-</div>
-<div class="paragraph">
-<p><em>&lt;(optional) Open Issues/Problems/Risks&gt;</em></p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_name_black_box_2">5.1.2. &lt;Name black box 2&gt;</h4>
+<h4 id="_wikidata">5.1.2. Wikidata</h4>
 <div class="paragraph">
-<p><em>&lt;black box template&gt;</em></p>
+<p>This interface represents the Wikidata service that is in charge of providing the necessary information to create the questions that the user will have to answer. They should also provide the answers to the questions that the user will have to answer.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_name_black_box_n">5.1.3. &lt;Name black box n&gt;</h4>
+<h4 id="_llm_provider">5.1.3. LLM Provider</h4>
 <div class="paragraph">
-<p><em>&lt;black box template&gt;</em></p>
+<p>This interface represents the provider of the LLM who the application communicates with to obtain the hints required by the user in order to answer the questions.</p>
 </div>
-</div>
-<div class="sect3">
-<h4 id="_name_interface_1">5.1.4. &lt;Name interface 1&gt;</h4>
-<div class="paragraph">
-<p>&#8230;&#8203;</p>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_name_interface_m">5.1.5. &lt;Name interface m&gt;</h4>
-
 </div>
 </div>
 <div class="sect2">
@@ -1566,73 +1539,260 @@ Leave out normal, simple, boring or standardized parts of your system</p>
 </div>
 </div>
 </div>
-<div class="sect3">
-<h4 id="_white_box_building_block_1">5.2.1. White Box <em>&lt;building block 1&gt;</em></h4>
-<div class="sidebarblock arc42help">
+<div class="imageblock">
 <div class="content">
+<img src="./images/05_building_blocks-EN_2.png" alt="Building block level 2">
+</div>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1">Motivation</dt>
+<dd>
+<p>In this level we represent the inner structure of the WIChat module. This level represents a communication between several parts of the application by means of a gateway.</p>
+</dd>
+</dl>
+</div>
+<div class="sect3">
+<h4 id="_webapp">5.2.1. WebApp</h4>
+<div class="sect4">
+<h5 id="_responsibility_2">Responsibility</h5>
 <div class="paragraph">
-<p>&#8230;&#8203;describes the internal structure of <em>building block 1</em>.</p>
+<p>Represents the interacting point of the application. It contains the different modules that conform the application front-end. It is in charge of managing the user interaction.</p>
 </div>
 </div>
+<div class="sect4">
+<h5 id="_interfaces_2">Interfaces</h5>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Gateway Service</strong>: Communicate with the back-end.</p>
+</li>
+</ul>
 </div>
-<div class="paragraph">
-<p><em>&lt;white box template&gt;</em></p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_white_box_building_block_2">5.2.2. White Box <em>&lt;building block 2&gt;</em></h4>
+<h4 id="_wichat_services">5.2.2. WIChat Services</h4>
+<div class="sect4">
+<h5 id="_responsibility_3">Responsibility</h5>
 <div class="paragraph">
-<p><em>&lt;white box template&gt;</em></p>
+<p>Represents the services that the WIChat module provides. It represents the back-end of the application.</p>
 </div>
-<div class="paragraph">
-<p>&#8230;&#8203;</p>
+</div>
+<div class="sect4">
+<h5 id="_interfaces_3">Interfaces</h5>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Gateway Service</strong>: Communicate with the front-end.</p>
+</li>
+<li>
+<p><strong>LLM Provider</strong>: Retrieve hints for the user.</p>
+</li>
+<li>
+<p><strong>Wikidata</strong>: Retrieve questions and answers.</p>
+</li>
+</ul>
+</div>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_white_box_building_block_m">5.2.3. White Box <em>&lt;building block m&gt;</em></h4>
+<h4 id="_gateway_service">5.2.3. Gateway Service</h4>
 <div class="paragraph">
-<p><em>&lt;white box template&gt;</em></p>
+<p>This interface represents the accessing point where all services are joined together. It allows an easy communication between the different modules of the application and provides useful methods to fulfill that end.</p>
 </div>
 </div>
 </div>
 <div class="sect2">
 <h3 id="_level_3">5.3. Level 3</h3>
-<div class="sidebarblock arc42help">
+<div class="imageblock">
 <div class="content">
-<div class="paragraph">
-<p>Here you can specify the inner structure of (some) building blocks from level 2 as white boxes.</p>
+<img src="./images/05_building_blocks-EN_3.png" alt="Building block level 3">
 </div>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1">Motivation</dt>
+<dd>
+<p>In this level we represent the inner structure of the front and back-end modules of the application. This level illustrates the different responsibilities of the modules that are encountered at the lowest level of the application.</p>
+</dd>
+</dl>
+</div>
+<div class="sect3">
+<h4 id="_home">5.3.1. Home</h4>
 <div class="paragraph">
-<p>When you need more detailed levels of your architecture please copy this
-part of arc42 for additional levels.</p>
+<p>Represents the main page. It allows users to either log in or sign up.</p>
+</div>
+<div class="sect4">
+<h5 id="_interfaces_4">Interfaces</h5>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Gateway Service</strong>: Display application status information.</p>
+</li>
+</ul>
 </div>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_white_box_building_block_x_1">5.3.1. White Box &lt;_building block x.1_&gt;</h4>
-<div class="sidebarblock arc42help">
-<div class="content">
+<h4 id="_new_user">5.3.2. New User</h4>
 <div class="paragraph">
-<p>Specifies the internal structure of <em>building block x.1</em>.</p>
+<p>Represents the page where users can sign up.</p>
 </div>
+<div class="sect4">
+<h5 id="_interfaces_5">Interfaces</h5>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Gateway Service</strong>: Save the registration data in the database.</p>
+</li>
+</ul>
 </div>
-</div>
-<div class="paragraph">
-<p><em>&lt;white box template&gt;</em></p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_white_box_building_block_x_2">5.3.2. White Box &lt;_building block x.2_&gt;</h4>
+<h4 id="_log_in">5.3.3. Log In</h4>
 <div class="paragraph">
-<p><em>&lt;white box template&gt;</em></p>
+<p>Represents the page where users can log in.</p>
+</div>
+<div class="sect4">
+<h5 id="_interfaces_6">Interfaces</h5>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Gateway Service</strong>: Authentication purposes.</p>
+</li>
+</ul>
+</div>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_white_box_building_block_y_1">5.3.3. White Box &lt;_building block y.1_&gt;</h4>
+<h4 id="_user_menu">5.3.4. User menu</h4>
 <div class="paragraph">
-<p><em>&lt;white box template&gt;</em></p>
+<p>Represents the menu that users can access once they have logged in or created an account.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_statistics">5.3.5. Statistics</h4>
+<div class="paragraph">
+<p>Represents the page where users can see their statistics.</p>
+</div>
+<div class="sect4">
+<h5 id="_interfaces_7">Interfaces</h5>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Gateway Service</strong>: Obtain those statistics.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_game">5.3.6. Game</h4>
+<div class="paragraph">
+<p>Represents the page where users can play the game.</p>
+</div>
+<div class="sect4">
+<h5 id="_interfaces_8">Interfaces</h5>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Gateway Service</strong>: Questions and hints.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_auth_service">5.3.7. Auth Service</h4>
+<div class="paragraph">
+<p>Represents the authentication service where users will log into their accounts.</p>
+</div>
+<div class="sect4">
+<h5 id="_interfaces_9">Interfaces</h5>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Gateway Service</strong>: Send the login status of the user that tried to log in.</p>
+</li>
+<li>
+<p><strong>Database</strong>: Retrieve the user information to check if the user information is valid.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_user_service">5.3.8. User Service</h4>
+<div class="paragraph">
+<p>Represents the service where users will manage their account creations.</p>
+</div>
+<div class="sect4">
+<h5 id="_interfaces_10">Interfaces</h5>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Gateway Service</strong>: Accept the user account creation information.</p>
+</li>
+<li>
+<p><strong>Database</strong>: Insert the retrieved information for their persistance.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_statistics_service">5.3.9. Statistics Service</h4>
+<div class="paragraph">
+<p>Represents the service where statistics from users will be retrieved.</p>
+</div>
+<div class="sect4">
+<h5 id="_interfaces_11">Interfaces</h5>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Gateway Service</strong>: Send those statistics to be displayed in the application.</p>
+</li>
+<li>
+<p><strong>Database</strong>: Store the statistics needed for the application to work.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_question_service">5.3.10. Question Service</h4>
+<div class="paragraph">
+<p>It is in charge of managing the creation of questions and answers.</p>
+</div>
+<div class="sect4">
+<h5 id="_interfaces_12">Interfaces</h5>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Gateway Service</strong>: Sharing the question and possible answers to the user.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_llm_service">5.3.11. LLM Service</h4>
+<div class="paragraph">
+<p>It represents the service that will provide the hints to the users by means of an LLM.</p>
+</div>
+<div class="sect4">
+<h5 id="_interfaces_13">Interfaces</h5>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Gateway Service</strong>: Sending hints retrieved to the user.</p>
+</li>
+</ul>
 </div>
 <div style="page-break-after: always;"></div>
+</div>
 </div>
 </div>
 </div>
@@ -1702,38 +1862,66 @@ You will mainly capture scenarios in your documentation to communicate your arch
 </div>
 </div>
 </div>
-<div class="sect2">
-<h3 id="_runtime_scenario_1">6.1. &lt;Runtime Scenario 1&gt;</h3>
-<div class="ulist">
-<ul>
-<li>
-<p><em>&lt;insert runtime diagram or textual description of the scenario&gt;</em></p>
-</li>
-<li>
-<p><em>&lt;insert description of the notable aspects of the interactions between the
-building block instances depicted in this diagram.&gt;</em></p>
-</li>
-</ul>
-</div>
 <div class="paragraph">
-<p>It is possible to use a sequence diagram:</p>
+<p>This section describes how the system components interacts between them. In this early stage, the information in this section cannot be too detailed.</p>
 </div>
+<div class="sect2">
+<h3 id="_user_authentication_flow">6.1. User Authentication Flow</h3>
+<div class="sect3">
+<h4 id="_sign_up_flow">6.1.1. Sign up Flow</h4>
 <div class="imageblock">
 <div class="content">
-<img src="./images/Sequence%20diagram.png" alt="Sequence diagram" width="332" height="335">
+<img src="./images/Authentication%20Sequence.png" alt="Authentication Sequence" width="711" height="624">
+</div>
+</div>
+<div class="paragraph">
+<p>Notable Aspects: Ensures secure authentication via an authentication service. Protects against unauthorized access and ensures session management.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_log_in_flow">6.1.2. Log in Flow</h4>
+<div class="imageblock">
+<div class="content">
+<img src="./images/Authentication%20Sequence.png" alt="Authentication Sequence" width="639" height="656">
+</div>
+</div>
+<div class="paragraph">
+<p>Notable Aspects: Ensures secure authentication via an authentication service. Protects against unauthorized access and ensures session management.</p>
 </div>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_runtime_scenario_2">6.2. &lt;Runtime Scenario 2&gt;</h3>
-
+<h3 id="_quiz_question_retrieval_flow">6.2. Quiz Question Retrieval Flow</h3>
+<div class="imageblock">
+<div class="content">
+<img src="./images/Quiz%20Question%20Retrieval.png" alt="Quiz Question Retrieval" width="413" height="298">
+</div>
+</div>
+<div class="paragraph">
+<p>Notable Aspects: Ensures real-time retrieval of quiz questions from Wikidata, requiring efficient API calls and caching strategies.</p>
+</div>
 </div>
 <div class="sect2">
-<h3 id="">6.3. &#8230;&#8203;</h3>
-
+<h3 id="_llm_chat_interaction_flow">6.3. LLM Chat Interaction Flow</h3>
+<div class="imageblock">
+<div class="content">
+<img src="./images/LLM%20Chat%20Interaction.png" alt="LLM Chat Interaction" width="361" height="298">
+</div>
+</div>
+<div class="paragraph">
+<p>Notable Aspects: Secure input handling is necessary to prevent prompt injection. Ensuring low-latency responses enhances user experience.</p>
+</div>
 </div>
 <div class="sect2">
-<h3 id="_runtime_scenario_n">6.4. &lt;Runtime Scenario n&gt;</h3>
+<h3 id="_error_handling_scenario">6.4. Error Handling Scenario</h3>
+<div class="imageblock">
+<div class="content">
+<img src="./images/Error%20Handling%20Sequence.png" alt="Error Handling Sequence" width="385" height="311">
+</div>
+</div>
+<div class="paragraph">
+<p>Notable Aspects: Ensures errors are logged for troubleshooting and users receive meaningful error messages.</p>
+</div>
 <div style="page-break-after: always;"></div>
 </div>
 </div>
@@ -1799,7 +1987,7 @@ when your infrastructure is more complex.</p>
 <p>Our project is configured using GitHub actions so that every new github release publish triggers an attempt to deploy the application to a server.</p>
 </div>
 <div class="paragraph">
-<p>This server is hosted on Azure and is configured to run the application using Docker containers. Only 2 ports are open to the public: The port to be used by the web client and the port to be used by the gateway service.
+<p>This server is hosted on Azure and is configured to run the application using Docker containers. Only 2 ports are open to the public: The port to be used by the web application and the port to be used by the gateway service.
 We have configured in github a set of secrets: DEPLOY_HOST (the IP address of the server), DEPLOY_USER (the user to connect to the server), DEPLOY_KEY (the SSH key to connect to the server) that allows us to deploy the application to the server using SSH.</p>
 </div>
 <div class="paragraph">
@@ -1835,7 +2023,7 @@ We have configured in github a set of secrets: DEPLOY_HOST (the IP address of th
 </div>
 <div class="imageblock">
 <div class="content">
-<img src="./images/Deployment%20view%20L1.png" alt="Deployment view L1" width="1011" height="593">
+<img src="./images/Deployment%20view%20L1.png" alt="Deployment view L1" width="493" height="357">
 </div>
 </div>
 <div class="dlist">
@@ -1876,14 +2064,14 @@ We have configured in github a set of secrets: DEPLOY_HOST (the IP address of th
 <h4 id="_server_side">7.2.1. <em>Server Side</em></h4>
 <div class="imageblock">
 <div class="content">
-<img src="./images/Deployment%20view%20L2.png" alt="Deployment view L2" width="990" height="593">
+<img src="./images/Deployment%20view%20L2.png" alt="Deployment view L2" width="749" height="442">
 </div>
 </div>
 <div class="paragraph">
-<p>The gateway service works as an adapter between the micro services and the web client. The web application is the main interface for the user to interact with the system. The wikidata API is used to fetch data from wikidata to generate questions. The empathy LLM API is used to generate tips for the questions.</p>
+<p>The gateway service works as an adapter between the micro services and the web client. The web application is the main interface for the user to interact with the system.</p>
 </div>
 <div class="paragraph">
-<p>We&#8217;ve opted for a microservices architecture using Docker containers instead of a monolithic setup. Each service has its Docker image, enabling flexibility in development and deployment. This Docker-based approach streamlines deployment, management, and resource utilization while enhancing the overall flexibility and scalability of our system.</p>
+<p>We&#8217;ve opted for a microservices architecture using Docker containers instead of a monolithic setup. Each service has its own Docker image. This Docker-based approach streamlines deployment, management, and resource utilization while enhancing the overall flexibility and scalability of our system.</p>
 </div>
 <div style="page-break-after: always;"></div>
 </div>
@@ -1916,7 +2104,8 @@ They can include many different topics, such as</p>
 <p>principal, often technical decisions of an overarching (= cross-cutting) nature</p>
 </li>
 <li>
-<p>implementation rules</p>
+<p>implementation rules
+All the documentation added is purely introductory, it doesn&#8217;t represent final decisions as the aplication isn&#8217;t developed yet.</p>
 </li>
 </ul>
 </div>
@@ -1992,26 +2181,74 @@ on this list.</p>
 </div>
 </div>
 </div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Class</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Explanation</strong></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Question</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The model of the questions stores both right and wrong answers.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">User</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The people using the application, they have statistics and take part in a ranking to compete.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Answer</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Models each possible answer, created to reuse answers that are common to different questions, as well as distractors.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Game</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">It is created when the user starts a game and includes the rounds that the user has to answer.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Statistics</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Stores information about the amount of correct and wrong answers that each user has answered.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">QuestionCategory</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Category for the question</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">AnswerCategory</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Category of the answer (used for getting distractors)</p></td>
+</tr>
+</tbody>
+</table>
 <div class="sect2">
-<h3 id="_concept_1">8.1. <em>&lt;Concept 1&gt;</em></h3>
+<h3 id="_architecture_and_design_patterns">8.1. Architecture and design patterns:</h3>
+
+</div>
+<div class="sect2">
+<h3 id="_safety_and_security_concepts">8.2. Safety and Security concepts:</h3>
 <div class="paragraph">
-<p><em>&lt;explanation&gt;</em></p>
+<p>Passwords must be hashed both in client and in API to ensure as much security as possible.An example to do it could be using SpringBoot3</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_concept_2">8.2. <em>&lt;Concept 2&gt;</em></h3>
-<div class="paragraph">
-<p><em>&lt;explanation&gt;</em></p>
+<h3 id="_development_concepts">8.3. Development concepts:</h3>
+
 </div>
+<div class="sect2">
+<h3 id="_user_experience">8.4. User Experience:</h3>
 <div class="paragraph">
-<p>&#8230;&#8203;</p>
+<p>As this is a game, the focus must be in our users so players can have a good experience, for achieving this, the response time should be less than 1,5 seconds and the interfaces should be intuitive and easy to learn.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_concept_n">8.3. <em>&lt;Concept n&gt;</em></h3>
+<h3 id="_robustness">8.5. Robustness:</h3>
 <div class="paragraph">
-<p><em>&lt;explanation&gt;</em></p>
+<p>It is desired to make the application as independant as possible from Wikidata. This way, if Wikidata is down our application can still manage to be available for our users.</p>
 </div>
+</div>
+<div class="sect2">
+<h3 id="_under_the_hood">8.6. Under-the-hood:</h3>
 <div style="page-break-after: always;"></div>
 </div>
 </div>
@@ -2121,7 +2358,7 @@ on this list.</p>
 <h3 id="_quality_tree">10.1. Quality Tree</h3>
 <div class="imageblock">
 <div class="content">
-<img src="./images/Quality%20Tree.png" alt="Quality Tree" width="1008" height="593">
+<img src="./images/Quality%20Tree.png" alt="Quality Tree" width="236" height="774">
 </div>
 </div>
 </div>
@@ -2327,12 +2564,48 @@ on this list.</p>
 </thead>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><em>&lt;Term-1&gt;</em></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><em>&lt;definition-1&gt;</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><em>REST</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><em>REST is an architectural style for web services that uses standard HTTP methods (GET, POST, PUT, DELETE) to manage resources. It is simple, stateless, and widely used for APIs.</em></p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><em>&lt;Term-2&gt;</em></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><em>&lt;definition-2&gt;</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><em>SPARQL</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><em>SPARQL (SPARQL Protocol and RDF Query Language) is a query language used to retrieve and manipulate data stored in RDF (Resource Description Framework) format. It is the W3C standard for querying semantic databases and extracting structured information from the web.</em></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><em>LLM</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><em>LLM (Large Language Model) is a type of artificial intelligence model designed to process and generate human-like text. These models, such as GPT-4, are trained on vast amounts of text data and use deep learning techniques, particularly transformer architectures, to understand context, generate responses, and perform tasks like translation, summarization, and text completion.</em></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><em>Gateway</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><em>A gateway is a network device or software that acts as a bridge between two different networks, protocols, or systems, enabling communication and data transfer. It translates data formats, protocols, or addresses to ensure interoperability. Gateways are commonly used in networking, cloud computing, and API integrations.</em></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><em>Framework</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><em>A framework is a pre-structured set of tools, libraries, and best practices that provides a foundation for developing software applications. It offers reusable code and predefined components to streamline development, enforce consistency, and improve efficiency. Frameworks exist for various domains, including web development (e.g., React, Django), machine learning (e.g., TensorFlow, PyTorch), and software architecture.</em></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><em>Technical Debt</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><em>Technical debt refers to the trade-offs made in software development where shortcuts, quick fixes, or suboptimal solutions are implemented to speed up delivery but create future maintenance challenges. Over time, this "debt" accumulates, requiring refactoring, rewriting, or fixing, which can slow down development and increase costs. Managing technical debt involves balancing short-term productivity with long-term code quality and sustainability.</em></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><em>Front-end</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><em>Front-end refers to the part of a software application or website that users interact with directly. It includes the user interface (UI), design, and client-side logic, typically built using technologies like HTML, CSS, and JavaScript, along with frameworks such as React, Angular, or Vue.js. The front-end communicates with the back-end to fetch and display data while ensuring a smooth user experience.</em></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><em>Back-end</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><em>Back-end refers to the server-side part of a software application that handles data processing, business logic, and database interactions. It is responsible for managing requests from the front-end, executing operations, and returning responses. Back-end technologies include programming languages like Python, Java, Node.js, and Ruby, frameworks such as Django, Spring, Express.js, and Rails, databases like MySQL, PostgreSQL, and MongoDB, and server infrastructure.</em></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><em>Docker</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><em>Docker is an open-source platform that automates the deployment, scaling, and management of applications within lightweight, portable containers. Containers bundle an application and its dependencies (such as libraries and configurations) into a single, consistent unit that can run anywhere—on a developer&#8217;s laptop, on a server, or in the cloud. Docker ensures that applications work uniformly across different environments, simplifying development, testing, and production workflows.</em></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><em>MongoDB</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><em>MongoDB is a NoSQL, document-oriented database that stores data in flexible JSON-like documents, making it scalable and easy to use.</em></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><em>Node.js</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><em>Node.js is a JavaScript runtime built on Chrome&#8217;s V8 engine that allows developers to run JavaScript on the server side. It is used to build scalable, high-performance applications, especially for real-time services like chat applications and APIs.</em></p></td>
 </tr>
 </tbody>
 </table>
@@ -2550,7 +2823,7 @@ on this list.</p>
 <div id="footer">
 <div id="footer-text">
 Version 8.2 EN<br>
-Last updated 2025-02-23 18:23:16 +0100
+Last updated 2025-02-23 22:33:11 +0100
 </div>
 </div>
 </body>
