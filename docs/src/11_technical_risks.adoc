@@ -26,6 +26,8 @@ See https://docs.arc42.org/section-11/[Risks and Technical Debt] in the arc42 do
 ****
 endif::arc42help[]
 
+In this section, the detected risks and technical debts of our project are presented in table format. Identifying this risks at the beggining of the project we can prevent them to scale, avoiding future problems
+
 [cols="3,2,2", options="header"]
 |===
 | Risk | Description | Solutions
