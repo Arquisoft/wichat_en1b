@@ -68,17 +68,17 @@ endif::arc42help[]
 | AnswerCategory | Category of the answer (used for getting distractors)
 |===
 
-===Architecture and design patterns:
+=== Architecture and design patterns:
 
-===Safety and Security concepts:
+=== Safety and Security concepts:
 Passwords must be hashed both in client and in API to ensure as much security as possible.An example to do it could be using SpringBoot3
 
-===Development concepts:
+=== Development concepts:
 
-===User Experience:
+=== User Experience:
 As this is a game, the focus must be in our users so players can have a good experience, for achieving this, the response time should be less than 1,5 seconds and the interfaces should be intuitive and easy to learn.
 
-===Robustness:
+=== Robustness:
 It is desired to make the application as independant as possible from Wikidata. This way, if Wikidata is down our application can still manage to be available for our users.
 
-===Under-the-hood:
+=== Under-the-hood:
