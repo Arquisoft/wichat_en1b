@@ -67,18 +67,10 @@ In the best case you will get away with examples or simple signatures.
 ****
 endif::arc42help[]
 
-_**<Overview Diagram>**_
+image::05_building_blocks-EN_1.png["Building block level 1"]
 
 Motivation::
-
-_<text explanation>_
-
-
-Contained Building Blocks::
-_<Description of contained building block (black boxes)>_
-
-Important Interfaces::
-_<Description of important interfaces>_
+In this level we represent the general overview of the system from a high level point of view. This level represents the general idea in which the application is based.
 
 ifdef::arc42help[]
 [role="arc42help"]
@@ -102,7 +94,7 @@ Its headline is the name of the black box.
 ****
 endif::arc42help[]
 
-==== <Name black box 1>
+==== WIChat
 
 ifdef::arc42help[]
 [role="arc42help"]
@@ -120,37 +112,18 @@ according the the following black box template:
 ****
 endif::arc42help[]
 
-_<Purpose/Responsibility>_
+===== Responsibility
+Represents the whole system. It is in charge of managing the different modules that compose the application, as well as communicating with the LLM provider and Wikidata.
 
-_<Interface(s)>_
+===== Interfaces
+* **Wikidata**: Retrieve questions and answers.
+* **LLM Provider**: Retrieve hints for the user.
 
-_<(Optional) Quality/Performance Characteristics>_
+==== Wikidata
+This interface represents the Wikidata service that is in charge of providing the necessary information to create the questions that the user will have to answer. They should also provide the answers to the questions that the user will have to answer.
 
-_<(Optional) Directory/File Location>_
-
-_<(Optional) Fulfilled Requirements>_
-
-_<(optional) Open Issues/Problems/Risks>_
-
-
-
-
-==== <Name black box 2>
-
-_<black box template>_
-
-==== <Name black box n>
-
-_<black box template>_
-
-
-==== <Name interface 1>
-
-...
-
-==== <Name interface m>
-
-
+==== LLM Provider
+This interface represents the provider of the LLM who the application communicates with to obtain the hints required by the user in order to answer the questions.
 
 === Level 2
 
@@ -165,61 +138,101 @@ Leave out normal, simple, boring or standardized parts of your system
 ****
 endif::arc42help[]
 
-==== White Box _<building block 1>_
+image::05_building_blocks-EN_2.png["Building block level 2"]
 
-ifdef::arc42help[]
-[role="arc42help"]
-****
-...describes the internal structure of _building block 1_.
-****
-endif::arc42help[]
+Motivation::
+In this level we represent the inner structure of the WIChat module. This level represents a communication between several parts of the application by means of a gateway.
 
-_<white box template>_
+==== WebApp
 
-==== White Box _<building block 2>_
+===== Responsibility
+Represents the interacting point of the application. It contains the different modules that conform the application front-end. It is in charge of managing the user interaction.
 
+===== Interfaces
+* **Gateway Service**: Communicate with the back-end.
 
-_<white box template>_
+==== WIChat Services
 
-...
+===== Responsibility
+Represents the services that the WIChat module provides. It represents the back-end of the application.
 
-==== White Box _<building block m>_
+===== Interfaces
+* **Gateway Service**: Communicate with the front-end.
+* **LLM Provider**: Retrieve hints for the user.
+* **Wikidata**: Retrieve questions and answers.
 
-
-_<white box template>_
-
-
+==== Gateway Service
+This interface represents the accessing point where all services are joined together. It allows an easy communication between the different modules of the application and provides useful methods to fulfill that end.
 
 === Level 3
 
-ifdef::arc42help[]
-[role="arc42help"]
-****
-Here you can specify the inner structure of (some) building blocks from level 2 as white boxes.
+image::05_building_blocks-EN_3.png["Building block level 3"]
 
-When you need more detailed levels of your architecture please copy this
-part of arc42 for additional levels.
-****
-endif::arc42help[]
+Motivation::
+In this level we represent the inner structure of the front and back-end modules of the application. This level illustrates the different responsibilities of the modules that are encountered at the lowest level of the application.
 
-==== White Box <_building block x.1_>
+==== Home
+Represents the main page. It allows users to either log in or sign up.
 
-ifdef::arc42help[]
-[role="arc42help"]
-****
-Specifies the internal structure of _building block x.1_.
-****
-endif::arc42help[]
+===== Interfaces
+* **Gateway Service**: Display application status information.
 
-_<white box template>_
+==== New User
+Represents the page where users can sign up.
 
+===== Interfaces
+* **Gateway Service**: Save the registration data in the database.
 
-==== White Box <_building block x.2_>
+==== Log In
+Represents the page where users can log in.
 
-_<white box template>_
+===== Interfaces
+* **Gateway Service**: Authentication purposes.
 
+==== User menu
+Represents the menu that users can access once they have logged in or created an account.
 
+==== Statistics
+Represents the page where users can see their statistics.
 
-==== White Box <_building block y.1_>
+===== Interfaces
+* **Gateway Service**: Obtain those statistics.
 
-_<white box template>_
+==== Game
+Represents the page where users can play the game.
+
+===== Interfaces
+* **Gateway Service**: Questions and hints.
+
+==== Auth Service
+Represents the authentication service where users will log into their accounts.
+
+===== Interfaces
+* **Gateway Service**: Send the login status of the user that tried to log in.
+* **Database**: Retrieve the user information to check if the user information is valid.
+
+==== User Service
+Represents the service where users will manage their account creations.
+
+===== Interfaces
+* **Gateway Service**: Accept the user account creation information.
+* **Database**: Insert the retrieved information for their persistance.
+
+==== Statistics Service
+Represents the service where statistics from users will be retrieved.
+
+===== Interfaces
+* **Gateway Service**: Send those statistics to be displayed in the application.
+* **Database**: Store the statistics needed for the application to work.
+
+==== Question Service
+It is in charge of managing the creation of questions and answers.
+
+===== Interfaces
+* **Gateway Service**: Sharing the question and possible answers to the user.
+
+==== LLM Service
+It represents the service that will provide the hints to the users by means of an LLM.
+
+===== Interfaces
+* **Gateway Service**: Sending hints retrieved to the user.
