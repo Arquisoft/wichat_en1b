@@ -1092,7 +1092,7 @@ conventions (e.g. programming or versioning guidelines, documentation or naming 
 </div>
 <div class="imageblock">
 <div class="content">
-<img src="./images/System%20Context%20Diagram.png" alt="System Context Diagram" width="487" height="538">
+<img src="./images/System%20Context%20Diagram.png" alt="System Context Diagram" width="1013" height="593">
 </div>
 </div>
 </div>
@@ -1153,7 +1153,7 @@ conventions (e.g. programming or versioning guidelines, documentation or naming 
 </div>
 <div class="imageblock">
 <div class="content">
-<img src="./images/Deployment%20Diagram.png" alt="Deployment Diagram" width="688" height="436">
+<img src="./images/Deployment%20Diagram.png" alt="Deployment Diagram" width="1035" height="593">
 </div>
 </div>
 <div class="paragraph">
@@ -1422,16 +1422,22 @@ In the best case you will get away with examples or simple signatures.</p>
 </div>
 </div>
 </div>
-<div class="imageblock">
-<div class="content">
-<img src="./images/05_building_blocks-EN_1.png" alt="Building block level 1">
-</div>
+<div class="paragraph">
+<p><em><strong>&lt;Overview Diagram&gt;</strong></em></p>
 </div>
 <div class="dlist">
 <dl>
 <dt class="hdlist1">Motivation</dt>
 <dd>
-<p>In this level we represent the general overview of the system from a high level point of view. This level represents the general idea in which the application is based.</p>
+<p><em>&lt;text explanation&gt;</em></p>
+</dd>
+<dt class="hdlist1">Contained Building Blocks</dt>
+<dd>
+<p><em>&lt;Description of contained building block (black boxes)&gt;</em></p>
+</dd>
+<dt class="hdlist1">Important Interfaces</dt>
+<dd>
+<p><em>&lt;Description of important interfaces&gt;</em></p>
 </dd>
 </dl>
 </div>
@@ -1473,7 +1479,7 @@ Its headline is the name of the black box.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_wichat">5.1.1. WIChat</h4>
+<h4 id="_name_black_box_1">5.1.1. &lt;Name black box 1&gt;</h4>
 <div class="sidebarblock arc42help">
 <div class="content">
 <div class="paragraph">
@@ -1504,37 +1510,46 @@ according the the following black box template:</p>
 </div>
 </div>
 </div>
-<div class="sect4">
-<h5 id="_responsibility">Responsibility</h5>
 <div class="paragraph">
-<p>Represents the whole system. It is in charge of managing the different modules that compose the application, as well as communicating with the LLM provider and Wikidata.</p>
+<p><em>&lt;Purpose/Responsibility&gt;</em></p>
 </div>
+<div class="paragraph">
+<p><em>&lt;Interface(s)&gt;</em></p>
 </div>
-<div class="sect4">
-<h5 id="_interfaces">Interfaces</h5>
-<div class="ulist">
-<ul>
-<li>
-<p><strong>Wikidata</strong>: Retrieve questions and answers.</p>
-</li>
-<li>
-<p><strong>LLM Provider</strong>: Retrieve hints for the user.</p>
-</li>
-</ul>
+<div class="paragraph">
+<p><em>&lt;(Optional) Quality/Performance Characteristics&gt;</em></p>
 </div>
+<div class="paragraph">
+<p><em>&lt;(Optional) Directory/File Location&gt;</em></p>
+</div>
+<div class="paragraph">
+<p><em>&lt;(Optional) Fulfilled Requirements&gt;</em></p>
+</div>
+<div class="paragraph">
+<p><em>&lt;(optional) Open Issues/Problems/Risks&gt;</em></p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_wikidata">5.1.2. Wikidata</h4>
+<h4 id="_name_black_box_2">5.1.2. &lt;Name black box 2&gt;</h4>
 <div class="paragraph">
-<p>This interface represents the Wikidata service that is in charge of providing the necessary information to create the questions that the user will have to answer. They should also provide the answers to the questions that the user will have to answer.</p>
+<p><em>&lt;black box template&gt;</em></p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_llm_provider">5.1.3. LLM Provider</h4>
+<h4 id="_name_black_box_n">5.1.3. &lt;Name black box n&gt;</h4>
 <div class="paragraph">
-<p>This interface represents the provider of the LLM who the application communicates with to obtain the hints required by the user in order to answer the questions.</p>
+<p><em>&lt;black box template&gt;</em></p>
 </div>
+</div>
+<div class="sect3">
+<h4 id="_name_interface_1">5.1.4. &lt;Name interface 1&gt;</h4>
+<div class="paragraph">
+<p>&#8230;&#8203;</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_name_interface_m">5.1.5. &lt;Name interface m&gt;</h4>
+
 </div>
 </div>
 <div class="sect2">
@@ -1551,260 +1566,73 @@ Leave out normal, simple, boring or standardized parts of your system</p>
 </div>
 </div>
 </div>
-<div class="imageblock">
+<div class="sect3">
+<h4 id="_white_box_building_block_1">5.2.1. White Box <em>&lt;building block 1&gt;</em></h4>
+<div class="sidebarblock arc42help">
 <div class="content">
-<img src="./images/05_building_blocks-EN_2.png" alt="Building block level 2">
-</div>
-</div>
-<div class="dlist">
-<dl>
-<dt class="hdlist1">Motivation</dt>
-<dd>
-<p>In this level we represent the inner structure of the WIChat module. This level represents a communication between several parts of the application by means of a gateway.</p>
-</dd>
-</dl>
-</div>
-<div class="sect3">
-<h4 id="_webapp">5.2.1. WebApp</h4>
-<div class="sect4">
-<h5 id="_responsibility_2">Responsibility</h5>
 <div class="paragraph">
-<p>Represents the interacting point of the application. It contains the different modules that conform the application front-end. It is in charge of managing the user interaction.</p>
+<p>&#8230;&#8203;describes the internal structure of <em>building block 1</em>.</p>
 </div>
 </div>
-<div class="sect4">
-<h5 id="_interfaces_2">Interfaces</h5>
-<div class="ulist">
-<ul>
-<li>
-<p><strong>Gateway Service</strong>: Communicate with the back-end.</p>
-</li>
-</ul>
 </div>
+<div class="paragraph">
+<p><em>&lt;white box template&gt;</em></p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_wichat_services">5.2.2. WIChat Services</h4>
-<div class="sect4">
-<h5 id="_responsibility_3">Responsibility</h5>
+<h4 id="_white_box_building_block_2">5.2.2. White Box <em>&lt;building block 2&gt;</em></h4>
 <div class="paragraph">
-<p>Represents the services that the WIChat module provides. It represents the back-end of the application.</p>
+<p><em>&lt;white box template&gt;</em></p>
 </div>
-</div>
-<div class="sect4">
-<h5 id="_interfaces_3">Interfaces</h5>
-<div class="ulist">
-<ul>
-<li>
-<p><strong>Gateway Service</strong>: Communicate with the front-end.</p>
-</li>
-<li>
-<p><strong>LLM Provider</strong>: Retrieve hints for the user.</p>
-</li>
-<li>
-<p><strong>Wikidata</strong>: Retrieve questions and answers.</p>
-</li>
-</ul>
-</div>
+<div class="paragraph">
+<p>&#8230;&#8203;</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_gateway_service">5.2.3. Gateway Service</h4>
+<h4 id="_white_box_building_block_m">5.2.3. White Box <em>&lt;building block m&gt;</em></h4>
 <div class="paragraph">
-<p>This interface represents the accessing point where all services are joined together. It allows an easy communication between the different modules of the application and provides useful methods to fulfill that end.</p>
+<p><em>&lt;white box template&gt;</em></p>
 </div>
 </div>
 </div>
 <div class="sect2">
 <h3 id="_level_3">5.3. Level 3</h3>
-<div class="imageblock">
+<div class="sidebarblock arc42help">
 <div class="content">
-<img src="./images/05_building_blocks-EN_3.png" alt="Building block level 3">
-</div>
-</div>
-<div class="dlist">
-<dl>
-<dt class="hdlist1">Motivation</dt>
-<dd>
-<p>In this level we represent the inner structure of the front and back-end modules of the application. This level illustrates the different responsibilities of the modules that are encountered at the lowest level of the application.</p>
-</dd>
-</dl>
-</div>
-<div class="sect3">
-<h4 id="_home">5.3.1. Home</h4>
 <div class="paragraph">
-<p>Represents the main page. It allows users to either log in or sign up.</p>
+<p>Here you can specify the inner structure of (some) building blocks from level 2 as white boxes.</p>
 </div>
-<div class="sect4">
-<h5 id="_interfaces_4">Interfaces</h5>
-<div class="ulist">
-<ul>
-<li>
-<p><strong>Gateway Service</strong>: Display application status information.</p>
-</li>
-</ul>
+<div class="paragraph">
+<p>When you need more detailed levels of your architecture please copy this
+part of arc42 for additional levels.</p>
 </div>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_new_user">5.3.2. New User</h4>
+<h4 id="_white_box_building_block_x_1">5.3.1. White Box &lt;_building block x.1_&gt;</h4>
+<div class="sidebarblock arc42help">
+<div class="content">
 <div class="paragraph">
-<p>Represents the page where users can sign up.</p>
+<p>Specifies the internal structure of <em>building block x.1</em>.</p>
 </div>
-<div class="sect4">
-<h5 id="_interfaces_5">Interfaces</h5>
-<div class="ulist">
-<ul>
-<li>
-<p><strong>Gateway Service</strong>: Save the registration data in the database.</p>
-</li>
-</ul>
 </div>
+</div>
+<div class="paragraph">
+<p><em>&lt;white box template&gt;</em></p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_log_in">5.3.3. Log In</h4>
+<h4 id="_white_box_building_block_x_2">5.3.2. White Box &lt;_building block x.2_&gt;</h4>
 <div class="paragraph">
-<p>Represents the page where users can log in.</p>
-</div>
-<div class="sect4">
-<h5 id="_interfaces_6">Interfaces</h5>
-<div class="ulist">
-<ul>
-<li>
-<p><strong>Gateway Service</strong>: Authentication purposes.</p>
-</li>
-</ul>
-</div>
+<p><em>&lt;white box template&gt;</em></p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_user_menu">5.3.4. User menu</h4>
+<h4 id="_white_box_building_block_y_1">5.3.3. White Box &lt;_building block y.1_&gt;</h4>
 <div class="paragraph">
-<p>Represents the menu that users can access once they have logged in or created an account.</p>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_statistics">5.3.5. Statistics</h4>
-<div class="paragraph">
-<p>Represents the page where users can see their statistics.</p>
-</div>
-<div class="sect4">
-<h5 id="_interfaces_7">Interfaces</h5>
-<div class="ulist">
-<ul>
-<li>
-<p><strong>Gateway Service</strong>: Obtain those statistics.</p>
-</li>
-</ul>
-</div>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_game">5.3.6. Game</h4>
-<div class="paragraph">
-<p>Represents the page where users can play the game.</p>
-</div>
-<div class="sect4">
-<h5 id="_interfaces_8">Interfaces</h5>
-<div class="ulist">
-<ul>
-<li>
-<p><strong>Gateway Service</strong>: Questions and hints.</p>
-</li>
-</ul>
-</div>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_auth_service">5.3.7. Auth Service</h4>
-<div class="paragraph">
-<p>Represents the authentication service where users will log into their accounts.</p>
-</div>
-<div class="sect4">
-<h5 id="_interfaces_9">Interfaces</h5>
-<div class="ulist">
-<ul>
-<li>
-<p><strong>Gateway Service</strong>: Send the login status of the user that tried to log in.</p>
-</li>
-<li>
-<p><strong>Database</strong>: Retrieve the user information to check if the user information is valid.</p>
-</li>
-</ul>
-</div>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_user_service">5.3.8. User Service</h4>
-<div class="paragraph">
-<p>Represents the service where users will manage their account creations.</p>
-</div>
-<div class="sect4">
-<h5 id="_interfaces_10">Interfaces</h5>
-<div class="ulist">
-<ul>
-<li>
-<p><strong>Gateway Service</strong>: Accept the user account creation information.</p>
-</li>
-<li>
-<p><strong>Database</strong>: Insert the retrieved information for their persistance.</p>
-</li>
-</ul>
-</div>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_statistics_service">5.3.9. Statistics Service</h4>
-<div class="paragraph">
-<p>Represents the service where statistics from users will be retrieved.</p>
-</div>
-<div class="sect4">
-<h5 id="_interfaces_11">Interfaces</h5>
-<div class="ulist">
-<ul>
-<li>
-<p><strong>Gateway Service</strong>: Send those statistics to be displayed in the application.</p>
-</li>
-<li>
-<p><strong>Database</strong>: Store the statistics needed for the application to work.</p>
-</li>
-</ul>
-</div>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_question_service">5.3.10. Question Service</h4>
-<div class="paragraph">
-<p>It is in charge of managing the creation of questions and answers.</p>
-</div>
-<div class="sect4">
-<h5 id="_interfaces_12">Interfaces</h5>
-<div class="ulist">
-<ul>
-<li>
-<p><strong>Gateway Service</strong>: Sharing the question and possible answers to the user.</p>
-</li>
-</ul>
-</div>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_llm_service">5.3.11. LLM Service</h4>
-<div class="paragraph">
-<p>It represents the service that will provide the hints to the users by means of an LLM.</p>
-</div>
-<div class="sect4">
-<h5 id="_interfaces_13">Interfaces</h5>
-<div class="ulist">
-<ul>
-<li>
-<p><strong>Gateway Service</strong>: Sending hints retrieved to the user.</p>
-</li>
-</ul>
+<p><em>&lt;white box template&gt;</em></p>
 </div>
 <div style="page-break-after: always;"></div>
-</div>
 </div>
 </div>
 </div>
@@ -1892,7 +1720,7 @@ building block instances depicted in this diagram.&gt;</em></p>
 </div>
 <div class="imageblock">
 <div class="content">
-<img src="./images/Sequence%20diagram.png" alt="Sequence diagram" width="353" height="328">
+<img src="./images/Sequence%20diagram.png" alt="Sequence diagram" width="332" height="335">
 </div>
 </div>
 </div>
@@ -1967,6 +1795,16 @@ when your infrastructure is more complex.</p>
 </div>
 </div>
 </div>
+<div class="paragraph">
+<p>Our project is configured using GitHub actions so that every new github release publish triggers an attempt to deploy the application to a server.</p>
+</div>
+<div class="paragraph">
+<p>This server is hosted on Azure and is configured to run the application using Docker containers. Only 2 ports are open to the public: The port to be used by the web client and the port to be used by the gateway service.
+We have configured in github a set of secrets: DEPLOY_HOST (the IP address of the server), DEPLOY_USER (the user to connect to the server), DEPLOY_KEY (the SSH key to connect to the server) that allows us to deploy the application to the server using SSH.</p>
+</div>
+<div class="paragraph">
+<p>This setup enables our team to achieve continuous deployment and delivery (CD) together with continuous integration (CI).</p>
+</div>
 <div class="sect2">
 <h3 id="_infrastructure_level_1">7.1. Infrastructure Level 1</h3>
 <div class="sidebarblock arc42help">
@@ -1995,22 +1833,32 @@ when your infrastructure is more complex.</p>
 </div>
 </div>
 </div>
-<div class="paragraph">
-<p><em><strong>&lt;Overview Diagram&gt;</strong></em></p>
+<div class="imageblock">
+<div class="content">
+<img src="./images/Deployment%20view%20L1.png" alt="Deployment view L1" width="1011" height="593">
+</div>
 </div>
 <div class="dlist">
 <dl>
 <dt class="hdlist1">Motivation</dt>
 <dd>
-<p><em>&lt;explanation in text form&gt;</em></p>
+<div class="ulist">
+<ul>
+<li>
+<p>The diagram above illustrates the initial version of our architecture and the delineation among its components. Our approach adopts a straightforward client-server architecture, where the server interacts with external services such as Wikidata or Empathy LLM. This division enforces a clear separation between the client/frontend and the server/backend. Such separation benefits the entire system by ensuring that as long as the common API is implemented, the specific implementations can remain interchangeable.</p>
+</li>
+<li>
+<p>Utilizing an Ubuntu server on Azure provides us with an isolated environment equipped with the essential configurations and installations necessary for running our services. By hosting our server on Azure, we can minimize costs associated with machine uptime while alleviating responsibilities such as security, availability, and maintenance.</p>
+</li>
+<li>
+<p>We use Docker as it is a containerization platform that allows us to package our application and its dependencies into a standardized unit for software development. This approach ensures that our application will run consistently on any environment, regardless of the machine’s configuration.</p>
+</li>
+</ul>
+</div>
 </dd>
 <dt class="hdlist1">Quality and/or Performance Features</dt>
 <dd>
-<p><em>&lt;explanation in text form&gt;</em></p>
-</dd>
-<dt class="hdlist1">Mapping of Building Blocks to Infrastructure</dt>
-<dd>
-<p><em>&lt;description of the mapping&gt;</em></p>
+<p>As mentioned earlier, the primary advantage of this architecture lies in the interchangeability of its components.</p>
 </dd>
 </dl>
 </div>
@@ -2020,32 +1868,22 @@ when your infrastructure is more complex.</p>
 <div class="sidebarblock arc42help">
 <div class="content">
 <div class="paragraph">
-<p>Here you can include the internal structure of (some) infrastructure elements from level 1.</p>
-</div>
-<div class="paragraph">
-<p>Please copy the structure from level 1 for each selected element.</p>
+<p>Here you can see the internal structure of (some) infrastructure elements from level 1.</p>
 </div>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_infrastructure_element_1">7.2.1. <em>&lt;Infrastructure Element 1&gt;</em></h4>
-<div class="paragraph">
-<p><em>&lt;diagram + explanation&gt;</em></p>
+<h4 id="_server_side">7.2.1. <em>Server Side</em></h4>
+<div class="imageblock">
+<div class="content">
+<img src="./images/Deployment%20view%20L2.png" alt="Deployment view L2" width="990" height="593">
 </div>
-</div>
-<div class="sect3">
-<h4 id="_infrastructure_element_2">7.2.2. <em>&lt;Infrastructure Element 2&gt;</em></h4>
-<div class="paragraph">
-<p><em>&lt;diagram + explanation&gt;</em></p>
 </div>
 <div class="paragraph">
-<p>&#8230;&#8203;</p>
+<p>The gateway service works as an adapter between the micro services and the web client. The web application is the main interface for the user to interact with the system. The wikidata API is used to fetch data from wikidata to generate questions. The empathy LLM API is used to generate tips for the questions.</p>
 </div>
-</div>
-<div class="sect3">
-<h4 id="_infrastructure_element_n">7.2.3. <em>&lt;Infrastructure Element n&gt;</em></h4>
 <div class="paragraph">
-<p><em>&lt;diagram + explanation&gt;</em></p>
+<p>We&#8217;ve opted for a microservices architecture using Docker containers instead of a monolithic setup. Each service has its Docker image, enabling flexibility in development and deployment. This Docker-based approach streamlines deployment, management, and resource utilization while enhancing the overall flexibility and scalability of our system.</p>
 </div>
 <div style="page-break-after: always;"></div>
 </div>
@@ -2283,7 +2121,7 @@ on this list.</p>
 <h3 id="_quality_tree">10.1. Quality Tree</h3>
 <div class="imageblock">
 <div class="content">
-<img src="./images/Quality%20Tree.png" alt="Quality Tree" width="236" height="774">
+<img src="./images/Quality%20Tree.png" alt="Quality Tree" width="1008" height="593">
 </div>
 </div>
 </div>
@@ -2712,7 +2550,7 @@ on this list.</p>
 <div id="footer">
 <div id="footer-text">
 Version 8.2 EN<br>
-Last updated 2025-02-23 19:19:24 +0100
+Last updated 2025-02-23 18:23:16 +0100
 </div>
 </div>
 </body>
