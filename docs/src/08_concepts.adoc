@@ -17,7 +17,7 @@ They can include many different topics, such as
 * rules for using specific technology
 * principal, often technical decisions of an overarching (= cross-cutting) nature
 * implementation rules
-
+All the documentation added is purely introductory, it doesn't represent final decisions as the aplication isn't developed yet.
 
 .Motivation
 Concepts form the basis for _conceptual integrity_ (consistency, homogeneity) of the architecture. 
@@ -57,18 +57,28 @@ See https://docs.arc42.org/section-8/[Concepts] in the arc42 documentation.
 ****
 endif::arc42help[]
 
-=== _<Concept 1>_
+|===
+| *Class* | *Explanation*
+| Question | The model of the questions stores both right and wrong answers.
+| User | The people using the application, they have statistics and take part in a ranking to compete.
+| Answer | Models each possible answer, created to reuse answers that are common to different questions, as well as distractors.
+| Game | It is created when the user starts a game and includes the rounds that the user has to answer.
+| Statistics | Stores information about the amount of correct and wrong answers that each user has answered.
+| QuestionCategory | Category for the question
+| AnswerCategory | Category of the answer (used for getting distractors)
+|===
 
-_<explanation>_
+===Architecture and design patterns:
 
+===Safety and Security concepts:
+Passwords must be hashed both in client and in API to ensure as much security as possible.An example to do it could be using SpringBoot3
 
+===Development concepts:
 
-=== _<Concept 2>_
+===User Experience:
+As this is a game, the focus must be in our users so players can have a good experience, for achieving this, the response time should be less than 1,5 seconds and the interfaces should be intuitive and easy to learn.
 
-_<explanation>_
+===Robustness:
+It is desired to make the application as independant as possible from Wikidata. This way, if Wikidata is down our application can still manage to be available for our users.
 
-...
-
-=== _<Concept n>_
-
-_<explanation>_
+===Under-the-hood:
