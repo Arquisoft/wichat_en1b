@@ -36,9 +36,36 @@ endif::arc42help[]
 |===
 |Term |Definition
 
-|<Term-1>
-|<definition-1>
+|REST
+|REST is an architectural style for web services that uses standard HTTP methods (GET, POST, PUT, DELETE) to manage resources. It is simple, stateless, and widely used for APIs.
 
-|<Term-2>
-|<definition-2>
+|SPARQL
+|SPARQL (SPARQL Protocol and RDF Query Language) is a query language used to retrieve and manipulate data stored in RDF (Resource Description Framework) format. It is the W3C standard for querying semantic databases and extracting structured information from the web.
+
+|LLM
+|LLM (Large Language Model) is a type of artificial intelligence model designed to process and generate human-like text. These models, such as GPT-4, are trained on vast amounts of text data and use deep learning techniques, particularly transformer architectures, to understand context, generate responses, and perform tasks like translation, summarization, and text completion.
+
+|Gateway
+|A gateway is a network device or software that acts as a bridge between two different networks, protocols, or systems, enabling communication and data transfer. It translates data formats, protocols, or addresses to ensure interoperability. Gateways are commonly used in networking, cloud computing, and API integrations.
+
+|Framework
+|A framework is a pre-structured set of tools, libraries, and best practices that provides a foundation for developing software applications. It offers reusable code and predefined components to streamline development, enforce consistency, and improve efficiency. Frameworks exist for various domains, including web development (e.g., React, Django), machine learning (e.g., TensorFlow, PyTorch), and software architecture.
+
+|Technical Debt
+|Technical debt refers to the trade-offs made in software development where shortcuts, quick fixes, or suboptimal solutions are implemented to speed up delivery but create future maintenance challenges. Over time, this "debt" accumulates, requiring refactoring, rewriting, or fixing, which can slow down development and increase costs. Managing technical debt involves balancing short-term productivity with long-term code quality and sustainability.
+
+|Front-end
+|Front-end refers to the part of a software application or website that users interact with directly. It includes the user interface (UI), design, and client-side logic, typically built using technologies like HTML, CSS, and JavaScript, along with frameworks such as React, Angular, or Vue.js. The front-end communicates with the back-end to fetch and display data while ensuring a smooth user experience.
+
+|Back-end
+|Back-end refers to the server-side part of a software application that handles data processing, business logic, and database interactions. It is responsible for managing requests from the front-end, executing operations, and returning responses. Back-end technologies include programming languages like Python, Java, Node.js, and Ruby, frameworks such as Django, Spring, Express.js, and Rails, databases like MySQL, PostgreSQL, and MongoDB, and server infrastructure.
+
+|Docker
+|Docker is an open-source platform that automates the deployment, scaling, and management of applications within lightweight, portable containers. Containers bundle an application and its dependencies (such as libraries and configurations) into a single, consistent unit that can run anywhere—on a developer's laptop, on a server, or in the cloud. Docker ensures that applications work uniformly across different environments, simplifying development, testing, and production workflows.
+
+|MongoDB
+|MongoDB is a NoSQL, document-oriented database that stores data in flexible JSON-like documents, making it scalable and easy to use.
+
+|Node.js
+|Node.js is a JavaScript runtime built on Chrome's V8 engine that allows developers to run JavaScript on the server side. It is used to build scalable, high-performance applications, especially for real-time services like chat applications and APIs.
 |===
