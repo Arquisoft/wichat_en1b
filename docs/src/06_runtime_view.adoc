@@ -48,7 +48,7 @@ This section describes how the system components interacts between them. In this
 ==== Sign up Flow
 
 [plantuml,"Authentication Sequence",png]
-
+----
 actor User
 participant "Web Application" as App
 participant "Authentication Service" as Auth
@@ -70,14 +70,14 @@ alt credentials are valid
 else credentials are invalid
     Auth --> App: Invalid credentials
     App --> User: Error invalid credentials
-
+----
 
 Notable Aspects: Ensures secure authentication via an authentication service. Protects against unauthorized access and ensures session management.
 
 ==== Log in Flow
 
 [plantuml,"Authentication Sequence",png]
-
+----
 actor User
 participant "Web Application" as App
 participant "Authentication Service" as Auth
@@ -101,7 +101,7 @@ alt credentials are valid
         App --> User: Incorrect password
 else credentials are invalid
     Auth --> App: Error invalid credentials
-
+----
 
 Notable Aspects: Ensures secure authentication via an authentication service. Protects against unauthorized access and ensures session management.
 
@@ -109,7 +109,7 @@ Notable Aspects: Ensures secure authentication via an authentication service. Pr
 === Quiz Question Retrieval Flow
 
 [plantuml,"Quiz Question Retrieval",png]
-
+----
 actor User
 participant "Web Application" as App
 participant "Wikidata API" as Wiki
@@ -118,13 +118,14 @@ User -> App: Request quiz question
 App -> Wiki: Fetch relevant question
 Wiki --> App: Return question data
 App --> User: Display question
+----
 
 Notable Aspects: Ensures real-time retrieval of quiz questions from Wikidata, requiring efficient API calls and caching strategies.
 
 === LLM Chat Interaction Flow
 
 [plantuml,"LLM Chat Interaction",png]
-
+----
 actor User
 participant "Web Application" as App
 participant "LLM Service" as LLM
@@ -133,13 +134,14 @@ User -> App: Send chat message
 App -> LLM: Process user input
 LLM --> App: Generate response
 App --> User: Display chat reply
+----
 
 Notable Aspects: Secure input handling is necessary to prevent prompt injection. Ensuring low-latency responses enhances user experience.
 
 === Error Handling Scenario
 
 [plantuml,"Error Handling Sequence",png]
-
+----
 actor User
 participant "Web Application" as App
 participant "Logging Service" as Log
@@ -148,5 +150,5 @@ User -> App: Perform action
 App -> App: Error occurs
 App -> Log: Log error details
 App --> User: Display error message
-
+----
 Notable Aspects: Ensures errors are logged for troubleshooting and users receive meaningful error messages.
