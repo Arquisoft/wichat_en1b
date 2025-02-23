@@ -25,3 +25,16 @@ See https://docs.arc42.org/section-11/[Risks and Technical Debt] in the arc42 do
 
 ****
 endif::arc42help[]
+
+In this section, the detected risks and technical debts of our project are presented in table format. Identifying this risks at the beggining of the project we can prevent them to scale, avoiding future problems
+
+[cols="3,2,2", options="header"]
+|===
+| Risk | Description | Solutions
+| Security Vulnerabilities | Potential security risks such as SQL injection, cross-site scripting (XSS), or data leaks due to improper input validation or misconfigured authentication. | Conduct security audits, apply input validation, and use industry-standard authentication mechanisms.
+| Third-Party Dependency Risks | The application relies on third-party libraries and APIs, which may introduce vulnerabilities or become deprecated. | Regularly update dependencies, monitor security advisories, and have fallback options for critical libraries.
+| Performance Bottlenecks | Inefficient front-end rendering or API response times could degrade user experience. | Use lazy loading, asynchronous processing, and optimize API response times.
+| Lack of Automated Testing | Absence of sufficient test coverage may lead to undetected bugs and regression issues. | Implement unit, integration, and end-to-end testing as part of the CI/CD pipeline
+| Limited Documentation | Incomplete or missing technical documentation may slow down onboarding and maintenance. | Establish documentation guidelines and regularly update the knowledge base.
+| Inconsistent Coding Standards | Different team members might follow different coding styles, leading to inconsistency. | Define and enforce coding standards through linters, code reviews, and shared guidelines.
+|===
