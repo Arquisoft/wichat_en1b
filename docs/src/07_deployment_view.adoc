@@ -5,7 +5,6 @@ ifndef::imagesdir[:imagesdir: ../images]
 
 == Deployment View
 
-ifdef::arc42help[]
 [role="arc42help"]
 ****
 .Content
@@ -42,11 +41,16 @@ when your infrastructure is more complex.
 See https://docs.arc42.org/section-7/[Deployment View] in the arc42 documentation.
 
 ****
-endif::arc42help[]
+
+Our project is configured using GitHub actions so that every new github release publish triggers an attempt to deploy the application to a server.
+
+This server is hosted on Azure and is configured to run the application using Docker containers. Only 2 ports are open to the public: The port to be used by the web application and the port to be used by the gateway service.
+We have configured in github a set of secrets: DEPLOY_HOST (the IP address of the server), DEPLOY_USER (the user to connect to the server), DEPLOY_KEY (the SSH key to connect to the server) that allows us to deploy the application to the server using SSH.
+
+This setup enables our team to achieve continuous deployment and delivery (CD) together with continuous integration (CI).
 
 === Infrastructure Level 1
 
-ifdef::arc42help[]
 [role="arc42help"]
 ****
 Describe (usually in a combination of diagrams, tables, and text):
@@ -58,43 +62,97 @@ Describe (usually in a combination of diagrams, tables, and text):
 
 For multiple environments or alternative deployments please copy and adapt this section of arc42 for all relevant environments.
 ****
-endif::arc42help[]
 
-_**<Overview Diagram>**_
+[plantuml,"Deployment view L1",png]
+----
+node "Client Side" {
+  component WC as "Web Client"
+}
+
+node "Server Side"{
+  component GS as "Gateway Service"
+  component WA as "Web Application"
+}
+
+node "Wikidata Server"{
+  component WAPI as "Wikidata API"
+}
+
+node "Empathy LLM Server"{
+  component EAPI as "Empathy API"
+}
+
+GS-[dashed]->WAPI
+WA-[dashed]->GS
+WC-[dashed]->WA
+WA-[dashed]->WC
+WC-[dashed]->GS
+GS-[dashed]->EAPI
+
+----
+
+
+
+
 
 Motivation::
 
-_<explanation in text form>_
+    * The diagram above illustrates the initial version of our architecture and the delineation among its components. Our approach adopts a straightforward client-server architecture, where the server interacts with external services such as Wikidata or Empathy LLM. This division enforces a clear separation between the client/frontend and the server/backend. Such separation benefits the entire system by ensuring that as long as the common API is implemented, the specific implementations can remain interchangeable.
+
+    * Utilizing an Ubuntu server on Azure provides us with an isolated environment equipped with the essential configurations and installations necessary for running our services. By hosting our server on Azure, we can minimize costs associated with machine uptime while alleviating responsibilities such as security, availability, and maintenance.
+
+    * We use Docker as it is a containerization platform that allows us to package our application and its dependencies into a standardized unit for software development. This approach ensures that our application will run consistently on any environment, regardless of the machine’s configuration.
 
 Quality and/or Performance Features::
 
-_<explanation in text form>_
-
-Mapping of Building Blocks to Infrastructure::
-_<description of the mapping>_
+    As mentioned earlier, the primary advantage of this architecture lies in the interchangeability of its components.
 
 
 === Infrastructure Level 2
 
-ifdef::arc42help[]
 [role="arc42help"]
 ****
-Here you can include the internal structure of (some) infrastructure elements from level 1.
-
-Please copy the structure from level 1 for each selected element.
+Here you can see the internal structure of (some) infrastructure elements from level 1.
 ****
-endif::arc42help[]
 
-==== _<Infrastructure Element 1>_
+==== _Server Side_
+[plantuml,"Deployment view L2",png]
+----
+node "Server Side"{
+  component GS as "Gateway Service"
+  component WA as "Web Application"
+  component US as "User Service"
+  component AS as "Authorization Service"
+  component QS as "Question Service"
+  component LLMS as "LLM Service"
+  database MDB as "Mongo DB"
+}
 
-_<diagram + explanation>_
 
-==== _<Infrastructure Element 2>_
 
-_<diagram + explanation>_
 
-...
+GS-[dashed]->WA
+WA-[dashed]->GS
 
-==== _<Infrastructure Element n>_
+GS-[dashed]->AS
+AS-[dashed]->GS
 
-_<diagram + explanation>_
+GS-[dashed]->US
+US-[dashed]->GS
+
+GS-[dashed]->QS
+QS-[dashed]->GS
+
+AS-[dashed]->MDB
+MDB-[dashed]->AS
+
+US-[dashed]->MDB
+MDB-[dashed]->US
+
+GS-[dashed]->LLMS
+LLMS-[dashed]->GS
+
+----
+The gateway service works as an adapter between the micro services and the web client. The web application is the main interface for the user to interact with the system.
+
+We've opted for a microservices architecture using Docker containers instead of a monolithic setup. Each service has its own Docker image. This Docker-based approach streamlines deployment, management, and resource utilization while enhancing the overall flexibility and scalability of our system.
