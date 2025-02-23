@@ -515,6 +515,11 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 </li>
 <li><a href="#section-technical-risks">11. Risks and Technical Debts</a></li>
 <li><a href="#section-glossary">12. Glossary</a></li>
+<li><a href="#section-annex">13. Annex</a>
+<ul class="sectlevel2">
+<li><a href="#_functional_requirements">13.1. Functional Requirements</a></li>
+</ul>
+</li>
 </ul>
 </div>
 </div>
@@ -1417,22 +1422,16 @@ In the best case you will get away with examples or simple signatures.</p>
 </div>
 </div>
 </div>
-<div class="paragraph">
-<p><em><strong>&lt;Overview Diagram&gt;</strong></em></p>
+<div class="imageblock">
+<div class="content">
+<img src="./images/05_building_blocks-EN_1.png" alt="Building block level 1">
+</div>
 </div>
 <div class="dlist">
 <dl>
 <dt class="hdlist1">Motivation</dt>
 <dd>
-<p><em>&lt;text explanation&gt;</em></p>
-</dd>
-<dt class="hdlist1">Contained Building Blocks</dt>
-<dd>
-<p><em>&lt;Description of contained building block (black boxes)&gt;</em></p>
-</dd>
-<dt class="hdlist1">Important Interfaces</dt>
-<dd>
-<p><em>&lt;Description of important interfaces&gt;</em></p>
+<p>In this level we represent the general overview of the system from a high level point of view. This level represents the general idea in which the application is based.</p>
 </dd>
 </dl>
 </div>
@@ -1474,7 +1473,7 @@ Its headline is the name of the black box.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_name_black_box_1">5.1.1. &lt;Name black box 1&gt;</h4>
+<h4 id="_wichat">5.1.1. WIChat</h4>
 <div class="sidebarblock arc42help">
 <div class="content">
 <div class="paragraph">
@@ -1505,46 +1504,37 @@ according the the following black box template:</p>
 </div>
 </div>
 </div>
+<div class="sect4">
+<h5 id="_responsibility">Responsibility</h5>
 <div class="paragraph">
-<p><em>&lt;Purpose/Responsibility&gt;</em></p>
+<p>Represents the whole system. It is in charge of managing the different modules that compose the application, as well as communicating with the LLM provider and Wikidata.</p>
 </div>
-<div class="paragraph">
-<p><em>&lt;Interface(s)&gt;</em></p>
 </div>
-<div class="paragraph">
-<p><em>&lt;(Optional) Quality/Performance Characteristics&gt;</em></p>
+<div class="sect4">
+<h5 id="_interfaces">Interfaces</h5>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Wikidata</strong>: Retrieve questions and answers.</p>
+</li>
+<li>
+<p><strong>LLM Provider</strong>: Retrieve hints for the user.</p>
+</li>
+</ul>
 </div>
-<div class="paragraph">
-<p><em>&lt;(Optional) Directory/File Location&gt;</em></p>
-</div>
-<div class="paragraph">
-<p><em>&lt;(Optional) Fulfilled Requirements&gt;</em></p>
-</div>
-<div class="paragraph">
-<p><em>&lt;(optional) Open Issues/Problems/Risks&gt;</em></p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_name_black_box_2">5.1.2. &lt;Name black box 2&gt;</h4>
+<h4 id="_wikidata">5.1.2. Wikidata</h4>
 <div class="paragraph">
-<p><em>&lt;black box template&gt;</em></p>
+<p>This interface represents the Wikidata service that is in charge of providing the necessary information to create the questions that the user will have to answer. They should also provide the answers to the questions that the user will have to answer.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_name_black_box_n">5.1.3. &lt;Name black box n&gt;</h4>
+<h4 id="_llm_provider">5.1.3. LLM Provider</h4>
 <div class="paragraph">
-<p><em>&lt;black box template&gt;</em></p>
+<p>This interface represents the provider of the LLM who the application communicates with to obtain the hints required by the user in order to answer the questions.</p>
 </div>
-</div>
-<div class="sect3">
-<h4 id="_name_interface_1">5.1.4. &lt;Name interface 1&gt;</h4>
-<div class="paragraph">
-<p>&#8230;&#8203;</p>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_name_interface_m">5.1.5. &lt;Name interface m&gt;</h4>
-
 </div>
 </div>
 <div class="sect2">
@@ -1561,73 +1551,260 @@ Leave out normal, simple, boring or standardized parts of your system</p>
 </div>
 </div>
 </div>
-<div class="sect3">
-<h4 id="_white_box_building_block_1">5.2.1. White Box <em>&lt;building block 1&gt;</em></h4>
-<div class="sidebarblock arc42help">
+<div class="imageblock">
 <div class="content">
+<img src="./images/05_building_blocks-EN_2.png" alt="Building block level 2">
+</div>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1">Motivation</dt>
+<dd>
+<p>In this level we represent the inner structure of the WIChat module. This level represents a communication between several parts of the application by means of a gateway.</p>
+</dd>
+</dl>
+</div>
+<div class="sect3">
+<h4 id="_webapp">5.2.1. WebApp</h4>
+<div class="sect4">
+<h5 id="_responsibility_2">Responsibility</h5>
 <div class="paragraph">
-<p>&#8230;&#8203;describes the internal structure of <em>building block 1</em>.</p>
+<p>Represents the interacting point of the application. It contains the different modules that conform the application front-end. It is in charge of managing the user interaction.</p>
 </div>
 </div>
+<div class="sect4">
+<h5 id="_interfaces_2">Interfaces</h5>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Gateway Service</strong>: Communicate with the back-end.</p>
+</li>
+</ul>
 </div>
-<div class="paragraph">
-<p><em>&lt;white box template&gt;</em></p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_white_box_building_block_2">5.2.2. White Box <em>&lt;building block 2&gt;</em></h4>
+<h4 id="_wichat_services">5.2.2. WIChat Services</h4>
+<div class="sect4">
+<h5 id="_responsibility_3">Responsibility</h5>
 <div class="paragraph">
-<p><em>&lt;white box template&gt;</em></p>
+<p>Represents the services that the WIChat module provides. It represents the back-end of the application.</p>
 </div>
-<div class="paragraph">
-<p>&#8230;&#8203;</p>
+</div>
+<div class="sect4">
+<h5 id="_interfaces_3">Interfaces</h5>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Gateway Service</strong>: Communicate with the front-end.</p>
+</li>
+<li>
+<p><strong>LLM Provider</strong>: Retrieve hints for the user.</p>
+</li>
+<li>
+<p><strong>Wikidata</strong>: Retrieve questions and answers.</p>
+</li>
+</ul>
+</div>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_white_box_building_block_m">5.2.3. White Box <em>&lt;building block m&gt;</em></h4>
+<h4 id="_gateway_service">5.2.3. Gateway Service</h4>
 <div class="paragraph">
-<p><em>&lt;white box template&gt;</em></p>
+<p>This interface represents the accessing point where all services are joined together. It allows an easy communication between the different modules of the application and provides useful methods to fulfill that end.</p>
 </div>
 </div>
 </div>
 <div class="sect2">
 <h3 id="_level_3">5.3. Level 3</h3>
-<div class="sidebarblock arc42help">
+<div class="imageblock">
 <div class="content">
-<div class="paragraph">
-<p>Here you can specify the inner structure of (some) building blocks from level 2 as white boxes.</p>
+<img src="./images/05_building_blocks-EN_3.png" alt="Building block level 3">
 </div>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1">Motivation</dt>
+<dd>
+<p>In this level we represent the inner structure of the front and back-end modules of the application. This level illustrates the different responsibilities of the modules that are encountered at the lowest level of the application.</p>
+</dd>
+</dl>
+</div>
+<div class="sect3">
+<h4 id="_home">5.3.1. Home</h4>
 <div class="paragraph">
-<p>When you need more detailed levels of your architecture please copy this
-part of arc42 for additional levels.</p>
+<p>Represents the main page. It allows users to either log in or sign up.</p>
+</div>
+<div class="sect4">
+<h5 id="_interfaces_4">Interfaces</h5>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Gateway Service</strong>: Display application status information.</p>
+</li>
+</ul>
 </div>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_white_box_building_block_x_1">5.3.1. White Box &lt;_building block x.1_&gt;</h4>
-<div class="sidebarblock arc42help">
-<div class="content">
+<h4 id="_new_user">5.3.2. New User</h4>
 <div class="paragraph">
-<p>Specifies the internal structure of <em>building block x.1</em>.</p>
+<p>Represents the page where users can sign up.</p>
 </div>
+<div class="sect4">
+<h5 id="_interfaces_5">Interfaces</h5>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Gateway Service</strong>: Save the registration data in the database.</p>
+</li>
+</ul>
 </div>
-</div>
-<div class="paragraph">
-<p><em>&lt;white box template&gt;</em></p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_white_box_building_block_x_2">5.3.2. White Box &lt;_building block x.2_&gt;</h4>
+<h4 id="_log_in">5.3.3. Log In</h4>
 <div class="paragraph">
-<p><em>&lt;white box template&gt;</em></p>
+<p>Represents the page where users can log in.</p>
+</div>
+<div class="sect4">
+<h5 id="_interfaces_6">Interfaces</h5>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Gateway Service</strong>: Authentication purposes.</p>
+</li>
+</ul>
+</div>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_white_box_building_block_y_1">5.3.3. White Box &lt;_building block y.1_&gt;</h4>
+<h4 id="_user_menu">5.3.4. User menu</h4>
 <div class="paragraph">
-<p><em>&lt;white box template&gt;</em></p>
+<p>Represents the menu that users can access once they have logged in or created an account.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_statistics">5.3.5. Statistics</h4>
+<div class="paragraph">
+<p>Represents the page where users can see their statistics.</p>
+</div>
+<div class="sect4">
+<h5 id="_interfaces_7">Interfaces</h5>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Gateway Service</strong>: Obtain those statistics.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_game">5.3.6. Game</h4>
+<div class="paragraph">
+<p>Represents the page where users can play the game.</p>
+</div>
+<div class="sect4">
+<h5 id="_interfaces_8">Interfaces</h5>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Gateway Service</strong>: Questions and hints.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_auth_service">5.3.7. Auth Service</h4>
+<div class="paragraph">
+<p>Represents the authentication service where users will log into their accounts.</p>
+</div>
+<div class="sect4">
+<h5 id="_interfaces_9">Interfaces</h5>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Gateway Service</strong>: Send the login status of the user that tried to log in.</p>
+</li>
+<li>
+<p><strong>Database</strong>: Retrieve the user information to check if the user information is valid.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_user_service">5.3.8. User Service</h4>
+<div class="paragraph">
+<p>Represents the service where users will manage their account creations.</p>
+</div>
+<div class="sect4">
+<h5 id="_interfaces_10">Interfaces</h5>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Gateway Service</strong>: Accept the user account creation information.</p>
+</li>
+<li>
+<p><strong>Database</strong>: Insert the retrieved information for their persistance.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_statistics_service">5.3.9. Statistics Service</h4>
+<div class="paragraph">
+<p>Represents the service where statistics from users will be retrieved.</p>
+</div>
+<div class="sect4">
+<h5 id="_interfaces_11">Interfaces</h5>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Gateway Service</strong>: Send those statistics to be displayed in the application.</p>
+</li>
+<li>
+<p><strong>Database</strong>: Store the statistics needed for the application to work.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_question_service">5.3.10. Question Service</h4>
+<div class="paragraph">
+<p>It is in charge of managing the creation of questions and answers.</p>
+</div>
+<div class="sect4">
+<h5 id="_interfaces_12">Interfaces</h5>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Gateway Service</strong>: Sharing the question and possible answers to the user.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_llm_service">5.3.11. LLM Service</h4>
+<div class="paragraph">
+<p>It represents the service that will provide the hints to the users by means of an LLM.</p>
+</div>
+<div class="sect4">
+<h5 id="_interfaces_13">Interfaces</h5>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Gateway Service</strong>: Sending hints retrieved to the user.</p>
+</li>
+</ul>
 </div>
 <div style="page-break-after: always;"></div>
+</div>
 </div>
 </div>
 </div>
@@ -2208,6 +2385,55 @@ on this list.</p>
 </div>
 </div>
 </div>
+<div class="paragraph">
+<p>In this section, the detected risks and technical debts of our project are presented in table format. Identifying this risks at the beggining of the project we can prevent them to scale, avoiding future problems</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 42.8571%;">
+<col style="width: 28.5714%;">
+<col style="width: 28.5715%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Risk</th>
+<th class="tableblock halign-left valign-top">Description</th>
+<th class="tableblock halign-left valign-top">Solutions</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Security Vulnerabilities</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Potential security risks such as SQL injection, cross-site scripting (XSS), or data leaks due to improper input validation or misconfigured authentication.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Conduct security audits, apply input validation, and use industry-standard authentication mechanisms.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Third-Party Dependency Risks</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The application relies on third-party libraries and APIs, which may introduce vulnerabilities or become deprecated.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Regularly update dependencies, monitor security advisories, and have fallback options for critical libraries.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Performance Bottlenecks</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Inefficient front-end rendering or API response times could degrade user experience.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Use lazy loading, asynchronous processing, and optimize API response times.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lack of Automated Testing</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Absence of sufficient test coverage may lead to undetected bugs and regression issues.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Implement unit, integration, and end-to-end testing as part of the CI/CD pipeline</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Limited Documentation</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Incomplete or missing technical documentation may slow down onboarding and maintenance.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Establish documentation guidelines and regularly update the knowledge base.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Inconsistent Coding Standards</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Different team members might follow different coding styles, leading to inconsistency.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Define and enforce coding standards through linters, code reviews, and shared guidelines.</p></td>
+</tr>
+</tbody>
+</table>
 <div style="page-break-after: always;"></div>
 </div>
 </div>
@@ -2272,13 +2498,221 @@ on this list.</p>
 </tr>
 </tbody>
 </table>
+<div style="page-break-after: always;"></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="section-annex">13. Annex</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_functional_requirements">13.1. Functional Requirements</h3>
+<div class="sect3">
+<h4 id="_users_register">13.1.1. Users Register.</h4>
+<div class="ulist none or no-bullet">
+<ul class="none or no-bullet">
+<li>
+<p>UR 1. The system must allow an unregistered user to register in the application.</p>
+</li>
+<li>
+<p>UR 2. The system must request data to register:</p>
+<div class="ulist none or no-bullet">
+<ul class="none or no-bullet">
+<li>
+<p>UR 2.1.1. Username.</p>
+</li>
+<li>
+<p>UR 2.1.2. Email address.</p>
+</li>
+<li>
+<p>UR 2.1.3. Password.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>UR 3. The system shouldn&#8217;t allow the user to be registered when any value entered by the new user is invalid.</p>
+</li>
+<li>
+<p>UR 4. The system must check for existing users with the data obtained.</p>
+<div class="ulist none or no-bullet">
+<ul class="none or no-bullet">
+<li>
+<p>UR 4.1. The system shouldn&#8217;t allow the user to create a new account if the email matches with an existing user.</p>
+</li>
+<li>
+<p>UR 4.2. The system should allow the user to create a new account if the email does not match with an existing user.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>UR 5. The system must recognice the user as registered.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_users_log">13.1.2. Users Log.</h4>
+<div class="ulist none or no-bullet">
+<ul class="none or no-bullet">
+<li>
+<p>UL 1. The system must allow an unidentified user to log in.</p>
+<div class="ulist none or no-bullet">
+<ul class="none or no-bullet">
+<li>
+<p>UL 1.1. The system must request the email address as the user identifier.</p>
+<div class="ulist none or no-bullet">
+<ul class="none or no-bullet">
+<li>
+<p>UL 1.1.1. The system must check that its format is valid.</p>
+</li>
+<li>
+<p>UL 1.1.2. The system must check the box is filled.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>UL 1.2. The system must request the user&#8217;s password.</p>
+<div class="ulist none or no-bullet">
+<ul class="none or no-bullet">
+<li>
+<p>UL 1.2.1. The system must check the box is filled.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>UL 1.3. The system must automatically validate the entered data to verify when it corresponds to a registered user account.</p>
+<div class="ulist none or no-bullet">
+<ul class="none or no-bullet">
+<li>
+<p>UL 1.3.1. When the user is not stored in the system, an error message must be displayed.</p>
+</li>
+<li>
+<p>UL 1.3.2. When the user exists in the system, but the password does not match, a message must be displayed to the user notifying them of the error.</p>
+</li>
+<li>
+<p>UL 1.3.3. When the user is stored in the system and the password matches, the user must be logged in.</p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>UL 2. The system must allow users who are logged in to log out.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_users_data">13.1.3. Users Data.</h4>
+<div class="ulist none or no-bullet">
+<ul class="none or no-bullet">
+<li>
+<p>UD 1. The system must allow all identified users to access their historical data.</p>
+<div class="ulist none or no-bullet">
+<ul class="none or no-bullet">
+<li>
+<p>UD 1.1. Identified users must be able to access the number of:</p>
+<div class="ulist none or no-bullet">
+<ul class="none or no-bullet">
+<li>
+<p>UD 1.1.1. Games they have played.</p>
+</li>
+<li>
+<p>UD 1.1.2. Questions they have answered correctly.</p>
+</li>
+<li>
+<p>UD 1.1.3. Questions they have answered incorrectly.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>UD 1.2. Identified users must be able to access the ranking of the game.</p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_playing_wichat">13.1.4. Playing WIChat.</h4>
+<div class="ulist none or no-bullet">
+<ul class="none or no-bullet">
+<li>
+<p>PWIC 1. The system must only allow identified users to play WIChat.</p>
+</li>
+<li>
+<p>PWIC 2. The system must retrieve indormation for the questions from Wikidata.</p>
+</li>
+<li>
+<p>PWIC 3. The system must provide the user with a LLM API to help answering the questions.</p>
+<div class="ulist none or no-bullet">
+<ul class="none or no-bullet">
+<li>
+<p>PWIC 3.1 The LLM must provide the user with hints about the questions.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>PWIC 4. The game consists of nine rounds by default.</p>
+<div class="ulist none or no-bullet">
+<ul class="none or no-bullet">
+<li>
+<p>PWIC 4.1. the system must automatically provide a question to the identified user.</p>
+</li>
+<li>
+<p>PWIC 4.3. The system must automatically provide one correct answer.</p>
+</li>
+<li>
+<p>PWIC 4.2. The system must automatically provide three distractors.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>PWIC 5. The system must allow the user to answer the questions if there is time remaining.</p>
+<div class="ulist none or no-bullet">
+<ul class="none or no-bullet">
+<li>
+<p>PWIC 5.1. The system must check when the identified user has provided an answer in the time given:</p>
+<div class="ulist none or no-bullet">
+<ul class="none or no-bullet">
+<li>
+<p>PWIC 5.1.1. If the answer is correct.</p>
+</li>
+<li>
+<p>PWIC 5.1.2. If the answer is incorrect.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>PWIC 5.2. The system must move to the next round when the specified time has ended.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>PWIC 6. The system must terminate the game and give a score when the last round is over.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
 </div>
 </div>
 </div>
 <div id="footer">
 <div id="footer-text">
 Version 8.2 EN<br>
-Last updated 2025-02-22 12:19:53 +0100
+Last updated 2025-02-23 19:19:24 +0100
 </div>
 </div>
 </body>
