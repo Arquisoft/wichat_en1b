@@ -47,12 +47,12 @@ This section describes how the system components interacts between them. In this
 
 ==== Sign up Flow
 
-[plantuml,"Authentication Sequence",png]
+[plantuml,"Authentication Sign Up Sequence",png]
 ----
 actor User
-participant "Web Application" as App
-participant "Authentication Service" as Auth
-participant "Users database" as Ust
+entity "Web Application" as App
+entity "Authentication Service" as Auth
+database "Users database" as Ust
 
 User -> App: Sign up
 App -> Auth: Validate credentials
@@ -67,21 +67,23 @@ alt credentials are valid
         Ust --> Auth: Error repeated user
         Auth --> App: Error repeated user
         App --> User: Log in page
+    end
 else credentials are invalid
     Auth --> App: Invalid credentials
     App --> User: Error invalid credentials
+end
 ----
 
 Notable Aspects: Ensures secure authentication via an authentication service. Protects against unauthorized access and ensures session management.
 
 ==== Log in Flow
 
-[plantuml,"Authentication Sequence",png]
+[plantuml,"Authentication Log In Sequence",png]
 ----
 actor User
-participant "Web Application" as App
-participant "Authentication Service" as Auth
-participant "Users database" as Ust
+entity "Web Application" as App
+entity "Authentication Service" as Auth
+database "Users database" as Ust
 
 User -> App: Login request
 App -> Auth: Validate credentials
@@ -99,8 +101,10 @@ alt credentials are valid
         Ust --> Auth: Error incorrect password
         Auth --> App: Error incorrect password
         App --> User: Incorrect password
+    end
 else credentials are invalid
     Auth --> App: Error invalid credentials
+end
 ----
 
 Notable Aspects: Ensures secure authentication via an authentication service. Protects against unauthorized access and ensures session management.
@@ -111,8 +115,8 @@ Notable Aspects: Ensures secure authentication via an authentication service. Pr
 [plantuml,"Quiz Question Retrieval",png]
 ----
 actor User
-participant "Web Application" as App
-participant "Wikidata API" as Wiki
+entity "Web Application" as App
+entity "Wikidata API" as Wiki
 
 User -> App: Request quiz question
 App -> Wiki: Fetch relevant question
@@ -127,8 +131,8 @@ Notable Aspects: Ensures real-time retrieval of quiz questions from Wikidata, re
 [plantuml,"LLM Chat Interaction",png]
 ----
 actor User
-participant "Web Application" as App
-participant "LLM Service" as LLM
+entity "Web Application" as App
+entity "LLM Service" as LLM
 
 User -> App: Send chat message
 App -> LLM: Process user input
@@ -143,8 +147,8 @@ Notable Aspects: Secure input handling is necessary to prevent prompt injection.
 [plantuml,"Error Handling Sequence",png]
 ----
 actor User
-participant "Web Application" as App
-participant "Logging Service" as Log
+entity "Web Application" as App
+entity "Logging Service" as Log
 
 User -> App: Perform action
 App -> App: Error occurs
