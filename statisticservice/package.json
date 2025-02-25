@@ -1,0 +1,29 @@
+{
+    "name": "statisticservice",
+    "version": "1.0.0",
+    "description": "Statistics service, in charge of managing user statistics in the application",
+    "main": "service.js",
+    "scripts": {
+        "start": "node statistics-service.js",
+        "test": "jest"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/arquisoft/wichat_en1b.git"
+    },
+    "author": "",
+    "license": "ISC",
+    "bugs": {
+        "url": "https://github.com/arquisoft/wichat_en1b/issues"
+    },
+    "homepage": "https://github.com/arquisoft/wichat_en1b#readme",
+    "dependencies": {
+        "express": "^4.21.2",
+        "mongoose": "^8.9.3"
+    },
+    "devDependencies": {
+        "jest": "^29.7.0",
+        "mongodb-memory-server": "^10.1.3",
+        "supertest": "^7.0.0"
+    }
+}
