@@ -163,7 +163,7 @@ Gat --> App: Forwards message
 App --> Admin: New questions were generated
 ----
 
-Notable Aspects: Ensures an improvement in performance, reducing external api calls
+Notable Aspects: Ensures an improvement in performance, reducing external api calls.
 
 === LLM Chat Interaction Flow
 
@@ -171,27 +171,31 @@ Notable Aspects: Ensures an improvement in performance, reducing external api ca
 ----
 actor User
 entity "Web Application" as App
+entity "Gateway Service" as Gat
 entity "LLM Service" as LLM
+boundary "LLM provider" as LLMP
 
 User -> App: Send chat message
-App -> LLM: Process user input
-LLM --> App: Generate response
-App --> User: Display chat reply
+App -> Gat: Send user input to the backend
+Gat -> LLM: Forwards user input
+LLM -> LLM: Process user input
+LLM -> LLMP: Send question
+LLMP --> LLM: Answer 
+alt If connection fails
+    LLM --> Gat: Error when asking a question
+    Gat --> App: Forwards the error
+    App --> User: Erro when geting a response
+else I connection is successful
+    LLM --> Gat: Sends hint
+    Gat --> App: Forwards hint
+    App --> User: Sends hint
 ----
 
-Notable Aspects: Secure input handling is necessary to prevent prompt injection. Ensuring low-latency responses enhances user experience.
+Notable Aspects: Ensures that the application does not crash if the external provider of the LLM fails
 
-=== Error Handling Scenario
+=== Question Game Interaction Flow
 
-[plantuml,"Error Handling Sequence",png]
-----
-actor User
-entity "Web Application" as App
-entity "Logging Service" as Log
+[plantuml,"Qestion Game Interaction",png]
 
-User -> App: Perform action
-App -> App: Error occurs
-App -> Log: Log error details
-App --> User: Display error message
-----
-Notable Aspects: Ensures errors are logged for troubleshooting and users receive meaningful error messages.
+
+
