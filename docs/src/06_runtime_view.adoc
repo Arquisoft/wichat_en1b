@@ -92,7 +92,7 @@ actor User
 entity "Web Application" as App
 entity "Gateway Service" as Gat
 entity "Authentication Service" as Auth
-database "Users database" as Ust
+database "Users Database" as Ust
 
 User -> App: Login request
 App -> Gat: Sends login data
@@ -129,17 +129,41 @@ Notable Aspects: Ensures secure authentication via an authentication service. Pr
 
 [plantuml,"Quiz Question Retrieval",png]
 ----
-actor User
+actor Admin
 entity "Web Application" as App
-entity "Wikidata API" as Wiki
+entity "Gateway Service" as Gat
+entity "Question Service" as Qus
+boundary "Wikidata API" as Wiki
+database "Questions Database" as Qdb
 
-User -> App: Request quiz question
-App -> Wiki: Fetch relevant question
-Wiki --> App: Return question data
-App --> User: Display question
+Admin -> App: Request generate batch of quiz questions
+App -> Gat: Sends the request
+Gat -> Qus: Forwards petition to the microservice
+loop Until batch is full
+    Qus -> Wiki: Fetch relevant question
+    Wiki --> Qus: Answer
+    alt If an error occurs
+        Qus -> Qus: Discard recolected data
+        break Exit loop
+        Qus --> Gat: Error while fetching questions
+        Gat --> App: Forwards error
+        App --> Admin: Notify error
+    else No error occurs
+        Qus -> Qus: Store data
+    end
+end
+Qus -> Qdb: Clear old data
+Qdb -> Qdb: Clear old data
+Qdb --> Qus: Old data removed
+Qus -> Qdb: New data
+Qdb -> Qdb: Store new data
+Qdb --> Qus: New data stored
+Qus --> Gat: New data generated
+Gat --> App: Forwards message
+App --> Admin: New questions were generated
 ----
 
-Notable Aspects: Ensures real-time retrieval of quiz questions from Wikidata, requiring efficient API calls and caching strategies.
+Notable Aspects: Ensures an improvement in performance, reducing external api calls
 
 === LLM Chat Interaction Flow
 
