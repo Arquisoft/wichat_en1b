@@ -181,11 +181,11 @@ Gat -> LLM: Forwards user input
 LLM -> LLM: Process user input
 LLM -> LLMP: Send question
 LLMP --> LLM: Answer 
-alt If connection fails
+alt Connection failure
     LLM --> Gat: Error when asking a question
     Gat --> App: Forwards the error
-    App --> User: Erro when geting a response
-else I connection is successful
+    App --> User: Error when geting a response
+else Connection successful
     LLM --> Gat: Sends hint
     Gat --> App: Forwards hint
     App --> User: Sends hint
@@ -196,6 +196,65 @@ Notable Aspects: Ensures that the application does not crash if the external pro
 === Question Game Interaction Flow
 
 [plantuml,"Qestion Game Interaction",png]
+----
+actor User
+entity "Web Application" as App
+entity "Gateway Service" as Gat
+entity "Question Service" as Qus
+entity "Statistics Service" as Sts
+database "Questions Database" as Qdb
+database "Users Database" as Udb
+entity "LLM Service" as LLM
+
+User -> App: Request play Game
+App -> Gat: Retrieve question request
+Gat -> Qus: Forward request
+Qus -> Qdb: Request new question
+Qdb -> Qdb: Fetch question
+Qdb --> Qus: Serves question
+Qus --> Gat: Sends the question back
+Gat --> App: Forwards the question
+App --> User: Shows the question
+alt User wants a hint
+    ref over App, LLM : LLM Chat Interaction
+end
+User -> App: Submits answer
+App -> Gat: Sends answer to backend
+Gat -> Sts: Forwards answer
+Sts -> Sts: Process answer and generates statistics
+Sts -> Udb: Sends statistics
+Udb -> Udb: Saves statistics
+Udb --> Sts: All correct message
+Sts --> Gat: Send result
+Gat --> App: Forward result
+App --> User: Shows result 
+----
 
 
+=== Statistics Interaction Flow
+[plantuml, "Statistics Interaction", png]
+----
+actor User
+entity "Web Application" as App
+entity "Gateway Service" as Gat
+entity "Statistics Service" as Sts
+database "Users Database" as Udb
 
+User -> App: Request statistics
+App -> Gat: Request statistics of user
+Gat -> Sts: Forwards request
+Sts -> Udb: Request statistics of user
+Udb -> Udb: Search for records of the user
+alt User has no records
+    Udb --> Sts: No records found for that user
+    Sts --> Gat: No records found
+    Gat --> App: Forwards message
+    App --> User: No records found
+else User has records
+    Udb --> Sts: User records
+    Sts --> Gat: User statistics
+    Gat --> App: Forwards user statistics
+    App --> User: Show user statistics
+end
+
+----
