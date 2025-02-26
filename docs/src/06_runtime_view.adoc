@@ -82,28 +82,35 @@ Notable Aspects: Ensures secure authentication via an authentication service. Pr
 ----
 actor User
 entity "Web Application" as App
+entity "Gateway Service" as Gat
 entity "Authentication Service" as Auth
 database "Users database" as Ust
 
 User -> App: Login request
-App -> Auth: Validate credentials
+App -> Gat: Sends login data
+Gat -> Auth: Forwards credentials
+Auth -> Auth: Validate credentials
 alt credentials are valid
     Auth -> Ust: Search for registered users
     alt user is found and pasword is correct
         Ust --> Auth: Found user
-        Auth --> App: Acess token
+        Auth --> Gat: Access token
+        Gat --> App: Forwards acess token
         App --> User: Acess token
     else user is not found 
         Ust --> Auth: Not found user
-        Auth --> App: Not found user
+        Auth --> Gat: Not found user
+        Gat --> App: Forwards not found user
         App --> User: Sign up page
     else password is not correct
         Ust --> Auth: Error incorrect password
-        Auth --> App: Error incorrect password
+        Auth --> Gat: Error incorrect password
+        Gat --> App: Forwards error incorrect password
         App --> User: Incorrect password
     end
 else credentials are invalid
-    Auth --> App: Error invalid credentials
+    Auth --> Gat: Error invalid credentials
+    Gat --> App: Forwards error invalid credentials
 end
 ----
 
