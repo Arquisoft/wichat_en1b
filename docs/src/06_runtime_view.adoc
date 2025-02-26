@@ -54,27 +54,35 @@ entity "Web Application" as App
 entity "Authentication Service" as Auth
 database "Users database" as Ust
 
-User -> App: Sign up
-App -> Auth: Validate credentials
+User -> App: Sign up request
+App -> Gat: Sends sign up data
+Gat -> Auth: Forwards credentials
+Auth -> Auth: Validate credentials
 alt credentials are valid
-    Auth -> Ust: Send the data to create the user
-    Ust -> Ust: Create the user
-    alt user is created correctly
-        Ust --> Auth: Sign up result
-        Auth --> App: Acess token
+    Auth -> Ust: Asks if user already exists
+    Ust -> Ust: Searchs user
+    alt user is not repeated
+        Ust --> Auth: Non-repeated user
+        Auth -> Ust: Sends new user's data to the database
+        Ust -> Ust: Creates user
+        Ust --> Auth: Success
+        Auth --> Gat: Access token
+        Gat --> App: Forwards acess token
         App --> User: Acess token
     else user is repeated
         Ust --> Auth: Error repeated user
-        Auth --> App: Error repeated user
+        Auth --> Gat: Error repeated user
+        Gat --> App: Forwards error repeated user
         App --> User: Log in page
     end
 else credentials are invalid
-    Auth --> App: Invalid credentials
+    Auth --> Gat: Invalid credentials error
+    Gat --> App: Forwards invalid credentials error
     App --> User: Error invalid credentials
 end
 ----
 
-Notable Aspects: Ensures secure authentication via an authentication service. Protects against unauthorized access and ensures session management.
+Notable Aspects: Ensures secure signup via an authentication service. Protects against duplicated.
 
 ==== Log in Flow
 
