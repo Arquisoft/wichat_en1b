@@ -195,7 +195,7 @@ Notable Aspects: Ensures that the application does not crash if the external pro
 
 === Question Game Interaction Flow
 
-[plantuml,"Qestion Game Interaction",png]
+[plantuml,"Question Game Interaction",png]
 ----
 actor User
 entity "Web Application" as App
