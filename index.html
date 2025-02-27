@@ -486,7 +486,8 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <li><a href="#_user_authentication_flow">6.1. User Authentication Flow</a></li>
 <li><a href="#_quiz_question_retrieval_flow">6.2. Quiz Question Retrieval Flow</a></li>
 <li><a href="#_llm_chat_interaction_flow">6.3. LLM Chat Interaction Flow</a></li>
-<li><a href="#_error_handling_scenario">6.4. Error Handling Scenario</a></li>
+<li><a href="#_question_game_interaction_flow">6.4. Question Game Interaction Flow</a></li>
+<li><a href="#_statistics_interaction_flow">6.5. Statistics Interaction Flow</a></li>
 </ul>
 </li>
 <li><a href="#section-deployment-view">7. Deployment View</a>
@@ -518,11 +519,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 </li>
 <li><a href="#section-technical-risks">11. Risks and Technical Debts</a></li>
 <li><a href="#section-glossary">12. Glossary</a></li>
-<li><a href="#section-annex">13. Annex</a>
-<ul class="sectlevel2">
-<li><a href="#_functional_requirements">13.1. Functional Requirements</a></li>
-</ul>
-</li>
+<li><a href="#section-annex">13. Annex</a></li>
 </ul>
 </div>
 </div>
@@ -637,6 +634,8 @@ If requirements documents exist this overview should refer to these documents.</
 </div>
 </div>
 </div>
+<div class="sect3">
+<h4 id="_functionalities_definition">1.1.1. Functionalities definition</h4>
 <div class="ulist">
 <ul>
 <li>
@@ -679,6 +678,209 @@ If requirements documents exist this overview should refer to these documents.</
 <p>The system will give access to information about the generated questions through an API.</p>
 </li>
 </ul>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_functional_requirements">1.1.2. Functional requirements</h4>
+<div class="paragraph">
+<p><strong>Users Register</strong></p>
+</div>
+<div class="ulist none or no-bullet">
+<ul class="none or no-bullet">
+<li>
+<p>UR 1. The system must allow an unregistered user to register in the application.</p>
+</li>
+<li>
+<p>UR 2. The system must request data to register:</p>
+<div class="ulist none or no-bullet">
+<ul class="none or no-bullet">
+<li>
+<p>UR 2.1.1. Username.</p>
+</li>
+<li>
+<p>UR 2.1.2. Email address.</p>
+</li>
+<li>
+<p>UR 2.1.3. Password.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>UR 3. The system shouldn&#8217;t allow the user to be registered when any value entered by the new user is invalid.</p>
+</li>
+<li>
+<p>UR 4. The system must check for existing users with the data obtained.</p>
+<div class="ulist none or no-bullet">
+<ul class="none or no-bullet">
+<li>
+<p>UR 4.1. The system shouldn&#8217;t allow the user to create a new account if the email matches with an existing user.</p>
+</li>
+<li>
+<p>UR 4.2. The system should allow the user to create a new account if the email does not match with an existing user.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>UR 5. The system must recognice the user as registered.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p><strong>Users log</strong></p>
+</div>
+<div class="ulist none or no-bullet">
+<ul class="none or no-bullet">
+<li>
+<p>UL 1. The system must allow an unidentified user to log in.</p>
+<div class="ulist none or no-bullet">
+<ul class="none or no-bullet">
+<li>
+<p>UL 1.1. The system must request the email address as the user identifier.</p>
+<div class="ulist none or no-bullet">
+<ul class="none or no-bullet">
+<li>
+<p>UL 1.1.1. The system must check that its format is valid.</p>
+</li>
+<li>
+<p>UL 1.1.2. The system must check the box is filled.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>UL 1.2. The system must request the user&#8217;s password.</p>
+<div class="ulist none or no-bullet">
+<ul class="none or no-bullet">
+<li>
+<p>UL 1.2.1. The system must check the box is filled.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>UL 1.3. The system must automatically validate the entered data to verify when it corresponds to a registered user account.</p>
+<div class="ulist none or no-bullet">
+<ul class="none or no-bullet">
+<li>
+<p>UL 1.3.1. When the user is not stored in the system, an error message must be displayed.</p>
+</li>
+<li>
+<p>UL 1.3.2. When the user exists in the system, but the password does not match, a message must be displayed to the user notifying them of the error.</p>
+</li>
+<li>
+<p>UL 1.3.3. When the user is stored in the system and the password matches, the user must be logged in.</p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>UL 2. The system must allow users who are logged in to log out.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p><strong>Users Data</strong></p>
+</div>
+<div class="ulist none or no-bullet">
+<ul class="none or no-bullet">
+<li>
+<p>UD 1. The system must allow all identified users to access their historical data.</p>
+<div class="ulist none or no-bullet">
+<ul class="none or no-bullet">
+<li>
+<p>UD 1.1. Identified users must be able to access the number of:</p>
+<div class="ulist none or no-bullet">
+<ul class="none or no-bullet">
+<li>
+<p>UD 1.1.1. Games they have played.</p>
+</li>
+<li>
+<p>UD 1.1.2. Questions they have answered correctly.</p>
+</li>
+<li>
+<p>UD 1.1.3. Questions they have answered incorrectly.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>UD 1.2. Identified users must be able to access the ranking of the game.</p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p><strong>Playing WIChat</strong></p>
+</div>
+<div class="ulist none or no-bullet">
+<ul class="none or no-bullet">
+<li>
+<p>PWIC 1. The system must only allow identified users to play WIChat.</p>
+</li>
+<li>
+<p>PWIC 2. The system must retrieve indormation for the questions from Wikidata.</p>
+</li>
+<li>
+<p>PWIC 3. The system must provide the user with a LLM API to help answering the questions.</p>
+<div class="ulist none or no-bullet">
+<ul class="none or no-bullet">
+<li>
+<p>PWIC 3.1 The LLM must provide the user with hints about the questions.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>PWIC 4. The game consists of nine rounds by default.</p>
+<div class="ulist none or no-bullet">
+<ul class="none or no-bullet">
+<li>
+<p>PWIC 4.1. the system must automatically provide a question to the identified user.</p>
+</li>
+<li>
+<p>PWIC 4.3. The system must automatically provide one correct answer.</p>
+</li>
+<li>
+<p>PWIC 4.2. The system must automatically provide three distractors.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>PWIC 5. The system must allow the user to answer the questions if there is time remaining.</p>
+<div class="ulist none or no-bullet">
+<ul class="none or no-bullet">
+<li>
+<p>PWIC 5.1. The system must check when the identified user has provided an answer in the time given:</p>
+<div class="ulist none or no-bullet">
+<ul class="none or no-bullet">
+<li>
+<p>PWIC 5.1.1. If the answer is correct.</p>
+</li>
+<li>
+<p>PWIC 5.1.2. If the answer is incorrect.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>PWIC 5.2. The system must move to the next round when the specified time has ended.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>PWIC 6. The system must terminate the game and give a score when the last round is over.</p>
+</li>
+</ul>
+</div>
 </div>
 </div>
 <div class="sect2">
@@ -733,7 +935,7 @@ If you as an architect do not know how the quality of your work will be judged&#
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Availability</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The system shall be available 99% of the time a user tries to access it.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The system shall be available 97% of the time a user tries to access it.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Maitainability</p></td>
@@ -741,11 +943,11 @@ If you as an architect do not know how the quality of your work will be judged&#
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Performance efficiency</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The system shall deliver optimal performance, ensuring responsive interactions for users. The automatic generation of questions from Wikidata and the LLM responses with a real-time gameplay shall be efficient. The system shall handle 1000 concurrent users.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The system shall deliver optimal performance, ensuring responsive interactions for users. The automatic generation of questions from Wikidata and the LLM responses with a real-time gameplay shall be efficient. The system shall handle 20 concurrent users.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Usability</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The system shall provide a user-friendly interface, making it easy for users to register, log in, and play the game. The system learning time for a user should be less than 3 hours.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The system shall provide a user-friendly interface, making it easy for users to register, log in, and play the game.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Portability</p></td>
@@ -754,6 +956,14 @@ If you as an architect do not know how the quality of your work will be judged&#
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Security</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The system shall prioritize user data security. It must implement robust authentication mechanisms for user registration and login. The API access points for user information and generated questions must be secured with proper authorization.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Testability</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Facilitate comprehensive testing to ensure software correctness and identify potential issues early.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Learnability</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The system learning time for a user should be low, preferable under 3 hours.</p></td>
 </tr>
 </tbody>
 </table>
@@ -907,8 +1117,8 @@ conventions (e.g. programming or versioning guidelines, documentation or naming 
 </thead>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Performance</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The system must be usable and handle a reasonable amount of users at the same time and ensure fast responses (specially from the LLM)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Web App</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The application should be a web application</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Wikidata</p></td>
@@ -970,6 +1180,10 @@ conventions (e.g. programming or versioning guidelines, documentation or naming 
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Testing</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The system must have robust and meaningful tests to make the application as secure as possible</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Version Control System</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The development process of the application must use GitHub as Version Control System</p></td>
 </tr>
 </tbody>
 </table>
@@ -1773,6 +1987,9 @@ Leave out normal, simple, boring or standardized parts of your system</p>
 <li>
 <p><strong>Gateway Service</strong>: Sharing the question and possible answers to the user.</p>
 </li>
+<li>
+<p><strong>Database</strong>: Store the questions that might be needed for the application to work.</p>
+</li>
 </ul>
 </div>
 </div>
@@ -1871,18 +2088,18 @@ You will mainly capture scenarios in your documentation to communicate your arch
 <h4 id="_sign_up_flow">6.1.1. Sign up Flow</h4>
 <div class="imageblock">
 <div class="content">
-<img src="./images/Authentication%20Sign%20Up%20Sequence.png" alt="Authentication Sign Up Sequence" width="669" height="657">
+<img src="./images/Authentication%20Sign%20Up%20Sequence.png" alt="Authentication Sign Up Sequence" width="940" height="926">
 </div>
 </div>
 <div class="paragraph">
-<p>Notable Aspects: Ensures secure authentication via an authentication service. Protects against unauthorized access and ensures session management.</p>
+<p>Notable Aspects: Ensures secure signup via an authentication service. Protects against duplicated.</p>
 </div>
 </div>
 <div class="sect3">
 <h4 id="_log_in_flow">6.1.2. Log in Flow</h4>
 <div class="imageblock">
 <div class="content">
-<img src="./images/Authentication%20Log%20In%20Sequence.png" alt="Authentication Log In Sequence" width="606" height="690">
+<img src="./images/Authentication%20Log%20In%20Sequence.png" alt="Authentication Log In Sequence" width="829" height="885">
 </div>
 </div>
 <div class="paragraph">
@@ -1894,33 +2111,38 @@ You will mainly capture scenarios in your documentation to communicate your arch
 <h3 id="_quiz_question_retrieval_flow">6.2. Quiz Question Retrieval Flow</h3>
 <div class="imageblock">
 <div class="content">
-<img src="./images/Quiz%20Question%20Retrieval.png" alt="Quiz Question Retrieval" width="377" height="305">
+<img src="./images/Quiz%20Question%20Retrieval.png" alt="Quiz Question Retrieval" width="1076" height="918">
 </div>
 </div>
 <div class="paragraph">
-<p>Notable Aspects: Ensures real-time retrieval of quiz questions from Wikidata, requiring efficient API calls and caching strategies.</p>
+<p>Notable Aspects: Ensures an improvement in performance, reducing external api calls.</p>
 </div>
 </div>
 <div class="sect2">
 <h3 id="_llm_chat_interaction_flow">6.3. LLM Chat Interaction Flow</h3>
 <div class="imageblock">
 <div class="content">
-<img src="./images/LLM%20Chat%20Interaction.png" alt="LLM Chat Interaction" width="338" height="305">
+<img src="./images/LLM%20Chat%20Interaction.png" alt="LLM Chat Interaction" width="794" height="602">
 </div>
 </div>
 <div class="paragraph">
-<p>Notable Aspects: Secure input handling is necessary to prevent prompt injection. Ensuring low-latency responses enhances user experience.</p>
+<p>Notable Aspects: Ensures that the application does not crash if the external provider of the LLM fails</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_error_handling_scenario">6.4. Error Handling Scenario</h3>
+<h3 id="_question_game_interaction_flow">6.4. Question Game Interaction Flow</h3>
 <div class="imageblock">
 <div class="content">
-<img src="./images/Error%20Handling%20Sequence.png" alt="Error Handling Sequence" width="347" height="318">
+<img src="./images/Question%20Game%20Interaction.png" alt="Question Game Interaction" width="1162" height="878">
 </div>
 </div>
-<div class="paragraph">
-<p>Notable Aspects: Ensures errors are logged for troubleshooting and users receive meaningful error messages.</p>
+</div>
+<div class="sect2">
+<h3 id="_statistics_interaction_flow">6.5. Statistics Interaction Flow</h3>
+<div class="imageblock">
+<div class="content">
+<img src="./images/Statistics%20Interaction.png" alt="Statistics Interaction" width="852" height="639">
+</div>
 </div>
 <div style="page-break-after: always;"></div>
 </div>
@@ -2615,208 +2837,7 @@ on this list.</p>
 <div class="sect1">
 <h2 id="section-annex">13. Annex</h2>
 <div class="sectionbody">
-<div class="sect2">
-<h3 id="_functional_requirements">13.1. Functional Requirements</h3>
-<div class="sect3">
-<h4 id="_users_register">13.1.1. Users Register.</h4>
-<div class="ulist none or no-bullet">
-<ul class="none or no-bullet">
-<li>
-<p>UR 1. The system must allow an unregistered user to register in the application.</p>
-</li>
-<li>
-<p>UR 2. The system must request data to register:</p>
-<div class="ulist none or no-bullet">
-<ul class="none or no-bullet">
-<li>
-<p>UR 2.1.1. Username.</p>
-</li>
-<li>
-<p>UR 2.1.2. Email address.</p>
-</li>
-<li>
-<p>UR 2.1.3. Password.</p>
-</li>
-</ul>
-</div>
-</li>
-<li>
-<p>UR 3. The system shouldn&#8217;t allow the user to be registered when any value entered by the new user is invalid.</p>
-</li>
-<li>
-<p>UR 4. The system must check for existing users with the data obtained.</p>
-<div class="ulist none or no-bullet">
-<ul class="none or no-bullet">
-<li>
-<p>UR 4.1. The system shouldn&#8217;t allow the user to create a new account if the email matches with an existing user.</p>
-</li>
-<li>
-<p>UR 4.2. The system should allow the user to create a new account if the email does not match with an existing user.</p>
-</li>
-</ul>
-</div>
-</li>
-<li>
-<p>UR 5. The system must recognice the user as registered.</p>
-</li>
-</ul>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_users_log">13.1.2. Users Log.</h4>
-<div class="ulist none or no-bullet">
-<ul class="none or no-bullet">
-<li>
-<p>UL 1. The system must allow an unidentified user to log in.</p>
-<div class="ulist none or no-bullet">
-<ul class="none or no-bullet">
-<li>
-<p>UL 1.1. The system must request the email address as the user identifier.</p>
-<div class="ulist none or no-bullet">
-<ul class="none or no-bullet">
-<li>
-<p>UL 1.1.1. The system must check that its format is valid.</p>
-</li>
-<li>
-<p>UL 1.1.2. The system must check the box is filled.</p>
-</li>
-</ul>
-</div>
-</li>
-<li>
-<p>UL 1.2. The system must request the user&#8217;s password.</p>
-<div class="ulist none or no-bullet">
-<ul class="none or no-bullet">
-<li>
-<p>UL 1.2.1. The system must check the box is filled.</p>
-</li>
-</ul>
-</div>
-</li>
-<li>
-<p>UL 1.3. The system must automatically validate the entered data to verify when it corresponds to a registered user account.</p>
-<div class="ulist none or no-bullet">
-<ul class="none or no-bullet">
-<li>
-<p>UL 1.3.1. When the user is not stored in the system, an error message must be displayed.</p>
-</li>
-<li>
-<p>UL 1.3.2. When the user exists in the system, but the password does not match, a message must be displayed to the user notifying them of the error.</p>
-</li>
-<li>
-<p>UL 1.3.3. When the user is stored in the system and the password matches, the user must be logged in.</p>
-</li>
-</ul>
-</div>
-</li>
-</ul>
-</div>
-</li>
-<li>
-<p>UL 2. The system must allow users who are logged in to log out.</p>
-</li>
-</ul>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_users_data">13.1.3. Users Data.</h4>
-<div class="ulist none or no-bullet">
-<ul class="none or no-bullet">
-<li>
-<p>UD 1. The system must allow all identified users to access their historical data.</p>
-<div class="ulist none or no-bullet">
-<ul class="none or no-bullet">
-<li>
-<p>UD 1.1. Identified users must be able to access the number of:</p>
-<div class="ulist none or no-bullet">
-<ul class="none or no-bullet">
-<li>
-<p>UD 1.1.1. Games they have played.</p>
-</li>
-<li>
-<p>UD 1.1.2. Questions they have answered correctly.</p>
-</li>
-<li>
-<p>UD 1.1.3. Questions they have answered incorrectly.</p>
-</li>
-</ul>
-</div>
-</li>
-<li>
-<p>UD 1.2. Identified users must be able to access the ranking of the game.</p>
-</li>
-</ul>
-</div>
-</li>
-</ul>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_playing_wichat">13.1.4. Playing WIChat.</h4>
-<div class="ulist none or no-bullet">
-<ul class="none or no-bullet">
-<li>
-<p>PWIC 1. The system must only allow identified users to play WIChat.</p>
-</li>
-<li>
-<p>PWIC 2. The system must retrieve indormation for the questions from Wikidata.</p>
-</li>
-<li>
-<p>PWIC 3. The system must provide the user with a LLM API to help answering the questions.</p>
-<div class="ulist none or no-bullet">
-<ul class="none or no-bullet">
-<li>
-<p>PWIC 3.1 The LLM must provide the user with hints about the questions.</p>
-</li>
-</ul>
-</div>
-</li>
-<li>
-<p>PWIC 4. The game consists of nine rounds by default.</p>
-<div class="ulist none or no-bullet">
-<ul class="none or no-bullet">
-<li>
-<p>PWIC 4.1. the system must automatically provide a question to the identified user.</p>
-</li>
-<li>
-<p>PWIC 4.3. The system must automatically provide one correct answer.</p>
-</li>
-<li>
-<p>PWIC 4.2. The system must automatically provide three distractors.</p>
-</li>
-</ul>
-</div>
-</li>
-<li>
-<p>PWIC 5. The system must allow the user to answer the questions if there is time remaining.</p>
-<div class="ulist none or no-bullet">
-<ul class="none or no-bullet">
-<li>
-<p>PWIC 5.1. The system must check when the identified user has provided an answer in the time given:</p>
-<div class="ulist none or no-bullet">
-<ul class="none or no-bullet">
-<li>
-<p>PWIC 5.1.1. If the answer is correct.</p>
-</li>
-<li>
-<p>PWIC 5.1.2. If the answer is incorrect.</p>
-</li>
-</ul>
-</div>
-</li>
-<li>
-<p>PWIC 5.2. The system must move to the next round when the specified time has ended.</p>
-</li>
-</ul>
-</div>
-</li>
-<li>
-<p>PWIC 6. The system must terminate the game and give a score when the last round is over.</p>
-</li>
-</ul>
-</div>
-</div>
-</div>
+
 </div>
 </div>
 </div>
