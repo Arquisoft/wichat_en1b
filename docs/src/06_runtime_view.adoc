@@ -51,30 +51,39 @@ This section describes how the system components interacts between them. In this
 ----
 actor User
 entity "Web Application" as App
+entity "Gateway Service" as Gat
 entity "Authentication Service" as Auth
 database "Users database" as Ust
 
-User -> App: Sign up
-App -> Auth: Validate credentials
+User -> App: Sign up request
+App -> Gat: Sends sign up data
+Gat -> Auth: Forwards credentials
+Auth -> Auth: Validate credentials
 alt credentials are valid
-    Auth -> Ust: Send the data to create the user
-    Ust -> Ust: Create the user
-    alt user is created correctly
-        Ust --> Auth: Sign up result
-        Auth --> App: Acess token
+    Auth -> Ust: Asks if user already exists
+    Ust -> Ust: Searchs user
+    alt user is not repeated
+        Ust --> Auth: Non-repeated user
+        Auth -> Ust: Sends new user's data to the database
+        Ust -> Ust: Creates user
+        Ust --> Auth: Success
+        Auth --> Gat: Access token
+        Gat --> App: Forwards acess token
         App --> User: Acess token
     else user is repeated
         Ust --> Auth: Error repeated user
-        Auth --> App: Error repeated user
+        Auth --> Gat: Error repeated user
+        Gat --> App: Forwards error repeated user
         App --> User: Log in page
     end
 else credentials are invalid
-    Auth --> App: Invalid credentials
+    Auth --> Gat: Invalid credentials error
+    Gat --> App: Forwards invalid credentials error
     App --> User: Error invalid credentials
 end
 ----
 
-Notable Aspects: Ensures secure authentication via an authentication service. Protects against unauthorized access and ensures session management.
+Notable Aspects: Ensures secure signup via an authentication service. Protects against duplicated.
 
 ==== Log in Flow
 
@@ -82,28 +91,35 @@ Notable Aspects: Ensures secure authentication via an authentication service. Pr
 ----
 actor User
 entity "Web Application" as App
+entity "Gateway Service" as Gat
 entity "Authentication Service" as Auth
-database "Users database" as Ust
+database "Users Database" as Ust
 
 User -> App: Login request
-App -> Auth: Validate credentials
+App -> Gat: Sends login data
+Gat -> Auth: Forwards credentials
+Auth -> Auth: Validate credentials
 alt credentials are valid
     Auth -> Ust: Search for registered users
     alt user is found and pasword is correct
         Ust --> Auth: Found user
-        Auth --> App: Acess token
+        Auth --> Gat: Access token
+        Gat --> App: Forwards acess token
         App --> User: Acess token
     else user is not found 
         Ust --> Auth: Not found user
-        Auth --> App: Not found user
+        Auth --> Gat: Not found user
+        Gat --> App: Forwards not found user
         App --> User: Sign up page
     else password is not correct
         Ust --> Auth: Error incorrect password
-        Auth --> App: Error incorrect password
+        Auth --> Gat: Error incorrect password
+        Gat --> App: Forwards error incorrect password
         App --> User: Incorrect password
     end
 else credentials are invalid
-    Auth --> App: Error invalid credentials
+    Auth --> Gat: Error invalid credentials
+    Gat --> App: Forwards error invalid credentials
 end
 ----
 
@@ -114,17 +130,41 @@ Notable Aspects: Ensures secure authentication via an authentication service. Pr
 
 [plantuml,"Quiz Question Retrieval",png]
 ----
-actor User
+actor Admin
 entity "Web Application" as App
-entity "Wikidata API" as Wiki
+entity "Gateway Service" as Gat
+entity "Question Service" as Qus
+boundary "Wikidata API" as Wiki
+database "Questions Database" as Qdb
 
-User -> App: Request quiz question
-App -> Wiki: Fetch relevant question
-Wiki --> App: Return question data
-App --> User: Display question
+Admin -> App: Request generate batch of quiz questions
+App -> Gat: Sends the request
+Gat -> Qus: Forwards petition to the microservice
+loop Until batch is full
+    Qus -> Wiki: Fetch relevant question
+    Wiki --> Qus: Answer
+    alt If an error occurs
+        Qus -> Qus: Discard recolected data
+        break Exit loop
+        Qus --> Gat: Error while fetching questions
+        Gat --> App: Forwards error
+        App --> Admin: Notify error
+    else No error occurs
+        Qus -> Qus: Store data
+    end
+end
+Qus -> Qdb: Clear old data
+Qdb -> Qdb: Clear old data
+Qdb --> Qus: Old data removed
+Qus -> Qdb: New data
+Qdb -> Qdb: Store new data
+Qdb --> Qus: New data stored
+Qus --> Gat: New data generated
+Gat --> App: Forwards message
+App --> Admin: New questions were generated
 ----
 
-Notable Aspects: Ensures real-time retrieval of quiz questions from Wikidata, requiring efficient API calls and caching strategies.
+Notable Aspects: Ensures an improvement in performance, reducing external api calls.
 
 === LLM Chat Interaction Flow
 
@@ -132,27 +172,90 @@ Notable Aspects: Ensures real-time retrieval of quiz questions from Wikidata, re
 ----
 actor User
 entity "Web Application" as App
+entity "Gateway Service" as Gat
 entity "LLM Service" as LLM
+boundary "LLM provider" as LLMP
 
 User -> App: Send chat message
-App -> LLM: Process user input
-LLM --> App: Generate response
-App --> User: Display chat reply
+App -> Gat: Send user input to the backend
+Gat -> LLM: Forwards user input
+LLM -> LLM: Process user input
+LLM -> LLMP: Send question
+LLMP --> LLM: Answer 
+alt Connection failure
+    LLM --> Gat: Error when asking a question
+    Gat --> App: Forwards the error
+    App --> User: Error when geting a response
+else Connection successful
+    LLM --> Gat: Sends hint
+    Gat --> App: Forwards hint
+    App --> User: Sends hint
 ----
 
-Notable Aspects: Secure input handling is necessary to prevent prompt injection. Ensuring low-latency responses enhances user experience.
+Notable Aspects: Ensures that the application does not crash if the external provider of the LLM fails
 
-=== Error Handling Scenario
+=== Question Game Interaction Flow
 
-[plantuml,"Error Handling Sequence",png]
+[plantuml,"Question Game Interaction",png]
 ----
 actor User
 entity "Web Application" as App
-entity "Logging Service" as Log
+entity "Gateway Service" as Gat
+entity "Question Service" as Qus
+entity "Statistics Service" as Sts
+database "Questions Database" as Qdb
+database "Users Database" as Udb
+entity "LLM Service" as LLM
 
-User -> App: Perform action
-App -> App: Error occurs
-App -> Log: Log error details
-App --> User: Display error message
+User -> App: Request play Game
+App -> Gat: Retrieve question request
+Gat -> Qus: Forward request
+Qus -> Qdb: Request new question
+Qdb -> Qdb: Fetch question
+Qdb --> Qus: Serves question
+Qus --> Gat: Sends the question back
+Gat --> App: Forwards the question
+App --> User: Shows the question
+alt User wants a hint
+    ref over App, LLM : LLM Chat Interaction
+end
+User -> App: Submits answer
+App -> Gat: Sends answer to backend
+Gat -> Sts: Forwards answer
+Sts -> Sts: Process answer and generates statistics
+Sts -> Udb: Sends statistics
+Udb -> Udb: Saves statistics
+Udb --> Sts: All correct message
+Sts --> Gat: Send result
+Gat --> App: Forward result
+App --> User: Shows result 
 ----
-Notable Aspects: Ensures errors are logged for troubleshooting and users receive meaningful error messages.
+
+
+=== Statistics Interaction Flow
+[plantuml, "Statistics Interaction", png]
+----
+actor User
+entity "Web Application" as App
+entity "Gateway Service" as Gat
+entity "Statistics Service" as Sts
+database "Users Database" as Udb
+
+User -> App: Request statistics
+App -> Gat: Request statistics of user
+Gat -> Sts: Forwards request
+Sts -> Udb: Request statistics of user
+Udb -> Udb: Search for records of the user
+alt User has no records
+    Udb --> Sts: No records found for that user
+    Sts --> Gat: No records found
+    Gat --> App: Forwards message
+    App --> User: No records found
+else User has records
+    Udb --> Sts: User records
+    Sts --> Gat: User statistics
+    Gat --> App: Forwards user statistics
+    App --> User: Show user statistics
+end
+
+----
