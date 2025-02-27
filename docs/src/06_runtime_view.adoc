@@ -190,6 +190,7 @@ else Connection successful
     LLM --> Gat: Sends hint
     Gat --> App: Forwards hint
     App --> User: Sends hint
+end
 ----
 
 Notable Aspects: Ensures that the application does not crash if the external provider of the LLM fails
