@@ -51,6 +51,7 @@ This section describes how the system components interacts between them. In this
 ----
 actor User
 entity "Web Application" as App
+entity "Gateway Service" as Gat
 entity "Authentication Service" as Auth
 database "Users database" as Ust
 
