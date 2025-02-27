@@ -29,7 +29,7 @@ endif::arc42help[]
 [cols="1,2", options="header"]
 |===
 | Constraint | Description
-| Performance | The system must be usable and handle a reasonable amount of users at the same time and ensure fast responses (specially from the LLM)
+| Web App | The application should be a web application
 | Wikidata | The system must integrate with Wikidata as it's going to be the main data souce for the questions.
 | LLM Integration | The system must handle the interaction of a user with a LLM chat
 | Data Storage | The system will use a database to store data about the users. The nature of this database is not decided yet
@@ -49,6 +49,7 @@ endif::arc42help[]
 | Team meetings | The team will have at least 1 weekly meeting
 | Continuous integration | This project will use continuous integration using Github Actions
 | Testing | The system must have robust and meaningful tests to make the application as secure as possible
+| Version Control System | The development process of the application must use GitHub as Version Control System
 |===
 
 === Political constraints
