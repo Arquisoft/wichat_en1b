@@ -49,6 +49,7 @@ endif::arc42help[]
 | Team meetings | The team will have at least 1 weekly meeting
 | Continuous integration | This project will use continuous integration using Github Actions
 | Testing | The system must have robust and meaningful tests to make the application as secure as possible
+| Version Control System | The development process of the application must use GitHub as Version Control System
 |===
 
 === Political constraints
