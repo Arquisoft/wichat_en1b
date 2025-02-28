@@ -1,3 +1,5 @@
+ifndef::imagesdir[:imagesdir: ../images]
+
 = WIChat Database Schema Documentation
 :toc:
 :toclevels: 2
@@ -176,7 +178,7 @@ The following DBML code represents the schema structure. It can be visualized us
 
 ----
 Table User {
-  _id ObjectId [pk] // Primary key using ObjectId
+  _id ObjectId [pk]
   username varchar
   email varchar
   passwordHash varchar
@@ -208,7 +210,7 @@ Table Question {
   questionText varchar
   image varchar
   correctAnswer varchar
-  distractors [array] // Stored as an array of varchar
+  distractors varchar[]
   category varchar
   creationDate datetime
   lastUpdateDate datetime
