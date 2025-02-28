@@ -167,10 +167,9 @@ Groups questions generated from an external data source.
 |Timestamp for when the hint was generated.
 |===
 
-== DBML Code
+== Database Schema
 
 image::databaseSchema.png["Database schema"]
-
 
 == DBML Code
 
