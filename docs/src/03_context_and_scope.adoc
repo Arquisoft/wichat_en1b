@@ -62,27 +62,22 @@ The technical interfaces and communication channels for the WIChat application a
 - **Database**: **MongoDB** stores user data, including historical performance and game statistics.
 - **LLM Integration**: **Empathy API** is used for generating hints.
 
-// PlantUML diagram: Deployment View
+// PlantUML diagram: Deployment Diagram
 [plantuml,"Deployment Diagram",png]
 ----
-node "User's Web Browser" as Browser {
-  component "React Frontend" as React
-}
+actor User
 
-node "Application Server" as Server {
-  component "Node.js + Express" as Node
-  database "MongoDB" as MongoDB
-}
+rectangle "React Frontend\n(HTTP/HTTPS)" as React
+rectangle "Node.js + Express\n(Backend)" as Node
+cloud "Wikidata\n(MediaWiki Action API)" as Wikidata
+cloud "Empathy API\n(REST API)" as Empathy
+database "MongoDB\n(Database)" as MongoDB
 
-cloud "External APIs" as APIs {
-  component "Wikidata" as Wikidata
-  component "Empathy API" as Empathy
-}
-
-Browser --> Server : HTTP/HTTPS\n(API calls)
-Server --> Wikidata : MediaWiki Action API\n(HTTP/HTTPS)
-Server --> Empathy : REST API\n(HTTP/HTTPS)
-Server --> MongoDB : Database operations
+User <--> React : Uses\nHTTP/HTTPS
+React <--> Node : API calls\n(HTTP/HTTPS)
+Node <--> Wikidata : Fetches data\n(HTTP/HTTPS)
+Node <--> Empathy : Retrieves hints\n(HTTP/HTTPS)
+Node <--> MongoDB : Reads/Writes\n(Database operations)
 ----
 //#caption: Deployment Diagram
 
