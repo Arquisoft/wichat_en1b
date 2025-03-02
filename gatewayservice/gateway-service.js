@@ -57,10 +57,10 @@ app.post('/askllm', async (req, res) => {
   }
 });
 
-app.post('/statistics', async (req, res) => {
+app.get('/statistics/:user', async (req, res) => {
   try {
     // Forward the add user request to the statistics service
-    const statisticsResponse = await axios.post(statisticsServiceUrl+'/statistics', req.body);
+    const statisticsResponse = await axios.get(statisticsServiceUrl+'/statistics/' + req.params.user.toString(), req.body);
     res.json(statisticsResponse.data);
   } catch (error) {
     res.status(error.response.status).json({ error: error.response.data.error });

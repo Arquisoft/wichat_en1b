@@ -51,6 +51,19 @@ services:
     networks:
       - mynetwork
 
+  statisticservice:
+    container_name: statisticservice-wichat_en1b
+    image: ghcr.io/arquisoft/wichat_en1b/statisticservice:latest
+    profiles: ["dev", "prod"]
+    env_file:
+      - .env
+    build: 
+      context: ./statisticservice
+    ports:
+      - "8004:8004"
+    networks:
+      - mynetwork
+
   gatewayservice:
     container_name: gatewayservice-wichat_en1b
     image: ghcr.io/arquisoft/wichat_en1b/gatewayservice:latest

@@ -39,8 +39,10 @@ app.post('/login',  [
   }
     let username =req.body.username.toString();
     let password =req.body.password.toString();
+
     // Find the user by username in the database
     const user = await User.findOne({ username });
+    console.log(user);
     
     // Check if the user exists and verify the password
     if (user && await bcrypt.compare(password, user.passwordHash)) {
@@ -52,7 +54,7 @@ app.post('/login',  [
       res.status(401).json({ error: 'Invalid credentials' });
     }
   } catch (error) {
-    res.status(500).json({ error: 'Internal Server Error' });
+    res.status(500).json({ error: error.toString() });
   }
 });
 
