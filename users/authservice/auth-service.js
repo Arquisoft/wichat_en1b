@@ -42,7 +42,6 @@ app.post('/login',  [
 
     // Find the user by username in the database
     const user = await User.findOne({ username });
-    console.log(user);
     
     // Check if the user exists and verify the password
     if (user && await bcrypt.compare(password, user.passwordHash)) {
