@@ -195,6 +195,7 @@ endif::arc42help[]
 |Role/Name|Contact|Expectations
 | _RTVE_ | _link:mailto:rtve.dircom@rtve.es[rtve.dircom@rtve.es]_ | A web application that mimics the popular Spanish TV show _"Saber y Ganar"_.
 | _ChattySw_ | _TBD_ | An outstanding and highly detailed application that meets with the requirements and constraints required by the product owner _(RTVE)_.
+| _Empathy_ | _https://empathy.co_ | They expect an aplication that uses an AI model provided by them that helps the users to answer the questions properly.
 | _Professors_ a|
 - link:mailto:labra@uniovi.es[Jose Emilio Labra Gayo]
 - link:mailto:gonzalezgpablo@uniovi.es[Pablo González]
