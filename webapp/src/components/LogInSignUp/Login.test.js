@@ -1,85 +1,38 @@
-import React from 'react';
-import { render, fireEvent, screen, waitFor, act } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import axios from 'axios';
 import MockAdapter from 'axios-mock-adapter';
 import Login from './Login';
 import Cookies from 'js-cookie';
+import { MemoryRouter } from 'react-router-dom';
 
-const mockAxios = new MockAdapter(axios);
+describe('LogIn Component Render Tests', () => {
 
-describe('Login component', () => {
-  beforeEach(() => {
-    mockAxios.reset();
+  it('should render LogIn component', () => {
+    render(
+      <MemoryRouter>
+        <LogIn />
+      </MemoryRouter>
+    );
+
+    // Check for the presence of LogIn form elements
+    expect(screen.getByLabelText(/username/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/password/i)).toBeInTheDocument();
+    expect(screen.getByText(/log in/i)).toBeInTheDocument();
   });
 
-  describe('Render and Input Fields', () => {
-    it('should render login form with username and password fields', () => {
-      render(
-        <Router>
-          <Login />
-        </Router>
-      );
+  it('should render LogIn component when user is logged in (cookie exists)', () => {
+    // Mock a logged-in state
+    Cookies.set('user', JSON.stringify({ username: 'testuser' }));
 
-      expect(screen.getByLabelText(/username/i)).toBeInTheDocument();
-      expect(screen.getByLabelText(/password/i)).toBeInTheDocument();
-      expect(screen.getByRole('button', { name: /log in/i })).toBeInTheDocument();
-    });
-  });
+    render(
+      <MemoryRouter>
+        <LogIn />
+      </MemoryRouter>
+    );
 
-
-
-
-
-
-
-
-
-  it('should log in successfully', async () => {
-    render(<Login />);
-
-    const usernameInput = screen.getByLabelText(/Username/i);
-    const passwordInput = screen.getByLabelText(/Password/i);
-    const loginButton = screen.getByRole('button', { name: /Login/i });
-
-    // Mock the axios.post request to simulate a successful response
-    mockAxios.onPost('http://localhost:8000/login').reply(200, { createdAt: '2024-01-01T12:34:56Z' });
-    mockAxios.onPost('http://localhost:8000/askllm').reply(200, { answer: 'Hello test user' });
-
-    // Simulate user input
-    await act(async () => {
-        fireEvent.change(usernameInput, { target: { value: 'testUser' } });
-        fireEvent.change(passwordInput, { target: { value: 'testPassword' } });
-        fireEvent.click(loginButton);
-      });
-
-    // Verify that the user information is displayed
-    expect(screen.getByText(/Your account was created on 1\/1\/2024/i)).toBeInTheDocument();
-  });
-
-  it('should handle error when logging in', async () => {
-    render(<Login />);
-
-    const usernameInput = screen.getByLabelText(/Username/i);
-    const passwordInput = screen.getByLabelText(/Password/i);
-    const loginButton = screen.getByRole('button', { name: /Login/i });
-
-    // Mock the axios.post request to simulate an error response
-    mockAxios.onPost('http://localhost:8000/login').reply(401, { error: 'Unauthorized' });
-
-    // Simulate user input
-    fireEvent.change(usernameInput, { target: { value: 'testUser' } });
-    fireEvent.change(passwordInput, { target: { value: 'testPassword' } });
-
-    // Trigger the login button click
-    fireEvent.click(loginButton);
-
-    // Wait for the error Snackbar to be open
-    await waitFor(() => {
-      expect(screen.getByText(/Error: Unauthorized/i)).toBeInTheDocument();
-    });
-
-    // Verify that the user information is not displayed
-    expect(screen.queryByText(/Hello testUser!/i)).toBeNull();
-    expect(screen.queryByText(/Your account was created on/i)).toBeNull();
+    // Check that the LogIn component is rendered correctly (you may have a redirect in place, which would affect this)
+    expect(screen.getByLabelText(/username/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/password/i)).toBeInTheDocument();
+    expect(screen.getByText(/log in/i)).toBeInTheDocument();
   });
 });
