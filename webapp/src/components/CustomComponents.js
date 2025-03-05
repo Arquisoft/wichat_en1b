@@ -1,6 +1,6 @@
 import Stack from '@mui/material/Stack';
 import MuiCard from '@mui/material/Card';
-import { styled } from '@mui/material/styles'; import { Typewriter } from "react-simple-typewriter";
+import { styled } from '@mui/material/styles';
 
 export const Card = styled(MuiCard)(({ theme }) => ({
     display: 'flex',
@@ -9,7 +9,7 @@ export const Card = styled(MuiCard)(({ theme }) => ({
     width: '100%',
     padding: theme.spacing(4),
     gap: theme.spacing(2),
-    margin: 'auto',
+    margin: '1em',
     [theme.breakpoints.up('sm')]: {
         maxWidth: '450px',
     },
@@ -23,11 +23,12 @@ export const Card = styled(MuiCard)(({ theme }) => ({
 }));
 
 export const LogInContainer = styled(Stack)(({ theme }) => ({
-    height: 'calc((1 - var(--template-frame-height, 0)) * 100dvh)',
-    minHeight: '100%',
+    height: 'auto',
+    minHeight: '20%',
+    alignSelf: 'center',
     padding: theme.spacing(2),
     [theme.breakpoints.up('sm')]: {
-        padding: theme.spacing(4),
+        padding: theme.spacing(2,4,4,4),
     },
     '&::before': {
         content: '""',
@@ -38,7 +39,8 @@ export const LogInContainer = styled(Stack)(({ theme }) => ({
         backgroundImage:
             'radial-gradient(ellipse at 50% 50%, hsl(210, 100%, 97%), hsl(0, 0%, 100%))',
         backgroundRepeat: 'no-repeat',
-        ...theme.applyStyles('dark', {
+        backgroundSize: "cover",
+        ...theme.applyStyles('dark', {  
             backgroundImage:
                 'radial-gradient(at 50% 50%, hsla(210, 100%, 16%, 0.5), hsl(220, 30%, 5%))',
         }),

@@ -1,52 +1,35 @@
-import React, { useState } from 'react';
-import AddUser from './components/AddUser';
-import Login from './components/Login';
-import CssBaseline from '@mui/material/CssBaseline';
-import Container from '@mui/material/Container';
-import Typography from '@mui/material/Typography';
-import Link from '@mui/material/Link';
-import Divider from '@mui/material/Divider';
-import { LogInContainer, Card } from './components/CustomComponents';
+import React, { useEffect } from 'react';
+import Login from './components/LogInSignUp/Login';
+import SignUp from './components/LogInSignUp/SignUp';
+import { Container } from '@mui/material';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import Home from './components/Home/Home';
+import Navbar from './components/fragments/Navbar';
+
 
 
 function App() {
-  const [showLogin, setShowLogin] = useState(true);
-
-  const handleToggleView = () => {
-    setShowLogin(!showLogin);
-  };
+  useEffect(() => {
+    document.title = 'WiChat';
+  }, [])
 
   return (
-    <Container component="main" maxWidth="xs">
-      <CssBaseline />
-      <Typography component="h1" variant="h5" align="center" sx={{ width: '100%', fontSize: 'clamp(2rem, 10vw, 2.15rem)', marginTop: 2 }}>
-        Welcome to the 2025 edition of the Software Architecture course!
-      </Typography>
-      <LogInContainer direction="column" justifyContent="space-between">
-        <Card>
-          {showLogin ? <Login /> : <AddUser />}
-          <Divider>or</Divider>
-          <Typography component="div" align="center" sx={{ marginTop: 2 }}>
-        {showLogin ? (
-          <Typography sx={{ textAlign: 'center' }}>
-            Don&apos;t have an account?{' '}
-          <Link name="gotoregister" component="button" variant="body2" onClick={handleToggleView}>
-            Register here.
-          </Link>
-          </Typography>
-        ) : (
-          <Typography sx={{ textAlign: 'center' }}>
-            Already have an account? {' '}
-          <Link component="button" variant="body2" onClick={handleToggleView}>
-            Login here.
-          </Link>
-          </Typography>
-        )}
-      </Typography>
-        </Card>
-      </LogInContainer>
-      
+    <Container>
+      <Navbar />
+    <Router>
+      <div style={{ position: 'relative', minHeight: '100vh'}}>
+        <Container component="main" className="main" maxWidth="lg" style={{ padding: '3em 0em' }}>
+          <Routes>
+            <Route path="/" element={<Navigate to="/home" />}/>
+            <Route path="/home" element={<Home />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/signup" element={<SignUp />} />
+          </Routes>
+        </Container>
+      </div>
+    </Router>
     </Container>
+    
   );
 }
 

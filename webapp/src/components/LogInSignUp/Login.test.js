@@ -3,6 +3,7 @@ import { render, fireEvent, screen, waitFor, act } from '@testing-library/react'
 import axios from 'axios';
 import MockAdapter from 'axios-mock-adapter';
 import Login from './Login';
+import Cookies from 'js-cookie';
 
 const mockAxios = new MockAdapter(axios);
 
@@ -10,6 +11,28 @@ describe('Login component', () => {
   beforeEach(() => {
     mockAxios.reset();
   });
+
+  describe('Render and Input Fields', () => {
+    it('should render login form with username and password fields', () => {
+      render(
+        <Router>
+          <Login />
+        </Router>
+      );
+
+      expect(screen.getByLabelText(/username/i)).toBeInTheDocument();
+      expect(screen.getByLabelText(/password/i)).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /log in/i })).toBeInTheDocument();
+    });
+  });
+
+
+
+
+
+
+
+
 
   it('should log in successfully', async () => {
     render(<Login />);
