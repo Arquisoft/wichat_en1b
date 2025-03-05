@@ -1,0 +1,27 @@
+{
+  "name": "questionservice",
+  "version": "1.0.0",
+  "description": "Microservice for question generation and question serve",
+  "main": "service.js",
+  "scripts": {
+    "start": "node quest-service.js",
+    "test": "jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Arquisoft/wichat_en1b.git"
+  },
+  "author": "wichat_en1b",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Arquisoft/wichat_en1b/issues"
+  },
+  "homepage": "https://github.com/Arquisoft/wichat_en1b#readme",
+  "dependencies": {
+    "express": "^4.21.2"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "supertest": "^7.0.0"
+  }
+}

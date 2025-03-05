@@ -46,7 +46,7 @@ See https://docs.arc42.org/section-1/[Introduction and Goals] in the arc42 docum
 
 ****
 endif::arc42help[]
-
+==== Functionalities definition
 * The system must provide non-registered users with the option to sign up.
 * The system must provide registered but not identified users with the option to log in.
 * The system must only be used by registered users.
@@ -61,13 +61,80 @@ endif::arc42help[]
 * The system will give access to the information about the users through an API which should be documented.
 * The system will give access to information about the generated questions through an API.
 
+==== Functional requirements
+
+*Users Register*
+[none or no-bullet]
+* UR 1. The system must allow an unregistered user to register in the application.
+* UR 2. The system must request data to register:
+[none or no-bullet]
+*** UR 2.1.1. Username.
+*** UR 2.1.2. Email address.
+*** UR 2.1.3. Password.
+* UR 3. The system shouldn't allow the user to be registered when any value entered by the new user is invalid.
+* UR 4. The system must check for existing users with the data obtained.
+[none or no-bullet]
+** UR 4.1. The system shouldn't allow the user to create a new account if the email matches with an existing user.
+** UR 4.2. The system should allow the user to create a new account if the email does not match with an existing user.
+* UR 5. The system must recognice the user as registered.
+
+*Users log*
+[none or no-bullet]
+* UL 1. The system must allow an unidentified user to log in.
+[none or no-bullet]
+** UL 1.1. The system must request the email address as the user identifier.
+[none or no-bullet]
+*** UL 1.1.1. The system must check that its format is valid.
+*** UL 1.1.2. The system must check the box is filled.
+** UL 1.2. The system must request the user's password.
+[none or no-bullet]
+*** UL 1.2.1. The system must check the box is filled.
+** UL 1.3. The system must automatically validate the entered data to verify when it corresponds to a registered user account.
+[none or no-bullet]
+*** UL 1.3.1. When the user is not stored in the system, an error message must be displayed.
+*** UL 1.3.2. When the user exists in the system, but the password does not match, a message must be displayed to the user notifying them of the error.
+*** UL 1.3.3. When the user is stored in the system and the password matches, the user must be logged in.
+* UL 2. The system must allow users who are logged in to log out.
+
+*Users Data*
+[none or no-bullet]
+* UD 1. The system must allow all identified users to access their historical data.
+[none or no-bullet]
+** UD 1.1. Identified users must be able to access the number of:
+[none or no-bullet]
+*** UD 1.1.1. Games they have played.
+*** UD 1.1.2. Questions they have answered correctly.
+*** UD 1.1.3. Questions they have answered incorrectly.
+** UD 1.2. Identified users must be able to access the ranking of the game.
+
+*Playing WIChat*
+[none or no-bullet]
+* PWIC 1. The system must only allow identified users to play WIChat.
+* PWIC 2. The system must retrieve indormation for the questions from Wikidata.
+* PWIC 3. The system must provide the user with a LLM API to help answering the questions.
+[none or no-bullet]
+** PWIC 3.1 The LLM must provide the user with hints about the questions.
+* PWIC 4. The game consists of nine rounds by default.
+[none or no-bullet]
+** PWIC 4.1. the system must automatically provide a question to the identified user.
+** PWIC 4.3. The system must automatically provide one correct answer.
+** PWIC 4.2. The system must automatically provide three distractors.
+* PWIC 5. The system must allow the user to answer the questions if there is time remaining.
+[none or no-bullet]
+** PWIC 5.1. The system must check when the identified user has provided an answer in the time given:
+[none or no-bullet]
+*** PWIC 5.1.1. If the answer is correct.
+*** PWIC 5.1.2. If the answer is incorrect.
+** PWIC 5.2. The system must move to the next round when the specified time has ended.
+* PWIC 6. The system must terminate the game and give a score when the last round is over.
+
 === Quality Goals
 
 ifdef::arc42help[]
 [role="arc42help"]
 ****
 .Contents
-The top three (max five) quality goals for the architecture whose fulfillment is of highest importance to the major stakeholders. 
+The top three (max five) quality goals for the architecture whose fulfillment is of highest importance to the major stakeholders.
 We really mean quality goals for the architecture. Don't confuse them with project goals.
 They are not necessarily identical.
 
@@ -89,12 +156,14 @@ endif::arc42help[]
 |Goal|Description
 |Functional suitability|The system must fulfill its intended purpose effectively and efficiently, allowing users to register, log in, play the quiz, access their user statistics and get aid from the LLM during the questions.
 |Reliability|The system should be reliable in generating questions from Wikidata, ensuring that questions are accurate and diverse. The LLM implemented in the system must be reliable and well trained to be able to help the users in answering the questions. The system shall handle user registrations, logins, and game data storage without errors.
-|Availability|The system shall be available 99% of the time a user tries to access it.
+|Availability|The system shall be available 97% of the time a user tries to access it.
 |Maitainability|The system shall be designed and implemented in a way that facilitates easy maintenance and updates.
-|Performance efficiency|The system shall deliver optimal performance, ensuring responsive interactions for users. The automatic generation of questions from Wikidata and the LLM responses with a real-time gameplay shall be efficient. The system shall handle 1000 concurrent users.
-|Usability|The system shall provide a user-friendly interface, making it easy for users to register, log in, and play the game. The system learning time for a user should be less than 3 hours.
+|Performance efficiency|The system shall deliver optimal performance, ensuring responsive interactions for users. The automatic generation of questions from Wikidata and the LLM responses with a real-time gameplay shall be efficient. The system shall handle 20 concurrent users.
+|Usability|The system shall provide a user-friendly interface, making it easy for users to register, log in, and play the game.
 |Portability|The system shall be portable to various web browsers and devices, ensuring a seamless experience for users regardless of their platform. It has to be optimized for different screen sizes and functionalities.
 |Security|The system shall prioritize user data security. It must implement robust authentication mechanisms for user registration and login. The API access points for user information and generated questions must be secured with proper authorization.
+|Testability|Facilitate comprehensive testing to ensure software correctness and identify potential issues early.
+|Learnability|The system learning time for a user should be low, preferable under 3 hours.
 |===
 
 === Stakeholders
@@ -126,6 +195,7 @@ endif::arc42help[]
 |Role/Name|Contact|Expectations
 | _RTVE_ | _link:mailto:rtve.dircom@rtve.es[rtve.dircom@rtve.es]_ | A web application that mimics the popular Spanish TV show _"Saber y Ganar"_.
 | _ChattySw_ | _TBD_ | An outstanding and highly detailed application that meets with the requirements and constraints required by the product owner _(RTVE)_.
+| _Empathy_ | _https://empathy.co_ | They expect an aplication that uses an AI model provided by them that helps the users to answer the questions properly.
 | _Professors_ a|
 - link:mailto:labra@uniovi.es[Jose Emilio Labra Gayo]
 - link:mailto:gonzalezgpablo@uniovi.es[Pablo González]

@@ -230,6 +230,7 @@ It is in charge of managing the creation of questions and answers.
 
 ===== Interfaces
 * **Gateway Service**: Sharing the question and possible answers to the user.
+* **Database**: Store the questions that might be needed for the application to work.
 
 ==== LLM Service
 It represents the service that will provide the hints to the users by means of an LLM.

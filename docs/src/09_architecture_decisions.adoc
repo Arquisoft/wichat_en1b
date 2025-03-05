@@ -8,9 +8,9 @@ ifndef::imagesdir[:imagesdir: ../images]
 | ID | Decision | Rationale | Impacted Quality Attributes
 
 | AD-001
-| React with TypeScript frontend
-| Type safety reduces runtime errors; aligns with team's prior coursework experience
-| Maintainability, Usability
+| React with JavaScript frontend
+| Eliminates the overhead of type annotations and compilation; simplifies setup and iteration
+| Maintainability, Usability, Flexibility
 
 | AD-002
 | Node.js/Express backend
