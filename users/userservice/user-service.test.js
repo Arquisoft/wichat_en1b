@@ -39,7 +39,7 @@ describe('User Service', () => {
     expect(userInDb.username).toBe('testuser');
 
     // Assert that the password is encrypted
-    const isPasswordValid = await bcrypt.compare('testpassword', userInDb.password);
+    const isPasswordValid = await bcrypt.compare('testpassword', userInDb.passwordHash);
     expect(isPasswordValid).toBe(true);
   });
 });

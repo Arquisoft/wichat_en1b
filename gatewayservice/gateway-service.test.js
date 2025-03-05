@@ -20,6 +20,12 @@ describe('Gateway Service', () => {
     }
   });
 
+  axios.get.mockImplementation((url, data) => {
+    if (url.endsWith('/statistics/mockuser')) {
+      return Promise.resolve({ data: { gamesPlayed: 0, correctAnswers: 0, incorrectAnswers: 0 } });
+    }
+  });
+
   // Test /login endpoint
   it('should forward login request to auth service', async () => {
     const response = await request(app)
@@ -48,5 +54,16 @@ describe('Gateway Service', () => {
 
     expect(response.statusCode).toBe(200);
     expect(response.body.answer).toBe('llmanswer');
+  });
+
+  // Test /statistics endpoint
+  it('should forward statistics request to the statistics service', async () => {
+    const response = await request(app)
+      .get('/statistics/mockuser');
+
+    expect(response.statusCode).toBe(200);
+    expect(response.body.gamesPlayed).toBe(0);
+    expect(response.body.correctAnswers).toBe(0);
+    expect(response.body.incorrectAnswers).toBe(0);
   });
 });

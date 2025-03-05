@@ -1,7 +1,7 @@
 const request = require('supertest');
 const { MongoMemoryServer } = require('mongodb-memory-server');
 const bcrypt = require('bcrypt');
-const User = require('./auth-model');
+const User = require('./statistics-model');
 
 let mongoServer;
 let app;
@@ -26,7 +26,7 @@ beforeAll(async () => {
   mongoServer = await MongoMemoryServer.create();
   const mongoUri = mongoServer.getUri();
   process.env.MONGODB_URI = mongoUri;
-  app = require('./auth-service'); 
+  app = require('./statistics-service'); 
   //Load database with initial conditions
   await addUser(user);
 });
@@ -36,10 +36,20 @@ afterAll(async () => {
   await mongoServer.stop();
 });
 
-describe('Auth Service', () => {
-  it('Should perform a login operation /login', async () => {
-    const response = await request(app).post('/login').send(user);
+describe('Statistics Service', () => {
+  it('Should retrieve the statistics for user "testuser" /statistics', async () => {
+    const response = await request(app).get('/statistics/testuser');
+
     expect(response.status).toBe(200);
-    expect(response.body).toHaveProperty('username', 'testuser');
+    expect(response.body).toHaveProperty('gamesPlayed', 0);
+    expect(response.body).toHaveProperty('correctAnswers', 0);
+    expect(response.body).toHaveProperty('incorrectAnswers', 0);
+  });
+
+  it('Should fail reterieving the statistics for user "invaliduser" /statistics', async () => {
+    const response = await request(app).get('/statistics/invaliduser');
+
+    expect(response.status).toBe(401);
+    expect(response.body.error).toBe('Invalid user');
   });
 });
