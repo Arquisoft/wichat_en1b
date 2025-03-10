@@ -3,7 +3,7 @@ import { AppBar, Toolbar, Button, IconButton, Box, Drawer, List, ListItem } from
 import { Menu as MenuIcon } from "@mui/icons-material"
 import Cookies from "js-cookie"
 
-export default function Navbar() {
+export const Navbar = () => {
     const [drawerOpen, setDrawerOpen] = React.useState(false)
     const [isMobile, setIsMobile] = React.useState(false)
     const [isLoggedIn, setIsLoggedIn] = React.useState(false)

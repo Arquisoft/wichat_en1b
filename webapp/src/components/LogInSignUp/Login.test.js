@@ -1,38 +1,59 @@
+import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { BrowserRouter } from 'react-router-dom';
+import { Login } from './Login';
 import axios from 'axios';
-import MockAdapter from 'axios-mock-adapter';
-import Login from './Login';
 import Cookies from 'js-cookie';
-import { MemoryRouter } from 'react-router-dom';
 
-describe('LogIn Component Render Tests', () => {
+jest.mock('axios');
+jest.mock('js-cookie', () => ({ set: jest.fn() }));
 
-  it('should render LogIn component', () => {
+describe('Login Component', () => {
+  beforeEach(() => {
     render(
-      <MemoryRouter>
-        <LogIn />
-      </MemoryRouter>
+      <BrowserRouter>
+        <Login />
+      </BrowserRouter>
     );
-
-    // Check for the presence of LogIn form elements
-    expect(screen.getByLabelText(/username/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/password/i)).toBeInTheDocument();
-    expect(screen.getByText(/log in/i)).toBeInTheDocument();
   });
 
-  it('should render LogIn component when user is logged in (cookie exists)', () => {
-    // Mock a logged-in state
-    Cookies.set('user', JSON.stringify({ username: 'testuser' }));
+  beforeAll(() => {
+    delete window.location;
+    window.location = { reload: jest.fn() };
+  })
 
-    render(
-      <MemoryRouter>
-        <LogIn />
-      </MemoryRouter>
-    );
+  test('renders login form with inputs and button', () => {
+    expect(screen.getByLabelText(/Username/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/Password/i)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Log in/i })).toBeInTheDocument();
+  });
 
-    // Check that the LogIn component is rendered correctly (you may have a redirect in place, which would affect this)
-    expect(screen.getByLabelText(/username/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/password/i)).toBeInTheDocument();
-    expect(screen.getByText(/log in/i)).toBeInTheDocument();
+  test('updates state on user input', () => {
+    const usernameInput = screen.getByLabelText(/Username/i);
+    const passwordInput = screen.getByLabelText(/Password/i);
+    
+    fireEvent.change(usernameInput, { target: { value: 'testuser' } });
+    fireEvent.change(passwordInput, { target: { value: 'password123' } });
+    
+    expect(usernameInput.value).toBe('testuser');
+    expect(passwordInput.value).toBe('password123');
+  });
+
+  test('handles successful login', async () => {
+    axios.post.mockResolvedValue({ data: { username: 'testuser', token: '12345' } });
+    const loginButton = screen.getByRole('button', { name: /Log in/i });
+    
+    fireEvent.click(loginButton);
+    
+    await waitFor(() => expect(Cookies.set).toHaveBeenCalled());
+  });
+
+  test('handles login error', async () => {
+    axios.post.mockRejectedValue({ response: { data: { error: 'Invalid credentials' } } });
+    const loginButton = screen.getByRole('button', { name: /Log in/i });
+    
+    fireEvent.click(loginButton);
+    
+    await waitFor(() => expect(screen.getByText(/Error: Invalid credentials/i)).toBeInTheDocument());
   });
 });

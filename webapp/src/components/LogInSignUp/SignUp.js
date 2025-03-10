@@ -9,7 +9,7 @@ import Cookies from 'js-cookie';
 
 const apiEndpoint = process.env.REACT_APP_API_ENDPOINT || 'http://localhost:8000';
 
-const SignUp = () => {
+export const SignUp = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -97,4 +97,3 @@ const SignUp = () => {
   );
 };
 
-export default SignUp;

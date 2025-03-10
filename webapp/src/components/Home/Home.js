@@ -5,7 +5,7 @@ import { Typewriter } from "react-simple-typewriter";
 import { Container, Typography } from "@mui/material";
 
 
-const Home = () => {
+export const Home = () => {
     const [message, setMessage] = useState('');
     const [error, setError] = useState('');
 
@@ -69,5 +69,3 @@ const Home = () => {
         </Container>
     )
 }
-
-export default Home;

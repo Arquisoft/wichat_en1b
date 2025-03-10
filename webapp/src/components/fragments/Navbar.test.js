@@ -1,6 +1,6 @@
 
 import { render, screen, fireEvent } from '@testing-library/react';
-import Navbar from './Navbar';
+import { Navbar } from './Navbar';
 import Cookies from 'js-cookie';
 import { MemoryRouter } from 'react-router-dom';
 

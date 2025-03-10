@@ -7,7 +7,7 @@ import { LogInContainer, Card } from '../CustomComponents';
 import { Link, useNavigate } from 'react-router-dom';
 import Cookies from 'js-cookie';
 
-const Login = () => {
+export const Login = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -17,6 +17,7 @@ const Login = () => {
   const navigate = useNavigate();
 
   const loginUser = async () => {
+    console.log("Logging in...");
     try {
       const response = await axios.post(`${apiEndpoint}/login`, { username, password });
       let oneHourAfter = new Date().getTime() + (1 * 60 * 60 * 1000)
@@ -53,7 +54,6 @@ const Login = () => {
         </Typography>
         <Box
           component="form"
-          onSubmit={loginUser}
           noValidate
           sx={{
             display: 'flex',
@@ -85,7 +85,7 @@ const Login = () => {
             type="submit"
             fullWidth
             variant="contained"
-            onClick={validateInputs}
+            onClick={loginUser}
           >
             Log in
           </Button>
@@ -106,5 +106,3 @@ const Login = () => {
     </LogInContainer>
   );
 };
-
-export default Login;

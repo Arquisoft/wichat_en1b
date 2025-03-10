@@ -1,38 +1,54 @@
+import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { BrowserRouter } from 'react-router-dom';
+import { SignUp } from './SignUp';
 import axios from 'axios';
-import MockAdapter from 'axios-mock-adapter';
-import SignUp from './SignUp';  // Import the SignUp component
 import Cookies from 'js-cookie';
-import { MemoryRouter } from 'react-router-dom';
 
-describe('SignUp Component Render Tests', () => {
+jest.mock('axios');
+jest.mock('js-cookie', () => ({ set: jest.fn() }));
 
-  it('should render SignUp component', () => {
+describe('SignUp Component', () => {
+  beforeEach(() => {
     render(
-      <MemoryRouter>
+      <BrowserRouter>
         <SignUp />
-      </MemoryRouter>
+      </BrowserRouter>
     );
-
-    // Check for the presence of SignUp form elements
-    expect(screen.getByLabelText(/username/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/password/i)).toBeInTheDocument();
-    expect(screen.getByText(/sign up/i)).toBeInTheDocument();
   });
 
-  it('should render SignUp component when user is logged in (cookie exists)', () => {
-    // Mock a logged-in state
-    Cookies.set('user', JSON.stringify({ username: 'testuser' }));
+  test('renders sign-up form with inputs and button', () => {
+    expect(screen.getByLabelText(/Username/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/Password/i)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Sign Up/i })).toBeInTheDocument();
+  });
 
-    render(
-      <MemoryRouter>
-        <SignUp />
-      </MemoryRouter>
-    );
+  test('updates state on user input', () => {
+    const usernameInput = screen.getByLabelText(/Username/i);
+    const passwordInput = screen.getByLabelText(/Password/i);
+    
+    fireEvent.change(usernameInput, { target: { value: 'newuser' } });
+    fireEvent.change(passwordInput, { target: { value: 'newpassword' } });
+    
+    expect(usernameInput.value).toBe('newuser');
+    expect(passwordInput.value).toBe('newpassword');
+  });
 
-    // Check that the SignUp component is rendered correctly (you may have a redirect in place, which would affect this)
-    expect(screen.getByLabelText(/username/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/password/i)).toBeInTheDocument();
-    expect(screen.getByText(/sign up/i)).toBeInTheDocument();
+  test('handles successful user creation', async () => {
+    axios.post.mockResolvedValue({ data: { username: 'newuser', token: '12345' } });
+    const signUpButton = screen.getByRole('button', { name: /Sign Up/i });
+    
+    fireEvent.click(signUpButton);
+    
+    await waitFor(() => expect(Cookies.set).toHaveBeenCalled());
+  });
+
+  test('handles sign-up error', async () => {
+    axios.post.mockRejectedValue({ response: { data: { error: 'User already exists' } } });
+    const signUpButton = screen.getByRole('button', { name: /Sign Up/i });
+    
+    fireEvent.click(signUpButton);
+    
+    await waitFor(() => expect(screen.getByText(/Error: User already exists/i)).toBeInTheDocument());
   });
 });
