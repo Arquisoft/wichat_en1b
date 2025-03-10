@@ -2,7 +2,7 @@
 FROM node:22
 
 # Set the working directory in the container
-WORKDIR /usr/src/questionservice
+WORKDIR /usr/src/statisticservice
 
 # Copy package.json and package-lock.json to the working directory
 COPY package*.json ./
@@ -14,7 +14,7 @@ RUN npm install
 COPY . .
 
 # Expose the port the app runs on
-EXPOSE 8004
+EXPOSE 8005
 
 # Define the command to run your app
-CMD ["node", "quest-service.js"]
+CMD ["node", "statistics-service.js"]

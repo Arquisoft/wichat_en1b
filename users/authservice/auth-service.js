@@ -39,16 +39,16 @@ app.post('/login',  [
   }
     let username =req.body.username.toString();
     let password =req.body.password.toString();
+
     // Find the user by username in the database
     const user = await User.findOne({ username });
     
-
     // Check if the user exists and verify the password
-    if (user && await bcrypt.compare(password, user.password)) {
+    if (user && await bcrypt.compare(password, user.passwordHash)) {
       // Generate a JWT token
       const token = jwt.sign({ userId: user._id }, 'your-secret-key', { expiresIn: '1h' });
       // Respond with the token and user information
-      res.json({ token: token, username: username, createdAt: user.createdAt });
+      res.json({ token: token, username: username, createdAt: user.registrationDate });
     } else {
       res.status(401).json({ error: 'Invalid credentials' });
     }
