@@ -1,4 +1,5 @@
-import { render, screen } from '@testing-library/react';
+
+import { render, screen, fireEvent } from '@testing-library/react';
 import Navbar from './Navbar';
 import Cookies from 'js-cookie';
 import { MemoryRouter } from 'react-router-dom';
@@ -8,6 +9,9 @@ describe('Navbar Component Render Tests', () => {
     beforeEach(() => {
         // Clear cookies before each test to ensure clean state
         Cookies.remove('user');
+        // Resize window
+        global.innerWidth = 1200;
+        global.dispatchEvent(new Event('resize'));
     });
 
     it('should render Navbar correctly for desktop view when not logged in', () => {
@@ -39,13 +43,16 @@ describe('Navbar Component Render Tests', () => {
     });
 
     it('should render Navbar correctly for mobile view when not logged in', () => {
+        global.innerWidth = 500;
+        global.dispatchEvent(new Event('resize'));
         render(
             <MemoryRouter>
                 <Navbar />
             </MemoryRouter>
         );
 
-        // Open the mobile drawer by clicking the menu icon
+        // Resize to enable mobile view
+        
         fireEvent.click(screen.getByLabelText('menu'));
 
         // Check if the mobile drawer has Login and Sign Up options
@@ -56,13 +63,15 @@ describe('Navbar Component Render Tests', () => {
 
     it('should render Navbar correctly for mobile view when logged in', () => {
         Cookies.set('user', JSON.stringify({ username: 'testuser' }));  // Mock logged-in state
-
+        global.innerWidth = 500;
+        global.dispatchEvent(new Event('resize'));
         render(
             <MemoryRouter>
                 <Navbar />
             </MemoryRouter>
         );
-
+        // Resize to enable mobile view
+        
         // Open the mobile drawer by clicking the menu icon
         fireEvent.click(screen.getByLabelText('menu'));
 
