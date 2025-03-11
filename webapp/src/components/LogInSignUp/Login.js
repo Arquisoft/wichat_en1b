@@ -1,44 +1,19 @@
 // src/components/Login.js
 import React, { useState } from 'react';
-import axios from 'axios';
 import { SitemarkIcon } from '../CustomIcons';
-import { Box, Button, FormControl, TextField, Typography, Snackbar, Divider } from '@mui/material';
+import { Box, Button, FormControl, TextField, Typography, Divider } from '@mui/material';
 import { LogInContainer, Card } from '../CustomComponents';
-import { Link, useNavigate } from 'react-router-dom';
-import Cookies from 'js-cookie';
+import { Link } from 'react-router-dom';
+import { useAuth } from '../hooks/useAuth';
 
 export const Login = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
-  const [openSnackbar, setOpenSnackbar] = useState(false);
-
-  const apiEndpoint = process.env.REACT_APP_API_ENDPOINT || 'http://localhost:8000';
-  const navigate = useNavigate();
-
-  const loginUser = async () => {
-    console.log("Logging in...");
-    try {
-      const response = await axios.post(`${apiEndpoint}/login`, { username, password });
-      let oneHourAfter = new Date().getTime() + (1 * 60 * 60 * 1000)
-      Cookies.set('user', JSON.stringify({ username: response.data.username, token: response.data.token })
-        , { expires: oneHourAfter });
-      navigate('/home');
-      window.location.reload();
-    } catch (error) {
-      setError(error.response.data.error);
-    }
-  };
-
-  const handleCloseSnackbar = () => {
-    setOpenSnackbar(false);
-  };
-
-  const validateInputs = () => {
-    console.log({
-      user: username,
-      password: password,
-    })
+  const { authenticateUser, error } = useAuth();
+  
+  const logIn = (e) => {
+    e.preventDefault();
+    authenticateUser('login', username, password)
   }
 
   return (
@@ -85,14 +60,12 @@ export const Login = () => {
             type="submit"
             fullWidth
             variant="contained"
-            onClick={loginUser}
+            onClick={logIn}
           >
             Log in
           </Button>
-          <Snackbar open={openSnackbar} autoHideDuration={6000} onClose={handleCloseSnackbar} message="Login successful" />
-          {error && (
-            <Snackbar open={!!error} autoHideDuration={6000} onClose={() => setError('')} message={`Error: ${error}`} />
-          )}
+          {error && <p style={{ color: 'red' }}>{error}</p>}
+
         </Box>
         <Divider>or</Divider>
         <Typography component="div" align="center" sx={{ marginTop: 2 }}>

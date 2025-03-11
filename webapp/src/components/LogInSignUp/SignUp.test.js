@@ -49,6 +49,6 @@ describe('SignUp Component', () => {
     
     fireEvent.click(signUpButton);
     
-    await waitFor(() => expect(screen.getByText(/Error: User already exists/i)).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByText(/User already exists/i)).toBeInTheDocument());
   });
 });
