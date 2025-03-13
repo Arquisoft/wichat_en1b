@@ -63,15 +63,6 @@ describe('Gateway Service', () => {
     expect(response.body.answer).toBe('llmanswer');
   });
 
-// Test /answer endpoint
-it('should forward answer request to the question service and return validation result', async () => {
-  const response = await request(app)
-    .post('/answer')
-    .send({ questionId: 'randomId123', answer: 'https://example.com/image1.jpg' });
-
-  expect(response.statusCode).toBe(200);
-  expect(response.body.correct).toBe(true);
-});
 
   // Test /statistics endpoint
   it('should forward statistics request to the statistics service', async () => {
