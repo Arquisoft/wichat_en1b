@@ -42,6 +42,22 @@ describe('Gateway Service', () => {
     expect(response.statusCode).toBe(200);
     expect(response.body.token).toBe('mockedToken');
   });
+// Test /login endpoint error-handling
+it('should return an error if the authentication service returns an error', async () => {
+  jest.spyOn(axios, 'post').mockRejectedValue({
+    response: {
+      status: 400,
+      data: { error: 'Invalid credentials' }
+    }
+  });
+
+  const response = await request(app)
+    .post('/login')
+    .send({ username: 'testuser', password: 'testpassword' });
+
+  expect(response.statusCode).toBe(400);
+  expect(response.body.error).toBe('Invalid credentials');
+});
 
   // Test /adduser endpoint
   it('should forward add user request to user service', async () => {
@@ -53,6 +69,23 @@ describe('Gateway Service', () => {
     expect(response.body.userId).toBe('mockedUserId');
   });
 
+// Test /adduser endpoint - error handling
+it('should return an error if the user service returns an error', async () => {
+  jest.spyOn(axios, 'post').mockRejectedValue({
+    response: {
+      status: 400,
+      data: { error: 'User already exists' }
+    }
+  });
+
+  const response = await request(app)
+    .post('/adduser')
+    .send({ username: 'existinguser', password: 'password' });
+
+  expect(response.statusCode).toBe(400);
+  expect(response.body.error).toBe('User already exists');
+});
+
   // Test /askllm endpoint
   it('should forward askllm request to the llm service', async () => {
     const response = await request(app)
@@ -62,7 +95,23 @@ describe('Gateway Service', () => {
     expect(response.statusCode).toBe(200);
     expect(response.body.answer).toBe('llmanswer');
   });
+  
+// Test /askllm endpoint - error handling
+it('should return an error if the llm service returns an error', async () => {
+  jest.spyOn(axios, 'post').mockRejectedValue({
+    response: {
+      status: 500,
+      data: { error: 'LLM service unavailable' }
+    }
+  });
 
+  const response = await request(app)
+    .post('/askllm')
+    .send({ question: 'What is the weather like?', apiKey: 'apiKey', model: 'gemini' });
+
+  expect(response.statusCode).toBe(500);
+  expect(response.body.error).toBe('LLM service unavailable');
+});
 
   // Test /statistics endpoint
   it('should forward statistics request to the statistics service', async () => {
