@@ -10,7 +10,8 @@ const YAML = require('yaml')
 const app = express();
 const port = 8000;
 
-const statisticsServiceUrl = process.env.STATS_SERVICE_URL || 'http://localhost:8004';
+const statisticsServiceUrl = process.env.STATS_SERVICE_URL || 'http://localhost:8005';
+const questionServiceUrl = process.env.QUESTION_SERVICE_URL || 'http://localhost:8004';
 const llmServiceUrl = process.env.LLM_SERVICE_URL || 'http://localhost:8003';
 const authServiceUrl = process.env.AUTH_SERVICE_URL || 'http://localhost:8002';
 const userServiceUrl = process.env.USER_SERVICE_URL || 'http://localhost:8001';
@@ -54,6 +55,26 @@ app.post('/askllm', async (req, res) => {
     res.json(llmResponse.data);
   } catch (error) {
     res.status(error.response.status).json({ error: error.response.data.error });
+  }
+});
+
+app.get('/question', async (req, res) => {
+  try {
+    //Forward the asking for a question to the question service
+    const questionResponse = await axios.get(`${questionServiceUrl}/question`);
+    res.json(questionResponse.data);
+  } catch (error) {
+    res.status(error.response?.status || 500).json({ error: error.response?.data?.error });
+  }
+});
+
+app.post('/answer', async (req, res) => {
+  try {
+    //Forward the answer for validation to the question service
+    const answerResponse = await axios.post(`${questionServiceUrl}/answer`, req.body);
+    res.json(answerResponse.data);
+  } catch (error) {
+    res.status(error.response?.status || 500).json({ error: error.response?.data?.error });
   }
 });
 
