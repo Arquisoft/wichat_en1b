@@ -11,35 +11,21 @@ jest.mock('axios');
 describe('Gateway Service', () => {
   // Mock responses from external services
   axios.post.mockImplementation((url, data) => {
-    if (url.endsWith('/login')) {
+    if (url.endsWith('/login')) { //Mock POST /login response
       return Promise.resolve({ data: { token: 'mockedToken' } });
-    } else if (url.endsWith('/adduser')) {
+    } else if (url.endsWith('/adduser')) { //Mock POST /adduser response
       return Promise.resolve({ data: { userId: 'mockedUserId' } });
-    } else if (url.endsWith('/ask')) {
+    } else if (url.endsWith('/ask')) { //Mock POST /ask response
       return Promise.resolve({ data: { answer: 'llmanswer' } });
-    }
-  });
-  
- //Mock GET /statistics response
-  axios.get.mockImplementation((url, data) => {
-    if (url.endsWith('/statistics/mockuser')) {
+    } else if (url.endsWith('/question')) {// Mock GET /question response
+      return Promise.resolve({ data: { question: 'mockedQuestion' } });
+    } else if (url.endsWith('/answer')) {// Mock POST /answer response
+      return Promise.resolve({ data: { correct: true } });
+    } else if (url.endsWith('/statistics/mockuser')) { //Mock GET /statistics response
       return Promise.resolve({ data: { gamesPlayed: 0, correctAnswers: 0, incorrectAnswers: 0 } });
     }
   });
 
-// Mock GET /question response
-axios.get.mockImplementation((url) => {
-  if (url.endsWith('/question')) {
-    return Promise.resolve({ data: { question: 'mockedQuestion' } });
-  }
-});
-
-// Mock POST /answer response
-axios.post.mockImplementation((url, data) => {
-  if (url.endsWith('/answer')) {
-    return Promise.resolve({ data: { correct: true } });
-  }
-});
 
 // Test /health endpoint
 it('should return OK status for health check', async () => {
