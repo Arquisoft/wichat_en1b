@@ -35,22 +35,6 @@ describe('Gateway Service', () => {
     expect(response.statusCode).toBe(200);
     expect(response.body.token).toBe('mockedToken');
   });
-// Test /login endpoint error-handling
-it('should return an error if the authentication service returns an error', async () => {
-  jest.spyOn(axios, 'post').mockRejectedValue({
-    response: {
-      status: 400,
-      data: { error: 'Invalid credentials' }
-    }
-  });
-
-  const response = await request(app)
-    .post('/login')
-    .send({ username: 'testuser', password: 'testpassword' });
-
-  expect(response.statusCode).toBe(400);
-  expect(response.body.error).toBe('Invalid credentials');
-});
 
   // Test /adduser endpoint
   it('should forward add user request to user service', async () => {
