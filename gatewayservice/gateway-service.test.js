@@ -25,6 +25,13 @@ describe('Gateway Service', () => {
       return Promise.resolve({ data: { gamesPlayed: 0, correctAnswers: 0, incorrectAnswers: 0 } });
     }
   });
+  //Test /health endpoint
+  it('should return a healthy status', async () => {
+    const response = await request(app).get('/health');
+  
+    expect(response.statusCode).toBe(200);
+    expect(response.body.status).toBe('OK');
+  });
 
   // Test /login endpoint
   it('should forward login request to auth service', async () => {
@@ -55,6 +62,16 @@ describe('Gateway Service', () => {
     expect(response.statusCode).toBe(200);
     expect(response.body.answer).toBe('llmanswer');
   });
+
+// Test /answer endpoint
+it('should forward answer request to the question service and return validation result', async () => {
+  const response = await request(app)
+    .post('/answer')
+    .send({ questionId: 'randomId123', answer: 'https://example.com/image1.jpg' });
+
+  expect(response.statusCode).toBe(200);
+  expect(response.body.correct).toBe(true);
+});
 
   // Test /statistics endpoint
   it('should forward statistics request to the statistics service', async () => {
