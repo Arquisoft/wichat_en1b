@@ -19,12 +19,34 @@ describe('Gateway Service', () => {
       return Promise.resolve({ data: { answer: 'llmanswer' } });
     }
   });
-
+  
+ //Mock GET /statistics response
   axios.get.mockImplementation((url, data) => {
     if (url.endsWith('/statistics/mockuser')) {
       return Promise.resolve({ data: { gamesPlayed: 0, correctAnswers: 0, incorrectAnswers: 0 } });
     }
   });
+
+// Mock GET /question response
+axios.get.mockImplementation((url) => {
+  if (url.endsWith('/question')) {
+    return Promise.resolve({ data: { question: 'mockedQuestion' } });
+  }
+});
+
+// Mock POST /answer response
+axios.post.mockImplementation((url, data) => {
+  if (url.endsWith('/answer')) {
+    return Promise.resolve({ data: { correct: true } });
+  }
+});
+
+// Test /health endpoint
+it('should return OK status for health check', async () => {
+  const response = await request(app).get('/health');
+  expect(response.statusCode).toBe(200);
+  expect(response.body.status).toBe('OK');
+});
 
   // Test /login endpoint
   it('should forward login request to auth service', async () => {
@@ -55,6 +77,23 @@ describe('Gateway Service', () => {
     expect(response.statusCode).toBe(200);
     expect(response.body.answer).toBe('llmanswer');
   });
+
+// Test /question endpoint
+it('should retrieve a question from the question service', async () => {
+  const response = await request(app).get('/question');
+  expect(response.statusCode).toBe(200);
+  expect(response.body.question).toBe('mockedQuestion');
+});
+
+// Test /answer endpoint
+it('should submit an answer and get a response', async () => {
+  const response = await request(app)
+    .post('/answer')
+    .send({ questionId: '1', answer: 'mockAnswer' });
+
+  expect(response.statusCode).toBe(200);
+  expect(response.body.correct).toBe(true);
+});
 
   // Test /statistics endpoint
   it('should forward statistics request to the statistics service', async () => {
