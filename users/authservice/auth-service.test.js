@@ -4,7 +4,7 @@ const bcrypt = require('bcrypt');
 const User = require('./auth-model');
 
 let mongoServer;
-let app;
+let app = require('./auth-service');
 
 //test user
 const user = {
@@ -26,7 +26,6 @@ beforeAll(async () => {
   mongoServer = await MongoMemoryServer.create();
   const mongoUri = mongoServer.getUri();
   process.env.MONGODB_URI = mongoUri;
-  app = require('./auth-service'); 
   //Load database with initial conditions
   await addUser(user);
 });
