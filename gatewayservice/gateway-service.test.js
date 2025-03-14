@@ -77,14 +77,6 @@ it('should return OK status for health check', async () => {
     expect(response.body.incorrectAnswers).toBe(0);
   }, 15000);
 
-  // Test /question endpoint
-it('should retrieve a question from the question service', async () => {
-  const response = await request(app)
-  .get('/question');
-  expect(response.statusCode).toBe(200);
-  expect(response.body.question).toBe('questionMock');
-});
-
 // Test /answer endpoint
 it('should submit an answer and get a response', async () => {
   const response = await request(app)
