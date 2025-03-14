@@ -24,6 +24,7 @@ describe('Gateway Service', () => {
     } else if (url.endsWith('/statistics/mockuser')) { //Mock GET /statistics response
       return Promise.resolve({ data: { gamesPlayed: 0, correctAnswers: 0, incorrectAnswers: 0 } });
     }
+    return Promise.reject(new Error(`Unhandled request to ${url}`));// Resolves request if no one matches
   });
 
 
