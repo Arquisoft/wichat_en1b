@@ -18,7 +18,7 @@ describe('Gateway Service', () => {
     } else if (url.endsWith('/ask')) { //Mock POST /ask response
       return Promise.resolve({ data: { answer: 'llmanswer' } });
     } else if (url.endsWith('/question')) {// Mock GET /question response
-      return Promise.resolve({ data: { question: 'mockedQuestion' } });
+      return Promise.resolve({ data: { question: 'questionMock' } });
     } else if (url.endsWith('/answer')) {// Mock POST /answer response
       return Promise.resolve({ data: { correct: true } });
     } else if (url.endsWith('/statistics/mockuser')) { //Mock GET /statistics response
@@ -66,11 +66,23 @@ it('should return OK status for health check', async () => {
     expect(response.body.answer).toBe('llmanswer');
   });
 
-// Test /question endpoint
+  // Test /statistics endpoint
+  it('should forward statistics request to the statistics service', async () => {
+    const response = await request(app)
+      .get('/statistics/mockuser');
+
+    expect(response.statusCode).toBe(200);
+    expect(response.body.gamesPlayed).toBe(0);
+    expect(response.body.correctAnswers).toBe(0);
+    expect(response.body.incorrectAnswers).toBe(0);
+  }, 15000);
+
+  // Test /question endpoint
 it('should retrieve a question from the question service', async () => {
-  const response = await request(app).get('/question');
+  const response = await request(app)
+  .get('/question');
   expect(response.statusCode).toBe(200);
-  expect(response.body.question).toBe('mockedQuestion');
+  expect(response.body.question).toBe('questionMock');
 });
 
 // Test /answer endpoint
@@ -82,15 +94,4 @@ it('should submit an answer and get a response', async () => {
   expect(response.statusCode).toBe(200);
   expect(response.body.correct).toBe(true);
 });
-
-  // Test /statistics endpoint
-  it('should forward statistics request to the statistics service', async () => {
-    const response = await request(app)
-      .get('/statistics/mockuser');
-
-    expect(response.statusCode).toBe(200);
-    expect(response.body.gamesPlayed).toBe(0);
-    expect(response.body.correctAnswers).toBe(0);
-    expect(response.body.incorrectAnswers).toBe(0);
-  }, 15000);
 });
