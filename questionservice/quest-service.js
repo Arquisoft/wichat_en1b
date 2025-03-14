@@ -22,7 +22,7 @@ app.get("/foods", async(req, res) => {
 })
 
 app.get("/question", async (req, res) => {
-    const questionQuery = query + ` LIMIT 1`;
+    const questionQuery = query + ` LIMIT 200`;
     try {
         const question = await wikidataController.getQuestionAndImages(questionQuery, "images", "corresponds to");
         res.json(question);
