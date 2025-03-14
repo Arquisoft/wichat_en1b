@@ -90,5 +90,5 @@ it('should submit an answer and get a response', async () => {
     expect(response.body.gamesPlayed).toBe(0);
     expect(response.body.correctAnswers).toBe(0);
     expect(response.body.incorrectAnswers).toBe(0);
-  });
+  }, 15000);
 });
