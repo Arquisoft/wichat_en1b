@@ -88,6 +88,7 @@ services:
       - userservice
       - authservice
       - llmservice
+      - questionservice
       - statisticservice
     ports:
       - "8000:8000"
@@ -97,6 +98,7 @@ services:
       AUTH_SERVICE_URL: http://authservice:8002
       USER_SERVICE_URL: http://userservice:8001
       LLM_SERVICE_URL: http://llmservice:8003
+      QUESTION_SERVICE_URL: http://questionservice:8004
       STATISTIC_SERVICE_URL: http://statisticservice:8005
 
   webapp:

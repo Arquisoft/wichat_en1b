@@ -61,31 +61,35 @@ export const Home = () => {
                     </Typography>
                 )}
             </div>
-            <div style={{ marginTop: "40px" }}></div>
-            <Grid container spacing={3}>
-                {menuItems.map((item) => (
-                    <Grid item xs={6} key={item.id}>
-                        <Link to={item.link} style={{ textDecoration: "none" }}>
-                            <Card
-                                sx={{
-                                    textAlign: "center",
-                                    padding: "20px",
-                                    backgroundColor: item.color,
-                                    borderRadius: "10px",
-                                    '&:hover': { boxShadow: 6 }
-                                }}
-                            >
-                                <CardContent>
-                                    {item.icon}
-                                    <Typography variant="h6" mt={2}>
-                                        {item.title}
-                                    </Typography>
-                                </CardContent>
-                            </Card>
-                        </Link>
+            {isUserLogged && (
+                <>
+                    <div style={{ marginTop: "40px" }}></div>
+                    <Grid container spacing={3}>
+                        {menuItems.map((item) => (
+                            <Grid item xs={6} key={item.id}>
+                                <Link to={item.link} style={{ textDecoration: "none" }}>
+                                    <Card
+                                        sx={{
+                                            textAlign: "center",
+                                            padding: "20px",
+                                            backgroundColor: item.color,
+                                            borderRadius: "10px",
+                                            '&:hover': { boxShadow: 6 }
+                                        }}
+                                    >
+                                        <CardContent>
+                                            {item.icon}
+                                            <Typography variant="h6" mt={2}>
+                                                {item.title}
+                                            </Typography>
+                                        </CardContent>
+                                    </Card>
+                                </Link>
+                            </Grid>
+                        ))}
                     </Grid>
-                ))}
-            </Grid>
+                </>
+            )}
         </Container>
     )
 }

@@ -27,12 +27,12 @@ export const Question = () => {
 
     const userCookie = Cookies.get('user');
     const isUserLogged = !!userCookie;
-    const apiEndpoint = process.env.REACT_APP_API_ENDPOINT || 'http://localhost:8000';
+    const gatewayEndpoint = process.env.GATEWAY_SERVICE_URL || 'http://localhost:8000';
 
     // Sample game data
     const gameQuestion = {
         question: "Pregunta",
-        images: ["Image 1", "Image 2"]
+        images: ["Image 1", "Image 2", "Image 3", "Image 4"]
     }
     
 
@@ -58,10 +58,12 @@ export const Question = () => {
     }, [timeLeft])
 
     const requestQuestion = async () => {
-        let questionResponse = await axios.get(`${apiEndpoint}/question`)
+        let questionResponse = await axios.get(`${gatewayEndpoint}/question`)
         console.log(questionResponse)
         setQuestion(questionResponse)
     }
+
+    // requestQuestion();
 
     const handleAnswerSelect = (answer) => {
         setSelectedAnswer(answer)
