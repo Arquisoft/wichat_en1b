@@ -11,6 +11,7 @@ const app = express();
 const port = 8000;
 
 const statisticsServiceUrl = process.env.STATS_SERVICE_URL || 'http://localhost:8005';
+
 const questionServiceUrl = 'http://localhost:8004';
 const llmServiceUrl = process.env.LLM_SERVICE_URL || 'http://localhost:8003';
 const authServiceUrl = process.env.AUTH_SERVICE_URL || 'http://localhost:8002';
