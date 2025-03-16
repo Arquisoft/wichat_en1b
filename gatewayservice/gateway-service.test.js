@@ -8,6 +8,15 @@ afterAll(async () => {
 
 jest.mock('axios');
 
+const getRejectedPromise = (status, error) => {
+  return Promise.reject({
+    response: {
+      status: status,
+      data: { error: error }
+    }
+  });
+};
+
 describe('Gateway Service', () => {
   // Mock responses from external services
   axios.post.mockImplementation((url, data) => {
@@ -129,18 +138,13 @@ describe('Error handling', () => {
   it('should handle errors from login endpoint from auth service', async () => {
     axios.post.mockImplementationOnce((url) => {
       if (url.endsWith('/login')) {
-        return Promise.reject({
-          response: {
-            status: 500,
-            data: { error: 'Auth service error' }
-          }
-        });
+        return getRejectedPromise(500, 'Auth service error');
       }
     });
 
     const response = await request(app)
       .post('/login')
-      .send({ username: 'testuser', password: 'testpassword' });
+      .send({ username: 'testuser', password: 'tstpswd' });
 
     expect(response.statusCode).toBe(500);
     expect(response.body.error).toBe('Auth service error');
@@ -151,12 +155,7 @@ describe('Error handling', () => {
   it('should handle errors from llm service', async () => {
     axios.post.mockImplementationOnce((url) => {
       if (url.endsWith('/ask')) {
-        return Promise.reject({
-          response: {
-            status: 500,
-            data: { error: 'LLM service error' }
-          }
-        });
+        return getRejectedPromise(500, 'LLM service error');
       }
     });
 
@@ -172,12 +171,7 @@ describe('Error handling', () => {
   it('should handle errors from question service', async () => {
     axios.get.mockImplementationOnce((url) => {
       if (url.endsWith('/question')) {
-        return Promise.reject({
-          response: {
-            status: 500,
-            data: { error: 'Question service error' }
-          }
-        });
+        return getRejectedPromise(500, 'Question service error');
       }
     });
 
@@ -191,12 +185,7 @@ describe('Error handling', () => {
   it('should handle errors from answer endoint from question service', async () => {
     axios.post.mockImplementationOnce((url) => {
       if (url.endsWith('/answer')) {
-        return Promise.reject({
-          response: {
-            status: 500,
-            data: { error: 'Answer service error' }
-          }
-        });
+        return getRejectedPromise(500, 'Answer service error');
       }
     });
 
@@ -212,12 +201,7 @@ describe('Error handling', () => {
   it('should handle errors from statistics service', async () => {
     axios.get.mockImplementationOnce((url) => {
       if (url.includes('/statistics')) {
-        return Promise.reject({
-          response: {
-            status: 404,
-            data: { error: 'User stats not found' }
-          }
-        });
+        return getRejectedPromise(404, 'User stats not found');
       }
     });
 
