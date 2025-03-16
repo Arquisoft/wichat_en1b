@@ -26,9 +26,7 @@ describe('Gateway Service', () => {
 
   // Mock responses for GET requests
   axios.get.mockImplementation((url) => {
-    if(url.endsWith('/health')){
-      return Promise.resolve({ data: { status: 'OK' } });
-    } else if (url.includes('/statistics/mockuser')) {
+    if (url.includes('/statistics/mockuser')) {
       return Promise.resolve({ data: { gamesPlayed: 0, correctAnswers: 0, incorrectAnswers: 0 } });
     } else if (url.endsWith('/question')) {
       return Promise.resolve({ data: { question: 'questionMock' } });
@@ -128,6 +126,27 @@ describe('Error handling', () => {
     expect(response.body.error).toBe('Invalid user data');
   });
 
+  it('should handle errors from login endpoint from auth service', async () => {
+    axios.post.mockImplementationOnce((url) => {
+      if (url.endsWith('/login')) {
+        return Promise.reject({
+          response: {
+            status: 500,
+            data: { error: 'Auth service error' }
+          }
+        });
+      }
+    });
+
+    const response = await request(app)
+      .post('/login')
+      .send({ username: 'testuser', password: 'testpassword' });
+
+    expect(response.statusCode).toBe(500);
+    expect(response.body.error).toBe('Auth service error');
+  });
+
+
   // Test error case for askllm
   it('should handle errors from llm service', async () => {
     axios.post.mockImplementationOnce((url) => {
@@ -167,6 +186,26 @@ describe('Error handling', () => {
 
     expect(response.statusCode).toBe(500);
     expect(response.body.error).toBe('Question service error');
+  });
+
+  it('should handle errors from answer endoint from question service', async () => {
+    axios.post.mockImplementationOnce((url) => {
+      if (url.endsWith('/answer')) {
+        return Promise.reject({
+          response: {
+            status: 500,
+            data: { error: 'Answer service error' }
+          }
+        });
+      }
+    });
+
+    const response = await request(app)
+      .post('/answer')
+      .send({ questionId: '1', answer: 'mockAnswer' });
+
+    expect(response.statusCode).toBe(500);
+    expect(response.body.error).toBe('Answer service error');
   });
 
   // Test error case for statistics
