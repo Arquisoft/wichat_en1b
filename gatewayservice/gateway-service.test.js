@@ -8,6 +8,11 @@ afterAll(async () => {
 
 jest.mock('axios');
 
+const TEST_CREDENTIALS = {
+  username: process.env.TEST_USER || 'testuser',
+  password: process.env.TEST_PASSWORD || 'test-password-123'
+};
+
 const getRejectedPromise = (status, error) => {
   return Promise.reject({
     response: {
@@ -144,7 +149,10 @@ describe('Error handling', () => {
 
     const response = await request(app)
       .post('/login')
-      .send({ username: 'testuser', password: 'tstpswd' });
+      .send({ 
+        username: TEST_CREDENTIALS.username, 
+        password: TEST_CREDENTIALS.password 
+      });
 
     expect(response.statusCode).toBe(500);
     expect(response.body.error).toBe('Auth service error');
