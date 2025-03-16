@@ -24,6 +24,7 @@ const getWikidataQuestion = async(req, res) => {
 
 /**
  * Get a random question
+ * (using flags as the default question type temporaly)
  */
 app.get("/question", async(req, _res, next) => {
     req.params.questionType = "random";
