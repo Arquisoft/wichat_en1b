@@ -31,7 +31,8 @@ export const StatisticsPage = () => {
   useEffect(() => {
     const fetchStatistics = async () => {
       try {
-        const response = await axios.get(`${apiEndpoint}/statistics/${user}`, {
+                                          // `${apiEndpoint}/statistics/${user}`
+        const response = await axios.get( `http://localhost:8005/statistics/test`, {
           headers: {
             Authorization: `Bearer ${authToken}`,
           },
