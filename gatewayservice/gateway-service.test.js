@@ -1,12 +1,26 @@
 const request = require('supertest');
 const axios = require('axios');
-const app = require('./gateway-service'); 
+const app = require('./gateway-service');
 
 afterAll(async () => {
-    app.close();
-  });
+  app.close();
+});
 
 jest.mock('axios');
+
+const TEST_CREDENTIALS = {
+  username: process.env.TEST_USER || 'testuser',
+  password: process.env.TEST_PASSWORD || 'test-password-123'
+};
+
+const getRejectedPromise = (status, error) => {
+  return Promise.reject({
+    response: {
+      status: status,
+      data: { error: error }
+    }
+  });
+};
 
 describe('Gateway Service', () => {
   // Mock responses from external services
@@ -36,12 +50,12 @@ describe('Gateway Service', () => {
   });
 
 
-// Test /health endpoint
-it('should return OK status for health check', async () => {
-  const response = await request(app).get('/health');
-  expect(response.statusCode).toBe(200);
-  expect(response.body.status).toBe('OK');
-});
+  // Test /health endpoint
+  it('should return OK status for health check', async () => {
+    const response = await request(app).get('/health');
+    expect(response.statusCode).toBe(200);
+    expect(response.body.status).toBe('OK');
+  });
 
   // Test /login endpoint
   it('should forward login request to auth service', async () => {
@@ -87,7 +101,7 @@ it('should return OK status for health check', async () => {
   // Test /question endpoint
   it('should retrieve a question from the question service', async () => {
     const response = await request(app)
-    .get('/question');
+      .get('/question');
     expect(response.statusCode).toBe(200);
     expect(response.body.question).toBe('questionMock');
   });
@@ -100,5 +114,109 @@ it('should return OK status for health check', async () => {
 
     expect(response.statusCode).toBe(200);
     expect(response.body.correct).toBe(true);
+  });
 });
+
+describe('Error handling', () => {
+  // Test error case for adduser
+  it('should handle errors from user service', async () => {
+    // Mock the error response
+    axios.post.mockImplementationOnce((url) => {
+      if (url.endsWith('/adduser')) {
+        return Promise.reject({
+          response: {
+            status: 400,
+            data: { error: 'Invalid user data' }
+          }
+        });
+      }
+    });
+
+    const response = await request(app)
+      .post('/adduser')
+      .send({ username: 'bad_user' });
+
+    expect(response.statusCode).toBe(400);
+    expect(response.body.error).toBe('Invalid user data');
+  });
+
+  it('should handle errors from login endpoint from auth service', async () => {
+    axios.post.mockImplementationOnce((url) => {
+      if (url.endsWith('/login')) {
+        return getRejectedPromise(500, 'Auth service error');
+      }
+    });
+
+    const response = await request(app)
+      .post('/login')
+      .send({ 
+        username: TEST_CREDENTIALS.username, 
+        password: TEST_CREDENTIALS.password 
+      });
+
+    expect(response.statusCode).toBe(500);
+    expect(response.body.error).toBe('Auth service error');
+  });
+
+
+  // Test error case for askllm
+  it('should handle errors from llm service', async () => {
+    axios.post.mockImplementationOnce((url) => {
+      if (url.endsWith('/ask')) {
+        return getRejectedPromise(500, 'LLM service error');
+      }
+    });
+
+    const response = await request(app)
+      .post('/askllm')
+      .send({ question: 'test' });
+
+    expect(response.statusCode).toBe(500);
+    expect(response.body.error).toBe('LLM service error');
+  });
+
+  // Test error case for question
+  it('should handle errors from question service', async () => {
+    axios.get.mockImplementationOnce((url) => {
+      if (url.endsWith('/question')) {
+        return getRejectedPromise(500, 'Question service error');
+      }
+    });
+
+    const response = await request(app)
+      .get('/question');
+
+    expect(response.statusCode).toBe(500);
+    expect(response.body.error).toBe('Question service error');
+  });
+
+  it('should handle errors from answer endoint from question service', async () => {
+    axios.post.mockImplementationOnce((url) => {
+      if (url.endsWith('/answer')) {
+        return getRejectedPromise(500, 'Answer service error');
+      }
+    });
+
+    const response = await request(app)
+      .post('/answer')
+      .send({ questionId: '1', answer: 'mockAnswer' });
+
+    expect(response.statusCode).toBe(500);
+    expect(response.body.error).toBe('Answer service error');
+  });
+
+  // Test error case for statistics
+  it('should handle errors from statistics service', async () => {
+    axios.get.mockImplementationOnce((url) => {
+      if (url.includes('/statistics')) {
+        return getRejectedPromise(404, 'User stats not found');
+      }
+    });
+
+    const response = await request(app)
+      .get('/statistics/nonexistentuser');
+
+    expect(response.statusCode).toBe(404);
+    expect(response.body.error).toBe('User stats not found');
+  });
 });
