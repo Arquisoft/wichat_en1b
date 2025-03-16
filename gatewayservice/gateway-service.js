@@ -11,6 +11,8 @@ const app = express();
 const port = 8000;
 
 const statisticsServiceUrl = process.env.STATS_SERVICE_URL || 'http://localhost:8005';
+
+const questionServiceUrl = 'http://localhost:8004';
 const llmServiceUrl = process.env.LLM_SERVICE_URL || 'http://localhost:8003';
 const authServiceUrl = process.env.AUTH_SERVICE_URL || 'http://localhost:8002';
 const userServiceUrl = process.env.USER_SERVICE_URL || 'http://localhost:8001';
@@ -66,6 +68,17 @@ app.get('/statistics/:user', async (req, res) => {
     res.status(error.response.status).json({ error: error.response.data.error });
   }
 });
+
+app.get('/question', async (req, res) => {
+  try{
+    const questionResponse = await axios.get(questionServiceUrl+'/foods', req.body);
+    console.log(questionResponse);
+    res.json(questionResponse.data)
+  } catch (error) {
+    console.log(error)
+    res.status(400).json({ error: error.response });
+  }
+})
 
 // Read the OpenAPI YAML file synchronously
 openapiPath='./openapi.yaml'
