@@ -81,10 +81,10 @@ app.post('/answer', async (req, res) => {
 app.get('/statistics/:user', async (req, res) => {
   try {
     // Forward the add user request to the statistics service
-    const statisticsResponse = await axios.get(statisticsServiceUrl+'/statistics/' + req.params.user.toString(), req.body);
+    const statisticsResponse = await axios.get(statisticsServiceUrl + '/statistics/' + req.params.user.toString());
     res.json(statisticsResponse.data);
   } catch (error) {
-    res.status(error.response.status).json({ error: error.response.data.error });
+    res.status(error.response?.status || 500).json({ error: error.response?.data?.error });
   }
 });
 
