@@ -15,7 +15,7 @@ const theme = createTheme({
 
 // Function to get the authentication token
 const getAuthToken = () => {
-  // TODO: Replace this with actual logic to get the authentication token
+  // TODO: Change this with actual logic to get the authentication token
   return localStorage.getItem("authToken");
 };
 
@@ -25,14 +25,14 @@ export const StatisticsPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const apiEndpoint = process.env.REACT_APP_API_ENDPOINT || "http://localhost:8005";
-  const authToken = getAuthToken(); // Get the authentication token
+  // process.env.REACT_APP_API_ENDPOINT || `http://localhost:8005`;
+  const apiEndpoint = `http://localhost:8005`;
+  const authToken = getAuthToken();   // Get the authentication token
 
   useEffect(() => {
     const fetchStatistics = async () => {
       try {
-                                          // `${apiEndpoint}/statistics/${user}`
-        const response = await axios.get( `http://localhost:8005/statistics/test`, {
+        const response = await axios.get( `${apiEndpoint}/statistics/${user}`, {
           headers: {
             Authorization: `Bearer ${authToken}`,
           },
