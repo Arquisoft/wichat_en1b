@@ -1,10 +1,10 @@
 const request = require('supertest');
 const axios = require('axios');
-const app = require('./gateway-service'); 
+const app = require('./gateway-service');
 
 afterAll(async () => {
-    app.close();
-  });
+  app.close();
+});
 
 jest.mock('axios');
 
@@ -26,7 +26,9 @@ describe('Gateway Service', () => {
 
   // Mock responses for GET requests
   axios.get.mockImplementation((url) => {
-    if (url.includes('/statistics/mockuser')) {
+    if(url.endsWith('/health')){
+      return Promise.resolve({ data: { status: 'OK' } });
+    } else if (url.includes('/statistics/mockuser')) {
       return Promise.resolve({ data: { gamesPlayed: 0, correctAnswers: 0, incorrectAnswers: 0 } });
     } else if (url.endsWith('/question')) {
       return Promise.resolve({ data: { question: 'questionMock' } });
@@ -36,12 +38,12 @@ describe('Gateway Service', () => {
   });
 
 
-// Test /health endpoint
-it('should return OK status for health check', async () => {
-  const response = await request(app).get('/health');
-  expect(response.statusCode).toBe(200);
-  expect(response.body.status).toBe('OK');
-});
+  // Test /health endpoint
+  it('should return OK status for health check', async () => {
+    const response = await request(app).get('/health');
+    expect(response.statusCode).toBe(200);
+    expect(response.body.status).toBe('OK');
+  });
 
   // Test /login endpoint
   it('should forward login request to auth service', async () => {
@@ -87,7 +89,7 @@ it('should return OK status for health check', async () => {
   // Test /question endpoint
   it('should retrieve a question from the question service', async () => {
     const response = await request(app)
-    .get('/question');
+      .get('/question');
     expect(response.statusCode).toBe(200);
     expect(response.body.question).toBe('questionMock');
   });
@@ -100,5 +102,90 @@ it('should return OK status for health check', async () => {
 
     expect(response.statusCode).toBe(200);
     expect(response.body.correct).toBe(true);
+  });
 });
+
+describe('Error handling', () => {
+  // Test error case for adduser
+  it('should handle errors from user service', async () => {
+    // Mock the error response
+    axios.post.mockImplementationOnce((url) => {
+      if (url.endsWith('/adduser')) {
+        return Promise.reject({
+          response: {
+            status: 400,
+            data: { error: 'Invalid user data' }
+          }
+        });
+      }
+    });
+
+    const response = await request(app)
+      .post('/adduser')
+      .send({ username: 'bad_user' });
+
+    expect(response.statusCode).toBe(400);
+    expect(response.body.error).toBe('Invalid user data');
+  });
+
+  // Test error case for askllm
+  it('should handle errors from llm service', async () => {
+    axios.post.mockImplementationOnce((url) => {
+      if (url.endsWith('/ask')) {
+        return Promise.reject({
+          response: {
+            status: 500,
+            data: { error: 'LLM service error' }
+          }
+        });
+      }
+    });
+
+    const response = await request(app)
+      .post('/askllm')
+      .send({ question: 'test' });
+
+    expect(response.statusCode).toBe(500);
+    expect(response.body.error).toBe('LLM service error');
+  });
+
+  // Test error case for question
+  it('should handle errors from question service', async () => {
+    axios.get.mockImplementationOnce((url) => {
+      if (url.endsWith('/question')) {
+        return Promise.reject({
+          response: {
+            status: 500,
+            data: { error: 'Question service error' }
+          }
+        });
+      }
+    });
+
+    const response = await request(app)
+      .get('/question');
+
+    expect(response.statusCode).toBe(500);
+    expect(response.body.error).toBe('Question service error');
+  });
+
+  // Test error case for statistics
+  it('should handle errors from statistics service', async () => {
+    axios.get.mockImplementationOnce((url) => {
+      if (url.includes('/statistics')) {
+        return Promise.reject({
+          response: {
+            status: 404,
+            data: { error: 'User stats not found' }
+          }
+        });
+      }
+    });
+
+    const response = await request(app)
+      .get('/statistics/nonexistentuser');
+
+    expect(response.statusCode).toBe(404);
+    expect(response.body.error).toBe('User stats not found');
+  });
 });
