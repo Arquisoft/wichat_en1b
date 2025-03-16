@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useParams } from "react-router-dom";
 import { Typography, Box, Container, Paper, CircularProgress, Grid } from "@mui/material";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import axios from "axios";
@@ -12,12 +13,6 @@ const theme = createTheme({
   },
 });
 
-// Function to get the current user
-const getCurrentUser = () => {
-  // TODO: Replace this with actual logic to get the current user return localStorage.getItem("username");
-  return "test";
-};
-
 // Function to get the authentication token
 const getAuthToken = () => {
   // TODO: Replace this with actual logic to get the authentication token
@@ -25,18 +20,18 @@ const getAuthToken = () => {
 };
 
 export const StatisticsPage = () => {
+  const { user } = useParams(); // Get the user parameter from the URL
   const [statistics, setStatistics] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   const apiEndpoint = process.env.REACT_APP_API_ENDPOINT || "http://localhost:8005";
-  const username = getCurrentUser(); // Get the current user's username
   const authToken = getAuthToken(); // Get the authentication token
 
   useEffect(() => {
     const fetchStatistics = async () => {
       try {
-        const response = await axios.get(`${apiEndpoint}/statistics/${username}`, {
+        const response = await axios.get(`${apiEndpoint}/statistics/${user}`, {
           headers: {
             Authorization: `Bearer ${authToken}`,
           },
@@ -51,38 +46,7 @@ export const StatisticsPage = () => {
     };
 
     fetchStatistics();
-  }, [apiEndpoint, username, authToken]);
-
-  if (loading) {
-    return (
-      <ThemeProvider theme={theme}>
-        <Container maxWidth="md" sx={{ py: 4 }}>
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              minHeight: "60vh",
-            }}
-          >
-            <CircularProgress />
-          </Box>
-        </Container>
-      </ThemeProvider>
-    );
-  }
-
-  if (error) {
-    return (
-      <ThemeProvider theme={theme}>
-        <Container maxWidth="md" sx={{ py: 4 }}>
-          <Typography variant="h6" color="error" align="center">
-            {error}
-          </Typography>
-        </Container>
-      </ThemeProvider>
-    );
-  }
+  }, [apiEndpoint, user, authToken]);
 
   return (
     <ThemeProvider theme={theme}>
@@ -92,9 +56,24 @@ export const StatisticsPage = () => {
             User Statistics
           </Typography>
           <Typography variant="body1" gutterBottom>
-            Here are the statistics for the user: {username}
+            Here are the statistics for the user: {user}
           </Typography>
-          {statistics ? (
+          {loading ? (
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                minHeight: "60vh",
+              }}
+            >
+              <CircularProgress />
+            </Box>
+          ) : error ? (
+            <Typography variant="h6" color="error" align="center">
+              {error}
+            </Typography>
+          ) : statistics ? (
             <Grid container spacing={2}>
               <Grid item xs={12} sm={6}>
                 <Paper elevation={1} sx={{ p: 2 }}>
