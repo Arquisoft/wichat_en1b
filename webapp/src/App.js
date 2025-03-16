@@ -1,37 +1,35 @@
-import React, { useState } from 'react';
-import AddUser from './components/AddUser';
-import Login from './components/Login';
-import CssBaseline from '@mui/material/CssBaseline';
-import Container from '@mui/material/Container';
-import Typography from '@mui/material/Typography';
-import Link from '@mui/material/Link';
+import React, { useEffect } from 'react';
+import { Login } from './components/LogInSignUp/Login';
+import { SignUp } from './components/LogInSignUp/SignUp';
+import { Container } from '@mui/material';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { Home } from './components/Home/Home';
+import { Navbar } from './components/fragments/Navbar';
+
+
 
 function App() {
-  const [showLogin, setShowLogin] = useState(true);
-
-  const handleToggleView = () => {
-    setShowLogin(!showLogin);
-  };
+  useEffect(() => {
+    document.title = 'WiChat';
+  }, [])
 
   return (
-    <Container component="main" maxWidth="xs">
-      <CssBaseline />
-      <Typography component="h1" variant="h5" align="center" sx={{ marginTop: 2 }}>
-        Welcome to the 2025 edition of the Software Architecture course!
-      </Typography>
-      {showLogin ? <Login /> : <AddUser />}
-      <Typography component="div" align="center" sx={{ marginTop: 2 }}>
-        {showLogin ? (
-          <Link name="gotoregister" component="button" variant="body2" onClick={handleToggleView}>
-            Don't have an account? Register here.
-          </Link>
-        ) : (
-          <Link component="button" variant="body2" onClick={handleToggleView}>
-            Already have an account? Login here.
-          </Link>
-        )}
-      </Typography>
+    <Container>
+      <Navbar />
+    <Router>
+      <div style={{ position: 'relative', minHeight: '100vh'}}>
+        <Container component="main" className="main" maxWidth="lg" style={{ padding: '3em 0em' }}>
+          <Routes>
+            <Route path="/" element={<Navigate to="/home" />}/>
+            <Route path="/home" element={<Home />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/signup" element={<SignUp />} />
+          </Routes>
+        </Container>
+      </div>
+    </Router>
     </Container>
+    
   );
 }
 
