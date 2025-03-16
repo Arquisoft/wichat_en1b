@@ -27,4 +27,12 @@ const server = app.listen(port, () => {
     console.log(`Question Service listening at http://localhost:${port}`);
 })
 
+app.post('/checkanswer', (req, res) => {
+    let questionID = req.body.questionID;
+    let answer = req.body.answer;
+
+    let isCorrect = wikidataController.isQuestionCorrect(questionID, answer);
+    res.json({ correct: isCorrect });
+})
+
 module.exports = server

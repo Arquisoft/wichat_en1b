@@ -8,11 +8,11 @@ const fs = require("fs")
 const YAML = require('yaml')
 
 const app = express();
+
 const port = 8000;
 
 const statisticsServiceUrl = process.env.STATS_SERVICE_URL || 'http://localhost:8005';
-
-const questionServiceUrl = 'http://localhost:8004';
+const questionServiceUrl = process.env.QUESTION_SERVICE_URL || 'http://localhost:8004';
 const llmServiceUrl = process.env.LLM_SERVICE_URL || 'http://localhost:8003';
 const authServiceUrl = process.env.AUTH_SERVICE_URL || 'http://localhost:8002';
 const userServiceUrl = process.env.USER_SERVICE_URL || 'http://localhost:8001';
@@ -62,7 +62,7 @@ app.post('/askllm', async (req, res) => {
 app.get('/statistics/:user', async (req, res) => {
   try {
     // Forward the add user request to the statistics service
-    const statisticsResponse = await axios.get(statisticsServiceUrl+'/statistics/' + req.params.user.toString(), req.body);
+    const statisticsResponse = await axios.get(statisticsServiceUrl+'/statistics/' + req.params.user.toString());
     res.json(statisticsResponse.data);
   } catch (error) {
     res.status(error.response.status).json({ error: error.response.data.error });
@@ -71,12 +71,23 @@ app.get('/statistics/:user', async (req, res) => {
 
 app.get('/question', async (req, res) => {
   try{
-    const questionResponse = await axios.get(questionServiceUrl+'/foods', req.body);
+    console.log(questionServiceUrl+'/foods')
+    const questionResponse = await axios.get(questionServiceUrl+'/foods');
     console.log(questionResponse);
     res.json(questionResponse.data)
   } catch (error) {
     console.log(error)
     res.status(400).json({ error: error.response });
+  }
+})
+
+app.post('/checkanswer', async (req, res) => {
+  try{
+    const checkAnswerResponse = await axios.post(questionServiceUrl+'/checkanswer', req.body);
+    res.json(checkAnswerResponse.data);
+  } catch (error) {
+    console.log(error)
+    res.status(400).json({ error: error.response.data.error });
   }
 })
 
