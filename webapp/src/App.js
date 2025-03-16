@@ -6,6 +6,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { Home } from './components/Home/Home';
 import { Navbar } from './components/fragments/Navbar';
 import { StatisticsPage } from './components/Statistics/StatisticsPage';
+import { Question } from './components/Question/Question';
 
 
 function App() {
@@ -24,6 +25,7 @@ function App() {
             <Route path="/home" element={<Home />} />
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<SignUp />} />
+            <Route path="/game" element={<Question />} />
             <Route path="/statistics/:user" element={<StatisticsPage />} />
           </Routes>
         </Container>
