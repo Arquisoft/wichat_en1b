@@ -34,21 +34,19 @@ describe('Login Component', () => {
     expect(screen.getByLabelText(/Username/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/Password/i)).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /Log in/i })).toBeInTheDocument();
-
   });
 
-  test('updates state on user input', () => {
+  test('updates state on user input for log in', () => {
+    const usernameLogInInput = screen.getByLabelText(/Username/i);
+    const passwordLogInInput = screen.getByLabelText(/Password/i);
 
-    const usernameInput = screen.getByLabelText(/Username/i);
-    const passwordInput = screen.getByLabelText(/Password/i);
+    fireEvent.change(usernameLogInInput, { target: { value: 'testuser' } });
+    fireEvent.change(passwordLogInInput, { target: { value: 'password123' } });
 
-    fireEvent.change(usernameInput, { target: { value: 'testuser' } });
-    fireEvent.change(passwordInput, { target: { value: 'password123' } });
-
-    expect(usernameInput.value).toBe('testuser');
-    expect(passwordInput.value).toBe('password123');
-
+    expect(usernameLogInInput.value).toBe('testuser');
+    expect(passwordLogInInput.value).toBe('password123');
   });
+
 
   test('handles successful login', async () => {
     axios.post.mockResolvedValue({ data: { username: 'testuser', token: '12345' } });

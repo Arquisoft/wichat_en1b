@@ -23,15 +23,15 @@ describe('SignUp Component', () => {
     expect(screen.getByRole('button', { name: /Sign Up/i })).toBeInTheDocument();
   });
 
-  test('updates state on user input', () => {
-    const usernameInput = screen.getByLabelText(/Username/i);
-    const passwordInput = screen.getByLabelText(/Password/i);
+  test('updates state on user input for sign up', () => {
+    const usernameSignUpInput = screen.getByLabelText(/Username/i);
+    const passwordSignUpInput = screen.getByLabelText(/Password/i);
     
-    fireEvent.change(usernameInput, { target: { value: 'newuser' } });
-    fireEvent.change(passwordInput, { target: { value: 'newpassword' } });
+    fireEvent.change(usernameSignUpInput, { target: { value: 'newuser' } });
+    fireEvent.change(passwordSignUpInput, { target: { value: 'newpassword' } });
     
-    expect(usernameInput.value).toBe('newuser');
-    expect(passwordInput.value).toBe('newpassword');
+    expect(usernameSignUpInput.value).toBe('newuser');
+    expect(passwordSignUpInput.value).toBe('newpassword');
   });
 
   test('handles successful user creation', async () => {
