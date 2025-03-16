@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require("cors"); // Import CORS
 const mongoose = require('mongoose');
 const User = require('./statistics-model');
+const Cookies = require('cookies');
 
 const app = express();
 const port = 8005;
@@ -18,13 +19,24 @@ app.use(cors(corsOptions));
 
 // Connect to MongoDB
 const mongoUri = process.env.MONGODB_URI || 'mongodb://localhost:27017/userdb';
-mongoose.connect(mongoUri);
+mongoose.connect(mongoUri, { useNewUrlParser: true, useUnifiedTopology: true });
+
+// Middleware to authenticate the user
+const authenticateUser = (req, res, next) => {
+  const cookies = new Cookies(req, res);
+  const userCookie = cookies.get('user');
+  if (!userCookie) {
+    return res.sendStatus(401);
+  }
+  const userData = JSON.parse(userCookie);
+  req.user = userData;
+  next();
+};
 
 // GET endpoint to retrieve user statistics
-app.get('/statistics/:user', async (req, res) => {
+app.get('/statistics', authenticateUser, async (req, res) => {
   try {
-    // Find the user by username in the database
-    let username = req.params.user.toString();
+    const username = req.user.username; // Get the username from the cookie
     const user = await User.findOne({ username });
 
     if (user) {
@@ -37,19 +49,15 @@ app.get('/statistics/:user', async (req, res) => {
       res.status(404).json({ error: 'User not found' });
     }
   } catch (error) {
-    if (error.response) {
-      res.status(error.response.status).json({ error: error.response.data.error });
-    } else {
-      res.status(500).json({ error: 'Internal Server Error' });
-    }
+    res.status(500).json({ error: 'Internal Server Error' });
   }
 });
 
 // POST endpoint to update user statistics when a game is played
-app.post('/statistics/:user/update', async (req, res) => {
+app.post('/statistics/update', authenticateUser, async (req, res) => {
   try {
     const { gamesPlayed, correctAnswers, incorrectAnswers } = req.body;
-    let username = req.params.user.toString();
+    const username = req.user.username; // Get the username from the cookie
     const user = await User.findOne({ username });
 
     if (user) {
