@@ -8,6 +8,7 @@ const fs = require("fs")
 const YAML = require('yaml')
 
 const app = express();
+
 const port = 8000;
 
 const statisticsServiceUrl = process.env.STATS_SERVICE_URL || 'http://localhost:8005';
@@ -73,7 +74,7 @@ app.get('/question', async (req, res) => {
   try{
     const questionResponse = await axios.get(questionServiceUrl+'/foods', req.body);
     console.log(questionResponse);
-    res.json(questionResponse.data)
+    res.json(questionResponse)
   } catch (error) {
     console.log(error)
     res.status(400).json({ error: error.response });
