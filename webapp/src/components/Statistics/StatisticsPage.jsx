@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Typography, Box, Container, Paper, CircularProgress, Grid } from "@mui/material";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import axios from "axios";
+import Cookies from "js-cookie";
 
 // Create a theme (using the same blue primary color)
 const theme = createTheme({
@@ -13,26 +14,35 @@ const theme = createTheme({
   },
 });
 
-// Function to get the authentication token
+// Function to get the authentication token from cookies
 const getAuthToken = () => {
-  // TODO: Change this with actual logic to get the authentication token
-  return localStorage.getItem("authToken");
+  const userCookie = Cookies.get('user');
+  if (userCookie) {
+    const userData = JSON.parse(userCookie);
+    return userData.token;
+  }
+  return null;
 };
 
 export const StatisticsPage = () => {
-  const { user } = useParams(); // Get the user parameter from the URL
+  const navigate = useNavigate();
   const [statistics, setStatistics] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // process.env.REACT_APP_API_ENDPOINT || `http://localhost:8005`;
+    // TODO: check env file to use: process.env.REACT_APP_API_ENDPOINT || "http://localhost:8005";
   const apiEndpoint = `http://localhost:8005`;
-  const authToken = getAuthToken();   // Get the authentication token
+  const authToken = getAuthToken(); // Get the authentication token
 
   useEffect(() => {
+    if (!authToken) {
+      navigate('/login'); // Redirect to login if the user is not logged in
+      return;
+    }
+
     const fetchStatistics = async () => {
       try {
-        const response = await axios.get( `${apiEndpoint}/statistics/${user}`, {
+        const response = await axios.get(`${apiEndpoint}/statistics`, {
           headers: {
             Authorization: `Bearer ${authToken}`,
           },
@@ -47,7 +57,7 @@ export const StatisticsPage = () => {
     };
 
     fetchStatistics();
-  }, [apiEndpoint, user, authToken]);
+  }, [apiEndpoint, authToken, navigate]);
 
   return (
     <ThemeProvider theme={theme}>
@@ -57,7 +67,7 @@ export const StatisticsPage = () => {
             User Statistics
           </Typography>
           <Typography variant="body1" gutterBottom>
-            Here are the statistics for the user: {user}
+            Here are your statistics:
           </Typography>
           {loading ? (
             <Box
