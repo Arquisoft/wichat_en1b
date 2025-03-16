@@ -17,14 +17,21 @@ describe('Gateway Service', () => {
       return Promise.resolve({ data: { userId: 'mockedUserId' } });
     } else if (url.endsWith('/ask')) { //Mock POST /ask response
       return Promise.resolve({ data: { answer: 'llmanswer' } });
-    } else if (url.endsWith('/question')) {// Mock GET /question response
-      return Promise.resolve({ data: { question: 'questionMock' } });
     } else if (url.endsWith('/answer')) {// Mock POST /answer response
       return Promise.resolve({ data: { correct: true } });
-    } else if (url.endsWith('/statistics/mockuser')) { //Mock GET /statistics response
+    } else {
+      return Promise.reject(new Error(`Unhandled POST request to ${url}`));
+    }
+  });
+
+  // Mock responses for GET requests
+  axios.get.mockImplementation((url) => {
+    if (url.includes('/statistics/mockuser')) {
       return Promise.resolve({ data: { gamesPlayed: 0, correctAnswers: 0, incorrectAnswers: 0 } });
-    }else{
-      return Promise.reject(new Error(`Unhandled request to ${url}`));// Resolves request if no one matches
+    } else if (url.endsWith('/question')) {
+      return Promise.resolve({ data: { question: 'questionMock' } });
+    } else {
+      return Promise.reject(new Error(`Unhandled GET request to ${url}`));
     }
   });
 
@@ -77,13 +84,21 @@ it('should return OK status for health check', async () => {
     expect(response.body.incorrectAnswers).toBe(0);
   }, 15000);
 
-// Test /answer endpoint
-it('should submit an answer and get a response', async () => {
-  const response = await request(app)
-    .post('/answer')
-    .send({ questionId: '1', answer: 'mockAnswer' });
+  // Test /question endpoint
+  it('should retrieve a question from the question service', async () => {
+    const response = await request(app)
+    .get('/question');
+    expect(response.statusCode).toBe(200);
+    expect(response.body.question).toBe('questionMock');
+  });
 
-  expect(response.statusCode).toBe(200);
-  expect(response.body.correct).toBe(true);
+  // Test /answer endpoint
+  it('should submit an answer and get a response', async () => {
+    const response = await request(app)
+      .post('/answer')
+      .send({ questionId: '1', answer: 'mockAnswer' });
+
+    expect(response.statusCode).toBe(200);
+    expect(response.body.correct).toBe(true);
 });
 });
