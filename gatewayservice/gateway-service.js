@@ -81,6 +81,16 @@ app.get('/question', async (req, res) => {
   }
 })
 
+app.post('/checkanswer', async (req, res) => {
+  try{
+    const checkAnswerResponse = await axios.post(questionServiceUrl+'/checkanswer', req.body);
+    res.json(checkAnswerResponse.data);
+  } catch (error) {
+    console.log(error)
+    res.status(400).json({ error: error.response.data.error });
+  }
+})
+
 // Read the OpenAPI YAML file synchronously
 openapiPath='./openapi.yaml'
 if (fs.existsSync(openapiPath)) {

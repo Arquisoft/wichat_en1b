@@ -21,19 +21,13 @@ export const Question = () => {
     const [timeLeft, setTimeLeft] = useState(60) // 60 seconds timer
     const [question, setQuestion] = useState({
         question: "Pregunta",
-        images: ["Image 1", "Image 2"]
+        images: []
     });
 
 
     const userCookie = Cookies.get('user');
     const isUserLogged = !!userCookie;
     const gatewayEndpoint = process.env.GATEWAY_SERVICE_URL || 'http://localhost:8000';
-
-    // Sample game data
-    const gameQuestion = {
-        question: "Pregunta",
-        images: ["Image 1", "Image 2", "Image 3", "Image 4"]
-    }
     
 
     useEffect(() => {
@@ -59,14 +53,14 @@ export const Question = () => {
 
     const requestQuestion = async () => {
         let questionResponse = await axios.get(`${gatewayEndpoint}/question`)
-        console.log(questionResponse)
-        setQuestion(questionResponse)
+        console.log(questionResponse.data);
+        setQuestion(questionResponse.data);
     }
 
-    // requestQuestion();
-
-    const handleAnswerSelect = (answer) => {
-        setSelectedAnswer(answer)
+    const handleAnswerSelect = async (answer) => {
+        setSelectedAnswer(answer);
+        let response = await axios.post(`${gatewayEndpoint}/checkanswer`, { questionID: question.id, answer: answer });
+        let isCorrect = response.data.correct;
     }
 
     // Format time as MM:SS
@@ -137,7 +131,7 @@ export const Question = () => {
 
                 {/* Question */}
                 <Typography variant="h5" component="h2" align="center" sx={{ my: 3, fontWeight: 500 }}>
-                    {gameQuestion.question}
+                    {question.question}
                 </Typography>
 
                 {/* Options */}
