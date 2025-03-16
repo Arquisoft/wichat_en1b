@@ -2,14 +2,21 @@ import { useEffect, useState } from "react";
 import Cookies from "js-cookie";
 import axios from 'axios';
 import { Typewriter } from "react-simple-typewriter";
-import { Container, Typography } from "@mui/material";
+import { Container, Grid, Card, CardContent, Typography } from "@mui/material";
+import { Link } from "react-router-dom";
+import { User, BarChart, Gamepad2, Layers } from "lucide-react";
 
 
 export const Home = () => {
     const [message, setMessage] = useState('');
     const [error, setError] = useState('');
 
-
+    const menuItems = [
+        { id: 1, title: "Your Profile", icon: <User size={50} />, link: "/profile", color: "#A7E3FF" },
+        { id: 2, title: "New Game", icon: <Gamepad2 size={50} />, link: "/game", color: "#D0C3FF" },
+        { id: 3, title: "Statistics", icon: <BarChart size={50} />, link: "/statistics", color: "#FFCF9D" },
+        { id: 4, title: "Game Modes", icon: <Layers size={50} />, link: "/game-modes", color: "#C3CADF" },
+    ];
 
     const userCookie = Cookies.get('user');
     const isUserLogged = !!userCookie;
@@ -40,19 +47,7 @@ export const Home = () => {
     }, [])
 
     return (
-        <Container >
-            <Typography component="h1" variant="h5" align="center" sx={{ width: '100%', fontSize: 'clamp(2rem, 10vw, 2.15rem)', marginTop: 2 }}>
-                Welcome to the 2025 edition of the Software Architecture course!
-            </Typography>
-            {!isUserLogged ? (
-                <Typography component="h2" variant="h5" align="center" sx={{ width: '100%', fontSize: 'clamp(2rem, 10vw, 2.15rem)', marginTop: 2 }}>
-                    You're not logged into the app!!
-                </Typography>
-            ) : (
-                <Typography component="h2" variant="h5" align="center" sx={{ width: '100%', fontSize: 'clamp(2rem, 10vw, 2.15rem)', marginTop: 2 }}>
-                    You're logged as {JSON.parse(userCookie).username}!!
-                </Typography>
-            )}
+        <Container maxWidth="sm" style={{ marginTop: "20px" }}>
             <div>
                 {message ? (
                     <Typewriter
@@ -66,6 +61,31 @@ export const Home = () => {
                     </Typography>
                 )}
             </div>
+            <div style={{ marginTop: "40px" }}></div>
+            <Grid container spacing={3}>
+                {menuItems.map((item) => (
+                    <Grid item xs={6} key={item.id}>
+                        <Link to={item.link} style={{ textDecoration: "none" }}>
+                            <Card
+                                sx={{
+                                    textAlign: "center",
+                                    padding: "20px",
+                                    backgroundColor: item.color,
+                                    borderRadius: "10px",
+                                    '&:hover': { boxShadow: 6 }
+                                }}
+                            >
+                                <CardContent>
+                                    {item.icon}
+                                    <Typography variant="h6" mt={2}>
+                                        {item.title}
+                                    </Typography>
+                                </CardContent>
+                            </Card>
+                        </Link>
+                    </Grid>
+                ))}
+            </Grid>
         </Container>
     )
 }
