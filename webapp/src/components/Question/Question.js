@@ -63,7 +63,7 @@ export const Question = () => {
         setQuestion(questionResponse)
     }
 
-    requestQuestion();
+    // requestQuestion();
 
     const handleAnswerSelect = (answer) => {
         setSelectedAnswer(answer)
