@@ -88,7 +88,8 @@ class WikidataController {
     async getQuestionAndImages(queryName) {
 
         if (queryName == "random") {
-            queryName = this.getRandomQuestionType();
+            // queryName = this.getRandomQuestionType();
+            queryName = "flags";
         }
 
         if (!questionTypes[queryName]) {
