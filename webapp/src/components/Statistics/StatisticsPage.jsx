@@ -14,36 +14,6 @@ const theme = createTheme({
   },
 });
 
-
-// Function to get the authentication token from cookies
-const getAuthToken = async () => {
-  try {
-    const cookie = Cookies.get('user');
-    if (!cookie) {
-      throw new Error("No user cookie found");
-    }
-
-    const parsedCookie = JSON.parse(cookie);
-    const user = parsedCookie.username;
-    const token = parsedCookie.token;
-
-    try {
-      const response = await axios.get(`http://localhost:8005/statistics/${user}`, {
-        headers: { 'Authorization': `Bearer ${token}` },
-        withCredentials: true
-      });
-      const receivedRecords = response.data;
-      return receivedRecords.record;
-    } catch (error) {
-      console.error("Error fetching statistics:", error);
-      setError("Error fetching statistics");
-    }
-  } catch (error) {
-    console.error("Error getting the authenticated user:", error);
-    setError("Error getting the authenticated user");
-  }
-};
-
 export const StatisticsPage = () => {
   const navigate = useNavigate();
   const [statistics, setStatistics] = useState(null);
@@ -52,6 +22,35 @@ export const StatisticsPage = () => {
 
   // TODO check env file to use: process.env.REACT_APP_API_ENDPOINT || "http://localhost:8005/statistics";
   const apiEndpoint = "http://localhost:8005/statistics";
+
+  // Function to get the authentication token from cookies
+  const getAuthToken = async () => {
+    try {
+      const cookie = Cookies.get('user');
+      if (!cookie) {
+        throw new Error("No user cookie found");
+      }
+
+      const parsedCookie = JSON.parse(cookie);
+      const user = parsedCookie.username;
+      const token = parsedCookie.token;
+
+      try {
+        const response = await axios.get(`http://localhost:8005/statistics/${user}`, {
+          headers: { 'Authorization': `Bearer ${token}` },
+          withCredentials: true
+        });
+        const receivedRecords = response.data;
+        return receivedRecords.record;
+      } catch (error) {
+        console.error("Error fetching statistics:", error);
+        setError("Error fetching statistics");
+      }
+    } catch (error) {
+      console.error("Error getting the authenticated user:", error);
+      setError("Error getting the authenticated user");
+    }
+  };
 
   useEffect(() => {
     const fetchStatistics = async () => {
