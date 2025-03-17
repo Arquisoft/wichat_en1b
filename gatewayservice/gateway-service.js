@@ -87,7 +87,7 @@ app.post('/checkanswer', async (req, res) => {
     res.json(checkAnswerResponse.data);
   } catch (error) {
     console.log(error)
-    res.status(error.response.status).json({ error: error.response.data.error });
+    res.status(400).json({ error: error.response.data.error });
   }
 })
 
