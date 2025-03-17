@@ -4,7 +4,10 @@ import { Typography, Box, Container, Paper, CircularProgress, Grid } from "@mui/
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import axios from "axios";
 import Cookies from "js-cookie";
+import RecordRetriever from "./RecordRetriever";
 
+
+const retrieves = new RecordRetriever();
 // Create a theme (using the same blue primary color)
 const theme = createTheme({
   palette: {
@@ -13,6 +16,7 @@ const theme = createTheme({
     },
   },
 });
+
 
 
 // Function to get the authentication token from cookies
@@ -50,37 +54,21 @@ export const StatisticsPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // TODO check env file to use: process.env.REACT_APP_API_ENDPOINT || "http://localhost:8005/statistics";
-  const apiEndpoint = "http://localhost:8005/statistics";
 
-  useEffect(() => {
-    const fetchStatistics = async () => {
+  const getRecords = async ()=>{
+    try {
+      let cookie = JSON.parse(Cookies.get('user'))
+      var jsonRecords = await retriever.getRecords(cookie.username, cookie.token); 
+      var recordsArray = jsonRecords.games;
+      setStatistics(recordsArray);
+    } catch (error) {
+      setError(error);
+    }
+  }
 
-      try {
-        const authToken = await getAuthToken(); // Get the authentication token
+  if(statistics === null)
+    getRecords();
 
-        if (!authToken) {
-          navigate('/login'); // Redirect to login if the user is not logged in
-          return;
-        }
-
-        const response = await axios.get(apiEndpoint, {
-          headers: {
-            Authorization: `Bearer ${authToken}`,
-          },
-          withCredentials: true, // Ensure cookies are sent with the request
-        });
-        setStatistics(response.data);
-      } catch (err) {
-        console.error("Error fetching statistics:", err);
-        setError("Error fetching statistics");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchStatistics();
-  }, [apiEndpoint, navigate]);
 
   return (
     <ThemeProvider theme={theme}>

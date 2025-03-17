@@ -48,7 +48,7 @@ app.post('/login',  [
     if (user && await bcrypt.compare(password, user.passwordHash)) {
 
       // Generate a JWT token
-      const token = jwt.sign({ userId: user._id }, 'your-secret-key', { expiresIn: '1h' });
+      const token = jwt.sign({ userId: user._id }, (process.env.JSW_SECRET), { expiresIn: '1h' });
 
       // Set cookie with JWT token
       const cookies = new Cookies(req, res);

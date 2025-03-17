@@ -22,30 +22,11 @@ app.use(cors(corsOptions));
 const mongoUri = process.env.MONGODB_URI || 'mongodb://localhost:27017/userdb';
 mongoose.connect(mongoUri, { useNewUrlParser: true, useUnifiedTopology: true });
 
-// Middleware to authenticate the user
-const authenticateUser = (req, res, next) => {
-  const authHeader = req.headers.authorization;
-
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    return res.sendStatus(401); // Unauthorized
-  }
-
-  const token = authHeader.split(' ')[1];
-
-  try {
-    const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = decodedToken;
-    next();
-  } catch (error) {
-    console.error("Invalid token:", error);
-    return res.sendStatus(401); // Unauthorized
-  }
-};
 
 // GET endpoint to retrieve user statistics
-app.get('/statistics', authenticateUser, async (req, res) => {
+app.post('/statistics', async (req, res) => {
   try {
-    const userId = req.user.id;   // Get the user ID from the token
+    const userId = req.body.user.id;   // Get the user ID from the token
     const user = await User.findById(userId);
 
     if (user) {

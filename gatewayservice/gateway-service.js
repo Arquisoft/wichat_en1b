@@ -6,6 +6,7 @@ const promBundle = require('express-prom-bundle');
 const swaggerUi = require('swagger-ui-express'); 
 const fs = require("fs")
 const YAML = require('yaml')
+const jwt = require('jsonwebtoken');
 
 const app = express();
 
@@ -59,13 +60,13 @@ app.post('/askllm', async (req, res) => {
   }
 });
 
-app.get('/statistics/:user', async (req, res) => {
+app.post('/statistics', verifyToken ,async (req, res) => {
   try {
     // Forward the add user request to the statistics service
-    const statisticsResponse = await axios.get(statisticsServiceUrl+'/statistics/' + req.params.user.toString());
+    const statisticsResponse = await axios.get(statisticsServiceUrl+'/statistics' + req.body);
     res.json(statisticsResponse.data);
   } catch (error) {
-    res.status(error.response.status).json({ error: error.response.data.error });
+    manageError(res, error);
   }
 });
 
@@ -80,6 +81,7 @@ app.get('/question', async (req, res) => {
     res.status(400).json({ error: error.response });
   }
 })
+
 
 // Read the OpenAPI YAML file synchronously
 openapiPath='./openapi.yaml'
@@ -102,5 +104,32 @@ if (fs.existsSync(openapiPath)) {
 const server = app.listen(port, () => {
   console.log(`Gateway Service listening at http://localhost:${port}`);
 });
+
+
+function verifyToken(req, res, next) {
+  // Get the token from the request headers
+  const token = req.headers['token'] || req.body.token || req.query.token;
+
+  // Verify if the token is valid
+  jwt.verify(token, (process.env.JSW_SECRET), (err, decoded) => {
+    if (err) {
+      // Token is not valid
+      res.status(403).json({authorized: false,
+        error: 'Invalid token or outdated'});
+    } else {
+      // Token is valid
+      req.decodedToken = decoded;
+      // Call next() to proceed to the next middleware or route handler
+      next();
+    }
+  });
+}
+
+function manageError(res, error){
+  if(error.response) //Some microservice responded with an error
+    res.status(error.response.status).json({ error: error.response.data.error });
+  else //Some other error
+    res.status(500).json({error : "Internal server error"})
+}
 
 module.exports = server
