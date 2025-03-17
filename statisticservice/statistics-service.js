@@ -13,6 +13,7 @@ app.use(express.json());
 // Configure CORS to allow requests from the frontend application
 const corsOptions = {
   origin: 'http://localhost:3000',
+  credentials: true, // Allow credentials (cookies) to be sent
   optionsSuccessStatus: 200,
 };
 app.use(cors(corsOptions));
@@ -25,12 +26,18 @@ mongoose.connect(mongoUri, { useNewUrlParser: true, useUnifiedTopology: true });
 const authenticateUser = (req, res, next) => {
   const cookies = new Cookies(req, res);
   const userCookie = cookies.get('user');
+
   if (!userCookie) {
-    return res.sendStatus(401);
+      return res.sendStatus(401); // Unauthorized
   }
-  const userData = JSON.parse(userCookie);
-  req.user = userData;
-  next();
+
+  try {
+      req.user = JSON.parse(userCookie);
+      next();
+  } catch (error) {
+      console.error("Invalid cookie format:", error);
+      return res.sendStatus(400); // Bad Request
+  }
 };
 
 // GET endpoint to retrieve user statistics

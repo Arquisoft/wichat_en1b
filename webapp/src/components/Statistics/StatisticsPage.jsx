@@ -30,8 +30,8 @@ export const StatisticsPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-    // TODO: check env file to use: process.env.REACT_APP_API_ENDPOINT || "http://localhost:8005";
-  const apiEndpoint = `http://localhost:8005`;
+  // TODO check env file to use: process.env.REACT_APP_API_ENDPOINT || "http://localhost:8005/statistics";
+  const apiEndpoint = "http://localhost:8005/statistics";
   const authToken = getAuthToken(); // Get the authentication token
 
   useEffect(() => {
@@ -42,11 +42,10 @@ export const StatisticsPage = () => {
 
     const fetchStatistics = async () => {
       try {
-        const response = await axios.get(`${apiEndpoint}/statistics`, {
-          headers: {
-            Authorization: `Bearer ${authToken}`,
-          },
-        });
+        const response = await axios.post(apiEndpoint,
+          { username, password },
+          { withCredentials: true } // Ensure cookies are sent
+        );
         setStatistics(response.data);
       } catch (err) {
         console.error("Error fetching statistics:", err);
