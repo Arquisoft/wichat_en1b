@@ -1,8 +1,8 @@
 const express = require('express');
 const cors = require("cors"); // Import CORS
 const mongoose = require('mongoose');
+const jwt = require('jsonwebtoken');
 const User = require('./statistics-model');
-const Cookies = require("js-cookie");
 
 const app = express();
 const port = 8005;
@@ -13,6 +13,7 @@ app.use(express.json());
 // Configure CORS to allow requests from the frontend application
 const corsOptions = {
   origin: 'http://localhost:3000',
+  credentials: true, // Allow credentials (cookies) to be sent
   optionsSuccessStatus: 200,
 };
 app.use(cors(corsOptions));
@@ -23,19 +24,29 @@ mongoose.connect(mongoUri, { useNewUrlParser: true, useUnifiedTopology: true });
 
 // Middleware to authenticate the user
 const authenticateUser = (req, res, next) => {
-  if (!Cookies.get('user')) {
-    return res.sendStatus(401);
+  const authHeader = req.headers.authorization;
+
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return res.sendStatus(401); // Unauthorized
   }
-  const userData = JSON.parse(userCookie);
-  req.user = userData;
-  next();
+
+  const token = authHeader.split(' ')[1];
+
+  try {
+    const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
+    req.user = decodedToken;
+    next();
+  } catch (error) {
+    console.error("Invalid token:", error);
+    return res.sendStatus(401); // Unauthorized
+  }
 };
 
 // GET endpoint to retrieve user statistics
 app.get('/statistics', async (req, res) => {
   try {
-    const username = req.user.username; // Get the username from the cookie
-    const user = await User.findOne({ username });
+    const userId = req.user.id;   // Get the user ID from the token
+    const user = await User.findById(userId);
 
     if (user) {
       res.json({
@@ -55,8 +66,8 @@ app.get('/statistics', async (req, res) => {
 app.post('/statistics/update', async (req, res) => {
   try {
     const { gamesPlayed, correctAnswers, incorrectAnswers } = req.body;
-    const username = req.user.username; // Get the username from the cookie
-    const user = await User.findOne({ username });
+    const userId = req.user.id; // Get the user ID from the token
+    const user = await User.findById(userId);
 
     if (user) {
       if (gamesPlayed !== undefined) user.gamesPlayed += gamesPlayed;
