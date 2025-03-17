@@ -45,11 +45,10 @@ describe('Statistics Service', () => {
     expect(response.body).toHaveProperty('incorrectAnswers', 0);
   });
 
-  it('Should return 404 for a non-existent user', async () => {
-    const response = await request(app).get('/statistics/invaliduser');
+  it('Should return 401 for a request without a token', async () => {
+    const response = await request(app).get('/statistics');
 
-    expect(response.status).toBe(404);
-    expect(response.body.error).toBe('User not found');
+    expect(response.status).toBe(401);
   });
 
   it('Should update statistics for user "testuser"', async () => {

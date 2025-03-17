@@ -7,6 +7,8 @@ const { check, matchedData, validationResult } = require('express-validator');
 const app = express();
 const port = 8002; 
 
+require('dotenv').config();
+
 // Middleware to parse JSON in request body
 app.use(express.json());
 
@@ -45,8 +47,10 @@ app.post('/login',  [
     
     // Check if the user exists and verify the password
     if (user && await bcrypt.compare(password, user.passwordHash)) {
+
       // Generate a JWT token
-      const token = jwt.sign({ userId: user._id }, 'your-secret-key', { expiresIn: '1h' });
+      const token = jwt.sign({ userId: user._id }, (process.env.JSW_SECRET), { expiresIn: '1h' });
+
       // Respond with the token and user information
       res.json({ token: token, username: username, createdAt: user.registrationDate });
     } else {

@@ -1,4 +1,5 @@
 const express = require("express")
+const cors  = require("cors")
 const WikidataController = require("./controllers/WikidataController")
 
 const app = express()
@@ -6,6 +7,7 @@ const port = 8004
 
 const wikidataController = new WikidataController()
 app.use(express.json())
+app.use(cors())
 
 app.get('/', (req, res) => {
     res.status(200).json({ message: "Server working" })
@@ -50,6 +52,14 @@ app.post("/answer", async(req, res) => {
 
 const server = app.listen(port, () => {
     console.log(`Question Service listening at http://localhost:${port}`)
+})
+
+app.post('/checkanswer', (req, res) => {
+    let questionID = req.body.questionID;
+    let answer = req.body.answer;
+
+    let isCorrect = wikidataController.isQuestionCorrect(questionID, answer);
+    res.json({ correct: isCorrect });
 })
 
 module.exports = server

@@ -3,6 +3,8 @@ const express = require('express');
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 const User = require('./user-model')
+const jwt = require('jsonwebtoken');
+require('dotenv').config();
 
 const app = express();
 const port = 8001;
@@ -39,8 +41,11 @@ app.post('/adduser', async (req, res) => {
         });
 
         await newUser.save();
-        res.json(newUser);
-    } catch (error) {
+
+        const token = jwt.sign({ userId: newUser._id }, (process.env.JSW_SECRET), { expiresIn: '1h' });
+      
+        res.json({ token: token, username: newUser.username, createdAt: newUser.registrationDate });
+      } catch (error) {
         res.status(400).json({ error: error.message }); 
     }});
 

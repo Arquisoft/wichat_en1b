@@ -59,7 +59,12 @@ export const Navbar = () => {
     }
 
     const navLinks = isLoggedIn
-        ? [{ title: "Sign Out", action: handleSignOut }]
+        ? [ { title: "Home", path: "/home" },
+            { title: "Profile", path: "/profile" },
+            { title: "New game", path: "/game" },
+            { title: "Statistics", path: "/statistics" },
+            { title: "Game modes", path: "/game-modes" },
+            { title: "Sign Out", action: handleSignOut }]
         : [
             { title: "Login", path: "/login" },
             { title: "Sign up", path: "/signup" },

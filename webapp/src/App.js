@@ -5,13 +5,17 @@ import { Container } from '@mui/material';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { Home } from './components/Home/Home';
 import { Navbar } from './components/fragments/Navbar';
-
+import { StatisticsPage } from './components/Statistics/StatisticsPage';
+import { Question } from './components/Question/Question';
+import Cookies from 'js-cookie';
 
 
 function App() {
   useEffect(() => {
     document.title = 'WiChat';
   }, [])
+
+  const isLoggedIn = !!Cookies.get('user'); 
 
   return (
     <Container>
@@ -22,8 +26,10 @@ function App() {
           <Routes>
             <Route path="/" element={<Navigate to="/home" />}/>
             <Route path="/home" element={<Home />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/signup" element={<SignUp />} />
+            <Route path="/login" element={isLoggedIn ? <Navigate to="/home" /> : <Login />} />
+            <Route path="/signup" element={isLoggedIn ? <Navigate to="/home" /> : <SignUp />} />
+            <Route path="/game" element={isLoggedIn ? <Question /> : <Navigate to="/login" />} />
+            <Route path="/statistics" element={isLoggedIn ? <StatisticsPage /> : <Navigate to="/login" /> } />
           </Routes>
         </Container>
       </div>
