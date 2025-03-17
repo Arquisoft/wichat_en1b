@@ -44,7 +44,7 @@ app.post('/statistics', async (req, res) => {
 });
 
 // POST endpoint to update user statistics when a game is played
-app.post('/statistics/update', authenticateUser, async (req, res) => {
+app.post('/statistics/update', async (req, res) => {
   try {
     const { gamesPlayed, correctAnswers, incorrectAnswers } = req.body;
     const userId = req.user.id; // Get the user ID from the token

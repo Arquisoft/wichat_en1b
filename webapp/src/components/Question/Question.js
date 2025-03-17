@@ -15,26 +15,19 @@ const theme = createTheme({
 })
 
 export const Question = () => {
-
-
+    
     const [selectedAnswer, setSelectedAnswer] = useState(null)
-    const [timeLeft, setTimeLeft] = useState(60) // 60 seconds timer
-    const [question, setQuestion] = useState({
-        question: "Pregunta",
-        images: ["Image 1", "Image 2"]
-    });
-
+    const [timeLeft, setTimeLeft] = useState(60)
+    const [question, setQuestion] = useState({question: "Pregunta", images: []});
+    const [isCorrect, setIsCorrect] = useState(false);
+    const [isTimeUp, setIsTimeUp] = useState(false);
+    const [isIncorrect, setIsIncorrect] = useState(false);
+    const [imagesLoaded, setImagesLoaded] = useState(false);
+    const [isPaused, setIsPaused] = useState(false);
 
     const userCookie = Cookies.get('user');
     const isUserLogged = !!userCookie;
     const gatewayEndpoint = process.env.GATEWAY_SERVICE_URL || 'http://localhost:8000';
-
-    // Sample game data
-    const gameQuestion = {
-        question: "Pregunta",
-        images: ["Image 1", "Image 2", "Image 3", "Image 4"]
-    }
-    
 
     useEffect(() => {
         const fetchData = async () => {
@@ -47,7 +40,16 @@ export const Question = () => {
 
     // Timer effect
     useEffect(() => {
-        if (timeLeft <= 0) return // Stop when timer reaches 0
+        if (timeLeft <= 0) {
+            setIsTimeUp(true);
+            setTimeout(() => {
+                setIsTimeUp(false);
+                requestQuestion();
+            }, 2000); // Show "time up" message for 2 seconds before restarting
+            return;
+        }
+
+        if (isPaused) return; // Pause the timer if isPaused is true
 
         const timerId = setInterval(() => {
             setTimeLeft((prevTime) => prevTime - 1)
@@ -55,18 +57,57 @@ export const Question = () => {
 
         // Cleanup timer on unmount
         return () => clearInterval(timerId)
-    }, [timeLeft])
+    }, [timeLeft, isPaused])
 
     const requestQuestion = async () => {
+        setIsPaused(true);
         let questionResponse = await axios.get(`${gatewayEndpoint}/question`)
-        console.log(questionResponse)
-        setQuestion(questionResponse)
+        setQuestion(questionResponse.data);
+        setImagesLoaded(false);
     }
 
-    // requestQuestion();
+    useEffect(() => {
+        if (question.images.length > 0) {
+            const imagePromises = question.images.map((image) => {
+                return new Promise((resolve) => {
+                    const img = new Image();
+                    img.src = image;
+                    img.onload = resolve;
+                });
+            });
 
-    const handleAnswerSelect = (answer) => {
-        setSelectedAnswer(answer)
+            Promise.all(imagePromises).then(() => {
+                setImagesLoaded(true);
+                setTimeLeft(60);
+                setIsPaused(false); // Resume the timer after images are loaded
+            });
+        }
+    }, [question.images]);
+
+    const handleAnswerSelect = async (answer) => {
+        if (isCorrect || isIncorrect || isTimeUp) {
+            return;
+        }
+
+        setSelectedAnswer(answer);
+        setIsPaused(true); // Pause the timer when an answer is selected
+        let response = await axios.post(`${gatewayEndpoint}/checkanswer`, { questionID: question.id, answer: answer });
+
+        if (response.data.correct) {
+            axios.post(`${gatewayEndpoint}/statistics/update`, { gamesPlayed: 1, correctAnswers: 1, incorrectAnswers: 0 });
+            setIsCorrect(true);
+            setTimeout(() => {
+                setIsCorrect(false);
+                requestQuestion();
+            }, 2000);
+        } else {
+            axios.post(`${gatewayEndpoint}/statistics/update`, { gamesPlayed: 1, correctAnswers: 0, incorrectAnswers: 1 });
+            setIsIncorrect(true);
+            setTimeout(() => {
+                setIsIncorrect(false);
+                requestQuestion();
+            }, 2000);
+        }
     }
 
     // Format time as MM:SS
@@ -135,39 +176,71 @@ export const Question = () => {
                     </Paper>
                 </Box>
 
-                {/* Question */}
                 <Typography variant="h5" component="h2" align="center" sx={{ my: 3, fontWeight: 500 }}>
-                    {gameQuestion.question}
+                    {question.question}
                 </Typography>
 
-                {/* Options */}
+                {isCorrect && (
+                    <Typography variant="h6" component="p" align="center" sx={{ my: 2, color: "green" }}>
+                        Correct!
+                    </Typography>
+                )}
+
+                {isIncorrect && (
+                    <Typography variant="h6" component="p" align="center" sx={{ my: 2, color: "red" }}>
+                        Incorrect
+                    </Typography>
+                )}
+
+                {isTimeUp && (
+                    <Typography variant="h6" component="p" align="center" sx={{ my: 2, color: "red" }}>
+                        You ran out of time!
+                    </Typography>
+                )}
                 <Box sx={{ width: "100%", maxWidth: 600, mx: "auto" }}>
                     <Grid container spacing={2}>
-                        {question.images.map((image, index) => (
-                            <Grid item xs={12} sm={6} key={index}>
-                                <Button
-                                    fullWidth
-                                    variant={selectedAnswer === image ? "contained" : "outlined"}
-                                    color="primary"
-                                    onClick={() => handleAnswerSelect(image)}
-                                    sx={{
-                                        py: 1.5,
-                                        textTransform: "none",
-                                        justifyContent: "center",
-                                        backgroundColor: selectedAnswer === image ? undefined : "white",
-                                    }}
-                                >
-                                    <img
-                                        src={image || "/placeholder.svg"}
-                                        alt="Game Question"
-                                        style={{ maxWidth: "100%", maxHeight: "100%", objectFit: "contain" }}
-                                    />
-                                </Button>
-                            </Grid>
-                        ))}
+                        {imagesLoaded ? (
+                            question.images.map((image, index) => (
+                                <Grid item xs={12} sm={6} key={index}>
+                                    <Button
+                                        fullWidth
+                                        variant={selectedAnswer === image ? "contained" : "outlined"}
+                                        color="primary"
+                                        onClick={() => handleAnswerSelect(image)}
+                                        sx={{
+                                            py: 1.5,
+                                            textTransform: "none",
+                                            justifyContent: "center",
+                                            backgroundColor: selectedAnswer === image && isCorrect ? "green" : selectedAnswer === image && isIncorrect ? "red" : undefined,
+                                        }}
+                                    >
+                                        <Box
+                                            component="img"
+                                            src={image || "/placeholder.svg"}
+                                            alt="Game Question"
+                                            sx={{
+                                                width: "100%",
+                                                height: "150px",
+                                                objectFit: "cover",
+                                                borderRadius: "4px",
+                                            }}
+                                        />
+                                    </Button>
+                                </Grid>
+                            ))
+                        ) : (
+                            <Typography variant="h6" component="p" align="center" sx={{ my: 2 }}>
+                                Loading images...
+                            </Typography>
+                        )}
                     </Grid>
                 </Box>
-                <Button onClick={requestQuestion}>Generar pregunta</Button>
+                <Button 
+                    onClick={requestQuestion}
+                    sx={{ display: "block", mx: "auto", mt: 3 }}
+                >
+                    Request new question
+                </Button>
             </Container>
         </ThemeProvider>
     )
