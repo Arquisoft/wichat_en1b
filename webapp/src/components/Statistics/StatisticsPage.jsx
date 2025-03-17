@@ -7,7 +7,7 @@ import Cookies from "js-cookie";
 import RecordRetriever from "./RecordRetriever";
 
 
-const retrieves = new RecordRetriever();
+const retriever = new RecordRetriever();
 // Create a theme (using the same blue primary color)
 const theme = createTheme({
   palette: {
@@ -17,36 +17,6 @@ const theme = createTheme({
   },
 });
 
-
-
-// Function to get the authentication token from cookies
-const getAuthToken = async () => {
-  try {
-    const cookie = Cookies.get('user');
-    if (!cookie) {
-      throw new Error("No user cookie found");
-    }
-
-    const parsedCookie = JSON.parse(cookie);
-    const user = parsedCookie.username;
-    const token = parsedCookie.token;
-
-    try {
-      const response = await axios.get(`http://localhost:8005/statistics/${user}`, {
-        headers: { 'Authorization': `Bearer ${token}` },
-        withCredentials: true
-      });
-      const receivedRecords = response.data;
-      return receivedRecords.record;
-    } catch (error) {
-      console.error("Error fetching statistics:", error);
-      setError("Error fetching statistics");
-    }
-  } catch (error) {
-    console.error("Error getting the authenticated user:", error);
-    setError("Error getting the authenticated user");
-  }
-};
 
 export const StatisticsPage = () => {
   const navigate = useNavigate();
