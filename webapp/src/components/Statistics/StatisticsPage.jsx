@@ -42,10 +42,12 @@ export const StatisticsPage = () => {
 
     const fetchStatistics = async () => {
       try {
-        const response = await axios.post(apiEndpoint,
-          { username, password },
-          { withCredentials: true } // Ensure cookies are sent
-        );
+        const response = await axios.get(apiEndpoint, {
+          headers: {
+            Authorization: `Bearer ${authToken}`,
+          },
+          withCredentials: true, // Ensure cookies are sent with the request
+        });
         setStatistics(response.data);
       } catch (err) {
         console.error("Error fetching statistics:", err);

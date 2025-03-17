@@ -24,8 +24,8 @@ mongoose.connect(mongoUri, { useNewUrlParser: true, useUnifiedTopology: true });
 
 // Middleware to authenticate the user
 const authenticateUser = (req, res, next) => {
-  const cookies = new Cookies(req, res);
-  const userCookie = cookies.get('user');
+//  const cookies = new Cookies(req, res);
+  const userCookie = Cookies.get('user');
 
   if (!userCookie) {
       return res.sendStatus(401); // Unauthorized
