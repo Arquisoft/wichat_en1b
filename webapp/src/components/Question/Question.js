@@ -94,12 +94,14 @@ export const Question = () => {
         let response = await axios.post(`${gatewayEndpoint}/checkanswer`, { questionID: question.id, answer: answer });
 
         if (response.data.correct) {
+            axios.post(`${gatewayEndpoint}/statistics/update`, { gamesPlayed: 1, correctAnswers: 1, incorrectAnswers: 0 });
             setIsCorrect(true);
             setTimeout(() => {
                 setIsCorrect(false);
                 requestQuestion();
             }, 2000);
         } else {
+            axios.post(`${gatewayEndpoint}/statistics/update`, { gamesPlayed: 1, correctAnswers: 0, incorrectAnswers: 1 });
             setIsIncorrect(true);
             setTimeout(() => {
                 setIsIncorrect(false);

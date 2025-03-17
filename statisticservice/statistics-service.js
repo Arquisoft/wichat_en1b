@@ -2,7 +2,7 @@ const express = require('express');
 const cors = require("cors"); // Import CORS
 const mongoose = require('mongoose');
 const User = require('./statistics-model');
-const Cookies = require('cookies');
+const Cookies = require("js-cookie");
 
 const app = express();
 const port = 8005;
@@ -23,9 +23,7 @@ mongoose.connect(mongoUri, { useNewUrlParser: true, useUnifiedTopology: true });
 
 // Middleware to authenticate the user
 const authenticateUser = (req, res, next) => {
-  const cookies = new Cookies(req, res);
-  const userCookie = cookies.get('user');
-  if (!userCookie) {
+  if (!Cookies.get('user')) {
     return res.sendStatus(401);
   }
   const userData = JSON.parse(userCookie);
@@ -34,7 +32,7 @@ const authenticateUser = (req, res, next) => {
 };
 
 // GET endpoint to retrieve user statistics
-app.get('/statistics', authenticateUser, async (req, res) => {
+app.get('/statistics', async (req, res) => {
   try {
     const username = req.user.username; // Get the username from the cookie
     const user = await User.findOne({ username });
@@ -54,7 +52,7 @@ app.get('/statistics', authenticateUser, async (req, res) => {
 });
 
 // POST endpoint to update user statistics when a game is played
-app.post('/statistics/update', authenticateUser, async (req, res) => {
+app.post('/statistics/update', async (req, res) => {
   try {
     const { gamesPlayed, correctAnswers, incorrectAnswers } = req.body;
     const username = req.user.username; // Get the username from the cookie

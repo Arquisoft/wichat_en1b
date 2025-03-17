@@ -89,6 +89,16 @@ app.get('/statistics/:user', async (req, res) => {
   }
 });
 
+app.post('/statistics/update', async (req, res) => {
+  try {
+    // Forward the add user request to the statistics service
+    const statisticsResponse = await axios.post(statisticsServiceUrl+'/statistics/update', req.body);
+    res.json(statisticsResponse.data);
+  } catch (error) {
+    res.status(error.response?.status || 500).json({ error: error.response?.data?.error });
+  }
+});
+
 app.get('/question', async (req, res) => {
   try{
     console.log(questionServiceUrl+'/foods')

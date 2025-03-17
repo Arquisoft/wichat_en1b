@@ -99,7 +99,7 @@ services:
       USER_SERVICE_URL: http://userservice:8001
       LLM_SERVICE_URL: http://llmservice:8003
       QUESTION_SERVICE_URL: http://questionservice:8004
-      STATISTIC_SERVICE_URL: http://statisticservice:8005
+      STATS_SERVICE_URL: http://statisticservice:8005
 
   webapp:
     container_name: webapp-wichat_en1b
