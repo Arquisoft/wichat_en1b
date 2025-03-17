@@ -59,13 +59,43 @@ app.post('/askllm', async (req, res) => {
   }
 });
 
+app.get('/question', async (req, res) => {
+  try {
+    //Forward the asking for a question to the question service
+    const questionResponse = await axios.get(`${questionServiceUrl}/question`);
+    res.json(questionResponse.data);
+  } catch (error) {
+    res.status(error.response?.status || 500).json({ error: error.response?.data?.error });
+  }
+});
+
+app.post('/answer', async (req, res) => {
+  try {
+    //Forward the answer for validation to the question service
+    const answerResponse = await axios.post(`${questionServiceUrl}/answer`, req.body);
+    res.json(answerResponse.data);
+  } catch (error) {
+    res.status(error.response?.status || 500).json({ error: error.response?.data?.error });
+  }
+});
+
 app.get('/statistics/:user', async (req, res) => {
   try {
     // Forward the add user request to the statistics service
     const statisticsResponse = await axios.get(statisticsServiceUrl+'/statistics/' + req.params.user.toString());
     res.json(statisticsResponse.data);
   } catch (error) {
-    res.status(error.response.status).json({ error: error.response.data.error });
+    res.status(error.response?.status || 500).json({ error: error.response?.data?.error });
+  }
+});
+
+app.post('/statistics/update', async (req, res) => {
+  try {
+    // Forward the add user request to the statistics service
+    const statisticsResponse = await axios.post(statisticsServiceUrl+'/statistics/update', req.body);
+    res.json(statisticsResponse.data);
+  } catch (error) {
+    res.status(error.response?.status || 500).json({ error: error.response?.data?.error });
   }
 });
 
@@ -78,6 +108,16 @@ app.get('/question', async (req, res) => {
   } catch (error) {
     console.log(error)
     res.status(400).json({ error: error.response });
+  }
+})
+
+app.post('/checkanswer', async (req, res) => {
+  try{
+    const checkAnswerResponse = await axios.post(questionServiceUrl+'/checkanswer', req.body);
+    res.json(checkAnswerResponse.data);
+  } catch (error) {
+    console.log(error)
+    res.status(400).json({ error: error.response.data.error });
   }
 })
 

@@ -43,7 +43,7 @@ const authenticateUser = (req, res, next) => {
 };
 
 // GET endpoint to retrieve user statistics
-app.get('/statistics', authenticateUser, async (req, res) => {
+app.get('/statistics', async (req, res) => {
   try {
     const userId = req.user.id;   // Get the user ID from the token
     const user = await User.findById(userId);
@@ -63,7 +63,7 @@ app.get('/statistics', authenticateUser, async (req, res) => {
 });
 
 // POST endpoint to update user statistics when a game is played
-app.post('/statistics/update', authenticateUser, async (req, res) => {
+app.post('/statistics/update', async (req, res) => {
   try {
     const { gamesPlayed, correctAnswers, incorrectAnswers } = req.body;
     const userId = req.user.id; // Get the user ID from the token
