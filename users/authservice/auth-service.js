@@ -7,6 +7,8 @@ const { check, matchedData, validationResult } = require('express-validator');
 const app = express();
 const port = 8002; 
 
+require('dotenv').config();
+
 // Middleware to parse JSON in request body
 app.use(express.json());
 

@@ -7,6 +7,7 @@ const swaggerUi = require('swagger-ui-express');
 const fs = require("fs")
 const YAML = require('yaml')
 const jwt = require('jsonwebtoken');
+require('dotenv').config();
 
 const app = express();
 

@@ -1,7 +1,6 @@
 const express = require('express');
 const cors = require("cors"); // Import CORS
 const mongoose = require('mongoose');
-const jwt = require('jsonwebtoken');
 const User = require('./statistics-model');
 
 const app = express();
