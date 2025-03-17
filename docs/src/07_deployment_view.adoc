@@ -74,10 +74,20 @@ node "Server Side"{
   component WA as "Web Application"
 }
 
+node "Wikidata Server"{
+  component WAPI as "Wikidata API"
+}
+
+node "Empathy LLM Server"{
+  component EAPI as "Empathy API"
+}
+
+GS-[dashed]->WAPI
 WA-[dashed]->GS
 WC-[dashed]->WA
 WA-[dashed]->WC
 WC-[dashed]->GS
+GS-[dashed]->EAPI
 
 ----
 
@@ -115,7 +125,6 @@ node "Server Side"{
   component AS as "Authorization Service"
   component QS as "Question Service"
   component LLMS as "LLM Service"
-  component SS as "Statistics Service"
   database MDB as "Mongo DB"
 }
 
@@ -133,9 +142,6 @@ US-[dashed]->GS
 
 GS-[dashed]->QS
 QS-[dashed]->GS
-
-GS-[dashed]->SS
-SS-[dashed]->GS
 
 AS-[dashed]->MDB
 MDB-[dashed]->AS
