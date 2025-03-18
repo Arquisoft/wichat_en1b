@@ -15,6 +15,13 @@ services:
     image: ghcr.io/arquisoft/wichat_en1b/authservice:latest
     profiles: ["dev", "prod"]
     build: ./users/authservice
+    develop:
+      watch:
+        - action: rebuild
+          path: ./users/authservice
+          target: /usr/src/authservice
+          ignore:
+            - node_modules
     depends_on:
       - mongodb
     ports:
@@ -29,6 +36,13 @@ services:
     image: ghcr.io/arquisoft/wichat_en1b/userservice:latest
     profiles: ["dev", "prod"]
     build: ./users/userservice
+    develop:
+      watch:
+        - action: rebuild
+          path: ./users/userservice
+          target: /usr/src/userservice
+          ignore:
+            - node_modules
     depends_on:
       - mongodb
     ports:
@@ -46,6 +60,13 @@ services:
       - .env
     build: 
       context: ./llmservice
+    develop:
+      watch:
+        - action: rebuild
+          path: ./llmservice
+          target: /usr/src/llmservice
+          ignore:
+            - node_modules
     ports:
       - "8003:8003"
     networks:
@@ -56,6 +77,13 @@ services:
     image: ghcr.io/arquisoft/wichat_en1b/questionservice:latest
     profiles: ["dev", "prod"]
     build: ./questionservice
+    develop:
+      watch:
+        - action: rebuild
+          path: ./questionservice
+          target: /usr/src/questionservice
+          ignore:
+            - node_modules
     depends_on:
       - mongodb
     ports:
@@ -71,6 +99,13 @@ services:
     profiles: ["dev", "prod"]
     build: 
       context: ./statisticservice
+    develop:
+      watch:
+        - action: rebuild
+          path: ./statisticservice
+          target: /usr/src/statisticservice
+          ignore:
+            - node_modules
     ports:
       - "8005:8005"
     networks:
@@ -83,6 +118,13 @@ services:
     image: ghcr.io/arquisoft/wichat_en1b/gatewayservice:latest
     profiles: ["dev", "prod"]
     build: ./gatewayservice
+    develop:
+      watch:
+        - action: rebuild
+          path: ./gatewayservice
+          target: /usr/src/gatewayservice
+          ignore:
+            - node_modules
     depends_on:
       - mongodb
       - userservice
@@ -106,6 +148,13 @@ services:
     image: ghcr.io/arquisoft/wichat_en1b/webapp:latest
     profiles: ["dev", "prod"]
     build: ./webapp
+    develop:
+      watch:
+        - action: rebuild
+          path: ./webapp
+          target: /app
+          ignore:
+            - node_modules
     depends_on:
       - gatewayservice
     ports:
