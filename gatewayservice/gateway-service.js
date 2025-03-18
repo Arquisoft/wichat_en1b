@@ -6,6 +6,8 @@ const promBundle = require('express-prom-bundle');
 const swaggerUi = require('swagger-ui-express'); 
 const fs = require("fs")
 const YAML = require('yaml')
+const jwt = require('jsonwebtoken');
+require('dotenv').config();
 
 const app = express();
 
@@ -79,13 +81,33 @@ app.post('/answer', async (req, res) => {
   }
 });
 
-app.get('/statistics/:user', async (req, res) => {
+app.get('/question', async (req, res) => {
   try {
-    // Forward the add user request to the statistics service
-    const statisticsResponse = await axios.get(statisticsServiceUrl+'/statistics/' + req.params.user.toString());
-    res.json(statisticsResponse.data);
+    //Forward the asking for a question to the question service
+    const questionResponse = await axios.get(`${questionServiceUrl}/question`);
+    res.json(questionResponse.data);
   } catch (error) {
     res.status(error.response?.status || 500).json({ error: error.response?.data?.error });
+  }
+});
+
+app.post('/answer', async (req, res) => {
+  try {
+    //Forward the answer for validation to the question service
+    const answerResponse = await axios.post(`${questionServiceUrl}/answer`, req.body);
+    res.json(answerResponse.data);
+  } catch (error) {
+    res.status(error.response?.status || 500).json({ error: error.response?.data?.error });
+  }
+});
+
+app.post('/statistics', verifyToken ,async (req, res) => {
+  try {
+    // Forward the add user request to the statistics service
+    const statisticsResponse = await axios.get(statisticsServiceUrl+'/statistics' + req.body);
+    res.json(statisticsResponse.data);
+  } catch (error) {
+    manageError(res, error);
   }
 });
 
@@ -142,5 +164,32 @@ if (fs.existsSync(openapiPath)) {
 const server = app.listen(port, () => {
   console.log(`Gateway Service listening at http://localhost:${port}`);
 });
+
+
+function verifyToken(req, res, next) {
+  // Get the token from the request headers
+  const token = req.headers['token'] || req.body.token || req.query.token;
+
+  // Verify if the token is valid
+  jwt.verify(token, (process.env.JSW_SECRET), (err, decoded) => {
+    if (err) {
+      // Token is not valid
+      res.status(403).json({authorized: false,
+        error: 'Invalid token or outdated'});
+    } else {
+      // Token is valid
+      req.decodedToken = decoded;
+      // Call next() to proceed to the next middleware or route handler
+      next();
+    }
+  });
+}
+
+function manageError(res, error){
+  if(error.response) //Some microservice responded with an error
+    res.status(error.response.status).json({ error: error.response.data.error });
+  else //Some other error
+    res.status(500).json({error : "Internal server error"})
+}
 
 module.exports = server

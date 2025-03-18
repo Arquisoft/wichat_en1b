@@ -4,7 +4,10 @@ import { Typography, Box, Container, Paper, CircularProgress, Grid } from "@mui/
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import axios from "axios";
 import Cookies from "js-cookie";
+import RecordRetriever from "./RecordRetriever";
 
+
+const retriever = new RecordRetriever();
 // Create a theme (using the same blue primary color)
 const theme = createTheme({
   palette: {
@@ -20,66 +23,21 @@ export const StatisticsPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // TODO check env file to use: process.env.REACT_APP_API_ENDPOINT || "http://localhost:8005/statistics";
-  const apiEndpoint = "http://localhost:8005/statistics";
 
-  // Function to get the authentication token from cookies
-  const getAuthToken = async () => {
+  const getRecords = async ()=>{
     try {
-      const cookie = Cookies.get('user');
-      if (!cookie) {
-        throw new Error("No user cookie found");
-      }
-
-      const parsedCookie = JSON.parse(cookie);
-      const user = parsedCookie.username;
-      const token = parsedCookie.token;
-
-      try {
-        const response = await axios.get(`http://localhost:8005/statistics/${user}`, {
-          headers: { 'Authorization': `Bearer ${token}` },
-          withCredentials: true
-        });
-        const receivedRecords = response.data;
-        return receivedRecords.record;
-      } catch (error) {
-        console.error("Error fetching statistics:", error);
-        setError("Error fetching statistics");
-      }
+      let cookie = JSON.parse(Cookies.get('user'))
+      var jsonRecords = await retriever.getRecords(cookie.username, cookie.token); 
+      var recordsArray = jsonRecords.games;
+      setStatistics(recordsArray);
     } catch (error) {
-      console.error("Error getting the authenticated user:", error);
-      setError("Error getting the authenticated user");
+      setError(error);
     }
-  };
+  }
 
-  useEffect(() => {
-    const fetchStatistics = async () => {
+  if(statistics === null)
+    getRecords();
 
-      try {
-        const authToken = await getAuthToken(); // Get the authentication token
-
-        if (!authToken) {
-          navigate('/login'); // Redirect to login if the user is not logged in
-          return;
-        }
-
-        const response = await axios.get(apiEndpoint, {
-          headers: {
-            Authorization: `Bearer ${authToken}`,
-          },
-          withCredentials: true, // Ensure cookies are sent with the request
-        });
-        setStatistics(response.data);
-      } catch (err) {
-        console.error("Error fetching statistics:", err);
-        setError("Error fetching statistics");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchStatistics();
-  }, [apiEndpoint, navigate]);
 
   return (
     <ThemeProvider theme={theme}>

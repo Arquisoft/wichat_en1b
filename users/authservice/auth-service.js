@@ -2,11 +2,12 @@ const express = require('express');
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const Cookies = require('cookies'); 
 const User = require('./auth-model')
 const { check, matchedData, validationResult } = require('express-validator');
 const app = express();
 const port = 8002; 
+
+require('dotenv').config();
 
 // Middleware to parse JSON in request body
 app.use(express.json());
@@ -48,16 +49,7 @@ app.post('/login',  [
     if (user && await bcrypt.compare(password, user.passwordHash)) {
 
       // Generate a JWT token
-      const token = jwt.sign({ userId: user._id }, 'your-secret-key', { expiresIn: '1h' });
-
-      // Set cookie with JWT token
-      const cookies = new Cookies(req, res);
-      cookies.set("user", JSON.stringify({ username, token }), {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "Lax",
-        maxAge: 3600000 // 1 hour expiration
-      });
+      const token = jwt.sign({ userId: user._id }, (process.env.JSW_SECRET), { expiresIn: '1h' });
 
       // Respond with the token and user information
       res.json({ token: token, username: username, createdAt: user.registrationDate });

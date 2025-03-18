@@ -3,6 +3,8 @@ const { MongoMemoryServer } = require('mongodb-memory-server');
 const bcrypt = require('bcrypt');
 const User = require('./auth-model');
 
+require('dotenv').config();
+
 let mongoServer;
 let app;
 
@@ -37,7 +39,7 @@ afterAll(async () => {
 });
 
 describe('Auth Service', () => {
-  it('Should perform a login operation /login', async () => {
+  it('Should perform a login operation /login', async () => { 
     const response = await request(app).post('/login').send(user);
     expect(response.status).toBe(200);
     expect(response.body).toHaveProperty('username', 'testuser');
