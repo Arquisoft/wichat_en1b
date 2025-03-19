@@ -17,7 +17,7 @@ services:
     build: ./users/authservice
     develop:
       watch:
-        - action: rebuild
+        - action: sync+restart
           path: ./users/authservice
           target: /usr/src/authservice
           ignore:
@@ -38,7 +38,7 @@ services:
     build: ./users/userservice
     develop:
       watch:
-        - action: rebuild
+        - action: sync+restart
           path: ./users/userservice
           target: /usr/src/userservice
           ignore:
@@ -62,7 +62,7 @@ services:
       context: ./llmservice
     develop:
       watch:
-        - action: rebuild
+        - action: sync+restart
           path: ./llmservice
           target: /usr/src/llmservice
           ignore:
@@ -79,7 +79,7 @@ services:
     build: ./questionservice
     develop:
       watch:
-        - action: rebuild
+        - action: sync+restart
           path: ./questionservice
           target: /usr/src/questionservice
           ignore:
@@ -101,7 +101,7 @@ services:
       context: ./statisticservice
     develop:
       watch:
-        - action: rebuild
+        - action: sync+restart
           path: ./statisticservice
           target: /usr/src/statisticservice
           ignore:
@@ -120,7 +120,7 @@ services:
     build: ./gatewayservice
     develop:
       watch:
-        - action: rebuild
+        - action: sync+restart
           path: ./gatewayservice
           target: /usr/src/gatewayservice
           ignore:
@@ -150,7 +150,7 @@ services:
     build: ./webapp
     develop:
       watch:
-        - action: rebuild
+        - action: sync+restart
           path: ./webapp
           target: /app
           ignore:
