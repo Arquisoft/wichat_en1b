@@ -4,6 +4,7 @@ import { createTheme, ThemeProvider } from "@mui/material/styles"
 import AccessTimeIcon from "@mui/icons-material/AccessTime"
 import Cookies from "js-cookie";
 import axios from 'axios';
+import { useGame } from "../GameContext";
 
 // Create a theme with the blue color from the login screen
 const theme = createTheme({
@@ -15,15 +16,16 @@ const theme = createTheme({
 })
 
 export const Question = () => {
-    
+
     const [selectedAnswer, setSelectedAnswer] = useState(null)
     const [timeLeft, setTimeLeft] = useState(60)
-    const [question, setQuestion] = useState({question: "Pregunta", images: []});
     const [isCorrect, setIsCorrect] = useState(false);
     const [isTimeUp, setIsTimeUp] = useState(false);
     const [isIncorrect, setIsIncorrect] = useState(false);
     const [imagesLoaded, setImagesLoaded] = useState(false);
     const [isPaused, setIsPaused] = useState(false);
+
+    const { question, setQuestion, setGameEnded } = useGame();
 
     const userCookie = Cookies.get('user');
     const isUserLogged = !!userCookie;
@@ -61,8 +63,13 @@ export const Question = () => {
 
     const requestQuestion = async () => {
         setIsPaused(true);
-        let questionResponse = await axios.get(`${gatewayEndpoint}/question`)
-        setQuestion(questionResponse.data);
+        setGameEnded(true);
+        try {
+            let questionResponse = await axios.get(`${gatewayEndpoint}/question`)
+            setQuestion(questionResponse.data);
+        } catch (error) {
+            console.error("Error fetching question: ", error)
+        }
         setImagesLoaded(false);
     }
 
@@ -79,6 +86,7 @@ export const Question = () => {
             Promise.all(imagePromises).then(() => {
                 setImagesLoaded(true);
                 setTimeLeft(60);
+                setSelectedAnswer(null); // Fix the problem of having selected an image from the previous round
                 setIsPaused(false); // Resume the timer after images are loaded
             });
         }
@@ -115,12 +123,6 @@ export const Question = () => {
         const mins = Math.floor(seconds / 60)
         const secs = seconds % 60
         return `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`
-    }
-
-    // Calculate progress for the circular timer (from 0 to 360 degrees)
-    const calculateProgress = (timeLeft, totalTime = 60) => {
-        const percentage = timeLeft / totalTime
-        return percentage * 360 // Convert to degrees for the circle
     }
 
     return (
@@ -235,7 +237,7 @@ export const Question = () => {
                         )}
                     </Grid>
                 </Box>
-                <Button 
+                <Button
                     onClick={requestQuestion}
                     sx={{ display: "block", mx: "auto", mt: 3 }}
                 >

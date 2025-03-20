@@ -1,12 +1,12 @@
+import { GameProvider } from "./GameContext";
 import { Chat } from "./Chat/Chat";
 import { Question } from "./Question/Question";
 
-
 export default function GameWrapper() {
     return (
-        <div className="triviaGame">
+        <GameProvider>
             <Question />
             <Chat />
-        </div>
-    )
+        </GameProvider>
+    );
 }

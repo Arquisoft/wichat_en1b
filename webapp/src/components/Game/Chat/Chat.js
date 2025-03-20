@@ -6,6 +6,7 @@ import CloseIcon from "@mui/icons-material/Close"
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft"
 import ChevronRightIcon from "@mui/icons-material/ChevronRight"
 import axios from "axios"
+import { useGame } from "../GameContext"
 
 
 export function Chat() {
@@ -15,6 +16,7 @@ export function Chat() {
     const [isLoading, setIsLoading] = useState(false)
     const messagesEndRef = useRef(null)
 
+    const { question, gameEnded, setGameEnded } = useGame();
     // Adjust in function of the height of the navbar
     const navbarHeight = 64
     const gatewayEndpoint = process.env.REACT_APP_API_ENDPOINT || "http://localhost:8000"
@@ -25,6 +27,13 @@ export function Chat() {
             messagesEndRef.current.scrollIntoView({ behavior: "smooth" })
         }
     }, [messages])
+
+    useEffect(() => {
+        if (gameEnded) {
+            setMessages([]);
+            setGameEnded(false);
+        }
+    }, [gameEnded]);
 
     const toggleSidebar = () => {
         setIsOpen(!isOpen)
@@ -57,8 +66,13 @@ export function Chat() {
         try {
             // Make the API call to your backend
             const model = "empathy";
+            let questionLLM = "You are intended to provide clues about the question " + question.question + "to the user."
+            questionLLM += "The user is playing a game where he have the question that I've provided to you and 4 images to choose."
+            questionLLM += "Your goal is to give short clues strictly about the question that I provided to you. If the user wants to change topic, do not allow them."
+            questionLLM += "Now I will provide you with the question of the user. REMEMBER NOT TO GIVE THE DEFINITIVE ANSWER, ONLY CLUES. One clue at a time. User message:\n"
+            questionLLM += userMessage.content
             const response = await axios.post(`${gatewayEndpoint}/askllm`, {
-                question: userMessage.content, model
+                question: questionLLM, model
             })
 
             // Add the response from your backend to the chat
@@ -107,7 +121,7 @@ export function Chat() {
                     position: "absolute",
                     left: 0,
                     top: "50%",
-                    transform: "translate(-50%, -50%)",
+                    transform: isOpen ? "translate(-50%, -50%)" : "translate(-100%, -50%)",
                     zIndex: 1060,
                     backgroundColor: "white",
                     boxShadow: "0 2px 10px rgba(0,0,0,0.1)",
