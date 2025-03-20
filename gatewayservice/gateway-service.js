@@ -61,16 +61,6 @@ app.post('/askllm', async (req, res) => {
   }
 });
 
-app.get('/question', async (req, res) => {
-  try {
-    //Forward the asking for a question to the question service
-    const questionResponse = await axios.get(`${questionServiceUrl}/question`);
-    res.json(questionResponse.data);
-  } catch (error) {
-    res.status(error.response?.status || 500).json({ error: error.response?.data?.error });
-  }
-});
-
 app.post('/answer', async (req, res) => {
   try {
     //Forward the answer for validation to the question service
