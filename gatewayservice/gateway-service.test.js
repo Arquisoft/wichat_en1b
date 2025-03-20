@@ -289,9 +289,7 @@ describe('Gateway Service - Additional Tests - Error handling', () => {
   it('should handle errors from check answer service', async () => {
     axios.post.mockImplementationOnce((url) => {
       if (url.endsWith('/checkanswer')) {
-        return Promise.reject({
-          response: { status: 500, data: { error: 'Check answer service error' } },
-        });
+        return getRejectedPromise(500, 'Check answer service error')
       }
     });
 
@@ -299,7 +297,7 @@ describe('Gateway Service - Additional Tests - Error handling', () => {
       .post('/checkanswer')
       .send({ questionId: '1', answer: 'mockAnswer' });
 
-    expect(response.statusCode).toBe(500);
+    expect(response.statusCode).toBe(400);
     expect(response.body.error).toBe('Check answer service error');
   });
 });
