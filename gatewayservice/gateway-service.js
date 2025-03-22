@@ -128,7 +128,6 @@ app.get('/question', async (req, res) => {
     console.log(questionResponse);
     res.json(questionResponse.data)
   } catch (error) {
-    console.log(error)
     res.status(400).json({ error: error.response });
   }
 })
@@ -138,7 +137,6 @@ app.post('/checkanswer', async (req, res) => {
     const checkAnswerResponse = await axios.post(questionServiceUrl+'/checkanswer', req.body);
     res.json(checkAnswerResponse.data);
   } catch (error) {
-    console.log(error)
     res.status(400).json({ error: error.response.data.error });
   }
 })

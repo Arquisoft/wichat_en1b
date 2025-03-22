@@ -48,7 +48,6 @@ async function sendQuestionToLLM(gameQuestion, userQuestion, apiKey) {
     };
 
     const response = await axios.post(llmConfig.url, requestData, { headers });
-
     return llmConfig.transformResponse(response);
 
   } catch (error) {
