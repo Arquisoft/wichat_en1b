@@ -39,21 +39,15 @@ const llmConfig = {
 
 // Generic function to send questions to LLM
 async function sendQuestionToLLM(gameQuestion, userQuestion, apiKey) {
-  try {
-    let requestData = llmConfig.transformRequest(gameQuestion, userQuestion);
+  let requestData = llmConfig.transformRequest(gameQuestion, userQuestion);
 
-    const headers = {
-      'Content-Type': 'application/json',
-      ...(llmConfig.headers ? llmConfig.headers(apiKey) : {})
-    };
+  const headers = {
+    'Content-Type': 'application/json',
+    ...(llmConfig.headers ? llmConfig.headers(apiKey) : {})
+  };
 
-    const response = await axios.post(llmConfig.url, requestData, { headers });
-    return llmConfig.transformResponse(response);
-
-  } catch (error) {
-    console.error(`Error sending question to LLM:`, error.message || error);
-    return null;
-  }
+  const response = await axios.post(llmConfig.url, requestData, { headers });
+  return llmConfig.transformResponse(response);
 }
 
 app.post('/ask', [
