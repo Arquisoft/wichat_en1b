@@ -3,7 +3,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 const User = require('./user-model')
-const jwt = require('jsonwebtoken');
+// TODO const jwt = require('jsonwebtoken');
 require('dotenv').config();
 
 const app = express();
@@ -42,21 +42,21 @@ app.post('/adduser', async (req, res) => {
 
         await newUser.save();
 
-        const token = jwt.sign({ userId: newUser._id }, (process.env.JWT_SECRET), { expiresIn: '1h' });
+        // TODO const token = jwt.sign({ userId: newUser._id }, (process.env.JWT_SECRET), { expiresIn: '1h' });
       
         res.json({ token: token, username: newUser.username, createdAt: newUser.registrationDate });
       } catch (error) {
         res.status(400).json({ error: error.message }); 
     }});
 
+// Start the server
 const server = app.listen(port, () => {
   console.log(`User Service listening at http://localhost:${port}`);
 });
 
-// Listen for the 'close' event on the Express.js server
+// Close MongoDB connection on server shutdown
 server.on('close', () => {
-    // Close the Mongoose connection
-    mongoose.connection.close();
-  });
+  mongoose.connection.close();
+});
 
-module.exports = server
+module.exports = server;

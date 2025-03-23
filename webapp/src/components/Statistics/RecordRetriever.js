@@ -7,15 +7,15 @@ class RecordRetriever {
     
     async getRecords(token) {
         try {
-          const response = await axios.get(this.apiUrl, {
+          
+            const response = await axios.get(this.apiUrl, {
             headers: {
-              'Authorization': `Bearer ${token}`,
-              'Content-Type': 'application/json'
+              'Authorization': `Bearer ${token}`
             }
           });
           
           return response.data;
-
+        
         } catch (error) {
             console.error("Error fetching statistics:", error);
             

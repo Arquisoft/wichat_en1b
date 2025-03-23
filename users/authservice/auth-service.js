@@ -2,7 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const User = require('./auth-model')
+const User = require('../userservice/user-model');  // Use the same User model for all services
 const { check, matchedData, validationResult } = require('express-validator');
 const app = express();
 const port = 8002; 
@@ -50,10 +50,13 @@ app.post('/login',  [
 
       // Generate a JWT token
       const token = jwt.sign(
-        { userId: user._id,
+        {
+          userId: user._id,
           username: user.username
-        }, 
-        (process.env.JWT_SECRET), { expiresIn: '1h' });
+        },
+        process.env.JWT_SECRET,
+        { expiresIn: '1h' }
+      );
 
       // Respond with the token and user information
       res.json({ token: token, username: username, createdAt: user.registrationDate });
