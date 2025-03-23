@@ -5,7 +5,7 @@ const jwt = require('jsonwebtoken');
 const User = require('./statistics-model');
 const app = express();
 const port = 8005;
-require('dotenv').config(); // To access JWT_SECRET from .env file
+require('dotenv').config(); // To access JWS_SECRET from .env file
 
 // Middleware to parse JSON in request body
 app.use(express.json());
@@ -27,7 +27,7 @@ const verifyToken = (req, res, next) => {
   }
   
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const decoded = jwt.verify(token, process.env.JSW_SECRET);
     
     // Add decoded user info to the request
     req.user = decoded;
