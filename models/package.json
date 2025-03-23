@@ -1,0 +1,8 @@
+{
+    "name": "shared-models",
+    "version": "1.0.0",
+    "description": "Shared models to use in the application",
+    "dependencies": {
+      "mongoose": "^8.9.3"
+    }
+  }
