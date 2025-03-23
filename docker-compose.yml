@@ -14,10 +14,16 @@ services:
     container_name: authservice-wichat_en1b
     image: ghcr.io/arquisoft/wichat_en1b/authservice:latest
     profiles: ["dev", "prod"]
+    env_file:
+      - .env
     build: ./users/authservice
     develop:
       watch:
         - action: rebuild
+          path: ./users/authservice/package.json
+          target: /usr/src/authservice/package.json
+          
+        - action: sync+restart
           path: ./users/authservice
           target: /usr/src/authservice
           ignore:
@@ -35,10 +41,16 @@ services:
     container_name: userservice-wichat_en1b
     image: ghcr.io/arquisoft/wichat_en1b/userservice:latest
     profiles: ["dev", "prod"]
+    env_file:
+      - .env
     build: ./users/userservice
     develop:
       watch:
         - action: rebuild
+          path: ./users/userservice/package.json
+          target: /usr/src/userservice/package.json
+
+        - action: sync+restart
           path: ./users/userservice
           target: /usr/src/userservice
           ignore:
@@ -63,6 +75,10 @@ services:
     develop:
       watch:
         - action: rebuild
+          path: ./llmservice/package.json
+          target: /usr/src/llmservice/package.json
+
+        - action: sync+restart
           path: ./llmservice
           target: /usr/src/llmservice
           ignore:
@@ -80,6 +96,10 @@ services:
     develop:
       watch:
         - action: rebuild
+          path: ./questionservice/package.json
+          target: /usr/src/questionservice/package.json
+
+        - action: sync+restart
           path: ./questionservice
           target: /usr/src/questionservice
           ignore:
@@ -102,6 +122,10 @@ services:
     develop:
       watch:
         - action: rebuild
+          path: ./statisticservice/package.json
+          target: /usr/src/statisticservice/package.json
+
+        - action: sync+restart
           path: ./statisticservice
           target: /usr/src/statisticservice
           ignore:
@@ -121,6 +145,10 @@ services:
     develop:
       watch:
         - action: rebuild
+          path: ./gatewayservice/package.json
+          target: /usr/src/gatewayservice/package.json
+
+        - action: sync+restart
           path: ./gatewayservice
           target: /usr/src/gatewayservice
           ignore:
@@ -151,6 +179,10 @@ services:
     develop:
       watch:
         - action: rebuild
+          path: ./webapp/package.json
+          target: /app/package.json
+          
+        - action: sync
           path: ./webapp
           target: /app
           ignore:

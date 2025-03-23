@@ -65,15 +65,10 @@ export function Chat() {
 
         try {
             // Make the API call to your backend
-            const model = "empathy";
-            let questionLLM = "You are intended to provide clues about the question " + question.question + "to the user."
-            questionLLM += "The user is playing a game where he have the question that I've provided to you and 4 images to choose."
-            questionLLM += "Your goal is to give short clues strictly about the question that I provided to you. If the user wants to change topic, do not allow them."
-            questionLLM += "Now I will provide you with the question of the user. REMEMBER NOT TO GIVE THE DEFINITIVE ANSWER, ONLY CLUES. One clue at a time. User message:\n"
-            questionLLM += userMessage.content
             const response = await axios.post(`${gatewayEndpoint}/askllm`, {
-                question: questionLLM, model
-            })
+                gameQuestion: question.question,
+                userQuestion: userMessage.content
+            });
 
             // Add the response from your backend to the chat
             const assistantMessage = {
