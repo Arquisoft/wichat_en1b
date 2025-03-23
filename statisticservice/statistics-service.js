@@ -1,7 +1,7 @@
 const express = require('express');
-const mongoose = require('mongoose');
 const cors = require('cors');
 const jwt = require('jsonwebtoken');
+const mongoose = require('../models/node_modules/mongoose');
 const User = require('../models/user-model');
 const app = express();
 const port = 8005;
@@ -84,6 +84,8 @@ app.post('/statistics/update', authMiddleware, async (req, res) => {
 });
 
 // Start the Express.js server
-app.listen(port, () => {
+const server = app.listen(port, () => {
   console.log(`Statistics Service listening at http://localhost:${port}`);
 });
+
+module.exports = server;

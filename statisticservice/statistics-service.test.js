@@ -2,7 +2,8 @@ const request = require('supertest');
 const { MongoMemoryServer } = require('mongodb-memory-server');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const mongoose = require('mongoose');
+
+const mongoose = require('../models/node_modules/mongoose');
 const User = require('../models/user-model');
 
 let mongoServer;
@@ -10,106 +11,69 @@ let server;
 let app;
 let token;
 
-// Test user details
 const testUser = {
   username: 'testuser',
   password: 'testpassword',
 };
 
-// Generate JWT token
 function generateToken(username) {
   return jwt.sign({ username }, process.env.JWT_SECRET, { expiresIn: '1h' });
 }
 
-// Start the MongoDB Memory Server
 beforeAll(async () => {
-  jest.setTimeout(60000); // Set timeout for the entire suite
+  jest.setTimeout(60000);
   process.env.JWT_SECRET = 'testsecret';
 
-  try {
-    // Start MongoDB Memory Server
-    mongoServer = await MongoMemoryServer.create();
-    const mongoUri = mongoServer.getUri();
-    console.log('MongoDB Memory Server URI:', mongoUri);
+  mongoServer = await MongoMemoryServer.create();
+  const mongoUri = mongoServer.getUri();
 
-    // Disconnect any existing connections
-    await mongoose.disconnect();
-    mongoose.connection.removeAllListeners();
+  await mongoose.connect(mongoUri, {
+    connectTimeoutMS: 30000,
+    socketTimeoutMS: 30000,
+  });
 
-    // Connect to MongoDB with explicit options
-    await mongoose.connect(mongoUri, {
-      connectTimeoutMS: 30000,
-      socketTimeoutMS: 30000,
-      maxPoolSize: 10, // Increase pool size for better handling
-    });
-    console.log(`Connected to MongoDB directly with status: ${mongoose.connection.readyState}`);
+  app = require('./statistics-service');
 
-    // Import the app
-    const { app: statisticsApp } = require('./statistics-service');
-    app = statisticsApp;
+  const hashedPassword = await bcrypt.hash(testUser.password, 10);
+  await User.deleteMany({});
+  const user = new User({
+    username: testUser.username,
+    passwordHash: hashedPassword,
+    gamesPlayed: 0,
+    questionsAnswered: 0,
+    correctAnswers: 0,
+    incorrectAnswers: 0,
+  });
+  await user.save();
 
-    // Start the server
-    server = app.listen(0);
-
-    // Setup test data
-    const hashedPassword = await bcrypt.hash(testUser.password, 10);
-    await User.deleteMany({}); // Clear existing users
-    const user = new User({
-      username: testUser.username,
-      passwordHash: hashedPassword,
-      gamesPlayed: 0,
-      questionsAnswered: 0,
-      correctAnswers: 0,
-      incorrectAnswers: 0,
-    });
-    await user.save();
-    console.log(`Test user created with ID: ${user._id}`);
-
-    // Generate token
-    token = generateToken(testUser.username);
-  } catch (error) {
-    console.error('Setup failed:', error);
-    throw error;
-  }
+  token = generateToken(testUser.username);
 }, 60000);
 
-// Clean up resources
 afterAll(async () => {
-  try {
-    if (server) {
-      await new Promise(resolve => server.close(resolve));
-    }
-    
-    if (mongoose.connection) {
-      await mongoose.connection.dropDatabase();
-      await mongoose.disconnect();
-    }
-    
-    if (mongoServer) {
-      await mongoServer.stop();
-    }
-  } catch (error) {
-    console.error('Cleanup error:', error);
+  if (server) {
+    await new Promise((resolve) => server.close(resolve));
+  }
+  if (mongoose.connection.readyState !== 0) {
+    await mongoose.connection.dropDatabase();
+    await mongoose.disconnect();
+  }
+  if (mongoServer) {
+    await mongoServer.stop();
   }
 });
 
-// Reset user stats before each test
 beforeEach(async () => {
-  try {
-    await User.updateOne(
-      { username: testUser.username },
-      {
-        $set: {
-          gamesPlayed: 0,
-          questionsAnswered: 0,
-          correctAnswers: 0,
-          incorrectAnswers: 0
-        }
-      }
-    );
-  } catch (error) {
-    console.error('Error resetting user stats:', error);
-  }
+  await User.updateOne(
+    { username: testUser.username },
+    {
+      $set: {
+        gamesPlayed: 0,
+        questionsAnswered: 0,
+        correctAnswers: 0,
+        incorrectAnswers: 0,
+      },
+    }
+  );
 });
 
 // Tests
