@@ -45,10 +45,7 @@ export const StatisticsPage = () => {
         let cookie;
         try {
           cookie = JSON.parse(userCookie);
-          console.log("User cookie found:", cookie.username);
-
-          // Log token for debugging (remove in production)
-          console.log("Token first 10 chars:", cookie.token.substring(0, 10) + "...");
+          
         } catch (e) {
           console.error("Error parsing user cookie:", e);
           setError("Invalid user data. Please log in again.");
@@ -65,7 +62,7 @@ export const StatisticsPage = () => {
         }
 
         // Try to get the statistics
-        const statsData = await retriever.getRecords(cookie.token);
+        const statsData = await retriever.getRecords(cookie.username, cookie.token);
         setStatistics(statsData);
         setLoading(false);
       } catch (error) {
@@ -100,7 +97,7 @@ export const StatisticsPage = () => {
         }
 
         const cookie = JSON.parse(userCookie);
-        const statsData = await retriever.getRecords(cookie.token);
+        const statsData = await retriever.getRecords(cookie.username, cookie.token);
         setStatistics(statsData);
         setLoading(false);
       } catch (error) {
