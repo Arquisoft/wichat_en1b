@@ -1,8 +1,7 @@
 const request = require('supertest');
 const { MongoMemoryServer } = require('mongodb-memory-server');
 const bcrypt = require('bcrypt');
-//const User = require('./statistics-model');
-const User = require('../users/userservice/user-model');  // Use the same User model for all services
+const User = require('../models/user-model');  // Use the same User model for all services
 
 let mongoServer;
 let app;

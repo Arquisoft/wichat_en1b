@@ -23,7 +23,8 @@ export const StatisticsPage = () => {
   const [error, setError] = useState(null);
 
   const handleLogout = () => {
-    Cookies.remove('user');
+    // Remove the user cookie securely
+    Cookies.remove('user', { path: '/' }); // Ensure the cookie is removed from the correct path
     navigate('/login');
   };
 
@@ -45,7 +46,7 @@ export const StatisticsPage = () => {
         try {
           cookie = JSON.parse(userCookie);
           console.log("User cookie found:", cookie.username);
-          
+
           // Log token for debugging (remove in production)
           console.log("Token first 10 chars:", cookie.token.substring(0, 10) + "...");
         } catch (e) {
@@ -69,17 +70,17 @@ export const StatisticsPage = () => {
         setLoading(false);
       } catch (error) {
         console.error("Error in getRecords:", error);
-        
+
         // Check if it's an authentication error
-        if (error.message && 
-            (error.message.includes("expired") || 
-             error.message.includes("Invalid token") ||
-             error.message.includes("log in again"))) {
+        if (error.message &&
+          (error.message.includes("expired") ||
+            error.message.includes("Invalid token") ||
+            error.message.includes("log in again"))) {
           setError("Your session has expired. Please log in again.");
         } else {
           setError(error.message || "Failed to load statistics");
         }
-        
+
         setLoading(false);
       }
     };
@@ -97,7 +98,7 @@ export const StatisticsPage = () => {
           navigate('/login');
           return;
         }
-        
+
         const cookie = JSON.parse(userCookie);
         const statsData = await retriever.getRecords(cookie.token);
         setStatistics(statsData);
@@ -107,7 +108,7 @@ export const StatisticsPage = () => {
         setLoading(false);
       }
     };
-    
+
     getRecords();
   };
 
@@ -138,15 +139,15 @@ export const StatisticsPage = () => {
                 {error}
               </Typography>
               <Box sx={{ mt: 2, display: "flex", justifyContent: "center", gap: 2 }}>
-                <Button 
-                  variant="contained" 
-                  color="primary" 
+                <Button
+                  variant="contained"
+                  color="primary"
                   onClick={handleRetry}
                 >
                   Retry
                 </Button>
-                <Button 
-                  variant="outlined" 
+                <Button
+                  variant="outlined"
                   onClick={handleLogout}
                 >
                   Log In Again
@@ -177,7 +178,7 @@ export const StatisticsPage = () => {
                 <Paper elevation={1} sx={{ p: 2 }}>
                   <Typography variant="h6">Success Rate</Typography>
                   <Typography variant="body1">
-                    {statistics.correctAnswers + statistics.incorrectAnswers > 0 
+                    {statistics.correctAnswers + statistics.incorrectAnswers > 0
                       ? ((statistics.correctAnswers / (statistics.correctAnswers + statistics.incorrectAnswers)) * 100).toFixed(1) + '%'
                       : 'N/A'}
                   </Typography>

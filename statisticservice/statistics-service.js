@@ -2,7 +2,7 @@ const express = require('express');
 const cors = require("cors");
 const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken');
-const User = require('../users/userservice/user-model');  // Use the same User model for all services
+const User = require('../models/user-model');  // Use the same User model for all services
 const app = express();
 const port = 8005;
 require('dotenv').config();
