@@ -171,7 +171,7 @@ function verifyToken(req, res, next) {
   const token = req.headers['token'] || req.body.token || req.query.token;
 
   // Verify if the token is valid
-  jwt.verify(token, (process.env.JSW_SECRET), (err, decoded) => {
+  jwt.verify(token, (process.env.JWT_SECRET), (err, decoded) => {
     if (err) {
       // Token is not valid
       res.status(403).json({authorized: false,

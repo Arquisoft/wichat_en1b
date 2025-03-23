@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Typography, Box, Container, Paper, CircularProgress, Grid } from "@mui/material";
+import { Typography, Box, Container, Paper, CircularProgress, Grid, Button } from "@mui/material";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import Cookies from "js-cookie";
 import RecordRetriever from "./RecordRetriever";
@@ -22,39 +22,94 @@ export const StatisticsPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  const handleLogout = () => {
+    Cookies.remove('user');
+    navigate('/login');
+  };
+
   // Use useEffect to fetch data only once when component mounts
   useEffect(() => {
     const getRecords = async () => {
       try {
-        // Add error handling for missing or malformed cookie
+        // Check if user cookie exists
         const userCookie = Cookies.get('user');
         if (!userCookie) {
-          setError("User not logged in");
+          console.error("No user cookie found");
+          setError("You are not logged in. Please log in to view your statistics.");
           setLoading(false);
           return;
         }
-        
+
+        // Parse the cookie and handle potential errors
         let cookie;
         try {
           cookie = JSON.parse(userCookie);
+          console.log("User cookie found:", cookie.username);
+          
+          // Log token for debugging (remove in production)
+          console.log("Token first 10 chars:", cookie.token.substring(0, 10) + "...");
         } catch (e) {
-          setError("Invalid user data");
+          console.error("Error parsing user cookie:", e);
+          setError("Invalid user data. Please log in again.");
           setLoading(false);
           return;
         }
-        
-        const statsData = await retriever.getRecords(cookie.username, cookie.token);
+
+        // Verify we have the required cookie data
+        if (!cookie.username || !cookie.token) {
+          console.error("Missing required user data in cookie");
+          setError("Missing user credentials. Please log in again.");
+          setLoading(false);
+          return;
+        }
+
+        // Try to get the statistics
+        const statsData = await retriever.getRecords(cookie.token);
         setStatistics(statsData);
         setLoading(false);
       } catch (error) {
-        console.error("Error fetching statistics:", error);
+        console.error("Error in getRecords:", error);
+        
+        // Check if it's an authentication error
+        if (error.message && 
+            (error.message.includes("expired") || 
+             error.message.includes("Invalid token") ||
+             error.message.includes("log in again"))) {
+          setError("Your session has expired. Please log in again.");
+        } else {
+          setError(error.message || "Failed to load statistics");
+        }
+        
+        setLoading(false);
+      }
+    };
+
+    getRecords();
+  }, []); // Empty dependency array means this runs once on mount
+
+  const handleRetry = () => {
+    setLoading(true);
+    setError(null);
+    const getRecords = async () => {
+      try {
+        const userCookie = Cookies.get('user');
+        if (!userCookie) {
+          navigate('/login');
+          return;
+        }
+        
+        const cookie = JSON.parse(userCookie);
+        const statsData = await retriever.getRecords(cookie.token);
+        setStatistics(statsData);
+        setLoading(false);
+      } catch (error) {
         setError(error.message || "Failed to load statistics");
         setLoading(false);
       }
     };
-  
+    
     getRecords();
-  }, []); // Empty dependency array means this runs once on mount
+  };
 
   return (
     <ThemeProvider theme={theme}>
@@ -78,9 +133,26 @@ export const StatisticsPage = () => {
               <CircularProgress />
             </Box>
           ) : error ? (
-            <Typography variant="h6" color="error" align="center">
-              {error}
-            </Typography>
+            <Box sx={{ textAlign: "center", py: 4 }}>
+              <Typography variant="h6" color="error" gutterBottom>
+                {error}
+              </Typography>
+              <Box sx={{ mt: 2, display: "flex", justifyContent: "center", gap: 2 }}>
+                <Button 
+                  variant="contained" 
+                  color="primary" 
+                  onClick={handleRetry}
+                >
+                  Retry
+                </Button>
+                <Button 
+                  variant="outlined" 
+                  onClick={handleLogout}
+                >
+                  Log In Again
+                </Button>
+              </Box>
+            </Box>
           ) : statistics ? (
             <Grid container spacing={2}>
               <Grid item xs={12} sm={6}>
@@ -99,6 +171,16 @@ export const StatisticsPage = () => {
                 <Paper elevation={1} sx={{ p: 2 }}>
                   <Typography variant="h6">Incorrect Answers</Typography>
                   <Typography variant="body1">{statistics.incorrectAnswers}</Typography>
+                </Paper>
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <Paper elevation={1} sx={{ p: 2 }}>
+                  <Typography variant="h6">Success Rate</Typography>
+                  <Typography variant="body1">
+                    {statistics.correctAnswers + statistics.incorrectAnswers > 0 
+                      ? ((statistics.correctAnswers / (statistics.correctAnswers + statistics.incorrectAnswers)) * 100).toFixed(1) + '%'
+                      : 'N/A'}
+                  </Typography>
                 </Paper>
               </Grid>
             </Grid>

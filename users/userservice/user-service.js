@@ -42,7 +42,7 @@ app.post('/adduser', async (req, res) => {
 
         await newUser.save();
 
-        const token = jwt.sign({ userId: newUser._id }, (process.env.JSW_SECRET), { expiresIn: '1h' });
+        const token = jwt.sign({ userId: newUser._id }, (process.env.JWT_SECRET), { expiresIn: '1h' });
       
         res.json({ token: token, username: newUser.username, createdAt: newUser.registrationDate });
       } catch (error) {
