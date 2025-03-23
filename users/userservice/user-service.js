@@ -3,7 +3,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 const User = require('../models/user-model')
-// TODO const jwt = require('jsonwebtoken');
+const jwt = require('jsonwebtoken');
 require('dotenv').config();
 
 const app = express();
@@ -15,8 +15,6 @@ app.use(express.json());
 // Connect to MongoDB
 const mongoUri = process.env.MONGODB_URI || 'mongodb://localhost:27017/userdb';
 mongoose.connect(mongoUri);
-
-
 
 // Function to validate required fields in the request body
 function validateRequiredFields(req, requiredFields) {
@@ -42,7 +40,7 @@ app.post('/adduser', async (req, res) => {
 
         await newUser.save();
 
-        // TODO const token = jwt.sign({ userId: newUser._id }, (process.env.JWT_SECRET), { expiresIn: '1h' });
+        const token = jwt.sign({ userId: newUser._id }, (process.env.JWT_SECRET), { expiresIn: '1h' });
       
         res.json({ token: token, username: newUser.username, createdAt: newUser.registrationDate });
       } catch (error) {
