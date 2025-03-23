@@ -3,9 +3,9 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user-model');
-const app = express();
-const port = 8005;
 require('dotenv').config();
+
+const app = express();
 
 // Enable CORS for all routes
 app.use(cors({
@@ -17,11 +17,17 @@ app.use(cors({
 // Middleware to parse JSON in request body
 app.use(express.json());
 
-// Connect to MongoDB
-const mongoUri = process.env.MONGODB_URI || 'mongodb://localhost:27017/userdb';
-mongoose.connect(mongoUri, { useNewUrlParser: true, useUnifiedTopology: true })
-  .then(() => console.log('Connected to MongoDB'))
-  .catch(err => console.error('MongoDB connection error:', err));
+// Function to connect to MongoDB (Its not done automatically because it conflicts with testing)
+const connectToMongoDB = async (mongoUri, options = {}) => {
+  try {
+    await mongoose.connect(mongoUri, options);
+    console.log('Connected to MongoDB at:', mongoUri);
+    return mongoose.connection;
+  } catch (err) {
+    console.error('MongoDB connection error:', err);
+    throw err;
+  }
+};
 
 // Middleware to verify JWT token and attach the user to the request
 const authMiddleware = (req, res, next) => {
@@ -83,7 +89,19 @@ app.post('/statistics/update', authMiddleware, async (req, res) => {
   }
 });
 
-// Start the Express.js server
-app.listen(port, () => {
-  console.log(`Statistics Service listening at http://localhost:${port}`);
-});
+// Export the app without starting the server
+module.exports = { app, connectToMongoDB };
+
+// Start the server only if this file is run directly
+if (require.main === module) {
+  const port = 8005;
+  const mongoUri = process.env.MONGODB_URI || 'mongodb://localhost:27017/userdb';
+  connectToMongoDB(mongoUri).then(() => {
+    app.listen(port, () => {
+      console.log(`Statistics Service listening at http://localhost:${port}`);
+    });
+  }).catch(err => {
+    console.error('Failed to start server:', err);
+    process.exit(1);
+  });
+}
