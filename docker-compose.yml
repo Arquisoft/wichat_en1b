@@ -36,9 +36,9 @@ services:
       - mynetwork
     volumes:
       - ./models:/usr/src/models
-      - ./models/node_modules:/usr/src/models/node_modules
     environment:
       MONGODB_URI: mongodb://mongodb:27017/userdb
+      NODE_PATH: /usr/src/models/node_modules
 
   userservice:
     container_name: userservice-wichat_en1b
@@ -66,9 +66,9 @@ services:
       - mynetwork
     volumes:
       - ./models:/usr/src/models
-      - ./models/node_modules:/usr/src/models/node_modules
     environment:
       MONGODB_URI: mongodb://mongodb:27017/userdb
+      NODE_PATH: /usr/src/models/node_modules
 
   llmservice:
     container_name: llmservice-wichat_en1b
@@ -146,9 +146,9 @@ services:
       - mynetwork
     volumes:
       - ./models:/usr/src/models
-      - ./models/node_modules:/usr/src/models/node_modules
     environment:
       MONGODB_URI: mongodb://mongodb:27017/userdb
+      NODE_PATH: /usr/src/models/node_modules
 
   gatewayservice:
     container_name: gatewayservice-wichat_en1b
