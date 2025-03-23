@@ -32,7 +32,6 @@ export const StatisticsPage = () => {
   useEffect(() => {
     const getRecords = async () => {
       try {
-        // Check if user cookie exists
         const userCookie = Cookies.get('user');
         if (!userCookie) {
           console.error("No user cookie found");
@@ -41,43 +40,17 @@ export const StatisticsPage = () => {
           return;
         }
 
-        // Parse the cookie and handle potential errors
-        let cookie;
-        try {
-          cookie = JSON.parse(userCookie);
-          
-        } catch (e) {
-          console.error("Error parsing user cookie:", e);
-          setError("Invalid user data. Please log in again.");
-          setLoading(false);
-          return;
-        }
-
-        // Verify we have the required cookie data
-        if (!cookie.username || !cookie.token) {
-          console.error("Missing required user data in cookie");
-          setError("Missing user credentials. Please log in again.");
-          setLoading(false);
-          return;
-        }
-
-        // Try to get the statistics
-        const statsData = await retriever.getRecords(cookie.username, cookie.token);
+        const cookie = JSON.parse(userCookie);
+        const statsData = await retriever.getRecords(cookie.token); // Pass the token to the retriever
         setStatistics(statsData);
         setLoading(false);
       } catch (error) {
         console.error("Error in getRecords:", error);
-
-        // Check if it's an authentication error
-        if (error.message &&
-          (error.message.includes("expired") ||
-            error.message.includes("Invalid token") ||
-            error.message.includes("log in again"))) {
+        if (error.message.includes("expired") || error.message.includes("log in again")) {
           setError("Your session has expired. Please log in again.");
         } else {
           setError(error.message || "Failed to load statistics");
         }
-
         setLoading(false);
       }
     };
@@ -97,7 +70,7 @@ export const StatisticsPage = () => {
         }
 
         const cookie = JSON.parse(userCookie);
-        const statsData = await retriever.getRecords(cookie.username, cookie.token);
+        const statsData = await retriever.getRecords(cookie.token); // Pass the token to the retriever
         setStatistics(statsData);
         setLoading(false);
       } catch (error) {

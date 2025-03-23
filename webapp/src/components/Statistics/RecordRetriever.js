@@ -1,4 +1,5 @@
 import axios from "axios";
+import Cookies from "js-cookie";
 
 class RecordRetriever {
     constructor() {
@@ -8,21 +9,21 @@ class RecordRetriever {
 
    /**
      * Fetch user statistics from the backend.
-     * @param {string} username - The username to fetch statistics for.
-     * @param {string} token - The authorization token for the request.
      * @returns {Promise<Object>} - The user statistics data.
      * @throws {Error} - Throws an error if the request fails.
      */
-   async getRecords(username, token) {
+   async getRecords() {
         try {
+            const userCookie = Cookies.get('user');         // Retrieve the 'user' cookie
+            if (!userCookie) throw new Error("Authentication token is missing.");
+
+            const token = JSON.parse(userCookie)?.token;    // Parse the token from the cookie
+            if (!token) throw new Error("Cannot parse authentication token.");
             
-            // Make a GET request to the statistics endpoint with the authorization token and username
+            // Make a GET request to the statistics endpoint with the authorization token
             const response = await axios.get(this.apiUrl, {
                 headers: {
                     'Authorization': `Bearer ${token}`
-                },
-                params: {
-                    username    // Pass the username as a query parameter
                 }
             });
 
@@ -31,28 +32,10 @@ class RecordRetriever {
 
         } catch (error) {
             console.error("Error fetching statistics:", error);
-
-            // Handle errors based on the type of Axios error
-            if (error.response) {
-
-                console.error("Response status:", error.response.status);
-                console.error("Response data:", error.response.data);
-
-                // Handle unauthorized or forbidden errors
-                if (error.response.status === 401 || error.response.status === 403) {
-                    throw new Error("Your session has expired. Please log in again.");
-                }
-
-                // Throw a server error with the response message or status
-                throw new Error(error.response.data.error || `Server error (${error.response.status})`);
-            } else if (error.request) {
-                // Request was made but no response was received
-                console.error("No response received from server");
-                throw new Error("No response from server. Please check if the backend service is running.");
-            } else {
-                // Other errors
-                throw new Error(error.message || "Failed to retrieve statistics");
+            if (error.response?.status === 401 || error.response?.status === 403) {
+                throw new Error("Your session has expired. Please log in again.");
             }
+            throw new Error(error.response?.data?.error || "Failed to retrieve statistics");
         }
     }
 }

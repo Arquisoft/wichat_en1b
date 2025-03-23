@@ -1,6 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
+const jwt = require('jsonwebtoken');
 const User = require('../models/user-model');
 const app = express();
 const port = 8005;
@@ -22,48 +23,59 @@ mongoose.connect(mongoUri, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => console.log('Connected to MongoDB'))
   .catch(err => console.error('MongoDB connection error:', err));
 
-// GET endpoint to retrieve user statistics
-app.get('/statistics', async (req, res) => {
-  try {
-    const { username } = req.query; // Get username from query parameters
+// Middleware to verify JWT token and attach the user to the request
+const authMiddleware = (req, res, next) => {
+    const authHeader = req.headers['authorization'];
+    if (!authHeader) return res.status(401).json({ error: 'Authorization header missing' });
 
-    const user = await User.findOne({ username });
+    const token = authHeader.split(' ')[1];
+    if (!token) return res.status(401).json({ error: 'Token missing' });
 
-    if (!user) return res.status(404).json({ error: 'User not found' });
-
-    res.json({
-      gamesPlayed: user.gamesPlayed,
-      correctAnswers: user.correctAnswers,
-      incorrectAnswers: user.incorrectAnswers
+    jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
+        if (err) return res.status(403).json({ error: 'Invalid or expired token' });
+        req.user = user; // Attach the verified user to the request
+        next();
     });
+};
+
+// GET endpoint to retrieve user statistics
+app.get('/statistics', authMiddleware, async (req, res) => {
+  try {
+      const user = await User.findOne({ username: req.user.username });
+      if (!user) return res.status(404).json({ error: 'User not found' });
+
+      res.json({
+          gamesPlayed: user.gamesPlayed,
+          correctAnswers: user.correctAnswers,
+          incorrectAnswers: user.incorrectAnswers
+      });
   } catch (error) {
-    res.status(500).json({ error: 'Internal Server Error' });
+      res.status(500).json({ error: 'Internal Server Error' });
   }
 });
 
 // POST endpoint to update user statistics
 app.post('/statistics/update', async (req, res) => {
   try {
-    const { username, gamesPlayed, correctAnswers, incorrectAnswers } = req.body;
-
-    const user = await User.findOne({ username });
+    const { gamesPlayed, correctAnswers, incorrectAnswers } = req.body;
+    const user = await User.findOne({ username: req.user.username });
 
     if (user) {
-      if (gamesPlayed !== undefined) user.gamesPlayed += parseInt(gamesPlayed);
-      if (correctAnswers !== undefined) user.correctAnswers += parseInt(correctAnswers);
-      if (incorrectAnswers !== undefined) user.incorrectAnswers += parseInt(incorrectAnswers);
-      await user.save();
+        if (gamesPlayed !== undefined) user.gamesPlayed += parseInt(gamesPlayed);
+        if (correctAnswers !== undefined) user.correctAnswers += parseInt(correctAnswers);
+        if (incorrectAnswers !== undefined) user.incorrectAnswers += parseInt(incorrectAnswers);
+        await user.save();
 
-      res.json({
-        gamesPlayed: user.gamesPlayed,
-        correctAnswers: user.correctAnswers,
-        incorrectAnswers: user.incorrectAnswers,
-      });
+        res.json({
+            gamesPlayed: user.gamesPlayed,
+            correctAnswers: user.correctAnswers,
+            incorrectAnswers: user.incorrectAnswers,
+        });
     } else {
-      res.status(404).json({ error: 'User not found' });
+        res.status(404).json({ error: 'User not found' });
     }
   } catch (error) {
-    res.status(500).json({ error: 'Internal Server Error' });
+      res.status(500).json({ error: 'Internal Server Error' });
   }
 });
 
