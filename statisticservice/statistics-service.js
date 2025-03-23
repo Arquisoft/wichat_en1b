@@ -46,6 +46,7 @@ app.get('/statistics', authMiddleware, async (req, res) => {
 
       res.json({
           gamesPlayed: user.gamesPlayed,
+          questionsAnswered: user.questionsAnswered,
           correctAnswers: user.correctAnswers,
           incorrectAnswers: user.incorrectAnswers
       });
@@ -55,19 +56,21 @@ app.get('/statistics', authMiddleware, async (req, res) => {
 });
 
 // POST endpoint to update user statistics
-app.post('/statistics/update', async (req, res) => {
+app.post('/statistics/update', authMiddleware, async (req, res) => {
   try {
-    const { gamesPlayed, correctAnswers, incorrectAnswers } = req.body;
+    const { gamesPlayed, questionsAnswered, correctAnswers, incorrectAnswers } = req.body;
     const user = await User.findOne({ username: req.user.username });
 
     if (user) {
         if (gamesPlayed !== undefined) user.gamesPlayed += parseInt(gamesPlayed);
+        if (questionsAnswered !== undefined) user.questionsAnswered += parseInt(questionsAnswered);
         if (correctAnswers !== undefined) user.correctAnswers += parseInt(correctAnswers);
         if (incorrectAnswers !== undefined) user.incorrectAnswers += parseInt(incorrectAnswers);
         await user.save();
 
         res.json({
             gamesPlayed: user.gamesPlayed,
+            questionsAnswered: user.questionsAnswered,
             correctAnswers: user.correctAnswers,
             incorrectAnswers: user.incorrectAnswers,
         });
@@ -75,7 +78,8 @@ app.post('/statistics/update', async (req, res) => {
         res.status(404).json({ error: 'User not found' });
     }
   } catch (error) {
-      res.status(500).json({ error: 'Internal Server Error' });
+    console.error("Error in /statistics/update:", error); // Log the error
+    res.status(500).json({ error: 'Internal Server Error' });
   }
 });
 

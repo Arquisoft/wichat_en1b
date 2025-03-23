@@ -134,6 +134,12 @@ export const StatisticsPage = () => {
               </Grid>
               <Grid item xs={12} sm={6}>
                 <Paper elevation={1} sx={{ p: 2 }}>
+                  <Typography variant="h6">Questions Answered</Typography>
+                  <Typography variant="body1">{statistics.questionsAnswered}</Typography>
+                </Paper>
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <Paper elevation={1} sx={{ p: 2 }}>
                   <Typography variant="h6">Correct Answers</Typography>
                   <Typography variant="body1">{statistics.correctAnswers}</Typography>
                 </Paper>
