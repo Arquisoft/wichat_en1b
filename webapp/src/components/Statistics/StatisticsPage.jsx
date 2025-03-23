@@ -2,12 +2,11 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Typography, Box, Container, Paper, CircularProgress, Grid } from "@mui/material";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
-import axios from "axios";
 import Cookies from "js-cookie";
 import RecordRetriever from "./RecordRetriever";
 
-
 const retriever = new RecordRetriever();
+
 // Create a theme (using the same blue primary color)
 const theme = createTheme({
   palette: {
@@ -17,28 +16,45 @@ const theme = createTheme({
   },
 });
 
-
 export const StatisticsPage = () => {
   const navigate = useNavigate();
   const [statistics, setStatistics] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-
-  const getRecords = async ()=>{
-    try {
-      let cookie = JSON.parse(Cookies.get('user'))
-      var jsonRecords = await retriever.getRecords(cookie.username, cookie.token); 
-      var recordsArray = jsonRecords.games;
-      setStatistics(recordsArray);
-    } catch (error) {
-      setError(error);
-    }
-  }
-
-  if(statistics === null)
+  // Use useEffect to fetch data only once when component mounts
+  useEffect(() => {
+    const getRecords = async () => {
+      try {
+        // Add error handling for missing or malformed cookie
+        const userCookie = Cookies.get('user');
+        if (!userCookie) {
+          setError("User not logged in");
+          setLoading(false);
+          return;
+        }
+        
+        let cookie;
+        try {
+          cookie = JSON.parse(userCookie);
+        } catch (e) {
+          setError("Invalid user data");
+          setLoading(false);
+          return;
+        }
+        
+        const statsData = await retriever.getRecords(cookie.username, cookie.token);
+        setStatistics(statsData);
+        setLoading(false);
+      } catch (error) {
+        console.error("Error fetching statistics:", error);
+        setError(error.message || "Failed to load statistics");
+        setLoading(false);
+      }
+    };
+  
     getRecords();
-
+  }, []); // Empty dependency array means this runs once on mount
 
   return (
     <ThemeProvider theme={theme}>
