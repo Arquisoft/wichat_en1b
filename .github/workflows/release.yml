@@ -12,6 +12,11 @@ jobs:
     - uses: actions/setup-node@v4
       with:
         node-version: 22
+    
+    - name: Install models dependencies
+      working-directory: ./models
+      run: npm ci || npm install
+    
     - run: npm --prefix users/authservice ci
     - run: npm --prefix users/userservice ci
     - run: npm --prefix llmservice ci
