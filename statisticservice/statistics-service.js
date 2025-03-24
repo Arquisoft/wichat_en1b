@@ -17,11 +17,13 @@ app.use(cors({
 // Middleware to parse JSON in request body
 app.use(express.json());
 
-// Connect to MongoDB
-const mongoUri = process.env.MONGODB_URI || 'mongodb://localhost:27017/userdb';
-mongoose.connect(mongoUri, { useNewUrlParser: true, useUnifiedTopology: true })
+// Connect to MongoDB only if not already connected
+if (mongoose.connection.readyState === 0) {
+  const mongoUri = process.env.MONGODB_URI || 'mongodb://localhost:27017/userdb';
+  mongoose.connect(mongoUri, { useNewUrlParser: true, useUnifiedTopology: true }); 
   .then(() => console.log('Connected to MongoDB'))
   .catch(err => console.error('MongoDB connection error:', err));
+}
 
 // Middleware to verify JWT token and attach the user to the request
 const authMiddleware = (req, res, next) => {
