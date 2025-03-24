@@ -61,16 +61,6 @@ app.post('/askllm', async (req, res) => {
   }
 });
 
-app.get('/question', async (req, res) => {
-  try {
-    //Forward the asking for a question to the question service
-    const questionResponse = await axios.get(`${questionServiceUrl}/question`);
-    res.json(questionResponse.data);
-  } catch (error) {
-    res.status(error.response?.status || 500).json({ error: error.response?.data?.error });
-  }
-});
-
 app.post('/answer', async (req, res) => {
   try {
     //Forward the answer for validation to the question service
@@ -128,7 +118,6 @@ app.get('/question', async (req, res) => {
     console.log(questionResponse);
     res.json(questionResponse.data)
   } catch (error) {
-    console.log(error)
     res.status(400).json({ error: error.response });
   }
 })
@@ -138,7 +127,6 @@ app.post('/checkanswer', async (req, res) => {
     const checkAnswerResponse = await axios.post(questionServiceUrl+'/checkanswer', req.body);
     res.json(checkAnswerResponse.data);
   } catch (error) {
-    console.log(error)
     res.status(400).json({ error: error.response.data.error });
   }
 })

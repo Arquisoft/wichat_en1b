@@ -232,3 +232,84 @@ describe('Error handling', () => {
     expect(response.body.error).toBe('User stats not found');
   });
 });
+
+describe('Gateway Service - Additional Tests', () => {
+  // Test /statistics/update endpoint
+  it('should forward statistics update request to the statistics service', async () => {
+    axios.post.mockImplementationOnce((url) => {
+      if (url.endsWith('/statistics/update')) {
+        return Promise.resolve({ data: { success: true } });
+      }
+    });
+
+    const response = await request(app)
+      .post('/statistics/update')
+      .send({ userId: 'mockuser', gamesPlayed: 1 });
+
+    expect(response.statusCode).toBe(200);
+    expect(response.body.success).toBe(true);
+  });
+
+  // Test /checkanswer endpoint
+  it('should forward check answer request to the question service', async () => {
+    axios.post.mockImplementationOnce((url) => {
+      if (url.endsWith('/checkanswer')) {
+        return Promise.resolve({ data: { correct: true } });
+      }
+    });
+
+    const response = await request(app)
+      .post('/checkanswer')
+      .send({ questionId: '1', answer: 'mockAnswer' });
+
+    expect(response.statusCode).toBe(200);
+    expect(response.body.correct).toBe(true);
+  });
+});
+
+describe('Gateway Service - Additional Tests - Error handling', () => {
+  // Test protected /statistics endpoint with invalid token
+  it('should block access to /statistics when token is invalid', async () => {
+    const response = await request(app)
+      .get('/statistics/mockuser')
+      .set('token', 'invalidToken');
+
+    expect(response.statusCode).toBe(403);
+    expect(response.body.authorized).toBe(false);
+    expect(response.body.error).toBe('Invalid token or outdated');
+  });
+
+  // Test error handling for /statistics/update
+  it('should handle errors from statistics update service', async () => {
+    axios.post.mockImplementationOnce((url) => {
+      if (url.endsWith('/statistics/update')) {
+        return Promise.reject({
+          response: { status: 500, data: { error: 'Statistics update failed' } },
+        });
+      }
+    });
+
+    const response = await request(app)
+      .post('/statistics/update')
+      .send({ userId: 'mockuser', gamesPlayed: 1 });
+
+    expect(response.statusCode).toBe(500);
+    expect(response.body.error).toBe('Statistics update failed');
+  });
+
+  // Test error handling for /checkanswer
+  it('should handle errors from check answer service', async () => {
+    axios.post.mockImplementationOnce((url) => {
+      if (url.endsWith('/checkanswer')) {
+        return getRejectedPromise(500, 'Check answer service error')
+      }
+    });
+
+    const response = await request(app)
+      .post('/checkanswer')
+      .send({ questionId: '1', answer: 'mockAnswer' });
+
+    expect(response.statusCode).toBe(400);
+    expect(response.body.error).toBe('Check answer service error');
+  });
+});
