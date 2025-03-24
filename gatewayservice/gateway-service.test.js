@@ -28,7 +28,7 @@ describe('Gateway Service', () => {
   axios.post.mockImplementation((url, data) => {
     if (url.endsWith('/login')) { //Mock POST /login response
       return Promise.resolve({ data: { token: 'mockedToken' } });
-    } else if (url.endsWith('/adduser')) { //Mock POST /adduser response
+    } else if (url.endsWith('/adduser')) { //Mock POST /adduser st
       return Promise.resolve({ data: { userId: 'mockedUserId' } });
     } else if (url.endsWith('/ask')) { //Mock POST /ask response
       return Promise.resolve({ data: { answer: 'llmanswer' } });
@@ -209,8 +209,9 @@ describe('Error handling', () => {
     expect(response.body.error).toBe('Answer service error');
   });
 
-  // Test error case for statistics
+  /// Test error case for statistics
   it('should handle errors from statistics service', async () => {
+    // Mock the error response from the statistics service
     axios.get.mockImplementationOnce((url) => {
       if (url.endsWith('/statistics')) {
         return getRejectedPromise(404, 'User stats not found');
