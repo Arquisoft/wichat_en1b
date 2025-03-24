@@ -25,6 +25,7 @@ describe('User Service', () => {
       password: 'testpassword',
     };
 
+    process.env.JWT_SECRET='mocksecret';
     const response = await request(app).post('/adduser').send(newUser);
     expect(response.status).toBe(200);
     expect(response.body).toHaveProperty('username', 'testuser');

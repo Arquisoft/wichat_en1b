@@ -101,10 +101,10 @@ app.post('/answer', async (req, res) => {
   }
 });
 
-app.post('/statistics', verifyToken ,async (req, res) => {
+app.get('/statistics', verifyToken ,async (req, res) => {
   try {
     // Forward the add user request to the statistics service
-    const statisticsResponse = await axios.get(statisticsServiceUrl+'/statistics' + req.body);
+    const statisticsResponse = await axios.get(statisticsServiceUrl+'/statistics');
     res.json(statisticsResponse.data);
   } catch (error) {
     manageError(res, error);
@@ -168,8 +168,7 @@ const server = app.listen(port, () => {
 
 function verifyToken(req, res, next) {
   // Get the token from the request headers
-  const token = req.headers['token'] || req.body.token || req.query.token;
-
+  const token = req.headers['authorization'] || req.headers['token'] || req.body.token || req.query.token;
   // Verify if the token is valid
   jwt.verify(token, (process.env.JWT_SECRET), (err, decoded) => {
     if (err) {
