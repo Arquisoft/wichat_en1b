@@ -20,7 +20,7 @@ app.use(express.json());
 // Connect to MongoDB only if not already connected
 if (mongoose.connection.readyState === 0) {
   const mongoUri = process.env.MONGODB_URI || 'mongodb://localhost:27017/userdb';
-  mongoose.connect(mongoUri, { useNewUrlParser: true, useUnifiedTopology: true }); 
+  mongoose.connect(mongoUri, { useNewUrlParser: true, useUnifiedTopology: true }) 
   .then(() => console.log('Connected to MongoDB'))
   .catch(err => console.error('MongoDB connection error:', err));
 }
