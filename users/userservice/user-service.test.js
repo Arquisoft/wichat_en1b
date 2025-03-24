@@ -24,6 +24,7 @@ describe('User Service', () => {
       username: 'testuser',
       password: 'testpassword',
     };
+    process.env.JWT_SECRET = 'testsecret';
 
     const response = await request(app).post('/adduser').send(newUser);
     expect(response.status).toBe(200);
