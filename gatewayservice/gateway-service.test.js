@@ -27,7 +27,7 @@ describe('Gateway Service', () => {
   axios.post.mockImplementation((url, data) => {
     if (url.endsWith('/login')) { //Mock POST /login response
       return Promise.resolve({ data: { token: 'mockedToken' } });
-    } else if (url.endsWith('/adduser')) { //Mock POST /adduser response
+    } else if (url.endsWith('/adduser')) { //Mock POST /adduser st
       return Promise.resolve({ data: { userId: 'mockedUserId' } });
     } else if (url.endsWith('/ask')) { //Mock POST /ask response
       return Promise.resolve({ data: { answer: 'llmanswer' } });
@@ -40,7 +40,7 @@ describe('Gateway Service', () => {
 
   // Mock responses for GET requests
   axios.get.mockImplementation((url) => {
-    if (url.includes('/statistics/mockuser')) {
+    if (url.includes('/statistics')) {
       return Promise.resolve({ data: { gamesPlayed: 0, correctAnswers: 0, incorrectAnswers: 0 } });
     } else if (url.endsWith('/question')) {
       return Promise.resolve({ data: { question: 'questionMock' } });
@@ -90,7 +90,7 @@ describe('Gateway Service', () => {
   // Test /statistics endpoint
   it('should forward statistics request to the statistics service', async () => {
     const response = await request(app)
-      .get('/statistics/mockuser');
+      .get('/statistics');
 
     expect(response.statusCode).toBe(200);
     expect(response.body.gamesPlayed).toBe(0);
@@ -205,16 +205,21 @@ describe('Error handling', () => {
     expect(response.body.error).toBe('Answer service error');
   });
 
-  // Test error case for statistics
+  /// Test error case for statistics
   it('should handle errors from statistics service', async () => {
+    // Mock the error response from the statistics service
     axios.get.mockImplementationOnce((url) => {
       if (url.includes('/statistics')) {
         return getRejectedPromise(404, 'User stats not found');
       }
     });
 
+    // Generate a mock token for the request
+    const mockToken = 'mockedInvalidToken';
+
     const response = await request(app)
-      .get('/statistics/nonexistentuser');
+      .get('/statistics')
+      .set('Authorization', `Bearer ${mockToken}`); // Include the token in the request
 
     expect(response.statusCode).toBe(404);
     expect(response.body.error).toBe('User stats not found');
