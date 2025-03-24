@@ -1,8 +1,10 @@
+// auth-service.js
 const express = require('express');
-const mongoose = require('../../models/node_modules/mongoose');
+// const mongoose = require('../../models/node_modules/mongoose');
+//const User = require('../../models/user-model');
+const { mongoose, User } = require('../../models/user-model');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const User = require('../../models/user-model');
 const { check, matchedData, validationResult } = require('express-validator');
 const app = express();
 const port = 8002; 

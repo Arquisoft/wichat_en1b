@@ -2,8 +2,9 @@ const request = require('supertest');
 const { MongoMemoryServer } = require('mongodb-memory-server');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const mongoose = require('../models/node_modules/mongoose');
-const User = require('../models/user-model');
+//const mongoose = require('../models/node_modules/mongoose');
+//const User = require('../models/user-model');
+const { mongoose, User } = require('../models/user-model');
 
 let mongoServer;
 let server;

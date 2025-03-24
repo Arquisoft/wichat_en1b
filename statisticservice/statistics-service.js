@@ -1,8 +1,9 @@
 const express = require('express');
 const cors = require('cors');
 const jwt = require('jsonwebtoken');
-const mongoose = require('../models/node_modules/mongoose');
-const User = require('../models/user-model');
+//const mongoose = require('../models/node_modules/mongoose');
+//const User = require('../models/user-model');
+const { mongoose, User } = require('../models/user-model');
 const app = express();
 const port = 8005;
 require('dotenv').config();

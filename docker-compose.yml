@@ -16,13 +16,15 @@ services:
     profiles: ["dev", "prod"]
     env_file:
       - .env
-    build: ./users/authservice
+    build:
+      context: ./
+      dockerfile: users/authservice/Dockerfile
     develop:
       watch:
         - action: rebuild
           path: ./users/authservice/package.json
           target: /usr/src/authservice/package.json
-          
+
         - action: sync+restart
           path: ./users/authservice
           target: /usr/src/authservice
@@ -34,11 +36,8 @@ services:
       - "8002:8002"
     networks:
       - mynetwork
-    volumes:
-      - ./models:/usr/src/models
     environment:
       MONGODB_URI: mongodb://mongodb:27017/userdb
-      NODE_PATH: /usr/src/models/node_modules
 
   userservice:
     container_name: userservice-wichat_en1b
@@ -46,7 +45,9 @@ services:
     profiles: ["dev", "prod"]
     env_file:
       - .env
-    build: ./users/userservice
+    build:
+      context: ./
+      dockerfile: users/userservice/Dockerfile
     develop:
       watch:
         - action: rebuild
@@ -64,11 +65,8 @@ services:
       - "8001:8001"
     networks:
       - mynetwork
-    volumes:
-      - ./models:/usr/src/models
     environment:
       MONGODB_URI: mongodb://mongodb:27017/userdb
-      NODE_PATH: /usr/src/models/node_modules
 
   llmservice:
     container_name: llmservice-wichat_en1b
