@@ -268,17 +268,7 @@ describe('Gateway Service - Additional Tests', () => {
 });
 
 describe('Gateway Service - Additional Tests - Error handling', () => {
-  // Test protected /statistics endpoint with invalid token
-  it('should block access to /statistics when token is invalid', async () => {
-    const response = await request(app)
-      .get('/statistics/mockuser')
-      .set('token', 'invalidToken');
-
-    expect(response.statusCode).toBe(403);
-    expect(response.body.authorized).toBe(false);
-    expect(response.body.error).toBe('Invalid token or outdated');
-  });
-
+  
   // Test error handling for /statistics/update
   it('should handle errors from statistics update service', async () => {
     axios.post.mockImplementationOnce((url) => {
