@@ -101,7 +101,7 @@ app.post('/answer', async (req, res) => {
   }
 });
 
-app.post('/statistics', verifyToken ,async (req, res) => {
+app.get('/statistics', verifyToken ,async (req, res) => {
   try {
     // Forward the add user request to the statistics service
     const statisticsResponse = await axios.get(statisticsServiceUrl+'/statistics' + req.body);
