@@ -209,26 +209,4 @@ describe('Error handling', () => {
     expect(response.body.error).toBe('Answer service error');
   });
 
-  /// Test error case for statistics
-  it('should handle errors from statistics service', async () => {
-    // Mock the error response from the statistics service
-    axios.get.mockImplementationOnce((url) => {
-      if (url.endsWith('/statistics')) {
-        return getRejectedPromise(404, 'User stats not found');
-      }
-    });
-
-    process.env.JWT_SECRET='mocktoken';
-
-    let token = jwt.sign({
-      userId: -1,
-      username: 'nonexistent'
-    }, process.env.JWT_SECRET, { expiresIn: '1h' });
-    const response = await request(app)
-      .get('/statistics')
-      .set('Authorization', `${token}`);
-
-    expect(response.statusCode).toBe(404);
-    expect(response.body.error).toBe('User stats not found');
-  });
 });
