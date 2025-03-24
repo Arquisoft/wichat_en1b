@@ -2,7 +2,6 @@ const request = require('supertest');
 const { MongoMemoryServer } = require('mongodb-memory-server');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-
 const mongoose = require('../models/node_modules/mongoose');
 const User = require('../models/user-model');
 
@@ -24,16 +23,33 @@ beforeAll(async () => {
   jest.setTimeout(60000);
   process.env.JWT_SECRET = 'testsecret';
 
+  // Disconnect any existing Mongoose connections to avoid conflicts
+  if (mongoose.connection.readyState !== 0) {
+    await mongoose.disconnect();
+  }
+
+  // Set up MongoMemoryServer
   mongoServer = await MongoMemoryServer.create();
   const mongoUri = mongoServer.getUri();
 
+  // Connect to MongoMemoryServer
   await mongoose.connect(mongoUri, {
     connectTimeoutMS: 30000,
     socketTimeoutMS: 30000,
   });
 
+  // Import the service after setting up the connection
   app = require('./statistics-service');
 
+  // Close the service's default server if it's running
+  if (app.listening) {
+    await new Promise((resolve) => app.close(resolve));
+  }
+
+  // Start a new server on a random port
+  server = app.listen(0);
+
+  // Set up test user
   const hashedPassword = await bcrypt.hash(testUser.password, 10);
   await User.deleteMany({});
   const user = new User({
@@ -50,12 +66,12 @@ beforeAll(async () => {
 }, 60000);
 
 afterAll(async () => {
-  if (server) {
+  if (server && server.listening) {
     await new Promise((resolve) => server.close(resolve));
   }
   if (mongoose.connection.readyState !== 0) {
     await mongoose.connection.dropDatabase();
-    await mongoose.disconnect();
+    await mongoose.connection.close();
   }
   if (mongoServer) {
     await mongoServer.stop();
@@ -76,7 +92,6 @@ beforeEach(async () => {
   );
 });
 
-// Tests
 describe('Statistics Service', () => {
   it('Should retrieve the statistics for the authenticated user', async () => {
     const response = await request(app)
@@ -116,7 +131,6 @@ describe('Statistics Service', () => {
     expect(response.body.correctAnswers).toBe(3);
     expect(response.body.incorrectAnswers).toBe(2);
 
-    // Verify with a GET request
     const getResponse = await request(app)
       .get('/statistics')
       .set('Authorization', `Bearer ${token}`);
