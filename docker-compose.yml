@@ -16,9 +16,7 @@ services:
     profiles: ["dev", "prod"]
     env_file:
       - .env
-    build:
-      context: ./
-      dockerfile: users/authservice/Dockerfile
+    build: ./users/authservice
     develop:
       watch:
         - action: rebuild
@@ -45,9 +43,7 @@ services:
     profiles: ["dev", "prod"]
     env_file:
       - .env
-    build:
-      context: ./
-      dockerfile: users/userservice/Dockerfile
+    build: ./users/userservice
     develop:
       watch:
         - action: rebuild

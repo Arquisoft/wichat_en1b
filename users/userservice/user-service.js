@@ -1,8 +1,7 @@
 // user-service.js
 const express = require('express');
-// const mongoose = require('../../models/node_modules/mongoose');
-//const User = require('../../models/user-model')
-const { mongoose, User } = require('../../models/user-model');
+const mongoose = require('mongoose');
+const User = require('./user-model');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
