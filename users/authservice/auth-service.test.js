@@ -1,7 +1,8 @@
 const request = require('supertest');
 const { MongoMemoryServer } = require('mongodb-memory-server');
 const bcrypt = require('bcrypt');
-const User = require('./auth-model');
+//const User = require('../../models/user-model');
+const { mongoose, User } = require('../../models/user-model');
 
 require('dotenv').config();
 
@@ -40,6 +41,7 @@ afterAll(async () => {
 
 describe('Auth Service', () => {
   it('Should perform a login operation /login', async () => { 
+    process.env.JWT_SECRET = 'testsecret';
     const response = await request(app).post('/login').send(user);
     expect(response.status).toBe(200);
     expect(response.body).toHaveProperty('username', 'testuser');

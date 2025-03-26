@@ -1,10 +1,10 @@
-const e = require('express');
 const mongoose = require('mongoose');
 
 const userSchema = new mongoose.Schema({
     username: {
       type: String,
       required: true,
+      unique: true,
     },
     email: {
       type: String,
@@ -19,6 +19,14 @@ const userSchema = new mongoose.Schema({
       default: Date.now,
     },
     gamesPlayed: {
+      type: Number,
+      default: 0,
+      validate: {
+        validator: Number.isInteger,
+        message: '{VALUE} is not an integer value',
+      }
+    },
+    questionsAnswered: {
       type: Number,
       default: 0,
       validate: {
@@ -46,4 +54,4 @@ const userSchema = new mongoose.Schema({
 
 const User = mongoose.model('User', userSchema);
 
-module.exports = User
+module.exports = User;

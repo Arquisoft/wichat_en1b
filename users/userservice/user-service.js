@@ -1,8 +1,8 @@
 // user-service.js
 const express = require('express');
 const mongoose = require('mongoose');
+const User = require('./user-model');
 const bcrypt = require('bcrypt');
-const User = require('./user-model')
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
 
@@ -15,8 +15,6 @@ app.use(express.json());
 // Connect to MongoDB
 const mongoUri = process.env.MONGODB_URI || 'mongodb://localhost:27017/userdb';
 mongoose.connect(mongoUri);
-
-
 
 // Function to validate required fields in the request body
 function validateRequiredFields(req, requiredFields) {
@@ -42,21 +40,21 @@ app.post('/adduser', async (req, res) => {
 
         await newUser.save();
 
-        const token = jwt.sign({ userId: newUser._id }, (process.env.JSW_SECRET), { expiresIn: '1h' });
+        const token = jwt.sign({ userId: newUser._id }, (process.env.JWT_SECRET), { expiresIn: '1h' });
       
         res.json({ token: token, username: newUser.username, createdAt: newUser.registrationDate });
       } catch (error) {
         res.status(400).json({ error: error.message }); 
     }});
 
+// Start the server
 const server = app.listen(port, () => {
   console.log(`User Service listening at http://localhost:${port}`);
 });
 
-// Listen for the 'close' event on the Express.js server
+// Close MongoDB connection on server shutdown
 server.on('close', () => {
-    // Close the Mongoose connection
-    mongoose.connection.close();
-  });
+  mongoose.connection.close();
+});
 
-module.exports = server
+module.exports = server;

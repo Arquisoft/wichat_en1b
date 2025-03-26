@@ -30,6 +30,7 @@ export const Question = () => {
     const userCookie = Cookies.get('user');
     const isUserLogged = !!userCookie;
     const gatewayEndpoint = process.env.GATEWAY_SERVICE_URL || 'http://localhost:8000';
+    const statisticsEndpoint = 'http://localhost:8005';
 
     useEffect(() => {
         const fetchData = async () => {
@@ -99,22 +100,60 @@ export const Question = () => {
 
         setSelectedAnswer(answer);
         setIsPaused(true); // Pause the timer when an answer is selected
-        let response = await axios.post(`${gatewayEndpoint}/checkanswer`, { questionID: question.id, answer: answer });
 
-        if (response.data.correct) {
-            axios.post(`${gatewayEndpoint}/statistics/update`, { gamesPlayed: 1, correctAnswers: 1, incorrectAnswers: 0 });
-            setIsCorrect(true);
-            setTimeout(() => {
-                setIsCorrect(false);
-                requestQuestion();
-            }, 2000);
-        } else {
-            axios.post(`${gatewayEndpoint}/statistics/update`, { gamesPlayed: 1, correctAnswers: 0, incorrectAnswers: 1 });
-            setIsIncorrect(true);
-            setTimeout(() => {
-                setIsIncorrect(false);
-                requestQuestion();
-            }, 2000);
+        try { 
+
+            let response = await axios.post(`${gatewayEndpoint}/checkanswer`, { questionID: question.id, answer: answer });
+
+            const userCookie = Cookies.get('user');         // Retrieve the 'user' cookie
+            if (!userCookie) throw new Error("Authentication token is missing.");
+            
+            const token = JSON.parse(userCookie)?.token;    // Parse the token from the cookie
+            if (!token) throw new Error("Cannot parse authentication token.");
+
+            if (response.data.correct) {
+
+                await axios.post(
+                    `${statisticsEndpoint}/statistics/update`,
+                    { questionsAnswered: 1, correctAnswers: 1, incorrectAnswers: 0 },
+                    {
+                        headers: {
+                            'Authorization': `Bearer ${token}` // Include the JWT in the Authorization header
+                        }
+                    }
+                ).catch((error) => {
+                    console.error("Error updating statistics:", error.response?.data || error.message);
+                });
+
+                setIsCorrect(true);
+                setTimeout(() => {
+                    setIsCorrect(false);
+                    requestQuestion();
+                }, 2000);
+
+            } else {
+
+                await axios.post(
+                    `${statisticsEndpoint}/statistics/update`,
+                    { questionsAnswered: 1, correctAnswers: 0, incorrectAnswers: 1 },
+                    {
+                        headers: {
+                            'Authorization': `Bearer ${token}` // Include the JWT in the Authorization header
+                        }
+                    }
+                ).catch((error) => {
+                    console.error("Error updating statistics:", error.response?.data || error.message);
+                });
+
+                setIsIncorrect(true);
+                setTimeout(() => {
+                    setIsIncorrect(false);
+                    requestQuestion();
+                }, 2000);
+            }
+
+        } catch (error) {
+            console.error("Error checking answer: ", error);
         }
     }
 

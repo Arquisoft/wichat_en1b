@@ -22,7 +22,7 @@ services:
         - action: rebuild
           path: ./users/authservice/package.json
           target: /usr/src/authservice/package.json
-          
+
         - action: sync+restart
           path: ./users/authservice
           target: /usr/src/authservice
@@ -117,6 +117,8 @@ services:
     container_name: statisticservice-wichat_en1b
     image: ghcr.io/arquisoft/wichat_en1b/statisticservice:latest
     profiles: ["dev", "prod"]
+    env_file:
+      - .env
     build: 
       context: ./statisticservice
     develop:
@@ -130,12 +132,17 @@ services:
           target: /usr/src/statisticservice
           ignore:
             - node_modules
+    depends_on:
+      - mongodb
     ports:
       - "8005:8005"
     networks:
       - mynetwork
+    volumes:
+      - ./models:/usr/src/models
     environment:
       MONGODB_URI: mongodb://mongodb:27017/userdb
+      NODE_PATH: /usr/src/models/node_modules
 
   gatewayservice:
     container_name: gatewayservice-wichat_en1b

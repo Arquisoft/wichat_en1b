@@ -1,12 +1,32 @@
 const mongoose = require('mongoose');
 
-const statisticsSchema = new mongoose.Schema({
+const userSchema = new mongoose.Schema({
     username: {
       type: String,
       required: true,
       unique: true,
     },
+    email: {
+      type: String,
+      // required: true,
+    },
+    passwordHash: {
+      type: String,
+      required: true,
+    },
+    registrationDate: {
+      type: Date,
+      default: Date.now,
+    },
     gamesPlayed: {
+      type: Number,
+      default: 0,
+      validate: {
+        validator: Number.isInteger,
+        message: '{VALUE} is not an integer value',
+      }
+    },
+    questionsAnswered: {
       type: Number,
       default: 0,
       validate: {
@@ -32,6 +52,6 @@ const statisticsSchema = new mongoose.Schema({
     }
 });
 
-const User = mongoose.model('User', statisticsSchema);
+const User = mongoose.model('User', userSchema);
 
-module.exports = User
+module.exports = { mongoose, User };
