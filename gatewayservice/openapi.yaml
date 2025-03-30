@@ -9,6 +9,56 @@ servers:
   - url: http://SOMEIP:8000
     description: Production server
 paths:
+  /login:
+    post:
+      summary: Log in to the system.
+      operationId: login
+      requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              username:
+                type: string
+                description: User ID.
+                example: student
+              password:
+                type: string
+                description: User password.
+                example: pass
+      responses:
+        '200':
+          description: User logged in successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                    description: User token.
+                    example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NWY3NTZkYjNmYTIyZDIyN2E0YjdjN2QiLCJpYXQiOjE3MTA3MDg3NDUsImV4cCI6MTcxMDcxMjM0NX0.VMG_5DOyQ4GYlJQRcu1I6ICG1IGzuo2Xuei093ONHxw
+                  username:
+                    type: string
+                    description: User ID.
+                    example: student
+                  createdAt:
+                    type: Date
+                    description: The date the user was created.
+                    example: 2025-03-30T14:20:56.789Z                                 
+        '400':
+          description: Invalid request parameters.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: object
+                    description: Error information.
+        ''
   /adduser:
     post:
       summary: Add a new user to the database.
