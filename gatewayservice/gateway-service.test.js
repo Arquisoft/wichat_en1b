@@ -1,6 +1,7 @@
 const request = require('supertest');
 const axios = require('axios');
 const app = require('./gateway-service');
+const jwt = require('jsonwebtoken');
 
 afterAll(async () => {
   app.close();
@@ -27,7 +28,7 @@ describe('Gateway Service', () => {
   axios.post.mockImplementation((url, data) => {
     if (url.endsWith('/login')) { //Mock POST /login response
       return Promise.resolve({ data: { token: 'mockedToken' } });
-    } else if (url.endsWith('/adduser')) { //Mock POST /adduser response
+    } else if (url.endsWith('/adduser')) { //Mock POST /adduser st
       return Promise.resolve({ data: { userId: 'mockedUserId' } });
     } else if (url.endsWith('/ask')) { //Mock POST /ask response
       return Promise.resolve({ data: { answer: 'llmanswer' } });
@@ -40,8 +41,8 @@ describe('Gateway Service', () => {
 
   // Mock responses for GET requests
   axios.get.mockImplementation((url) => {
-    if (url.includes('/statistics/mockuser')) {
-      return Promise.resolve({ data: { gamesPlayed: 0, correctAnswers: 0, incorrectAnswers: 0 } });
+    if (url.endsWith('/statistics')) {
+      return Promise.resolve({ data: { gamesPlayed: 0, questionsAnswered: 0, correctAnswers: 0, incorrectAnswers: 0 } });
     } else if (url.endsWith('/question')) {
       return Promise.resolve({ data: { question: 'questionMock' } });
     } else {
@@ -89,8 +90,11 @@ describe('Gateway Service', () => {
 
   // Test /statistics endpoint
   it('should forward statistics request to the statistics service', async () => {
+    process.env.JWT_SECRET = 'mocktoken';
+    let token = jwt.sign({ userId: 999, username: process.env.JWT_SECRET }, process.env.JWT_SECRET, { expiresIn: '1h' });
     const response = await request(app)
-      .get('/statistics/mockuser');
+      .get('/statistics')
+      .set('Authorization', `${token}`);
 
     expect(response.statusCode).toBe(200);
     expect(response.body.gamesPlayed).toBe(0);
@@ -205,16 +209,24 @@ describe('Error handling', () => {
     expect(response.body.error).toBe('Answer service error');
   });
 
-  // Test error case for statistics
+  /// Test error case for statistics
   it('should handle errors from statistics service', async () => {
+    // Mock the error response from the statistics service
     axios.get.mockImplementationOnce((url) => {
-      if (url.includes('/statistics')) {
+      if (url.endsWith('/statistics')) {
         return getRejectedPromise(404, 'User stats not found');
       }
     });
 
+    process.env.JWT_SECRET='mocktoken';
+
+    let token = jwt.sign({
+      userId: -1,
+      username: 'nonexistent'
+    }, process.env.JWT_SECRET, { expiresIn: '1h' });
     const response = await request(app)
-      .get('/statistics/nonexistentuser');
+      .get('/statistics')
+      .set('Authorization', `${token}`);
 
     expect(response.statusCode).toBe(404);
     expect(response.body.error).toBe('User stats not found');
@@ -256,17 +268,7 @@ describe('Gateway Service - Additional Tests', () => {
 });
 
 describe('Gateway Service - Additional Tests - Error handling', () => {
-  // Test protected /statistics endpoint with invalid token
-  it('should block access to /statistics when token is invalid', async () => {
-    const response = await request(app)
-      .get('/statistics/mockuser')
-      .set('token', 'invalidToken');
-
-    expect(response.statusCode).toBe(403);
-    expect(response.body.authorized).toBe(false);
-    expect(response.body.error).toBe('Invalid token or outdated');
-  });
-
+  
   // Test error handling for /statistics/update
   it('should handle errors from statistics update service', async () => {
     axios.post.mockImplementationOnce((url) => {

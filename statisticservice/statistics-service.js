@@ -1,63 +1,88 @@
 const express = require('express');
-const cors = require("cors"); // Import CORS
+const cors = require('cors');
+const jwt = require('jsonwebtoken');
 const mongoose = require('mongoose');
 const User = require('./statistics-model');
-
 const app = express();
 const port = 8005;
+require('dotenv').config();
+
+// Enable CORS for all routes
+app.use(cors({
+  origin: 'http://localhost:3000',  // Allow requests from the frontend
+  methods: ['GET', 'POST'],
+  credentials: true                 // Allow cookies and credentials
+}));
 
 // Middleware to parse JSON in request body
 app.use(express.json());
 
-// Configure CORS to allow requests from the frontend application
-const corsOptions = {
-  origin: 'http://localhost:3000',
-  credentials: true, // Allow credentials (cookies) to be sent
-  optionsSuccessStatus: 200,
+// Connect to MongoDB only if not already connected
+if (mongoose.connection.readyState === 0) {
+  const mongoUri = process.env.MONGODB_URI || 'mongodb://localhost:27017/userdb';
+  mongoose.connect(mongoUri)
+  .then(() => console.log('Connected to MongoDB'))
+  .catch(err => console.error('MongoDB connection error:', err));
+}
+
+// Middleware to verify JWT token and attach the user to the request
+const authMiddleware = (req, res, next) => {
+    const authHeader = req.headers['authorization'];
+    if (!authHeader) return res.status(401).json({ error: 'Authorization header missing' });
+
+    const token = authHeader.split(' ')[1];
+    if (!token) return res.status(401).json({ error: 'Token missing' });
+
+    jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
+        if (err) return res.status(403).json({ error: 'Invalid or expired token' });
+        req.user = user; // Attach the verified user to the request
+        next();
+    });
 };
-app.use(cors(corsOptions));
-
-// Connect to MongoDB
-const mongoUri = process.env.MONGODB_URI || 'mongodb://localhost:27017/userdb';
-mongoose.connect(mongoUri, { useNewUrlParser: true, useUnifiedTopology: true });
-
 
 // GET endpoint to retrieve user statistics
-app.post('/statistics', async (req, res) => {
+app.get('/statistics', authMiddleware, async (req, res) => {
   try {
-    const userId = req.body.user.id;   // Get the user ID from the token
-    const user = await User.findById(userId);
+      const user = await User.findOne({ username: req.user.username });
+      if (!user) return res.status(404).json({ error: 'User not found' });
 
-    if (user) {
       res.json({
-        gamesPlayed: user.gamesPlayed,
-        correctAnswers: user.correctAnswers,
-        incorrectAnswers: user.incorrectAnswers,
+          gamesPlayed: user.gamesPlayed,
+          questionsAnswered: user.questionsAnswered,
+          correctAnswers: user.correctAnswers,
+          incorrectAnswers: user.incorrectAnswers
       });
-    } else {
-      res.status(404).json({ error: 'User not found' });
-    }
   } catch (error) {
-    res.status(500).json({ error: 'Internal Server Error' });
+      res.status(500).json({ error: 'Internal Server Error' });
   }
 });
 
-// POST endpoint to update user statistics when a game is played
-app.post('/statistics/update', async (req, res) => {
+// POST endpoint to update user statistics
+app.post('/statistics/update', authMiddleware, async (req, res) => {
   try {
-    const { gamesPlayed, correctAnswers, incorrectAnswers } = req.body;
-    const userId = req.user.id; // Get the user ID from the token
-    const user = await User.findById(userId);
+    const { gamesPlayed, questionsAnswered, correctAnswers, incorrectAnswers } = req.body;
+
+    if (
+      (gamesPlayed !== undefined && isNaN(gamesPlayed)) ||
+      (questionsAnswered !== undefined && isNaN(questionsAnswered)) ||
+      (correctAnswers !== undefined && isNaN(correctAnswers)) ||
+      (incorrectAnswers !== undefined && isNaN(incorrectAnswers))
+    ) {
+      return res.status(400).json({ error: 'Invalid input: All statistics must be numbers.' });
+    }
+
+    const user = await User.findOne({ username: req.user.username });
 
     if (user) {
-      if (gamesPlayed !== undefined) user.gamesPlayed += gamesPlayed;
-      if (correctAnswers !== undefined) user.correctAnswers += correctAnswers;
-      if (incorrectAnswers !== undefined) user.incorrectAnswers += incorrectAnswers;
-
+      if (gamesPlayed !== undefined) user.gamesPlayed += parseInt(gamesPlayed);
+      if (questionsAnswered !== undefined) user.questionsAnswered += parseInt(questionsAnswered);
+      if (correctAnswers !== undefined) user.correctAnswers += parseInt(correctAnswers);
+      if (incorrectAnswers !== undefined) user.incorrectAnswers += parseInt(incorrectAnswers);
       await user.save();
 
       res.json({
         gamesPlayed: user.gamesPlayed,
+        questionsAnswered: user.questionsAnswered,
         correctAnswers: user.correctAnswers,
         incorrectAnswers: user.incorrectAnswers,
       });
@@ -65,6 +90,7 @@ app.post('/statistics/update', async (req, res) => {
       res.status(404).json({ error: 'User not found' });
     }
   } catch (error) {
+    console.error("Error in /statistics/update:", error);
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
@@ -72,12 +98,6 @@ app.post('/statistics/update', async (req, res) => {
 // Start the Express.js server
 const server = app.listen(port, () => {
   console.log(`Statistics Service listening at http://localhost:${port}`);
-});
-
-// Listen for the 'close' event on the Express.js server
-server.on('close', () => {
-  // Close the Mongoose connection
-  mongoose.connection.close();
 });
 
 module.exports = server;

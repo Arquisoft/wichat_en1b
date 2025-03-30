@@ -1,9 +1,7 @@
 const request = require('supertest');
 const bcrypt = require('bcrypt');
 const { MongoMemoryServer } = require('mongodb-memory-server');
-
 const User = require('./user-model');
-
 
 let mongoServer;
 let app;
@@ -26,7 +24,9 @@ describe('User Service', () => {
       username: 'testuser',
       password: 'testpassword',
     };
+    process.env.JWT_SECRET = 'testsecret';
 
+    process.env.JWT_SECRET='mocksecret';
     const response = await request(app).post('/adduser').send(newUser);
     expect(response.status).toBe(200);
     expect(response.body).toHaveProperty('username', 'testuser');
