@@ -1,8 +1,7 @@
 const request = require('supertest');
 const { MongoMemoryServer } = require('mongodb-memory-server');
 const bcrypt = require('bcrypt');
-//const User = require('../../models/user-model');
-const { mongoose, User } = require('../../models/user-model');
+const User = require('./auth-model');
 
 require('dotenv').config();
 

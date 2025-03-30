@@ -1,9 +1,8 @@
 const express = require('express');
 const cors = require('cors');
 const jwt = require('jsonwebtoken');
-//const mongoose = require('../models/node_modules/mongoose');
-//const User = require('../models/user-model');
-const { mongoose, User } = require('../models/user-model');
+const mongoose = require('mongoose');
+const User = require('./statistics-model');
 const app = express();
 const port = 8005;
 require('dotenv').config();
@@ -21,7 +20,7 @@ app.use(express.json());
 // Connect to MongoDB only if not already connected
 if (mongoose.connection.readyState === 0) {
   const mongoUri = process.env.MONGODB_URI || 'mongodb://localhost:27017/userdb';
-  mongoose.connect(mongoUri, { useNewUrlParser: true, useUnifiedTopology: true }) 
+  mongoose.connect(mongoUri)
   .then(() => console.log('Connected to MongoDB'))
   .catch(err => console.error('MongoDB connection error:', err));
 }
@@ -62,26 +61,36 @@ app.get('/statistics', authMiddleware, async (req, res) => {
 app.post('/statistics/update', authMiddleware, async (req, res) => {
   try {
     const { gamesPlayed, questionsAnswered, correctAnswers, incorrectAnswers } = req.body;
+
+    if (
+      (gamesPlayed !== undefined && isNaN(gamesPlayed)) ||
+      (questionsAnswered !== undefined && isNaN(questionsAnswered)) ||
+      (correctAnswers !== undefined && isNaN(correctAnswers)) ||
+      (incorrectAnswers !== undefined && isNaN(incorrectAnswers))
+    ) {
+      return res.status(400).json({ error: 'Invalid input: All statistics must be numbers.' });
+    }
+
     const user = await User.findOne({ username: req.user.username });
 
     if (user) {
-        if (gamesPlayed !== undefined) user.gamesPlayed += parseInt(gamesPlayed);
-        if (questionsAnswered !== undefined) user.questionsAnswered += parseInt(questionsAnswered);
-        if (correctAnswers !== undefined) user.correctAnswers += parseInt(correctAnswers);
-        if (incorrectAnswers !== undefined) user.incorrectAnswers += parseInt(incorrectAnswers);
-        await user.save();
+      if (gamesPlayed !== undefined) user.gamesPlayed += parseInt(gamesPlayed);
+      if (questionsAnswered !== undefined) user.questionsAnswered += parseInt(questionsAnswered);
+      if (correctAnswers !== undefined) user.correctAnswers += parseInt(correctAnswers);
+      if (incorrectAnswers !== undefined) user.incorrectAnswers += parseInt(incorrectAnswers);
+      await user.save();
 
-        res.json({
-            gamesPlayed: user.gamesPlayed,
-            questionsAnswered: user.questionsAnswered,
-            correctAnswers: user.correctAnswers,
-            incorrectAnswers: user.incorrectAnswers,
-        });
+      res.json({
+        gamesPlayed: user.gamesPlayed,
+        questionsAnswered: user.questionsAnswered,
+        correctAnswers: user.correctAnswers,
+        incorrectAnswers: user.incorrectAnswers,
+      });
     } else {
-        res.status(404).json({ error: 'User not found' });
+      res.status(404).json({ error: 'User not found' });
     }
   } catch (error) {
-    console.error("Error in /statistics/update:", error); // Log the error
+    console.error("Error in /statistics/update:", error);
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });

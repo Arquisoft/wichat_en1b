@@ -138,11 +138,8 @@ services:
       - "8005:8005"
     networks:
       - mynetwork
-    volumes:
-      - ./models:/usr/src/models
     environment:
       MONGODB_URI: mongodb://mongodb:27017/userdb
-      NODE_PATH: /usr/src/models/node_modules
 
   gatewayservice:
     container_name: gatewayservice-wichat_en1b
