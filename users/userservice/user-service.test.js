@@ -13,20 +13,24 @@ beforeAll(async () => {
   app = require('./user-service'); 
 });
 
+beforeEach(async () => {
+  process.env.JWT_SECRET = '';
+});
+
 afterAll(async () => {
     app.close();
     await mongoServer.stop();
 });
 
 describe('User Service', () => {
-  it('should add a new user on POST /adduser', async () => {
-    const newUser = {
+  it('Should add a new user on POST /adduser with valid data', async () => {
+    let newUser = {
       username: 'testuser',
-      password: 'testpassword',
+      password: 'testpassword'
     };
+
     process.env.JWT_SECRET = 'testsecret';
 
-    process.env.JWT_SECRET='mocksecret';
     const response = await request(app).post('/adduser').send(newUser);
     expect(response.status).toBe(200);
     expect(response.body).toHaveProperty('username', 'testuser');
@@ -41,5 +45,29 @@ describe('User Service', () => {
     // Assert that the password is encrypted
     const isPasswordValid = await bcrypt.compare('testpassword', userInDb.passwordHash);
     expect(isPasswordValid).toBe(true);
+  });
+
+  it('Should throw a 400 status code if some field is missing', async () => {
+    let newUser = {
+      username: 'testuser',
+    };
+
+    process.env.JWT_SECRET = 'testsecret';
+
+    const response = await request(app).post('/adduser').send(newUser);
+    expect(response.status).toBe(400);
+    expect(response.body.errors).toHaveLength(1);
+    expect(response.body.errors[0]).toHaveProperty("msg", "The password is required");
+  });
+
+  it('Should throw a 500 status code if some internal error occurs (f.i. missing JWT_SECRET)', async () => {
+    const newUser = {
+      username: 'testuser',
+      password: 'testpassword'
+    };
+
+    const response = await request(app).post('/adduser').send(newUser);
+    expect(response.status).toBe(500);
+    expect(response.body).toHaveProperty("error", "secretOrPrivateKey must have a value");
   });
 });

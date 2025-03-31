@@ -101,17 +101,6 @@ app.post('/statistics', async (req, res) => {
   }
 });
 
-app.get('/question', async (req, res) => {
-  try{
-    console.log(questionServiceUrl+'/foods')
-    const questionResponse = await axios.get(questionServiceUrl+'/foods');
-    console.log(questionResponse);
-    res.json(questionResponse.data)
-  } catch (error) {
-    manageError(res, error);
-  }
-});
-
 // Read the OpenAPI YAML file synchronously
 openapiPath='./openapi.yaml'
 if (fs.existsSync(openapiPath)) {
@@ -142,8 +131,7 @@ function verifyToken(req, res, next) {
   jwt.verify(token, (process.env.JWT_SECRET), (err, decoded) => {
     if (err) {
       // Token is not valid
-      res.status(403).json({authorized: false,
-        error: 'Invalid token or outdated'});
+      res.status(403).json({authorized: false, error: 'Invalid token or outdated'});
     } else {
       // Token is valid
       req.decodedToken = decoded;
