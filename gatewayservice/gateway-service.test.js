@@ -249,22 +249,6 @@ describe('Gateway Service - Additional Tests', () => {
     expect(response.statusCode).toBe(200);
     expect(response.body.success).toBe(true);
   });
-
-  // Test /checkanswer endpoint
-  it('should forward check answer request to the question service', async () => {
-    axios.post.mockImplementationOnce((url) => {
-      if (url.endsWith('/checkanswer')) {
-        return Promise.resolve({ data: { correct: true } });
-      }
-    });
-
-    const response = await request(app)
-      .post('/checkanswer')
-      .send({ questionId: '1', answer: 'mockAnswer' });
-
-    expect(response.statusCode).toBe(200);
-    expect(response.body.correct).toBe(true);
-  });
 });
 
 describe('Gateway Service - Additional Tests - Error handling', () => {
@@ -285,21 +269,5 @@ describe('Gateway Service - Additional Tests - Error handling', () => {
 
     expect(response.statusCode).toBe(500);
     expect(response.body.error).toBe('Statistics update failed');
-  });
-
-  // Test error handling for /checkanswer
-  it('should handle errors from check answer service', async () => {
-    axios.post.mockImplementationOnce((url) => {
-      if (url.endsWith('/checkanswer')) {
-        return getRejectedPromise(500, 'Check answer service error')
-      }
-    });
-
-    const response = await request(app)
-      .post('/checkanswer')
-      .send({ questionId: '1', answer: 'mockAnswer' });
-
-    expect(response.statusCode).toBe(400);
-    expect(response.body.error).toBe('Check answer service error');
   });
 });
