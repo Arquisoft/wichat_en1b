@@ -6,7 +6,7 @@ info:
 servers:
   - url: http://localhost:8000
     description: Development server
-  - url: http://SOMEIP:8000
+  - url: http://98.66.177.253:8000
     description: Production server
 paths:
   /login:
@@ -378,7 +378,6 @@ paths:
                     type: string
                     description: The error message.
                     example: Internal Server Error
-  /statistics/update:
     post:
       summary: Updates the user in session's statistics.
       operationId: statisticsUpdate

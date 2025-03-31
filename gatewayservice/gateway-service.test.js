@@ -234,16 +234,16 @@ describe('Error handling', () => {
 });
 
 describe('Gateway Service - Additional Tests', () => {
-  // Test /statistics/update endpoint
+  // Test /statistics POST endpoint
   it('should forward statistics update request to the statistics service', async () => {
     axios.post.mockImplementationOnce((url) => {
-      if (url.endsWith('/statistics/update')) {
+      if (url.endsWith('/statistics')) {
         return Promise.resolve({ data: { success: true } });
       }
     });
 
     const response = await request(app)
-      .post('/statistics/update')
+      .post('/statistics')
       .send({ userId: 'mockuser', gamesPlayed: 1 });
 
     expect(response.statusCode).toBe(200);
@@ -253,10 +253,10 @@ describe('Gateway Service - Additional Tests', () => {
 
 describe('Gateway Service - Additional Tests - Error handling', () => {
   
-  // Test error handling for /statistics/update
+  // Test error handling for /statistics POST
   it('should handle errors from statistics update service', async () => {
     axios.post.mockImplementationOnce((url) => {
-      if (url.endsWith('/statistics/update')) {
+      if (url.endsWith('/statistics')) {
         return Promise.reject({
           response: { status: 500, data: { error: 'Statistics update failed' } },
         });
@@ -264,7 +264,7 @@ describe('Gateway Service - Additional Tests - Error handling', () => {
     });
 
     const response = await request(app)
-      .post('/statistics/update')
+      .post('/statistics')
       .send({ userId: 'mockuser', gamesPlayed: 1 });
 
     expect(response.statusCode).toBe(500);

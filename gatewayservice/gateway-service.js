@@ -91,10 +91,10 @@ app.get('/statistics', verifyToken ,async (req, res) => {
   }
 });
 
-app.post('/statistics/update', async (req, res) => {
+app.post('/statistics', async (req, res) => {
   try {
     // Forward the add user request to the statistics service
-    const statisticsResponse = await axios.post(statisticsServiceUrl+'/statistics/update', req.body);
+    const statisticsResponse = await axios.post(statisticsServiceUrl+'/statistics', req.body);
     res.json(statisticsResponse.data);
   } catch (error) {
     manageError(res, error);
