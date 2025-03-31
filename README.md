@@ -43,7 +43,7 @@ We need to create an `.env` file in the root folder of the project. It should co
 # Your LLM API key
 LLM_API_KEY=YOUR-API-KEY
 
-# JWT secret to sign tokens, locally it can be totally random
+# JWT secret to sign tokens, locally it can be random
 JWT_SECRET=YOUR-JWT-SECRET
 ```
 #### ⚠️ IMPORTANT
