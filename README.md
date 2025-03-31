@@ -39,7 +39,7 @@ First, clone the project:
 In order to perform some operations on this project, such as comunicating with the LLM and signing tokens, we need to set up some secrets that are crucial for the application to work. In this project we use the LLM of [Empathy](https://ai-challange-2025.webflow.io/) for the game questions and [JWT](https://en.wikipedia.org/wiki/JSON_Web_Token) to sign tokens.
 
 We need to create an `.env` file in the root folder of the project. It should contain the following fields so the project can work locally:
-```properties
+```ini
 # Your LLM API key
 LLM_API_KEY=YOUR-API-KEY
 
@@ -59,11 +59,11 @@ You can optionally include the `--watch` tag so the application starts with the 
 ```docker compose --profile dev up --build --watch```
 
 If you want that the Front-end also **hot reloads** as you save your changes, you should modify the `dockerfile` of the `webapp` module. The last command should be:
-```docker
+```dockerfile
 CMD ["npm", "start"]
 ````
 instead of
-```docker
+```dockerfile
 CMD ["npm", "run", "prod"]
 ````
 
@@ -95,7 +95,7 @@ The machine for deployment can be created in services like Microsoft Azure or Am
 
 Once you have the virtual machine created, you can install **docker** using the following instructions:
 
-```ssh
+```bash
 sudo apt update
 sudo apt install apt-transport-https ca-certificates curl software-properties-common
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
