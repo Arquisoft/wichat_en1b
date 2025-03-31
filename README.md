@@ -55,7 +55,7 @@ An extra configuration, so everything works in the deployed version of the app, 
 For launching the application using docker compose, just type:
 ```docker compose --profile dev up --build```
 
-You can optionally include the `--watch` tag so the application starts with the [`watch`](https://docs.docker.com/compose/how-tos/file-watch/) functionality and **hot reloads** as you save your changes: 
+You can optionally include the `--watch` tag so the application starts with the [watch](https://docs.docker.com/compose/how-tos/file-watch/) functionality and **hot reloads** as you save your changes: 
 ```docker compose --profile dev up --build --watch```
 
 If you want that the Front-end also **hot reloads** as you save your changes, you should modify the `dockerfile` of the `webapp` module. The last command should be:
