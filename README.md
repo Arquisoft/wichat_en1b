@@ -13,18 +13,20 @@ This is a base project for the Software Architecture course in 2024/2025. It is 
 
 - **User service**. Express service that handles the insertion of new users in the system.
 - **Auth service**. Express service that handles the authentication of users.
-- **LLM service**. Express service that handles the communication with the LLM.
-- **Gateway service**. Express service that is exposed to the public and serves as a proxy to the two previous ones.
-- **Webapp**. React web application that uses the gateway service to allow basic login and new user features.
+- **LLM service**. Express service that handles the communication with the LLM, to ask questions about the game.
+- **Question service**. Express service that handles the questions that are presented in the game.
+- **Statistics service**. Express service that handles the statistics of the users.
+- **Gateway service**. Express service that is exposed to the public and serves as a proxy to the previous ones.
+- **Webapp**. React web application that uses the gateway service to manage the different application characteristics.
 
-Both the user and auth service share a Mongo database that is accessed with mongoose.
+The **user**, **auth** and **statistics** services share a Mongo database that is accessed with mongoose.
 
 ## Team members
-- **Br1NKOL** Alberto Cuervo Arias, [UO289088@uniovi.es](mailto:uo289088@uniovi.es)
-- **Rolitoansu** Raúl Antuña Suárez, [UO294202@uniovi.es](mailto:uo294202@uniovi.es)
-- **UO288583** Fernando Sutil Fernández, [UO288583@uniovi.es](mailto:uo288583@uniovi.es)
-- **orvizz** Mario Orviz Viesca, [UO295180@uniovi.es](mailto:UO295180@uniovi.es)
-- **saulmf** Saúl Martín Fernández, [UO294936@uniovi.es](mailto:UO294936@uniovi.es)
+- **Br1NKOL** — Alberto Cuervo Arias, [UO289088@uniovi.es](mailto:uo289088@uniovi.es)
+- **Rolitoansu** — Raúl Antuña Suárez, [UO294202@uniovi.es](mailto:uo294202@uniovi.es)
+- **UO288583** — Fernando Sutil Fernández, [UO288583@uniovi.es](mailto:uo288583@uniovi.es)
+- **orvizz** — Mario Orviz Viesca, [UO295180@uniovi.es](mailto:UO295180@uniovi.es)
+- **saulmf** — Saúl Martín Fernández, [UO294936@uniovi.es](mailto:UO294936@uniovi.es)
 
 ## Quick start guide
 
@@ -32,27 +34,41 @@ First, clone the project:
 
 ```git clone git@github.com:arquisoft/wichat_en1b.git```
 
-### LLM API key configuration
+### Secrets configuration
 
-In order to communicate with the LLM integrated in this project, we need to setup an API key. Two integrations are available in this propotipe: gemini and empaphy. The API key provided must match the LLM provider used.
+In order to perform some operations on this project, such as comunicating with the LLM and signing tokens, we need to set up some secrets that are crucial for the application to work. In this project we use the LLM of [Empathy](https://ai-challange-2025.webflow.io/) for the game questions and [JWT](https://en.wikipedia.org/wiki/JSON_Web_Token) to sign tokens.
 
-We need to create two .env files. 
-- The first one in the llmservice directory (for executing the llmservice using ```npm start```). The content of this .env file should be as follows:
-```
-LLM_API_KEY="YOUR-API-KEY"
-```
-- The second one located in the root of the project (along the docker-compose.yml). This .env file is used for the docker-compose when launching the app with docker. The content of this .env file should be as follows:
-```
-LLM_API_KEY="YOUR-API-KEY"
-```
+We need to create an `.env` file in the root folder of the project. It should contain the following fields so the project can work locally:
+```properties
+# Your LLM API key
+LLM_API_KEY=YOUR-API-KEY
 
-Note that these files must NOT be uploaded to the github repository (they are excluded in the .gitignore).
+# JWT secret to sign tokens, locally it can be totally random
+JWT_SECRET=YOUR-JWT-SECRET
+```
+#### ⚠️ IMPORTANT
+Note that this file must **NOT** be uploaded to the github repository (it is excluded in the `.gitignore`).
 
-An extra configuration for the LLM to work in the deployed version of the app is to create the same .env file (with the LLM_API_KEY variable) in the virtual machine (in the home of the azureuser directory).
+An extra configuration, so everything works in the deployed version of the app, is to create the same `.env` file (with the `LLM_API_KEY` and `JWT_SECRET` variables) in the virtual machine (in the home of the azureuser directory).
 
 ### Launching Using docker
-For launching the propotipe using docker compose, just type:
+For launching the application using docker compose, just type:
 ```docker compose --profile dev up --build```
+
+You can optionally include the `--watch` tag so the application starts with the [`watch`](https://docs.docker.com/compose/how-tos/file-watch/) functionality and **hot reloads** as you save your changes: 
+```docker compose --profile dev up --build --watch```
+
+If you want that the Front-end also **hot reloads** as you save your changes, you should modify the `dockerfile` of the `webapp` module. The last command should be:
+```docker
+CMD ["npm", "start"]
+````
+instead of
+```docker
+CMD ["npm", "run", "prod"]
+````
+
+#### ⚠️ IMPORTANT
+If you modify the `dockerfile`, please ensure that **it is not included by any means in your changes**. You could avoid this by including it in the `.gitignore` file.
 
 ### Component by component start
 First, start the database. Either install and run Mongo or run it using docker:
@@ -65,7 +81,7 @@ Now launch the auth, user and gateway services. Just go to each directory and ru
 
 Lastly, go to the webapp directory and launch this component with `npm install` followed by `npm start`.
 
-After all the components are launched, the app should be available in localhost in port 3000.
+After all the components are launched, the app should be available in **localhost** in port **3000**.
 
 ## Deployment
 For the deployment, we have several options. The first and more flexible is to deploy to a virtual machine using SSH. This will work with any cloud service (or with our own server). Other options include using the container services that all the cloud services provide. This means, deploying our Docker containers directly. Here I am going to use the first approach. I am going to create a virtual machine in a cloud service and after installing docker and docker-compose, deploy our containers there using GitHub Actions and SSH.
@@ -92,7 +108,7 @@ sudo usermod -aG docker ${USER}
 ### Continuous delivery (GitHub Actions)
 Once we have our machine ready, we could deploy by hand the application, taking our docker-compose file and executing it in the remote machine. In this repository, this process is done automatically using **GitHub Actions**. The idea is to trigger a series of actions when some condition is met in the repository. The precondition to trigger a deployment is going to be: "create a new release". The actions to execute are the following:
 
-![imagen](https://github.com/user-attachments/assets/7ead6571-0f11-4070-8fe8-1bbc2e327ad2)
+![GitHub workflow image](https://github.com/user-attachments/assets/dde1b14f-7bc1-4036-b253-4cc86ce32701)
 
 
 As you can see, unitary tests of each module and e2e tests are executed before pushing the docker images and deploying them. Using this approach we avoid deploying versions that do not pass the tests.
@@ -101,20 +117,20 @@ The deploy action is the following:
 
 ```yml
 deploy:
-    name: Deploy over SSH
-    runs-on: ubuntu-latest
-    needs: [docker-push-userservice,docker-push-authservice,docker-push-llmservice,docker-push-gatewayservice,docker-push-webapp]
-    steps:
-    - name: Deploy over SSH
-      uses: fifsky/ssh-action@master
-      with:
-        host: ${{ secrets.DEPLOY_HOST }}
-        user: ${{ secrets.DEPLOY_USER }}
-        key: ${{ secrets.DEPLOY_KEY }}
-        command: |
-          wget https://raw.githubusercontent.com/arquisoft/wichat_en1b/master/docker-compose.yml -O docker-compose.yml
-          docker compose --profile prod down
-          docker compose --profile prod up -d --pull always
+  name: Deploy over SSH
+  runs-on: ubuntu-latest
+  needs: [docker-push-userservice,docker-push-authservice,docker-push-llmservice,docker-push-statisticservice,docker-push-questionservice,docker-push-gatewayservice,docker-push-webapp]
+  steps:
+  - name: Deploy over SSH
+    uses: fifsky/ssh-action@master
+    with:
+      host: ${{ secrets.DEPLOY_HOST }}
+      user: ${{ secrets.DEPLOY_USER }}
+      key: ${{ secrets.DEPLOY_KEY }}
+      command: |
+        wget https://raw.githubusercontent.com/arquisoft/wichat_en1b/master/docker-compose.yml -O docker-compose.yml
+        docker compose --profile prod down
+        docker compose --profile prod up -d --pull always
 ```
 
 This action uses three secrets that must be configured in the repository:
