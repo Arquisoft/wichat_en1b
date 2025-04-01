@@ -58,7 +58,7 @@ app.get('/statistics', authMiddleware, async (req, res) => {
 });
 
 // POST endpoint to update user statistics
-app.post('/statistics/update', authMiddleware, async (req, res) => {
+app.post('/statistics', authMiddleware, async (req, res) => {
   try {
     const { gamesPlayed, questionsAnswered, correctAnswers, incorrectAnswers } = req.body;
 
@@ -90,7 +90,7 @@ app.post('/statistics/update', authMiddleware, async (req, res) => {
       res.status(404).json({ error: 'User not found' });
     }
   } catch (error) {
-    console.error("Error in /statistics/update:", error);
+    console.error("Error in /statistics POST:", error);
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });

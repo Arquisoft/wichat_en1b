@@ -35,7 +35,7 @@ describe('LLM Service', () => {
         .send({ userQuestion: "Which is this flag's main color?" });
 
         expect(response.statusCode).toBe(400);
-        expect(response.body.errors[0].msg).toBe('Question is required');
+        expect(response.body.errors[0].msg).toBe('The game question is required');
     });
 
     it('An invalid LLM POST request, userQuestion is missing', async () => {
@@ -53,7 +53,7 @@ describe('LLM Service', () => {
         .post('/ask')
         .send({ gameQuestion: 'Which of the following flags belongs to Switzerland?', userQuestion: "Which is this flag's main color?" });
 
-        expect(response.statusCode).toBe(400);
+        expect(response.statusCode).toBe(500);
         expect(response.body.error).toBe('API key is missing.');
     });
 });

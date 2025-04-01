@@ -44,7 +44,7 @@ app.post('/adduser', async (req, res) => {
       
         res.json({ token: token, username: newUser.username, createdAt: newUser.registrationDate });
       } catch (error) {
-        res.status(400).json({ error: error.message }); 
+        res.status(500).json({ error: error.message }); 
     }});
 
 // Start the server

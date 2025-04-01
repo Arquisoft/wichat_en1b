@@ -234,45 +234,29 @@ describe('Error handling', () => {
 });
 
 describe('Gateway Service - Additional Tests', () => {
-  // Test /statistics/update endpoint
+  // Test /statistics POST endpoint
   it('should forward statistics update request to the statistics service', async () => {
     axios.post.mockImplementationOnce((url) => {
-      if (url.endsWith('/statistics/update')) {
+      if (url.endsWith('/statistics')) {
         return Promise.resolve({ data: { success: true } });
       }
     });
 
     const response = await request(app)
-      .post('/statistics/update')
+      .post('/statistics')
       .send({ userId: 'mockuser', gamesPlayed: 1 });
 
     expect(response.statusCode).toBe(200);
     expect(response.body.success).toBe(true);
   });
-
-  // Test /checkanswer endpoint
-  it('should forward check answer request to the question service', async () => {
-    axios.post.mockImplementationOnce((url) => {
-      if (url.endsWith('/checkanswer')) {
-        return Promise.resolve({ data: { correct: true } });
-      }
-    });
-
-    const response = await request(app)
-      .post('/checkanswer')
-      .send({ questionId: '1', answer: 'mockAnswer' });
-
-    expect(response.statusCode).toBe(200);
-    expect(response.body.correct).toBe(true);
-  });
 });
 
 describe('Gateway Service - Additional Tests - Error handling', () => {
   
-  // Test error handling for /statistics/update
+  // Test error handling for /statistics POST
   it('should handle errors from statistics update service', async () => {
     axios.post.mockImplementationOnce((url) => {
-      if (url.endsWith('/statistics/update')) {
+      if (url.endsWith('/statistics')) {
         return Promise.reject({
           response: { status: 500, data: { error: 'Statistics update failed' } },
         });
@@ -280,26 +264,10 @@ describe('Gateway Service - Additional Tests - Error handling', () => {
     });
 
     const response = await request(app)
-      .post('/statistics/update')
+      .post('/statistics')
       .send({ userId: 'mockuser', gamesPlayed: 1 });
 
     expect(response.statusCode).toBe(500);
     expect(response.body.error).toBe('Statistics update failed');
-  });
-
-  // Test error handling for /checkanswer
-  it('should handle errors from check answer service', async () => {
-    axios.post.mockImplementationOnce((url) => {
-      if (url.endsWith('/checkanswer')) {
-        return getRejectedPromise(500, 'Check answer service error')
-      }
-    });
-
-    const response = await request(app)
-      .post('/checkanswer')
-      .send({ questionId: '1', answer: 'mockAnswer' });
-
-    expect(response.statusCode).toBe(400);
-    expect(response.body.error).toBe('Check answer service error');
   });
 });

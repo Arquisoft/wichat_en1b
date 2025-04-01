@@ -37,7 +37,7 @@ app.post('/login', async (req, res) => {
     const authResponse = await axios.post(authServiceUrl+'/login', req.body);
     res.json(authResponse.data);
   } catch (error) {
-    res.status(error.response.status).json({ error: error.response.data.error });
+    manageError(res, error);
   }
 });
 
@@ -47,7 +47,7 @@ app.post('/adduser', async (req, res) => {
     const userResponse = await axios.post(userServiceUrl+'/adduser', req.body);
     res.json(userResponse.data);
   } catch (error) {
-    res.status(error.response.status).json({ error: error.response.data.error });
+    manageError(res, error);
   }
 });
 
@@ -57,17 +57,7 @@ app.post('/askllm', async (req, res) => {
     const llmResponse = await axios.post(llmServiceUrl+'/ask', req.body);
     res.json(llmResponse.data);
   } catch (error) {
-    res.status(error.response.status).json({ error: error.response.data.error });
-  }
-});
-
-app.post('/answer', async (req, res) => {
-  try {
-    //Forward the answer for validation to the question service
-    const answerResponse = await axios.post(`${questionServiceUrl}/answer`, req.body);
-    res.json(answerResponse.data);
-  } catch (error) {
-    res.status(error.response?.status || 500).json({ error: error.response?.data?.error });
+    manageError(res, error);
   }
 });
 
@@ -77,7 +67,7 @@ app.get('/question', async (req, res) => {
     const questionResponse = await axios.get(`${questionServiceUrl}/question`);
     res.json(questionResponse.data);
   } catch (error) {
-    res.status(error.response?.status || 500).json({ error: error.response?.data?.error });
+    manageError(res, error);
   }
 });
 
@@ -87,7 +77,7 @@ app.post('/answer', async (req, res) => {
     const answerResponse = await axios.post(`${questionServiceUrl}/answer`, req.body);
     res.json(answerResponse.data);
   } catch (error) {
-    res.status(error.response?.status || 500).json({ error: error.response?.data?.error });
+    manageError(res, error);
   }
 });
 
@@ -101,13 +91,13 @@ app.get('/statistics', verifyToken ,async (req, res) => {
   }
 });
 
-app.post('/statistics/update', async (req, res) => {
+app.post('/statistics', async (req, res) => {
   try {
     // Forward the add user request to the statistics service
-    const statisticsResponse = await axios.post(statisticsServiceUrl+'/statistics/update', req.body);
+    const statisticsResponse = await axios.post(statisticsServiceUrl+'/statistics', req.body);
     res.json(statisticsResponse.data);
   } catch (error) {
-    res.status(error.response?.status || 500).json({ error: error.response?.data?.error });
+    manageError(res, error);
   }
 });
 
@@ -118,18 +108,9 @@ app.get('/question', async (req, res) => {
     console.log(questionResponse);
     res.json(questionResponse.data)
   } catch (error) {
-    res.status(400).json({ error: error.response });
+    manageError(res, error);
   }
-})
-
-app.post('/checkanswer', async (req, res) => {
-  try{
-    const checkAnswerResponse = await axios.post(questionServiceUrl+'/checkanswer', req.body);
-    res.json(checkAnswerResponse.data);
-  } catch (error) {
-    res.status(400).json({ error: error.response.data.error });
-  }
-})
+});
 
 // Read the OpenAPI YAML file synchronously
 openapiPath='./openapi.yaml'
@@ -172,9 +153,9 @@ function verifyToken(req, res, next) {
   });
 }
 
-function manageError(res, error){
-  if(error.response) //Some microservice responded with an error
-    res.status(error.response.status).json({ error: error.response.data.error });
+function manageError(res, error) {
+  if (error.response) //Some microservice responded with an error
+    res.status(error.response.status).json(error.response.data);
   else //Some other error
     res.status(500).json({error : "Internal server error"})
 }
