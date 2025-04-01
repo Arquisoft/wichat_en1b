@@ -33,7 +33,7 @@ app.post('/adduser', async (req, res) => {
         // Check if a user with the same username already exists
         const existingUser = await User.findOne({ username: req.body.username });
         if (existingUser) {
-            throw new Error('The username provided is already in use. Please choose another one.');
+            throw new Error('The username provided is already in use. Please choose a different one.');
         }
 
         // Encrypt the password before saving it
@@ -46,7 +46,15 @@ app.post('/adduser', async (req, res) => {
 
         await newUser.save();
 
-        const token = jwt.sign({ userId: newUser._id }, (process.env.JWT_SECRET), { expiresIn: '1h' });
+        // Generate a JWT token
+        const token = jwt.sign(
+          {
+            userId: newUser._id,
+            username: newUser.username
+          },
+          process.env.JWT_SECRET,
+          { expiresIn: '1h' }
+        );
       
         res.json({ token: token, username: newUser.username, createdAt: newUser.registrationDate });
       } catch (error) {
