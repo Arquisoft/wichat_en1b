@@ -25,13 +25,23 @@ function validateRequiredFields(req, requiredFields) {
     }
 }
 
+function validateUsername(username) {
+  // Example: Allow only letters, numbers, and underscores, and ensure a minimum/maximum length
+  const usernameRegex = /^[a-zA-Z0-9_]{3,20}$/;
+  if (!usernameRegex.test(username)) {
+      throw new Error('Invalid username. It must be 3-20 characters long and contain only letters, numbers, and underscores.');
+  }
+  return username;
+}
+
 app.post('/adduser', async (req, res) => {
     try {
         // Check if required fields are present in the request body
         validateRequiredFields(req, ['username', 'password']);
 
         // Check if a user with the same username already exists
-        const existingUser = await User.findOne({ username: req.body.username });
+        const validatedUsername = validateUsername(req.body.username);  // Validate to prevent NoSQL injection
+        const existingUser = await User.findOne({ username: validatedUsername});
         if (existingUser) {
             throw new Error('The username provided is already in use. Please choose a different one.');
         }
