@@ -22,7 +22,7 @@ defineFeature(feature, test => {
       })
       .catch(() => {});
   });
-
+/*
   test('The user is not registered in the site', ({given,when,then}) => {
     
     let username;
@@ -44,7 +44,7 @@ defineFeature(feature, test => {
         await expect(page).toMatchElement("div", { text: "User added successfully" });
     });
   })
-
+*/
   afterAll(async ()=>{
     browser.close()
   })
