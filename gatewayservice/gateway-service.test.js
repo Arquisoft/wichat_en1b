@@ -42,12 +42,27 @@ describe('Gateway Service', () => {
   // Mock responses for GET requests
   axios.get.mockImplementation((url) => {
     if (url.endsWith('/statistics')) {
-      return Promise.resolve({ data: { gamesPlayed: 0, questionsAnswered: 0, correctAnswers: 0, incorrectAnswers: 0 } });
+      return Promise.resolve({ data: { gamesPlayed: 0, 
+                                       questionsAnswered: 0, 
+                                       correctAnswers: 0, 
+                                       incorrectAnswers: 0 
+                                     }
+                            });
+
     } else if (url.endsWith('/question')) {
-      return Promise.resolve({ data: { question: 'questionMock' } });
-    } else {
-      return Promise.reject(new Error(`Unhandled GET request to ${url}`));
+      return Promise.resolve({ data: { id: "mpzulblyui9du98pmodg5o", 
+                                       question: "Which of the following flags belongs to Nepal?",
+                                       images: [
+                                         "http://commons.wikimedia.org/wiki/Special:FilePath/Flag%20of%20Nepal.svg",
+                                         "http://commons.wikimedia.org/wiki/Special:FilePath/Flag%20of%20Myanmar.svg",
+                                         "http://commons.wikimedia.org/wiki/Special:FilePath/Flag%20of%20Costa%20Rica.svg",
+                                         "http://commons.wikimedia.org/wiki/Special:FilePath/Flag%20of%20Yemen.svg"
+                                       ] 
+                                     } 
+                            });
     }
+    
+      throw new Error(`Unhandled GET request to ${url}`);
   });
 
 
@@ -102,12 +117,26 @@ describe('Gateway Service', () => {
     expect(response.body.incorrectAnswers).toBe(0);
   }, 15000);
 
+  // Test /statistics endpoint, bad token
+  it('should retrieve a 403 error with an invalid token in statistics endpoint', async () => {
+    const response = await request(app)
+      .get('/statistics');
+
+      expect(response.statusCode).toBe(403);
+      expect(response.body.authorized).toBe(false);
+      expect(response.body.error).toBe('Invalid token or outdated');
+  });
+
   // Test /question endpoint
   it('should retrieve a question from the question service', async () => {
     const response = await request(app)
       .get('/question');
+
+    console.log(response.body);
     expect(response.statusCode).toBe(200);
-    expect(response.body.question).toBe('questionMock');
+    expect(response.body.id).toBe('mpzulblyui9du98pmodg5o');
+    expect(response.body.question).toBe('Which of the following flags belongs to Nepal?');
+    expect(response.body.images).toHaveLength(4);
   });
 
   // Test /answer endpoint
@@ -254,20 +283,13 @@ describe('Gateway Service - Additional Tests', () => {
 describe('Gateway Service - Additional Tests - Error handling', () => {
   
   // Test error handling for /statistics POST
-  it('should handle errors from statistics update service', async () => {
-    axios.post.mockImplementationOnce((url) => {
-      if (url.endsWith('/statistics')) {
-        return Promise.reject({
-          response: { status: 500, data: { error: 'Statistics update failed' } },
-        });
-      }
-    });
+  it('should handle errors from statistics POST service', async () => {
 
     const response = await request(app)
       .post('/statistics')
       .send({ userId: 'mockuser', gamesPlayed: 1 });
 
     expect(response.statusCode).toBe(500);
-    expect(response.body.error).toBe('Statistics update failed');
+    expect(response.body.error).toBe('Internal server error');
   });
 });

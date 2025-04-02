@@ -42,56 +42,47 @@ const authMiddleware = (req, res, next) => {
 
 // GET endpoint to retrieve user statistics
 app.get('/statistics', authMiddleware, async (req, res) => {
-  try {
-      const user = await User.findOne({ username: req.user.username });
-      if (!user) return res.status(404).json({ error: 'User not found' });
+    const user = await User.findOne({ username: req.user.username });
+    if (!user) return res.status(404).json({ error: 'User not found' });
 
-      res.json({
-          gamesPlayed: user.gamesPlayed,
-          questionsAnswered: user.questionsAnswered,
-          correctAnswers: user.correctAnswers,
-          incorrectAnswers: user.incorrectAnswers
-      });
-  } catch (error) {
-      res.status(500).json({ error: 'Internal Server Error' });
-  }
+    res.json({
+        gamesPlayed: user.gamesPlayed,
+        questionsAnswered: user.questionsAnswered,
+        correctAnswers: user.correctAnswers,
+        incorrectAnswers: user.incorrectAnswers
+    });
 });
 
 // POST endpoint to update user statistics
 app.post('/statistics', authMiddleware, async (req, res) => {
-  try {
-    const { gamesPlayed, questionsAnswered, correctAnswers, incorrectAnswers } = req.body;
+  const { gamesPlayed, questionsAnswered, correctAnswers, incorrectAnswers } = req.body;
 
-    if (
-      (gamesPlayed !== undefined && isNaN(gamesPlayed)) ||
-      (questionsAnswered !== undefined && isNaN(questionsAnswered)) ||
-      (correctAnswers !== undefined && isNaN(correctAnswers)) ||
-      (incorrectAnswers !== undefined && isNaN(incorrectAnswers))
-    ) {
-      return res.status(400).json({ error: 'Invalid input: All statistics must be numbers.' });
-    }
+  if (
+    (gamesPlayed !== undefined && isNaN(gamesPlayed)) ||
+    (questionsAnswered !== undefined && isNaN(questionsAnswered)) ||
+    (correctAnswers !== undefined && isNaN(correctAnswers)) ||
+    (incorrectAnswers !== undefined && isNaN(incorrectAnswers))
+  ) {
+    return res.status(400).json({ error: 'Invalid input: All statistics must be numbers.' });
+  }
 
-    const user = await User.findOne({ username: req.user.username });
+  const user = await User.findOne({ username: req.user.username });
 
-    if (user) {
-      if (gamesPlayed !== undefined) user.gamesPlayed += parseInt(gamesPlayed);
-      if (questionsAnswered !== undefined) user.questionsAnswered += parseInt(questionsAnswered);
-      if (correctAnswers !== undefined) user.correctAnswers += parseInt(correctAnswers);
-      if (incorrectAnswers !== undefined) user.incorrectAnswers += parseInt(incorrectAnswers);
-      await user.save();
+  if (user) {
+    if (gamesPlayed !== undefined) user.gamesPlayed += parseInt(gamesPlayed);
+    if (questionsAnswered !== undefined) user.questionsAnswered += parseInt(questionsAnswered);
+    if (correctAnswers !== undefined) user.correctAnswers += parseInt(correctAnswers);
+    if (incorrectAnswers !== undefined) user.incorrectAnswers += parseInt(incorrectAnswers);
+    await user.save();
 
-      res.json({
-        gamesPlayed: user.gamesPlayed,
-        questionsAnswered: user.questionsAnswered,
-        correctAnswers: user.correctAnswers,
-        incorrectAnswers: user.incorrectAnswers,
-      });
-    } else {
-      res.status(404).json({ error: 'User not found' });
-    }
-  } catch (error) {
-    console.error("Error in /statistics POST:", error);
-    res.status(500).json({ error: 'Internal Server Error' });
+    res.json({
+      gamesPlayed: user.gamesPlayed,
+      questionsAnswered: user.questionsAnswered,
+      correctAnswers: user.correctAnswers,
+      incorrectAnswers: user.incorrectAnswers,
+    });
+  } else {
+    res.status(404).json({ error: 'User not found' });
   }
 });
 

@@ -83,13 +83,6 @@ describe('Statistics Service', () => {
     });
   });
 
-  it('Should return a 401 error for a request without a token', async () => {
-    const response = await request(app).get('/statistics');
-    
-    expect(response.status).toBe(401);
-    expect(response.body.error).toBe('Authorization header missing');
-  });
-
   it('Should update statistics for authenticated user', async () => {
     const updateData = {
       gamesPlayed: 1,
@@ -125,22 +118,6 @@ describe('Statistics Service', () => {
     });
   });
 
-  it('Should return a 404 error when updating statistics for a non-existent user', async () => {
-    const fakeToken = generateToken('nonexistent');
-
-    const updateData = {
-      gamesPlayed: 1,
-    };
-
-    const response = await request(app)
-      .post('/statistics')
-      .set('Authorization', `Bearer ${fakeToken}`)
-      .send(updateData);
-
-    expect(response.status).toBe(404);
-    expect(response.body.error).toBe('User not found');
-  });
-
   it('Should handle partial updates', async () => {
     const updateData = { gamesPlayed: 2 };
 
@@ -168,5 +145,28 @@ describe('Statistics Service', () => {
   
     expect(response.status).toBe(400);
     expect(response.body.error).toBe('Invalid input: All statistics must be numbers.');
+  });
+  
+  it('Should return a 401 error for a request without a token', async () => {
+    const response = await request(app).get('/statistics');
+    
+    expect(response.status).toBe(401);
+    expect(response.body.error).toBe('Authorization header missing');
+  });
+  
+  it('Should return a 404 error when updating statistics for a non-existent user', async () => {
+    const fakeToken = generateToken('nonexistent');
+
+    const updateData = {
+      gamesPlayed: 1,
+    };
+
+    const response = await request(app)
+      .post('/statistics')
+      .set('Authorization', `Bearer ${fakeToken}`)
+      .send(updateData);
+
+    expect(response.status).toBe(404);
+    expect(response.body.error).toBe('User not found');
   });
 });

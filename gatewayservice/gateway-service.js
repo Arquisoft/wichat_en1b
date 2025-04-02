@@ -101,33 +101,17 @@ app.post('/statistics', async (req, res) => {
   }
 });
 
-app.get('/question', async (req, res) => {
-  try{
-    console.log(questionServiceUrl+'/foods')
-    const questionResponse = await axios.get(questionServiceUrl+'/foods');
-    console.log(questionResponse);
-    res.json(questionResponse.data)
-  } catch (error) {
-    manageError(res, error);
-  }
-});
-
 // Read the OpenAPI YAML file synchronously
 openapiPath='./openapi.yaml'
-if (fs.existsSync(openapiPath)) {
-  const file = fs.readFileSync(openapiPath, 'utf8');
+const file = fs.readFileSync(openapiPath, 'utf8');
 
-  // Parse the YAML content into a JavaScript object representing the Swagger document
-  const swaggerDocument = YAML.parse(file);
+// Parse the YAML content into a JavaScript object representing the Swagger document
+const swaggerDocument = YAML.parse(file);
 
-  // Serve the Swagger UI documentation at the '/api-doc' endpoint
-  // This middleware serves the Swagger UI files and sets up the Swagger UI page
-  // It takes the parsed Swagger document as input
-  app.use('/api-doc', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
-} else {
-  console.log("Not configuring OpenAPI. Configuration file not present.")
-}
-
+// Serve the Swagger UI documentation at the '/api-doc' endpoint
+// This middleware serves the Swagger UI files and sets up the Swagger UI page
+// It takes the parsed Swagger document as input
+app.use('/api-doc', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 // Start the gateway service
 const server = app.listen(port, () => {
@@ -142,8 +126,7 @@ function verifyToken(req, res, next) {
   jwt.verify(token, (process.env.JWT_SECRET), (err, decoded) => {
     if (err) {
       // Token is not valid
-      res.status(403).json({authorized: false,
-        error: 'Invalid token or outdated'});
+      res.status(403).json({authorized: false, error: 'Invalid token or outdated'});
     } else {
       // Token is valid
       req.decodedToken = decoded;

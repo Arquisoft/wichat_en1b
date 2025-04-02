@@ -4,7 +4,7 @@ const mongoose = require('mongoose');
 const User = require('./auth-model');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const { check, matchedData, validationResult } = require('express-validator');
+const { check, validationResult } = require('express-validator');
 const app = express();
 const port = 8002; 
 
@@ -17,29 +17,18 @@ app.use(express.json());
 const mongoUri = process.env.MONGODB_URI || 'mongodb://localhost:27017/userdb';
 mongoose.connect(mongoUri);
 
-// Function to validate required fields in the request body
-function validateRequiredFields(req, requiredFields) {
-    for (const field of requiredFields) {
-      if (!(field in req.body)) {
-        throw new Error(`Missing required field: ${field}`);
-      }
-    }
-}
-
 // Route for user login
 app.post('/login',  [
-  check('username').isLength({ min: 3 }).trim().escape(),
-  check('password').isLength({ min: 3 }).trim().escape()
+  check('username').notEmpty().withMessage('The username required'),
+  check('password').notEmpty().withMessage('The password is required')
 ],async (req, res) => {
   try {
-    // Check if required fields are present in the request body
-  
-  validateRequiredFields(req, ['username', 'password']);
-  
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors['errors'] });
-  }
+    const errors = validationResult(req);
+    
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors['errors'] });
+    }
+
     let username =req.body.username.toString();
     let password =req.body.password.toString();
 
@@ -65,7 +54,7 @@ app.post('/login',  [
       res.status(401).json({ error: 'Invalid credentials' });
     }
   } catch (error) {
-    res.status(500).json({ error: 'Internal Server Error' });
+    res.status(500).json({ error: error.message });
   }
 });
 

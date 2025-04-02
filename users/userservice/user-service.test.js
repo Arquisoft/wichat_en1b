@@ -14,6 +14,10 @@ beforeAll(async () => {
   app = require('./user-service'); 
 });
 
+beforeEach(async () => {
+  process.env.JWT_SECRET = '';
+});
+
 afterAll(async () => {
     app.close();
     await mongoServer.stop();
