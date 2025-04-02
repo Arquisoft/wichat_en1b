@@ -134,7 +134,7 @@ app.post('/statistics', async (req, res) => {
 });
 
 // Read the OpenAPI YAML file synchronously
-openapiPath='./openapi.yaml'
+openapiPath= __dirname + '/openapi.yaml'
 const file = fs.readFileSync(openapiPath, 'utf8');
 
 // Parse the YAML content into a JavaScript object representing the Swagger document

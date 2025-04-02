@@ -7,9 +7,9 @@ const app = express();
 const port = 8005;
 require('dotenv').config();
 
+
 // Enable CORS
 app.use(cors());
-
 app.use(express.json());
 
 // Middleware to extract user from header
