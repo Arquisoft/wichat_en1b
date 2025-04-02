@@ -33,7 +33,7 @@ const Logo = () => {
                     fontWeight: "bold",
                     fontFamily: "Inter, sans-serif",
                     letterSpacing: 1,
-                    fontSize: { xs: "12vw", sm: "11vw", md: "11vw", lg: "10vw" },
+                    fontSize: { xs: "10vw", sm: "9vw", md: "8.5vw", lg: "8vw" },
                     textAlign: "center",
                 }}
             >
