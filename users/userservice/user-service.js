@@ -26,12 +26,16 @@ function validateRequiredFields(req, requiredFields) {
 }
 
 function validateUsername(username) {
-  // Example: Allow only letters, numbers, and underscores, and ensure a minimum/maximum length
+  // Convert to string first
+  const usernameStr = String(username);
+  
+  // Allow only letters, numbers, and underscores, and ensure length between 3 and 20 characters
   const usernameRegex = /^[a-zA-Z0-9_]{3,20}$/;
-  if (!usernameRegex.test(username)) {
+  if (!usernameRegex.test(usernameStr)) {
     throw new Error('Invalid username. It must be 3-20 characters long and contain only letters, numbers and underscores.');
   }
-  return username;
+  // Return the sanitized string
+  return usernameStr;
 }
 
 app.post('/adduser', async (req, res) => {
