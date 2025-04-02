@@ -17,38 +17,6 @@ const userSchema = new mongoose.Schema({
     registrationDate: {
       type: Date,
       default: Date.now,
-    },
-    gamesPlayed: {
-      type: Number,
-      default: 0,
-      validate: {
-        validator: Number.isInteger,
-        message: '{VALUE} is not an integer value',
-      }
-    },
-    questionsAnswered: {
-      type: Number,
-      default: 0,
-      validate: {
-        validator: Number.isInteger,
-        message: '{VALUE} is not an integer value',
-      }
-    },
-    correctAnswers: {
-      type: Number,
-      default: 0,
-      validate: {
-        validator: Number.isInteger,
-        message: '{VALUE} is not an integer value',
-      }
-    },
-    incorrectAnswers: {
-      type: Number,
-      default: 0,
-      validate: {
-        validator: Number.isInteger,
-        message: '{VALUE} is not an integer value',
-      }
     }
 });
 
