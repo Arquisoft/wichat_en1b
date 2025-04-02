@@ -2,10 +2,47 @@ import { useEffect, useState } from "react";
 import Cookies from "js-cookie";
 import axios from 'axios';
 import { Typewriter } from "react-simple-typewriter";
-import { Container, Grid, Card, CardContent, Typography } from "@mui/material";
+import { Container, Grid, Card, CardContent, Typography, Box } from "@mui/material";
 import { Link } from "react-router-dom";
 import { User, BarChart, Gamepad2, Layers } from "lucide-react";
+import { keyframes } from "@mui/system";
+import "@fontsource/inter";
 
+
+const floatAnimation = keyframes`
+  0% { transform: translateY(0); }
+  50% { transform: translateY(6px); }
+  100% { transform: translateY(0); }
+`;
+
+const Logo = () => {
+    return (
+        <Box
+            sx={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                my: 4,
+                animation: `${floatAnimation} 3s ease-in-out infinite`,
+            }}
+        >
+            <Typography
+                variant="h2"
+                component="div"
+                sx={{
+                    fontWeight: "bold",
+                    fontFamily: "Inter, sans-serif",
+                    letterSpacing: 1,
+                    fontSize: { xs: "10vw", sm: "9vw", md: "8.5vw", lg: "8vw" },
+                    textAlign: "center",
+                }}
+            >
+                <span style={{ color: "black" }}>wichat</span>
+                <span style={{ color: "#1976D2" }}>_en1b</span>
+            </Typography>
+        </Box>
+    );
+};
 
 export const Home = () => {
     const [message, setMessage] = useState('');
@@ -23,7 +60,7 @@ export const Home = () => {
     const apiEndpoint = process.env.REACT_APP_API_ENDPOINT || 'http://localhost:8000';
 
     const getGreetingMessage = async () => {
-        
+
         try {
             const model = "empathy";
             let question = "";
@@ -48,6 +85,7 @@ export const Home = () => {
 
     return (
         <Container maxWidth="sm" style={{ marginTop: "20px" }}>
+            {!isUserLogged && <Logo />}
             <div>
                 {message ? (
                     <Typewriter

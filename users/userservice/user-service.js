@@ -17,31 +17,65 @@ app.use(express.json());
 const mongoUri = process.env.MONGODB_URI || 'mongodb://localhost:27017/userdb';
 mongoose.connect(mongoUri);
 
-app.post('/adduser', [
-    check('username').notEmpty().withMessage('The username required'),
-    check('password').notEmpty().withMessage('The password is required')
-  ], async (req, res) => {
-    try {
-        const errors = validationResult(req);
-          
-        if (!errors.isEmpty()) {
-          return res.status(400).json({ errors: errors['errors'] });
-        }
-        // Encrypt the password before saving it
-        const hashedPassword = await bcrypt.hash(req.body.password, 10);
+// Function to validate required fields in the request body
+function validateRequiredFields(req, requiredFields) {
+  for (const field of requiredFields) {
+    if (!(field in req.body)) {
+      throw new Error(`Missing required field: ${field}`);
+    }
+  }
+}
 
-        const newUser = new User({
-            username: req.body.username,
-            passwordHash: hashedPassword,
-        });
+function validateUsername(username) {
+  // Convert to string first
+  const usernameStr = String(username);
+  
+  // Allow only letters, numbers, and underscores, and ensure length between 3 and 20 characters
+  const usernameRegex = /^[a-zA-Z0-9_]{3,20}$/;
+  if (!usernameRegex.test(usernameStr)) {
+    throw new Error('Invalid username. It must be 3-20 characters long and contain only letters, numbers and underscores.');
+  }
+  // Return the sanitized string
+  return usernameStr;
+}
 
-        const token = jwt.sign({ userId: newUser._id }, (process.env.JWT_SECRET), { expiresIn: '1h' });
-        await newUser.save();
-      
-        res.json({ token: token, username: newUser.username, createdAt: newUser.registrationDate });
-      } catch (error) {
-        res.status(500).json({ error: error.message }); 
-    }});
+app.post('/adduser', async (req, res) => {
+  try {
+    // Check if required fields are present in the request body
+    validateRequiredFields(req, ['username', 'password']);
+
+    // Check if a user with the same username already exists
+    const validatedUsername = validateUsername(req.body.username);  // Validate to prevent NoSQL injection
+    const existingUser = await User.findOne({ username: { $eq: validatedUsername }});
+    if (existingUser) {
+      throw new Error('The username provided is already in use. Please choose a different one.');
+    }
+
+    // Encrypt the password before saving it
+    const hashedPassword = await bcrypt.hash(req.body.password, 10);
+
+    const newUser = new User({
+      username: validatedUsername,
+      passwordHash: hashedPassword,
+    });
+
+    await newUser.save();
+
+    // Generate a JWT token
+    const token = jwt.sign(
+      {
+        userId: newUser._id,
+        username: newUser.username
+      },
+      process.env.JWT_SECRET,
+      { expiresIn: '1h' }
+    );
+
+    res.json({ token: token, username: newUser.username, createdAt: newUser.registrationDate });
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+});
 
 // Start the server
 const server = app.listen(port, () => {

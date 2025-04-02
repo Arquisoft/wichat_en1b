@@ -2,6 +2,7 @@ const request = require('supertest');
 const bcrypt = require('bcrypt');
 const { MongoMemoryServer } = require('mongodb-memory-server');
 const User = require('./user-model');
+const jwt = require('jsonwebtoken');
 
 let mongoServer;
 let app;
@@ -22,52 +23,112 @@ afterAll(async () => {
     await mongoServer.stop();
 });
 
-describe('User Service', () => {
-  it('Should add a new user on POST /adduser with valid data', async () => {
-    let newUser = {
-      username: 'testuser',
+describe('User Service Validation', () => {
+  it('should reject requests with missing username', async () => {
+    const incompleteUser = {
       password: 'testpassword'
     };
-
-    process.env.JWT_SECRET = 'testsecret';
-
-    const response = await request(app).post('/adduser').send(newUser);
-    expect(response.status).toBe(200);
-    expect(response.body).toHaveProperty('username', 'testuser');
-
-    // Check if the user is inserted into the database
-    const userInDb = await User.findOne({ username: 'testuser' });
-
-    // Assert that the user exists in the database
-    expect(userInDb).not.toBeNull();
-    expect(userInDb.username).toBe('testuser');
-
-    // Assert that the password is encrypted
-    const isPasswordValid = await bcrypt.compare('testpassword', userInDb.passwordHash);
-    expect(isPasswordValid).toBe(true);
-  });
-
-  it('Should throw a 400 status code if some field is missing', async () => {
-    let newUser = {
-      username: 'testuser',
-    };
-
-    process.env.JWT_SECRET = 'testsecret';
-
-    const response = await request(app).post('/adduser').send(newUser);
+    
+    const response = await request(app).post('/adduser').send(incompleteUser);
+    
     expect(response.status).toBe(400);
-    expect(response.body.errors).toHaveLength(1);
-    expect(response.body.errors[0]).toHaveProperty("msg", "The password is required");
+    expect(response.body.error).toContain('Missing required field: username');
   });
-
-  it('Should throw a 500 status code if some internal error occurs (f.i. missing JWT_SECRET)', async () => {
-    const newUser = {
-      username: 'testuser',
+  
+  it('should reject requests with missing password', async () => {
+    const incompleteUser = {
+      username: 'testuser2'
+    };
+    
+    const response = await request(app).post('/adduser').send(incompleteUser);
+    
+    expect(response.status).toBe(400);
+    expect(response.body.error).toContain('Missing required field: password');
+  });
+  
+  it('should reject usernames that are too short', async () => {
+    const invalidUser = {
+      username: 'ab',
       password: 'testpassword'
     };
+    
+    const response = await request(app).post('/adduser').send(invalidUser);
+    
+    expect(response.status).toBe(400);
+    expect(response.body.error).toContain('Invalid username');
+  });
+  
+  it('should reject usernames with invalid characters', async () => {
+    const invalidUser = {
+      username: 'test-user!',
+      password: 'testpassword'
+    };
+    
+    const response = await request(app).post('/adduser').send(invalidUser);
+    
+    expect(response.status).toBe(400);
+    expect(response.body.error).toContain('Invalid username');
+  });
+  
+  it('should reject duplicate usernames', async () => {
+    // Create a user
+    await request(app).post('/adduser').send({
+      username: 'duplicateuser',
+      password: 'testpassword'
+    });
+    
+    // Try to create the same user again
+    const response = await request(app).post('/adduser').send({
+      username: 'duplicateuser',
+      password: 'anotherpassword'
+    });
+    
+    expect(response.status).toBe(400);
+    expect(response.body.error).toContain('already in use');
+  });
+  
+  it('should validate and sanitize username for NoSQL injection attempts', async () => {
+    const suspiciousUser = {
+      username: { $ne: null }, // NoSQL injection attempt
+      password: 'testpassword'
+    };
+    
+    const response = await request(app).post('/adduser').send(suspiciousUser);
+    
+    expect(response.status).toBe(400);
+  });
+  
+  it('should return a valid JWT token for successful registration', async () => {
+    process.env.JWT_SECRET = 'testsecret';
 
+    const newUser = {
+      username: 'tokenuser',
+      password: 'testpassword'
+    };
+    
     const response = await request(app).post('/adduser').send(newUser);
-    expect(response.status).toBe(500);
-    expect(response.body).toHaveProperty("error", "secretOrPrivateKey must have a value");
+    
+    expect(response.status).toBe(200);
+    expect(response.body).toHaveProperty('token');
+    
+    // Verify token structure if you have jwt.verify available in tests
+    const decoded = jwt.verify(response.body.token, process.env.JWT_SECRET);
+    expect(decoded).toHaveProperty('username', 'tokenuser');
+    expect(decoded).toHaveProperty('userId');
+  });
+  
+  it('should set registration date when creating a new user', async () => {
+    process.env.JWT_SECRET = 'testsecret';
+
+    const newUser = {
+      username: 'dateuser',
+      password: 'testpassword'
+    };
+    
+    const response = await request(app).post('/adduser').send(newUser);
+    const userInDb = await User.findOne({ username: 'dateuser' });
+    
+    expect(userInDb.registrationDate).toBeInstanceOf(Date);
+    expect(response.body).toHaveProperty('createdAt');
   });
 });
