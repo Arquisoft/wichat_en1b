@@ -283,6 +283,7 @@ export function Chat() {
                         type="submit"
                         variant="contained"
                         color="primary"
+                        name="send"
                         disabled={isLoading || !input.trim()}
                         sx={{ minWidth: "unset", width: 40, height: 40, padding: 0 }}
                     >

@@ -14,11 +14,7 @@ describe("Question Component", () => {
         Cookies.get.mockReturnValue("testUser");
         axios.get.mockResolvedValue({ data: { question: "New Question", images: ["Image1.jpg", "Image2.jpg"] } });
         });
-        it('should work', () => {
-            expect(true).toBe(true);
-        });
         
-        /*
     test("renders the timer correctly", () => {
         render(
             <GameProvider>
@@ -52,5 +48,4 @@ describe("Question Component", () => {
         expect(screen.getByText("00:55")).toBeInTheDocument();
         jest.useRealTimers();
     });
-    */
 });

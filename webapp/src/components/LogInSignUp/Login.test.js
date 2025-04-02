@@ -17,11 +17,6 @@ jest.mock('js-cookie', () => ({ set: jest.fn() }));
 // TODO: Fix tests
 describe('Login Component', () => {
   
-  it('should work', () => {
-    expect(true).toBe(true);
-  });
-  
-  /*
   beforeEach(() => {
     render(
       <BrowserRouter>
@@ -70,6 +65,5 @@ describe('Login Component', () => {
     fireEvent.click(loginButton);
     await waitFor(() => expect(screen.getByText(/Invalid credentials/i)).toBeInTheDocument());
   });
-  */
-
+  
 });
