@@ -92,6 +92,8 @@ services:
     container_name: questionservice-wichat_en1b
     image: ghcr.io/arquisoft/wichat_en1b/questionservice:latest
     profiles: ["dev", "prod"]
+    env_file:
+      - .env
     build: ./questionservice
     develop:
       watch:
@@ -145,6 +147,8 @@ services:
     container_name: gatewayservice-wichat_en1b
     image: ghcr.io/arquisoft/wichat_en1b/gatewayservice:latest
     profiles: ["dev", "prod"]
+    env_file:
+      - .env
     build: ./gatewayservice
     develop:
       watch:
@@ -179,6 +183,8 @@ services:
     container_name: webapp-wichat_en1b
     image: ghcr.io/arquisoft/wichat_en1b/webapp:latest
     profiles: ["dev", "prod"]
+    env_file:
+      - .env
     build: ./webapp
     develop:
       watch:
@@ -200,6 +206,8 @@ services:
     image: prom/prometheus
     container_name: prometheus-wichat_en1b
     profiles: ["dev"]
+    env_file:
+      - .env
     networks:
       - mynetwork
     volumes:
@@ -214,6 +222,8 @@ services:
     image: grafana/grafana
     container_name: grafana-wichat_en1b
     profiles: ["dev"]
+    env_file:
+      - .env
     networks:
       - mynetwork
     volumes:
@@ -228,7 +238,6 @@ services:
       - "9091:9091"
     depends_on: 
       - prometheus
-
 
 volumes:
   mongodb_data:
