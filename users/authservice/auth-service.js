@@ -38,7 +38,7 @@ app.post('/login',  [
   
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    return res.status(400).json({ error: errors.array().toString()});
+    return res.status(400).json({ errors: errors['errors'] });
   }
     let username =req.body.username.toString();
     let password =req.body.password.toString();

@@ -99,7 +99,7 @@ describe('Statistics Service', () => {
     };
 
     const response = await request(app)
-      .post('/statistics/update')
+      .post('/statistics')
       .set('Authorization', `Bearer ${token}`)
       .send(updateData);
 
@@ -133,7 +133,7 @@ describe('Statistics Service', () => {
     };
 
     const response = await request(app)
-      .post('/statistics/update')
+      .post('/statistics')
       .set('Authorization', `Bearer ${fakeToken}`)
       .send(updateData);
 
@@ -145,7 +145,7 @@ describe('Statistics Service', () => {
     const updateData = { gamesPlayed: 2 };
 
     const response = await request(app)
-      .post('/statistics/update')
+      .post('/statistics')
       .set('Authorization', `Bearer ${token}`)
       .send(updateData);
 
@@ -162,7 +162,7 @@ describe('Statistics Service', () => {
     const updateData = { gamesPlayed: "invalid" };
   
     const response = await request(app)
-      .post('/statistics/update')
+      .post('/statistics')
       .set('Authorization', `Bearer ${token}`)
       .send(updateData);
   

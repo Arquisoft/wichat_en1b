@@ -103,7 +103,7 @@ export const Question = () => {
 
         try { 
 
-            let response = await axios.post(`${gatewayEndpoint}/checkanswer`, { questionID: question.id, answer: answer });
+            let response = await axios.post(`${gatewayEndpoint}/answer`, { questionId: question.id, answer: answer });
 
             const userCookie = Cookies.get('user');         // Retrieve the 'user' cookie
             if (!userCookie) throw new Error("Authentication token is missing.");
@@ -114,7 +114,7 @@ export const Question = () => {
             if (response.data.correct) {
 
                 await axios.post(
-                    `${statisticsEndpoint}/statistics/update`,
+                    `${statisticsEndpoint}/statistics`,
                     { questionsAnswered: 1, correctAnswers: 1, incorrectAnswers: 0 },
                     {
                         headers: {
@@ -134,7 +134,7 @@ export const Question = () => {
             } else {
 
                 await axios.post(
-                    `${statisticsEndpoint}/statistics/update`,
+                    `${statisticsEndpoint}/statistics`,
                     { questionsAnswered: 1, correctAnswers: 0, incorrectAnswers: 1 },
                     {
                         headers: {

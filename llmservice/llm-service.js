@@ -15,7 +15,7 @@ require('dotenv').config();
 const llmConfig = {
   url: 'https://empathyai.prod.empathy.co/v1/chat/completions',
   transformRequest: (gameQuestion, userQuestion) => ({
-    model: "mistralai/Mistral-7B-Instruct-v0.3",
+    model: "qwen/Qwen2.5-Coder-7B-Instruct",
     messages: [
       { role: "system", content: `You are an AI designed to provide hints about a hidden answer.\
                                   \
@@ -63,29 +63,24 @@ async function sendQuestionToLLM(gameQuestion, userQuestion, apiKey) {
 }
 
 app.post('/ask', [
-  body('gameQuestion').notEmpty().withMessage('Question is required'),
+  body('gameQuestion').notEmpty().withMessage('The game question is required'),
   body('userQuestion').notEmpty().withMessage('The user question is required'),
 ], async (req, res) => {
-  try {
-    // Check validation results
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
-    }
-
-    let { gameQuestion, userQuestion } = req.body;
-    //load the api key from an environment variable
-    let apiKey = process.env.LLM_API_KEY;
-    if (!apiKey) {
-      return res.status(400).json({ error: 'API key is missing.' });
-    }
-
-    let answer = await sendQuestionToLLM(gameQuestion, userQuestion, apiKey);
-    res.json({ answer });
-
-  } catch (error) {
-    res.status(400).json({ error: error.message });
+  // Check validation results
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors['errors'] });
   }
+
+  let { gameQuestion, userQuestion } = req.body;
+  //load the api key from an environment variable
+  let apiKey = process.env.LLM_API_KEY;
+  if (!apiKey) {
+    return res.status(500).json({ error: 'API key is missing.' });
+  }
+
+  let answer = await sendQuestionToLLM(gameQuestion, userQuestion, apiKey);
+  res.json({ answer });
 });
 
 const server = app.listen(port, () => {
