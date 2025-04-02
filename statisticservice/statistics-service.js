@@ -7,15 +7,25 @@ const app = express();
 const port = 8005;
 require('dotenv').config();
 
-// Enable CORS for all routes
-app.use(cors({
-  origin: 'http://localhost:3000',  // Allow requests from the frontend
-  methods: ['GET', 'POST'],
-  credentials: true                 // Allow cookies and credentials
-}));
+// Enable CORS
+app.use(cors());
 
-// Middleware to parse JSON in request body
 app.use(express.json());
+
+// Middleware to extract user from header
+const extractUserMiddleware = (req, res, next) => {
+  const userInfo = req.headers['user-info'];
+  if (!userInfo) {
+    return res.status(401).json({ error: 'User information missing' });
+  }
+  
+  try {
+    req.user = JSON.parse(userInfo);
+    next();
+  } catch (error) {
+    return res.status(400).json({ error: 'Invalid user information format' });
+  }
+};
 
 // Connect to MongoDB only if not already connected
 if (mongoose.connection.readyState === 0) {
@@ -25,23 +35,8 @@ if (mongoose.connection.readyState === 0) {
   .catch(err => console.error('MongoDB connection error:', err));
 }
 
-// Middleware to verify JWT token and attach the user to the request
-const authMiddleware = (req, res, next) => {
-    const authHeader = req.headers['authorization'];
-    if (!authHeader) return res.status(401).json({ error: 'Authorization header missing' });
-
-    const token = authHeader.split(' ')[1];
-    if (!token) return res.status(401).json({ error: 'Token missing' });
-
-    jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
-        if (err) return res.status(403).json({ error: 'Invalid or expired token' });
-        req.user = user; // Attach the verified user to the request
-        next();
-    });
-};
-
 // GET endpoint to retrieve user statistics
-app.get('/statistics', authMiddleware, async (req, res) => {
+app.get('/statistics', extractUserMiddleware, async (req, res) => {
     const user = await User.findOne({ username: req.user.username });
     if (!user) return res.status(404).json({ error: 'User not found' });
 
@@ -55,7 +50,7 @@ app.get('/statistics', authMiddleware, async (req, res) => {
 });
 
 // POST endpoint to update user statistics
-app.post('/statistics', authMiddleware, async (req, res) => {
+app.post('/statistics', async (req, res) => {
   const { gamesPlayed, questionsAnswered, correctAnswers, incorrectAnswers } = req.body;
 
   if (

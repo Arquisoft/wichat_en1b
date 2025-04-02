@@ -30,7 +30,6 @@ export const Question = () => {
     const userCookie = Cookies.get('user');
     const isUserLogged = !!userCookie;
     const gatewayEndpoint = process.env.GATEWAY_SERVICE_URL || 'http://localhost:8000';
-    const statisticsEndpoint = 'http://localhost:8005';
 
     useEffect(() => {
         const fetchData = async () => {
@@ -68,6 +67,26 @@ export const Question = () => {
         try {
             let questionResponse = await axios.get(`${gatewayEndpoint}/question`)
             setQuestion(questionResponse.data);
+
+            // Update gamesPlayed when a new question is fetched for a new game session
+            const userCookie = Cookies.get('user');
+            if (userCookie) {
+                const token = JSON.parse(userCookie)?.token;
+                if (token) {
+                    await axios.post(
+                        `${gatewayEndpoint}/statistics`,
+                        { gamesPlayed: 1 },
+                        {
+                            headers: {
+                                'Authorization': `Bearer ${token}`
+                            }
+                        }
+                    ).catch((error) => {
+                        console.error("Error updating gamesPlayed:", error.response?.data || error.message);
+                    });
+                }
+            }
+
         } catch (error) {
             console.error("Error fetching question: ", error)
         }
@@ -114,7 +133,7 @@ export const Question = () => {
             if (response.data.correct) {
 
                 await axios.post(
-                    `${statisticsEndpoint}/statistics`,
+                    `${gatewayEndpoint}/statistics`,
                     { questionsAnswered: 1, correctAnswers: 1, incorrectAnswers: 0 },
                     {
                         headers: {
@@ -134,7 +153,7 @@ export const Question = () => {
             } else {
 
                 await axios.post(
-                    `${statisticsEndpoint}/statistics`,
+                    `${gatewayEndpoint}/statistics`,
                     { questionsAnswered: 1, correctAnswers: 0, incorrectAnswers: 1 },
                     {
                         headers: {

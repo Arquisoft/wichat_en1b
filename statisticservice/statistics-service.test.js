@@ -10,7 +10,7 @@ let token;
 
 const testUser = {
   username: 'testuser',
-  passwordHash: 'hashedpassword', // Required by your model
+  passwordHash: 'hashedpassword',
 };
 
 function generateToken(username) {
@@ -80,6 +80,7 @@ describe('Statistics Service', () => {
       questionsAnswered: 0,
       correctAnswers: 0,
       incorrectAnswers: 0,
+      registrationDate: expect.any(String)
     });
   });
 
@@ -115,6 +116,7 @@ describe('Statistics Service', () => {
       questionsAnswered: 5,
       correctAnswers: 3,
       incorrectAnswers: 2,
+      registrationDate: expect.any(String)
     });
   });
 

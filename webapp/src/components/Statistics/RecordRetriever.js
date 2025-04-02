@@ -2,12 +2,11 @@ import axios from "axios";
 import Cookies from "js-cookie";
 
 class RecordRetriever {
-    constructor() {
-        // Set the API URL for the statistics endpoint (process.env.REACT_APP_API_ENDPOINT || 'http://localhost:8005') + "/statistics"
-        this.apiUrl = 'http://localhost:8005/statistics';
+    constructor() {     
+        this.apiUrl = 'http://localhost:8000';  //  process.env.GATEWAY_SERVICE_URL || 'http://localhost:8000'
     }
 
-   /**
+    /**
      * Fetch user statistics from the backend.
      * @returns {Promise<Object>} - The user statistics data.
      * @throws {Error} - Throws an error if the request fails.
@@ -20,8 +19,8 @@ class RecordRetriever {
             const token = JSON.parse(userCookie)?.token;    // Parse the token from the cookie
             if (!token) throw new Error("Cannot parse authentication token.");
             
-            // Make a GET request to the statistics endpoint with the authorization token
-            const response = await axios.get(this.apiUrl, {
+            // Make a GET request to the gateway with the authorization token
+            const response = await axios.get(this.apiUrl + "/statistics", {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }
