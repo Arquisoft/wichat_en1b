@@ -9,7 +9,7 @@ require('dotenv').config();
 
 // Enable CORS for all routes
 app.use(cors({
-  origin: 'http://localhost:3000',  // Allow requests from the frontend
+  origin: process.env.WEBAPP_URL || 'http://localhost:3000',  // Allow requests from the frontend
   methods: ['GET', 'POST'],
   credentials: true                 // Allow cookies and credentials
 }));
