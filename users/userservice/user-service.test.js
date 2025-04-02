@@ -95,6 +95,8 @@ describe('User Service Validation', () => {
   });
   
   it('should return a valid JWT token for successful registration', async () => {
+    process.env.JWT_SECRET = 'testsecret';
+
     const newUser = {
       username: 'tokenuser',
       password: 'testpassword'
@@ -112,6 +114,8 @@ describe('User Service Validation', () => {
   });
   
   it('should set registration date when creating a new user', async () => {
+    process.env.JWT_SECRET = 'testsecret';
+
     const newUser = {
       username: 'dateuser',
       password: 'testpassword'
