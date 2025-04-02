@@ -49,7 +49,8 @@ app.get('/statistics', authMiddleware, async (req, res) => {
         gamesPlayed: user.gamesPlayed,
         questionsAnswered: user.questionsAnswered,
         correctAnswers: user.correctAnswers,
-        incorrectAnswers: user.incorrectAnswers
+        incorrectAnswers: user.incorrectAnswers,
+        registrationDate: user.registrationDate,
     });
 });
 
