@@ -242,19 +242,19 @@ export const Statistics = () => {
                     
                     <Grid container spacing={2} sx={{ mt: 1 }}>
                       <Grid item xs={6}>
-                        <Paper elevation={1} sx={{ p: 2, bgcolor: "primary.light", color: "white" }}>
+                        <Paper elevation={1} sx={{ p: 2, bgcolor: "primary.main", color: "white" }}>
                           <Typography variant="h6">{statistics.gamesPlayed}</Typography>
                           <Typography variant="body2">Games Played</Typography>
                         </Paper>
                       </Grid>
                       <Grid item xs={6}>
-                        <Paper elevation={1} sx={{ p: 2, bgcolor: "success.main", color: "white" }}>
+                        <Paper elevation={1} sx={{ p: 2, bgcolor: "primary.light", color: "white" }}>
                           <Typography variant="h6">{statistics.questionsAnswered}</Typography>
                           <Typography variant="body2">Questions Answered</Typography>
                         </Paper>
                       </Grid>
                       <Grid item xs={6}>
-                        <Paper elevation={1} sx={{ p: 2, bgcolor: "primary.main", color: "white" }}>
+                        <Paper elevation={1} sx={{ p: 2, bgcolor: "success.main", color: "white" }}>
                           <Typography variant="h6">{statistics.correctAnswers}</Typography>
                           <Typography variant="body2">Correct Answers</Typography>
                         </Paper>
