@@ -30,7 +30,7 @@ export const Question = () => {
     const userCookie = Cookies.get('user');
     const isUserLogged = !!userCookie;
     const gatewayEndpoint = process.env.REACT_APP_API_ENDPOINT || 'http://localhost:8000';
-    const statisticsEndpoint = 'http://localhost:8005';
+    const statisticsEndpoint = process.env.STATS_SERVICE_URL || 'http://localhost:8005';
 
     useEffect(() => {
         const fetchData = async () => {
