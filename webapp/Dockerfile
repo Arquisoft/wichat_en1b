@@ -3,6 +3,9 @@ FROM node:22
 COPY . /app
 WORKDIR /app
 
+ARG REACT_APP_API_ENDPOINT
+ENV REACT_APP_API_ENDPOINT = $REACT_APP_API_ENDPOINT
+
 #Install the dependencies
 RUN npm install --omit=dev
 
