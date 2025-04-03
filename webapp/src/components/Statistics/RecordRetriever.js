@@ -3,7 +3,7 @@ import Cookies from "js-cookie";
 
 class RecordRetriever {
     constructor() {     
-        this.apiUrl = 'http://localhost:8000';  //  process.env.GATEWAY_SERVICE_URL || 'http://localhost:8000'
+        this.apiUrl = process.env.GATEWAY_SERVICE_URL || 'http://localhost:8000'
     }
 
     /**
@@ -13,18 +13,32 @@ class RecordRetriever {
      */
    async getRecords() {
         try {
-            const userCookie = Cookies.get('user');         // Retrieve the 'user' cookie
-            if (!userCookie) throw new Error("Authentication token is missing.");
+            // Retrieve the 'user' cookie
+            const userCookie = Cookies.get('user');         
+            if (!userCookie) throw new Error("You are not logged in. Please log in to view your statistics.");
 
-            const token = JSON.parse(userCookie)?.token;    // Parse the token from the cookie
+            // Parse the cookie value
+            const parsedUserCookie = JSON.parse(userCookie); 
+            if (!parsedUserCookie) throw new Error("Cannot parse user cookie.");
+
+            // Parse the token from the cookie
+            const token = parsedUserCookie.token;    
             if (!token) throw new Error("Cannot parse authentication token.");
-            
+
             // Make a GET request to the gateway with the authorization token
-            const response = await axios.get(this.apiUrl + "/statistics", {
+            
+            console.log("Accessing url :", this.apiUrl + "/statistics");
+            console.log("Username inside cookie:", parsedUserCookie.username);
+            console.log("Fetching statistics with token:", token);
+            // TODO : JUST FOR TESTING: remove the hardcoded URL and use the apiUrl variable and add the token in the header
+            const response = await axios.get("http://localhost:8000/statistics");
+
+            /*const response = await axios.get(this.apiUrl + "/statistics", {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }
             });
+            */
 
             // Return the response data (user statistics)
             return response.data;

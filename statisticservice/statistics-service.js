@@ -14,6 +14,7 @@ app.use(express.json());
 
 // Middleware to extract user from header
 const extractUserMiddleware = (req, res, next) => {
+  console.log("extractUserMiddleware called");
   const userInfo = req.headers['user-info'];
   if (!userInfo) {
     return res.status(401).json({ error: 'User information missing' });
@@ -37,6 +38,7 @@ if (mongoose.connection.readyState === 0) {
 
 // GET endpoint to retrieve user statistics
 app.get('/statistics', extractUserMiddleware, async (req, res) => {
+    console.log("Search for user: ", req.user.username);
     const user = await User.findOne({ username: req.user.username });
     if (!user) return res.status(404).json({ error: 'User not found' });
 

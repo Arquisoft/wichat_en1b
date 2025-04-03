@@ -19,15 +19,22 @@ const llmServiceUrl = process.env.LLM_SERVICE_URL || 'http://localhost:8003';
 const authServiceUrl = process.env.AUTH_SERVICE_URL || 'http://localhost:8002';
 const userServiceUrl = process.env.USER_SERVICE_URL || 'http://localhost:8001';
 
-app.use(cors());
+// TODO : just for testing: when deploying, change the origin to the domain of the webapp and remove the credentials
+app.use(cors({
+  origin: 'http://localhost:3000',
+  credentials: true,
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
+
 app.use(express.json());
 
 //Prometheus configuration
 const metricsMiddleware = promBundle({includeMethod: true});
 app.use(metricsMiddleware);
 
-
+// TODO: just for testing, uncomment authentication middleware
 // Middleware to verify JWT token and attach the user to the request (usued in the statistics service)
+/*
 const authMiddleware = (req, res, next) => {
     console.log("authMiddleware called");
 
@@ -46,7 +53,7 @@ const authMiddleware = (req, res, next) => {
         next();
     });
 };
-
+*/
 function manageError(res, error) {
   if (error.response) //Some microservice responded with an error
     res.status(error.response.status).json(error.response.data);
@@ -109,15 +116,23 @@ app.post('/answer', async (req, res) => {
   }
 });
 
-app.get('/statistics', authMiddleware, async (req, res) => {
+// TODO : just for testing, add the authentication middleware
+app.get('/statistics', async (req, res) => {
   try {
+    
+    // TODO : just for testing, check if the frontend arrives at this method
+    console.log("LLEGUÉ");
+
     // Forward the user information to the statistics service
+    /*
     const statisticsResponse = await axios.get(`${statisticsServiceUrl}/statistics`, {
       headers: {
-        'user-info': JSON.stringify(req.user), // Pass the user information in the headers
+        'Authorization': req.headers['authorization']
       }
     });
+    
     res.json(statisticsResponse.data);
+    */
   } catch (error) {
     manageError(res, error);
   }

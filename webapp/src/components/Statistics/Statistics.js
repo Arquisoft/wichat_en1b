@@ -74,20 +74,12 @@ export const Statistics = () => {
   useEffect(() => {
     const getRecords = async () => {
       try {
-        const userCookie = Cookies.get('user');
-        if (!userCookie) {
-          console.error("No user cookie found");
-          setError("You are not logged in. Please log in to view your statistics.");
-          setLoading(false);
-          return;
-        }
-
-        const cookie = JSON.parse(userCookie);
-        setUsername(cookie.username || "User");
-        
-        const statsData = await retriever.getRecords(cookie.token);
+        const statsData = await retriever.getRecords();
         setStatistics(statsData);
-        
+  
+        //const cookie = { username : "test" };
+        //setUsername(cookie.username || "User");        
+      
         // Set registration date if available
         if (statsData.registrationDate) {
           setRegistrationDate(new Date(statsData.registrationDate));
@@ -95,12 +87,7 @@ export const Statistics = () => {
         
         setLoading(false);
       } catch (error) {
-        console.error("Error in getRecords:", error);
-        if (error.message.includes("expired") || error.message.includes("log in again")) {
-          setError("Your session has expired. Please log in again.");
-        } else {
-          setError(error.message || "Failed to load statistics");
-        }
+        setError(error.message || "Failed to load statistics");
         setLoading(false);
       }
     };
