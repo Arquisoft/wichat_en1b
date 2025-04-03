@@ -124,7 +124,9 @@ export function Chat() {
                     "&:hover": {
                         backgroundColor: "#f5f5f5",
                     },
+                    name: "toggleSidebar",
                 }}
+                aria-label= "toggleSidebar"
             >
                 {isOpen ? <ChevronRightIcon /> : <ChevronLeftIcon />}
             </IconButton>
@@ -283,6 +285,8 @@ export function Chat() {
                         type="submit"
                         variant="contained"
                         color="primary"
+                        name="send"
+                        aria-label="Send message"
                         disabled={isLoading || !input.trim()}
                         sx={{ minWidth: "unset", width: 40, height: 40, padding: 0 }}
                     >
