@@ -15,17 +15,18 @@ describe('Home Component Render Tests', () => {
         expect(true).toBe(true);
     });
        
-    /*
+    
     it('should render Home component for non-logged-in users', () => {
+        Cookies.remove('user')
         render(
             <MemoryRouter>
                 <Home />
             </MemoryRouter>
         );
 
-        // Check for generic greeting message and "Login" prompt
-        expect(screen.getByText('Welcome to the 2025 edition of the Software Architecture course!')).toBeInTheDocument();
-        expect(screen.getByText("You're not logged into the app!!")).toBeInTheDocument();
+        expect(screen.getByText(/wichat/i)).toBeInTheDocument();
+        expect(screen.getByText(/_en1b/i)).toBeInTheDocument();
+
     });
 
     it('should render Home component for logged-in users', () => {
@@ -38,8 +39,10 @@ describe('Home Component Render Tests', () => {
         );
 
         // Check for personalized greeting message and username
-        expect(screen.getByText('Welcome to the 2025 edition of the Software Architecture course!')).toBeInTheDocument();
-        expect(screen.getByText("You're logged as testuser!!")).toBeInTheDocument();
+        expect(screen.getByText(/Your Profile/i)).toBeInTheDocument();
+        expect(screen.getByText(/New Game/i)).toBeInTheDocument();
+        expect(screen.getByText(/Statistics/i)).toBeInTheDocument();
+        expect(screen.getByText(/Game Modes/i)).toBeInTheDocument();
     });
-    */
+    
 });
