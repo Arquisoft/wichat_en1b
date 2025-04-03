@@ -104,9 +104,7 @@ export const Statistics = () => {
           navigate('/login');
           return;
         }
-
-        const cookie = JSON.parse(userCookie);
-        const statsData = await retriever.getRecords(cookie.token);
+        const statsData = await retriever.getRecords();
         setStatistics(statsData);
         setLoading(false);
       } catch (error) {
