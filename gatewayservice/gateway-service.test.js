@@ -103,28 +103,44 @@ describe('Gateway Service', () => {
     expect(response.body.answer).toBe('llmanswer');
   });
 
-  // Test /statistics endpoint
+  // Test /statistics GET endpoint
   it('should forward statistics request to the statistics service', async () => {
-    process.env.JWT_SECRET = 'mocktoken';
-    let token = jwt.sign({ userId: 999, username: process.env.JWT_SECRET }, process.env.JWT_SECRET, { expiresIn: '1h' });
+    process.env.JWT_SECRET = 'mocksecret';
+    const token = jwt.sign({ username: 'testuser' }, process.env.JWT_SECRET, { expiresIn: '1h' });
+
+    axios.get.mockImplementationOnce((url, { headers }) => {
+      if (url.endsWith('/statistics') && headers.username === 'testuser') {
+        return Promise.resolve({
+          data: { gamesPlayed: 5, correctAnswers: 3 }
+        });
+      }
+    });
+
     const response = await request(app)
       .get('/statistics')
-      .set('Authorization', `${token}`);
+      .set('Authorization', `Bearer ${token}`);
 
     expect(response.statusCode).toBe(200);
-    expect(response.body.gamesPlayed).toBe(0);
-    expect(response.body.correctAnswers).toBe(0);
-    expect(response.body.incorrectAnswers).toBe(0);
+    expect(response.body.gamesPlayed).toBe(5);
+    expect(response.body.correctAnswers).toBe(3);
   }, 15000);
 
-  // Test /statistics endpoint, bad token
+  // Test /statistics GET endpoint, bad token
   it('should retrieve a 403 error with an invalid token in statistics endpoint', async () => {
     const response = await request(app)
-      .get('/statistics');
+      .get('/statistics')
+      .set('Authorization', 'Bearer invalid_token'); // Provide an invalid token
+  
+    expect(response.statusCode).toBe(403);
+    expect(response.body.error).toBe('Invalid or expired token'); // Check correct error message
+  });
 
-      expect(response.statusCode).toBe(403);
-      expect(response.body.authorized).toBe(false);
-      expect(response.body.error).toBe('Invalid token or outdated');
+  // Test /statistics GET endpoint, missing token
+  it('should return 401 for missing Authorization header in GET /statistics', async () => {
+    const response = await request(app).get('/statistics');
+    
+    expect(response.statusCode).toBe(401);
+    expect(response.body.error).toBe('Authorization header missing');
   });
 
   // Test /question endpoint
@@ -241,22 +257,21 @@ describe('Error handling', () => {
   /// Test error case for statistics
   it('should handle errors from statistics service', async () => {
     // Mock the error response from the statistics service
-    axios.get.mockImplementationOnce((url) => {
+    axios.get.mockImplementationOnce((url, config) => {
       if (url.endsWith('/statistics')) {
         return getRejectedPromise(404, 'User stats not found');
       }
     });
-
-    process.env.JWT_SECRET='mocktoken';
-
-    let token = jwt.sign({
-      userId: -1,
-      username: 'nonexistent'
-    }, process.env.JWT_SECRET, { expiresIn: '1h' });
+  
+    process.env.JWT_SECRET='mocksecret';
+    const username = 'nonexistent';
+  
+    let token = jwt.sign({ username: username }, process.env.JWT_SECRET, { expiresIn: '1h' });
+  
     const response = await request(app)
       .get('/statistics')
-      .set('Authorization', `${token}`);
-
+      .set('Authorization', `Bearer ${token}`);
+  
     expect(response.statusCode).toBe(404);
     expect(response.body.error).toBe('User stats not found');
   });
@@ -265,15 +280,23 @@ describe('Error handling', () => {
 describe('Gateway Service - Additional Tests', () => {
   // Test /statistics POST endpoint
   it('should forward statistics update request to the statistics service', async () => {
-    axios.post.mockImplementationOnce((url) => {
-      if (url.endsWith('/statistics')) {
+    process.env.JWT_SECRET = 'mocksecret';
+    const token = jwt.sign({ username: 'testuser' }, process.env.JWT_SECRET, { expiresIn: '1h' });
+
+    axios.post.mockImplementationOnce((url, data, { headers }) => {
+      if (
+        url.endsWith('/statistics') &&
+        headers.username === 'testuser' &&
+        data.gamesPlayed === 1
+      ) {
         return Promise.resolve({ data: { success: true } });
       }
     });
 
     const response = await request(app)
       .post('/statistics')
-      .send({ userId: 'mockuser', gamesPlayed: 1 });
+      .set('Authorization', `Bearer ${token}`)
+      .send({ gamesPlayed: 1 });
 
     expect(response.statusCode).toBe(200);
     expect(response.body.success).toBe(true);
@@ -282,14 +305,15 @@ describe('Gateway Service - Additional Tests', () => {
 
 describe('Gateway Service - Additional Tests - Error handling', () => {
   
-  // Test error handling for /statistics POST
-  it('should handle errors from statistics POST service', async () => {
+  // Test /statistics POST endpoint, missing token
+  it('should return 401 for missing Authorization header in POST /statistics', async () => {
 
     const response = await request(app)
       .post('/statistics')
       .send({ userId: 'mockuser', gamesPlayed: 1 });
 
-    expect(response.statusCode).toBe(500);
-    expect(response.body.error).toBe('Internal server error');
+      expect(response.statusCode).toBe(401);
+      expect(response.body.error).toBe('Authorization header missing');
   });
+
 });

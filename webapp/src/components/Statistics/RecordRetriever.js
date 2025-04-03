@@ -26,7 +26,6 @@ class RecordRetriever {
             if (!token) throw new Error("Cannot parse authentication token.");
 
             // Make a GET request to the gateway with the authorization token
-
             const response = await axios.get(this.apiUrl + "/statistics", {
                 headers: {
                     'Authorization': `Bearer ${token}`

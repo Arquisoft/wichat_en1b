@@ -121,10 +121,20 @@ app.get('/statistics', authMiddleware, async (req, res) => {
   }
 });
 
-app.post('/statistics', async (req, res) => {
+app.post('/statistics', authMiddleware, async (req, res) => {
   try {
     // Forward the update statistics request to the statistics service
-    const statisticsResponse = await axios.post(statisticsServiceUrl+'/statistics', req.body);
+    const statisticsData = req.body;
+    
+    const statisticsResponse = await axios.post(`${statisticsServiceUrl}/statistics`, 
+      statisticsData,
+      {
+        headers: {
+          'username': req.user  // Send username in the headers
+        }
+      }
+    );
+    
     res.json(statisticsResponse.data);
   } catch (error) {
     manageError(res, error);

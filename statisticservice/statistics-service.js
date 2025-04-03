@@ -7,11 +7,9 @@ const app = express();
 const port = 8005;
 require('dotenv').config();
 
-
 // Enable CORS
 app.use(cors());
 app.use(express.json());
-
 
 // Connect to MongoDB only if not already connected
 if (mongoose.connection.readyState === 0) {

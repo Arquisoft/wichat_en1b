@@ -2,9 +2,9 @@ import { useState, useEffect } from "react"
 import { Typography, Box, Grid, Button, Container, Paper, CircularProgress } from "@mui/material"
 import { createTheme, ThemeProvider } from "@mui/material/styles"
 import AccessTimeIcon from "@mui/icons-material/AccessTime"
-import Cookies from "js-cookie";
 import axios from 'axios';
 import { useGame } from "../GameContext";
+import StatisticsUpdater from "./StatisticsUpdater";
 
 // Create a theme with the blue color from the login screen
 const theme = createTheme({
@@ -16,7 +16,6 @@ const theme = createTheme({
 })
 
 export const Question = () => {
-
     const [selectedAnswer, setSelectedAnswer] = useState(null)
     const [timeLeft, setTimeLeft] = useState(60)
     const [isCorrect, setIsCorrect] = useState(false);
@@ -26,14 +25,13 @@ export const Question = () => {
     const [isPaused, setIsPaused] = useState(false);
 
     const { question, setQuestion, setGameEnded } = useGame();
+    const statisticsUpdater = new StatisticsUpdater();
 
-    const userCookie = Cookies.get('user');
-    const isUserLogged = !!userCookie;
     const gatewayEndpoint = process.env.GATEWAY_SERVICE_URL || 'http://localhost:8000';
 
     useEffect(() => {
         const fetchData = async () => {
-            await requestQuestion();
+            await requestQuestion(true); // Pass true to indicate it's the initial load
         };
         fetchData();
     }, [])
@@ -46,7 +44,7 @@ export const Question = () => {
             setIsTimeUp(true);
             setTimeout(() => {
                 setIsTimeUp(false);
-                requestQuestion();
+                requestQuestion(false);
             }, 2000); // Show "time up" message for 2 seconds before restarting
             return;
         }
@@ -61,29 +59,19 @@ export const Question = () => {
         return () => clearInterval(timerId)
     }, [timeLeft, isPaused])
 
-    const requestQuestion = async () => {
+    const requestQuestion = async (isInitialLoad = false) => {
         setIsPaused(true);
         setGameEnded(true);
         try {
             let questionResponse = await axios.get(`${gatewayEndpoint}/question`)
             setQuestion(questionResponse.data);
 
-            // Update gamesPlayed when a new question is fetched for a new game session
-            const userCookie = Cookies.get('user');
-            if (userCookie) {
-                const token = JSON.parse(userCookie)?.token;
-                if (token) {
-                    await axios.post(
-                        `${gatewayEndpoint}/statistics`,
-                        { gamesPlayed: 1 },
-                        {
-                            headers: {
-                                'Authorization': `Bearer ${token}`
-                            }
-                        }
-                    ).catch((error) => {
-                        console.error("Error updating gamesPlayed:", error.response?.data || error.message);
-                    });
+            // Update gamesPlayed only on the first load
+            if (isInitialLoad) {
+                try {
+                    await statisticsUpdater.incrementGamesPlayed();
+                } catch (error) {
+                    console.error("Error incrementing games played:", error.message);
                 }
             }
 
@@ -94,7 +82,7 @@ export const Question = () => {
     }
 
     useEffect(() => {
-        if (question.images.length > 0) {
+        if (question.images?.length > 0) {
             const imagePromises = question.images.map((image) => {
                 return new Promise((resolve) => {
                     const img = new Image();
@@ -106,8 +94,8 @@ export const Question = () => {
             Promise.all(imagePromises).then(() => {
                 setImagesLoaded(true);
                 setTimeLeft(60);
-                setSelectedAnswer(null); // Fix the problem of having selected an image from the previous round
-                setIsPaused(false); // Resume the timer after images are loaded
+                setSelectedAnswer(null);    // Fix the problem of having selected an image from the previous round
+                setIsPaused(false);         // Resume the timer after images are loaded
             });
         }
     }, [question.images]);
@@ -121,56 +109,35 @@ export const Question = () => {
         setIsPaused(true); // Pause the timer when an answer is selected
 
         try { 
-
             let response = await axios.post(`${gatewayEndpoint}/answer`, { questionId: question.id, answer: answer });
 
-            const userCookie = Cookies.get('user');         // Retrieve the 'user' cookie
-            if (!userCookie) throw new Error("Authentication token is missing.");
-            
-            const token = JSON.parse(userCookie)?.token;    // Parse the token from the cookie
-            if (!token) throw new Error("Cannot parse authentication token.");
-
             if (response.data.correct) {
-
-                await axios.post(
-                    `${gatewayEndpoint}/statistics`,
-                    { questionsAnswered: 1, correctAnswers: 1, incorrectAnswers: 0 },
-                    {
-                        headers: {
-                            'Authorization': `Bearer ${token}` // Include the JWT in the Authorization header
-                        }
-                    }
-                ).catch((error) => {
-                    console.error("Error updating statistics:", error.response?.data || error.message);
-                });
+                // Update statistics for correct answer
+                try {
+                    await statisticsUpdater.recordCorrectAnswer();
+                } catch (error) {
+                    console.error("Error recording correct answer:", error.message);
+                }
 
                 setIsCorrect(true);
                 setTimeout(() => {
                     setIsCorrect(false);
-                    requestQuestion();
+                    requestQuestion(false); // Not the first question
                 }, 2000);
-
             } else {
-
-                await axios.post(
-                    `${gatewayEndpoint}/statistics`,
-                    { questionsAnswered: 1, correctAnswers: 0, incorrectAnswers: 1 },
-                    {
-                        headers: {
-                            'Authorization': `Bearer ${token}` // Include the JWT in the Authorization header
-                        }
-                    }
-                ).catch((error) => {
-                    console.error("Error updating statistics:", error.response?.data || error.message);
-                });
+                // Update statistics for incorrect answer
+                try {
+                    await statisticsUpdater.recordIncorrectAnswer();
+                } catch (error) {
+                    console.error("Error recording incorrect answer:", error.message);
+                }
 
                 setIsIncorrect(true);
                 setTimeout(() => {
                     setIsIncorrect(false);
-                    requestQuestion();
+                    requestQuestion(false); // Not the first question
                 }, 2000);
             }
-
         } catch (error) {
             console.error("Error checking answer: ", error);
         }
@@ -184,7 +151,6 @@ export const Question = () => {
     }
 
     return (
-
         <ThemeProvider theme={theme}>
             <Container maxWidth="md" sx={{ py: 4 }}>
                 {/* Large Timer at the top */}
@@ -260,7 +226,7 @@ export const Question = () => {
                 <Box sx={{ width: "100%", maxWidth: 600, mx: "auto" }}>
                     <Grid container spacing={2}>
                         {imagesLoaded ? (
-                            question.images.map((image, index) => (
+                            question.images?.map((image, index) => (
                                 <Grid item xs={12} sm={6} key={index}>
                                     <Button
                                         fullWidth
@@ -296,7 +262,7 @@ export const Question = () => {
                     </Grid>
                 </Box>
                 <Button
-                    onClick={requestQuestion}
+                    onClick={() => requestQuestion(false)} // Not the first question when manually requesting
                     sx={{ display: "block", mx: "auto", mt: 3 }}
                 >
                     Request new question
@@ -305,5 +271,3 @@ export const Question = () => {
         </ThemeProvider>
     )
 }
-
-
