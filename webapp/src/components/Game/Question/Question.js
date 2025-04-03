@@ -15,7 +15,10 @@ const theme = createTheme({
     },
 })
 
-export const Question = () => {
+// Create a default statistics updater instance
+const defaultStatisticsUpdater = new StatisticsUpdater();
+
+export const Question = ({ statisticsUpdater = defaultStatisticsUpdater }) => {
     const [selectedAnswer, setSelectedAnswer] = useState(null)
     const [timeLeft, setTimeLeft] = useState(60)
     const [isCorrect, setIsCorrect] = useState(false);
@@ -25,8 +28,6 @@ export const Question = () => {
     const [isPaused, setIsPaused] = useState(false);
 
     const { question, setQuestion, setGameEnded } = useGame();
-    const statisticsUpdater = new StatisticsUpdater();
-
     const gatewayEndpoint = process.env.GATEWAY_SERVICE_URL || 'http://localhost:8000';
 
     useEffect(() => {
