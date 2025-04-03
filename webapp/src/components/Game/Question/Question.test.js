@@ -12,13 +12,12 @@ jest.mock('../GameContext', () => ({
     useGame: jest.fn()
 }));
 
-global.Image = class {
-    constructor() {
+global.Image = function imageFunction() {
         setTimeout(() => {
             if (this.onload) this.onload();
         }, 100);
     }
-};
+
 
 describe('Question Component', () => {
     const mockQuestion = {
@@ -99,7 +98,7 @@ describe('Question Component', () => {
     test('handles correct answer selection', async () => {
         axios.post.mockResolvedValueOnce({ data: { correct: true } });
 
-        const { container } = render(<Question />);
+        render(<Question />);
 
         await waitFor(() => {
             expect(screen.queryByText('Loading images...')).not.toBeInTheDocument();
