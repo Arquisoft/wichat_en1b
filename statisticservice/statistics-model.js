@@ -6,14 +6,6 @@ const userSchema = new mongoose.Schema({
       required: true,
       unique: true,
     },
-    email: {
-      type: String,
-      // required: true,
-    },
-    passwordHash: {
-      type: String,
-      required: true,
-    },
     registrationDate: {
       type: Date,
       default: Date.now,
