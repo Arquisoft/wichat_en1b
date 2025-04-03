@@ -19,12 +19,7 @@ const llmServiceUrl = process.env.LLM_SERVICE_URL || 'http://localhost:8003';
 const authServiceUrl = process.env.AUTH_SERVICE_URL || 'http://localhost:8002';
 const userServiceUrl = process.env.USER_SERVICE_URL || 'http://localhost:8001';
 
-// TODO : just for testing: when deploying, change the origin to the domain of the webapp and remove the credentials
-app.use(cors({
-  origin: 'http://localhost:3000',
-  credentials: true,
-  allowedHeaders: ['Content-Type', 'Authorization']
-}));
+app.use(cors());
 
 app.use(express.json());
 
@@ -38,17 +33,13 @@ const authMiddleware = (req, res, next) => {
   // Get the token from the request headers
     const authHeader = req.headers['authorization'];
     if (!authHeader) return res.status(401).json({ error: 'Authorization header missing' });
-    console.log("Authorization header:", authHeader)
 
     const token = authHeader.split(' ')[1];
     if (!token) return res.status(401).json({ error: 'Token missing' });
-    
-    console.log("Token:", token)
 
     jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
       if (err) return res.status(403).json({ error: 'Invalid or expired token' });
       req.user = decoded.username;  // Attach the user information to the request object
-      console.log("User inside authMiddleware:", req.user)
       next();
   });
 };
@@ -118,7 +109,6 @@ app.post('/answer', async (req, res) => {
 app.get('/statistics', authMiddleware, async (req, res) => {
   try {
     // Forward the user information to the statistics service
-    console.log("Calling statistics service ", statisticsServiceUrl,"/statistics with user:", req.user)
     const statisticsResponse = await axios.get(`${statisticsServiceUrl}/statistics`, {
       headers: {
         'username': req.user

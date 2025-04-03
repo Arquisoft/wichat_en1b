@@ -74,11 +74,10 @@ export const Statistics = () => {
   useEffect(() => {
     const getRecords = async () => {
       try {
-        const statsData = await retriever.getRecords();
+        const {statsData, username} = await retriever.getRecords();
         setStatistics(statsData);
   
-        //const cookie = { username : "test" };
-        //setUsername(cookie.username || "User");        
+        setUsername(username || "User");        
       
         // Set registration date if available
         if (statsData.registrationDate) {

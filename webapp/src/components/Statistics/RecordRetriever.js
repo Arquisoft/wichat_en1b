@@ -26,19 +26,18 @@ class RecordRetriever {
             if (!token) throw new Error("Cannot parse authentication token.");
 
             // Make a GET request to the gateway with the authorization token
-            
-            console.log("Accessing url :", this.apiUrl + "/statistics");
-            console.log("Username inside cookie:", parsedUserCookie.username);
-            console.log("Fetching statistics with token:", token);
-            
+
             const response = await axios.get(this.apiUrl + "/statistics", {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }
             });
 
-            // Return the response data (user statistics)
-            return response.data;
+            // Return the response data (user statistics) and the username
+            return {
+                statsData: response.data,
+                username: parsedUserCookie.username
+            };
 
         } catch (error) {
             console.error("Error fetching statistics:", error);
