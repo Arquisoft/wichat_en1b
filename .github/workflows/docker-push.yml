@@ -19,7 +19,7 @@ jobs:
         env:
           API_URI: http://${{ secrets.DEPLOY_HOST }}:8000
         with:
-          name: arquisoft/wichat_en1b/webapp
+          name: arquisoft/wichat_en1b/webapp:latest
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
           registry: ghcr.io
@@ -39,7 +39,7 @@ jobs:
       - name: Publish to Registry
         uses: elgohr/Publish-Docker-Github-Action@v5
         with:
-          name: arquisoft/wichat_en1b/authservice
+          name: arquisoft/wichat_en1b/authservice:latest
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
           registry: ghcr.io
@@ -57,7 +57,7 @@ jobs:
       - name: Publish to Registry
         uses: elgohr/Publish-Docker-Github-Action@v5
         with:
-          name: arquisoft/wichat_en1b/userservice
+          name: arquisoft/wichat_en1b/userservice:latest
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
           registry: ghcr.io
@@ -74,7 +74,7 @@ jobs:
       - name: Publish to Registry
         uses: elgohr/Publish-Docker-Github-Action@v5
         with:
-          name: arquisoft/wichat_en1b/llmservice
+          name: arquisoft/wichat_en1b/llmservice:latest
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
           registry: ghcr.io
@@ -91,7 +91,7 @@ jobs:
       - name: Publish to Registry
         uses: elgohr/Publish-Docker-Github-Action@v5
         with:
-          name: arquisoft/wichat_en1b/statisticservice
+          name: arquisoft/wichat_en1b/statisticservice:latest
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
           registry: ghcr.io
@@ -108,7 +108,7 @@ jobs:
       - name: Publish to Registry
         uses: elgohr/Publish-Docker-Github-Action@v5
         with:
-          name: arquisoft/wichat_en1b/questionservice
+          name: arquisoft/wichat_en1b/questionservice:latest
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
           registry: ghcr.io
@@ -129,7 +129,7 @@ jobs:
       - name: Publish to Registry
         uses: elgohr/Publish-Docker-Github-Action@v5
         with:
-          name: arquisoft/wichat_en1b/gatewayservice
+          name: arquisoft/wichat_en1b/gatewayservice:latest
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
           registry: ghcr.io
