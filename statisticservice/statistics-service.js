@@ -12,21 +12,6 @@ require('dotenv').config();
 app.use(cors());
 app.use(express.json());
 
-// Middleware to extract user from header
-const extractUserMiddleware = (req, res, next) => {
-  console.log("extractUserMiddleware called");
-  const userInfo = req.headers['user-info'];
-  if (!userInfo) {
-    return res.status(401).json({ error: 'User information missing' });
-  }
-  
-  try {
-    req.user = JSON.parse(userInfo);
-    next();
-  } catch (error) {
-    return res.status(400).json({ error: 'Invalid user information format' });
-  }
-};
 
 // Connect to MongoDB only if not already connected
 if (mongoose.connection.readyState === 0) {
@@ -37,9 +22,11 @@ if (mongoose.connection.readyState === 0) {
 }
 
 // GET endpoint to retrieve user statistics
-app.get('/statistics', extractUserMiddleware, async (req, res) => {
-    console.log("Search for user: ", req.user.username);
-    const user = await User.findOne({ username: req.user.username });
+app.get('/statistics', async (req, res) => {
+    const username = req.headers['username'];
+    if (!username) return res.status(400).json({ error: 'Username missing in request' });
+
+    const user = await User.findOne({ username });
     if (!user) return res.status(404).json({ error: 'User not found' });
 
     res.json({
@@ -53,6 +40,9 @@ app.get('/statistics', extractUserMiddleware, async (req, res) => {
 
 // POST endpoint to update user statistics
 app.post('/statistics', async (req, res) => {
+  const username = req.headers['username'];
+  if (!username) return res.status(400).json({ error: 'Username missing in request' });
+  
   const { gamesPlayed, questionsAnswered, correctAnswers, incorrectAnswers } = req.body;
 
   if (
@@ -64,7 +54,7 @@ app.post('/statistics', async (req, res) => {
     return res.status(400).json({ error: 'Invalid input: All statistics must be numbers.' });
   }
 
-  const user = await User.findOne({ username: req.user.username });
+  const user = await User.findOne({ username });
 
   if (user) {
     if (gamesPlayed !== undefined) user.gamesPlayed += parseInt(gamesPlayed);

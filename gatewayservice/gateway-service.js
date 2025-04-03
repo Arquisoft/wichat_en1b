@@ -32,28 +32,27 @@ app.use(express.json());
 const metricsMiddleware = promBundle({includeMethod: true});
 app.use(metricsMiddleware);
 
-// TODO: just for testing, uncomment authentication middleware
 // Middleware to verify JWT token and attach the user to the request (usued in the statistics service)
-/*
 const authMiddleware = (req, res, next) => {
-    console.log("authMiddleware called");
-
-    // Get the token from the request headers
+    
+  // Get the token from the request headers
     const authHeader = req.headers['authorization'];
     if (!authHeader) return res.status(401).json({ error: 'Authorization header missing' });
+    console.log("Authorization header:", authHeader)
 
     const token = authHeader.split(' ')[1];
     if (!token) return res.status(401).json({ error: 'Token missing' });
+    
+    console.log("Token:", token)
 
-    console.log(statisticsServiceUrl+'/statistics')
-    console.log(token)
-    jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
-        if (err) return res.status(403).json({ error: 'Invalid or expired token' });
-        req.user = user; // Attach the verified user to the request
-        next();
-    });
+    jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
+      if (err) return res.status(403).json({ error: 'Invalid or expired token' });
+      req.user = decoded.username;  // Attach the user information to the request object
+      console.log("User inside authMiddleware:", req.user)
+      next();
+  });
 };
-*/
+
 function manageError(res, error) {
   if (error.response) //Some microservice responded with an error
     res.status(error.response.status).json(error.response.data);
@@ -116,23 +115,17 @@ app.post('/answer', async (req, res) => {
   }
 });
 
-// TODO : just for testing, add the authentication middleware
-app.get('/statistics', async (req, res) => {
+app.get('/statistics', authMiddleware, async (req, res) => {
   try {
-    
-    // TODO : just for testing, check if the frontend arrives at this method
-    console.log("LLEGUÉ");
-
     // Forward the user information to the statistics service
-    /*
+    console.log("Calling statistics service ", statisticsServiceUrl,"/statistics with user:", req.user)
     const statisticsResponse = await axios.get(`${statisticsServiceUrl}/statistics`, {
       headers: {
-        'Authorization': req.headers['authorization']
+        'username': req.user
       }
     });
     
     res.json(statisticsResponse.data);
-    */
   } catch (error) {
     manageError(res, error);
   }

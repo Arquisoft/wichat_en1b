@@ -30,15 +30,12 @@ class RecordRetriever {
             console.log("Accessing url :", this.apiUrl + "/statistics");
             console.log("Username inside cookie:", parsedUserCookie.username);
             console.log("Fetching statistics with token:", token);
-            // TODO : JUST FOR TESTING: remove the hardcoded URL and use the apiUrl variable and add the token in the header
-            const response = await axios.get("http://localhost:8000/statistics");
-
-            /*const response = await axios.get(this.apiUrl + "/statistics", {
+            
+            const response = await axios.get(this.apiUrl + "/statistics", {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }
             });
-            */
 
             // Return the response data (user statistics)
             return response.data;
