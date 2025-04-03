@@ -13,6 +13,7 @@ export const useAuth = () => {
     
     const authenticateUser = async (action, username, password) => {
         try {
+            console.log(apiEndpoint);
             const response = await axios.post(`${apiEndpoint}/${action}`, { username, password });
             let oneHourAfter = new Date().getTime() + (1 * 60 * 60 * 1000)
             Cookies.set('user', JSON.stringify({ username: response.data.username, token: response.data.token })
