@@ -20,11 +20,36 @@ const authServiceUrl = process.env.AUTH_SERVICE_URL || 'http://localhost:8002';
 const userServiceUrl = process.env.USER_SERVICE_URL || 'http://localhost:8001';
 
 app.use(cors());
+
 app.use(express.json());
 
 //Prometheus configuration
 const metricsMiddleware = promBundle({includeMethod: true});
 app.use(metricsMiddleware);
+
+// Middleware to verify JWT token and attach the user to the request (usued in the statistics service)
+const authMiddleware = (req, res, next) => {
+    
+  // Get the token from the request headers
+    const authHeader = req.headers['authorization'];
+    if (!authHeader) return res.status(401).json({ error: 'Authorization header missing' });
+
+    const token = authHeader.split(' ')[1];
+    if (!token) return res.status(401).json({ error: 'Token missing' });
+
+    jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
+      if (err) return res.status(403).json({ error: 'Invalid or expired token' });
+      req.user = decoded.username;  // Attach the user information to the request object
+      next();
+  });
+};
+
+function manageError(res, error) {
+  if (error.response) //Some microservice responded with an error
+    res.status(error.response.status).json(error.response.data);
+  else //Some other error
+    res.status(500).json({error : "Internal server error"})
+}
 
 // Health check endpoint
 app.get('/health', (req, res) => {
@@ -81,20 +106,35 @@ app.post('/answer', async (req, res) => {
   }
 });
 
-app.get('/statistics', verifyToken ,async (req, res) => {
+app.get('/statistics', authMiddleware, async (req, res) => {
   try {
-    // Forward the add user request to the statistics service
-    const statisticsResponse = await axios.get(statisticsServiceUrl+'/statistics');
+    // Forward the user information to the statistics service
+    const statisticsResponse = await axios.get(`${statisticsServiceUrl}/statistics`, {
+      headers: {
+        'username': req.user
+      }
+    });
+    
     res.json(statisticsResponse.data);
   } catch (error) {
     manageError(res, error);
   }
 });
 
-app.post('/statistics', async (req, res) => {
+app.post('/statistics', authMiddleware, async (req, res) => {
   try {
-    // Forward the add user request to the statistics service
-    const statisticsResponse = await axios.post(statisticsServiceUrl+'/statistics', req.body);
+    // Forward the update statistics request to the statistics service
+    const statisticsData = req.body;
+    
+    const statisticsResponse = await axios.post(`${statisticsServiceUrl}/statistics`, 
+      statisticsData,
+      {
+        headers: {
+          'username': req.user  // Send username in the headers
+        }
+      }
+    );
+    
     res.json(statisticsResponse.data);
   } catch (error) {
     manageError(res, error);
@@ -118,29 +158,5 @@ const server = app.listen(port, () => {
   console.log(`Gateway Service listening at http://localhost:${port}`);
 });
 
-
-function verifyToken(req, res, next) {
-  // Get the token from the request headers
-  const token = req.headers['authorization'] || req.headers['token'] || req.body.token || req.query.token;
-  // Verify if the token is valid
-  jwt.verify(token, (process.env.JWT_SECRET), (err, decoded) => {
-    if (err) {
-      // Token is not valid
-      res.status(403).json({authorized: false, error: 'Invalid token or outdated'});
-    } else {
-      // Token is valid
-      req.decodedToken = decoded;
-      // Call next() to proceed to the next middleware or route handler
-      next();
-    }
-  });
-}
-
-function manageError(res, error) {
-  if (error.response) //Some microservice responded with an error
-    res.status(error.response.status).json(error.response.data);
-  else //Some other error
-    res.status(500).json({error : "Internal server error"})
-}
 
 module.exports = server

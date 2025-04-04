@@ -5,12 +5,14 @@ import { Question } from './Question';
 import axios from 'axios';
 import Cookies from 'js-cookie';
 import { useGame } from '../GameContext';
+import StatisticsUpdater from './StatisticsUpdater';
 
 jest.mock('axios');
 jest.mock('js-cookie');
 jest.mock('../GameContext', () => ({
     useGame: jest.fn()
 }));
+jest.mock('./StatisticsUpdater');
 
 global.Image = function imageFunction() {
         setTimeout(() => {
@@ -38,6 +40,13 @@ describe('Question Component', () => {
     };
 
     const mockUserCookie = JSON.stringify({ token: 'fake-jwt-token' });
+    
+    // Mock StatisticsUpdater instance with jest functions
+    const mockStatisticsUpdater = {
+        incrementGamesPlayed: jest.fn().mockResolvedValue({}),
+        recordCorrectAnswer: jest.fn().mockResolvedValue({}),
+        recordIncorrectAnswer: jest.fn().mockResolvedValue({})
+    };
 
     beforeEach(() => {
         jest.clearAllMocks();
@@ -53,6 +62,11 @@ describe('Question Component', () => {
         axios.get.mockResolvedValue({ data: mockQuestion });
 
         jest.useFakeTimers();
+        
+        // Reset the mock statistics updater methods
+        mockStatisticsUpdater.incrementGamesPlayed.mockClear();
+        mockStatisticsUpdater.recordCorrectAnswer.mockClear();
+        mockStatisticsUpdater.recordIncorrectAnswer.mockClear();
     });
 
     afterEach(() => {
@@ -60,7 +74,7 @@ describe('Question Component', () => {
     });
 
     test('renders the question and timer', async () => {
-        render(<Question />);
+        render(<Question statisticsUpdater={mockStatisticsUpdater} />);
 
         await waitFor(() => {
             expect(screen.getByText('Which image shows a cat?')).toBeInTheDocument();
@@ -70,7 +84,7 @@ describe('Question Component', () => {
     });
 
     test('fetches a question on initial render', async () => {
-        render(<Question />);
+        render(<Question statisticsUpdater={mockStatisticsUpdater} />);
 
         expect(axios.get).toHaveBeenCalledWith('http://test-gateway.com/question');
 
@@ -80,7 +94,7 @@ describe('Question Component', () => {
     });
 
     test('loads images and starts timer when question is set', async () => {
-        render(<Question />);
+        render(<Question statisticsUpdater={mockStatisticsUpdater} />);
 
         await waitFor(() => {
             expect(screen.queryByText('Loading images...')).not.toBeInTheDocument();
@@ -98,7 +112,7 @@ describe('Question Component', () => {
     test('handles correct answer selection', async () => {
         axios.post.mockResolvedValueOnce({ data: { correct: true } });
 
-        render(<Question />);
+        render(<Question statisticsUpdater={mockStatisticsUpdater} />);
 
         await waitFor(() => {
             expect(screen.queryByText('Loading images...')).not.toBeInTheDocument();
@@ -113,20 +127,14 @@ describe('Question Component', () => {
         });
 
         await waitFor(() => {
-            expect(axios.post).toHaveBeenCalledWith(
-                'http://localhost:8005/statistics',
-                { questionsAnswered: 1, correctAnswers: 1, incorrectAnswers: 0 },
-                { headers: { 'Authorization': 'Bearer fake-jwt-token' } }
-            );
+            expect(mockStatisticsUpdater.recordCorrectAnswer).toHaveBeenCalled();
         });
-
-        expect(axios.post).toHaveBeenCalledTimes(2);
     });
 
     test('handles incorrect answer selection', async () => {
         axios.post.mockResolvedValueOnce({ data: { correct: false } });
 
-        render(<Question />);
+        render(<Question statisticsUpdater={mockStatisticsUpdater} />);
 
         await waitFor(() => {
             expect(screen.queryByText('Loading images...')).not.toBeInTheDocument();
@@ -141,18 +149,12 @@ describe('Question Component', () => {
         });
 
         await waitFor(() => {
-            expect(axios.post).toHaveBeenCalledWith(
-                'http://localhost:8005/statistics',
-                { questionsAnswered: 1, correctAnswers: 0, incorrectAnswers: 1 },
-                { headers: { 'Authorization': 'Bearer fake-jwt-token' } }
-            );
+            expect(mockStatisticsUpdater.recordIncorrectAnswer).toHaveBeenCalled();
         });
-
-        expect(axios.post).toHaveBeenCalledTimes(2);
     });
 
     test('handles time running out', async () => {
-        render(<Question />);
+        render(<Question statisticsUpdater={mockStatisticsUpdater} />);
 
         await waitFor(() => {
             expect(screen.queryByText('Loading images...')).not.toBeInTheDocument();
@@ -179,7 +181,7 @@ describe('Question Component', () => {
             return Promise.resolve({ data: {} });
         });
 
-        render(<Question />);
+        render(<Question statisticsUpdater={mockStatisticsUpdater} />);
 
         await waitFor(() => {
             expect(screen.queryByText('Loading images...')).not.toBeInTheDocument();
@@ -189,11 +191,7 @@ describe('Question Component', () => {
         fireEvent.click(images[0].closest('button'));
 
         await waitFor(() => {
-            expect(axios.post).toHaveBeenCalledWith(
-                'http://localhost:8005/statistics',
-                { questionsAnswered: 1, correctAnswers: 1, incorrectAnswers: 0 },
-                { headers: { 'Authorization': 'Bearer fake-jwt-token' } }
-            );
+            expect(mockStatisticsUpdater.recordCorrectAnswer).toHaveBeenCalled();
         });
     });
 
@@ -205,7 +203,7 @@ describe('Question Component', () => {
             return Promise.resolve({ data: {} });
         });
 
-        render(<Question />);
+        render(<Question statisticsUpdater={mockStatisticsUpdater} />);
 
         await waitFor(() => {
             expect(screen.queryByText('Loading images...')).not.toBeInTheDocument();
@@ -215,16 +213,20 @@ describe('Question Component', () => {
         fireEvent.click(images[1].closest('button'));
 
         await waitFor(() => {
-            expect(axios.post).toHaveBeenCalledWith(
-                'http://localhost:8005/statistics',
-                { questionsAnswered: 1, correctAnswers: 0, incorrectAnswers: 1 },
-                { headers: { 'Authorization': 'Bearer fake-jwt-token' } }
-            );
+            expect(mockStatisticsUpdater.recordIncorrectAnswer).toHaveBeenCalled();
+        });
+    });
+
+    test('increments games played on initial load', async () => {
+        render(<Question statisticsUpdater={mockStatisticsUpdater} />);
+        
+        await waitFor(() => {
+            expect(mockStatisticsUpdater.incrementGamesPlayed).toHaveBeenCalledTimes(1);
         });
     });
 
     test('handles request new question button click', async () => {
-        render(<Question />);
+        render(<Question statisticsUpdater={mockStatisticsUpdater} />);
 
         await waitFor(() => {
             expect(screen.queryByText('Loading images...')).not.toBeInTheDocument();
@@ -238,7 +240,7 @@ describe('Question Component', () => {
     });
 
     test('shows timer in red when time is running low', async () => {
-        render(<Question />);
+        render(<Question statisticsUpdater={mockStatisticsUpdater} />);
 
         await waitFor(() => {
             expect(screen.queryByText('Loading images...')).not.toBeInTheDocument();
@@ -259,7 +261,7 @@ describe('Question Component', () => {
 
         const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => { });
 
-        render(<Question />);
+        render(<Question statisticsUpdater={mockStatisticsUpdater} />);
 
         await waitFor(() => {
             expect(consoleErrorSpy).toHaveBeenCalled();
@@ -272,7 +274,7 @@ describe('Question Component', () => {
 
         jest.spyOn(console, 'error').mockImplementation(() => { });
 
-        render(<Question />);
+        render(<Question statisticsUpdater={mockStatisticsUpdater} />);
 
         await waitFor(() => {
             expect(screen.queryByText('Loading images...')).not.toBeInTheDocument();

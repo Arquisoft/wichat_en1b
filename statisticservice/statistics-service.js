@@ -7,14 +7,8 @@ const app = express();
 const port = 8005;
 require('dotenv').config();
 
-// Enable CORS for all routes
-app.use(cors({
-  origin: process.env.WEBAPP_URL || 'http://localhost:3000',  // Allow requests from the frontend
-  methods: ['GET', 'POST'],
-  credentials: true                 // Allow cookies and credentials
-}));
-
-// Middleware to parse JSON in request body
+// Enable CORS
+app.use(cors());
 app.use(express.json());
 
 // Connect to MongoDB only if not already connected
@@ -25,36 +19,28 @@ if (mongoose.connection.readyState === 0) {
   .catch(err => console.error('MongoDB connection error:', err));
 }
 
-// Middleware to verify JWT token and attach the user to the request
-const authMiddleware = (req, res, next) => {
-    const authHeader = req.headers['authorization'];
-    if (!authHeader) return res.status(401).json({ error: 'Authorization header missing' });
-
-    const token = authHeader.split(' ')[1];
-    if (!token) return res.status(401).json({ error: 'Token missing' });
-
-    jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
-        if (err) return res.status(403).json({ error: 'Invalid or expired token' });
-        req.user = user; // Attach the verified user to the request
-        next();
-    });
-};
-
 // GET endpoint to retrieve user statistics
-app.get('/statistics', authMiddleware, async (req, res) => {
-    const user = await User.findOne({ username: req.user.username });
+app.get('/statistics', async (req, res) => {
+    const username = req.headers['username'];
+    if (!username) return res.status(400).json({ error: 'Username missing in request' });
+
+    const user = await User.findOne({ username });
     if (!user) return res.status(404).json({ error: 'User not found' });
 
     res.json({
         gamesPlayed: user.gamesPlayed,
         questionsAnswered: user.questionsAnswered,
         correctAnswers: user.correctAnswers,
-        incorrectAnswers: user.incorrectAnswers
+        incorrectAnswers: user.incorrectAnswers,
+        registrationDate: user.registrationDate,
     });
 });
 
 // POST endpoint to update user statistics
-app.post('/statistics', authMiddleware, async (req, res) => {
+app.post('/statistics', async (req, res) => {
+  const username = req.headers['username'];
+  if (!username) return res.status(400).json({ error: 'Username missing in request' });
+  
   const { gamesPlayed, questionsAnswered, correctAnswers, incorrectAnswers } = req.body;
 
   if (
@@ -66,7 +52,7 @@ app.post('/statistics', authMiddleware, async (req, res) => {
     return res.status(400).json({ error: 'Invalid input: All statistics must be numbers.' });
   }
 
-  const user = await User.findOne({ username: req.user.username });
+  const user = await User.findOne({ username });
 
   if (user) {
     if (gamesPlayed !== undefined) user.gamesPlayed += parseInt(gamesPlayed);

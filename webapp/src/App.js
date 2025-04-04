@@ -5,7 +5,7 @@ import { Container } from '@mui/material';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { Home } from './components/Home/Home';
 import { Navbar } from './components/fragments/Navbar';
-import { StatisticsPage } from './components/Statistics/StatisticsPage';
+import { Statistics } from './components/Statistics/Statistics';
 import Cookies from 'js-cookie';
 import GameWrapper from './components/Game/GameWrapper';
 
@@ -29,7 +29,7 @@ function App() {
             <Route path="/login" element={isLoggedIn ? <Navigate to="/home" /> : <Login />} />
             <Route path="/signup" element={isLoggedIn ? <Navigate to="/home" /> : <SignUp />} />
             <Route path="/game" element={isLoggedIn ? <GameWrapper /> : <Navigate to="/login" />} />
-            <Route path="/statistics" element={isLoggedIn ? <StatisticsPage /> : <Navigate to="/login" /> } />
+            <Route path="/statistics" element={isLoggedIn ? <Statistics /> : <Navigate to="/login" /> } />
           </Routes>
         </Container>
       </div>
