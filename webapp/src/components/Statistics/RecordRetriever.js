@@ -3,7 +3,7 @@ import Cookies from "js-cookie";
 
 class RecordRetriever {
     constructor() {     
-        this.apiUrl = process.env.GATEWAY_SERVICE_URL || 'http://localhost:8000'
+        this.apiUrl = process.env.REACT_APP_API_ENDPOINT || 'http://localhost:8000'
     }
 
     /**

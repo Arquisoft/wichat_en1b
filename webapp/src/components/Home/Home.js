@@ -75,7 +75,6 @@ export const Home = () => {
         } catch (error) {
             setError(error.response.data.error);
         }
-        console.log(message);
     }
 
     useEffect(() => {

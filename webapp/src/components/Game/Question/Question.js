@@ -28,7 +28,7 @@ export const Question = ({ statisticsUpdater = defaultStatisticsUpdater }) => {
     const [isPaused, setIsPaused] = useState(false);
 
     const { question, setQuestion, setGameEnded } = useGame();
-    const gatewayEndpoint = process.env.GATEWAY_SERVICE_URL || 'http://localhost:8000';
+    const gatewayEndpoint = process.env.REACT_APP_API_ENDPOINT || 'http://localhost:8000';
 
     useEffect(() => {
         const fetchData = async () => {

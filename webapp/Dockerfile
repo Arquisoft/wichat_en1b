@@ -3,6 +3,9 @@ FROM node:22
 COPY . /app
 WORKDIR /app
 
+ARG API_URI
+ENV REACT_APP_API_ENDPOINT $API_URI
+
 #Install the dependencies
 RUN npm install --omit=dev
 
