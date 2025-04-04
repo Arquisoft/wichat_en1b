@@ -132,7 +132,6 @@ describe('Gateway Service', () => {
     const response = await request(app)
       .get('/question');
 
-    console.log(response.body);
     expect(response.statusCode).toBe(200);
     expect(response.body.id).toBe('mpzulblyui9du98pmodg5o');
     expect(response.body.question).toBe('Which of the following flags belongs to Nepal?');
