@@ -85,7 +85,6 @@ new CronJob(
 
 // a equivalent for if __name__ == "__main__": (when running the file directly)
 if (require.main === module) {
-    console.log(1);
     wikidataController.preSaveWikidataItems(); // initial run to save
 }
 
