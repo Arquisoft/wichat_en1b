@@ -49,7 +49,7 @@ describe('Gateway Service', () => {
                                      }
                             });
 
-    } else if (url.endsWith('/question')) {
+    } else if (url.endsWith('/question') || url.endsWith('/question/flags')) {
       return Promise.resolve({ data: { id: "mpzulblyui9du98pmodg5o", 
                                        question: "Which of the following flags belongs to Nepal?",
                                        images: [
@@ -147,6 +147,17 @@ describe('Gateway Service', () => {
   it('should retrieve a question from the question service', async () => {
     const response = await request(app)
       .get('/question');
+
+    console.log(response.body);
+    expect(response.statusCode).toBe(200);
+    expect(response.body.id).toBe('mpzulblyui9du98pmodg5o');
+    expect(response.body.question).toBe('Which of the following flags belongs to Nepal?');
+    expect(response.body.images).toHaveLength(4);
+  });
+
+  it('should retrieve a question from the question service by specific question type', async () => {
+    const response = await request(app)
+      .get('/question/flags');
 
     console.log(response.body);
     expect(response.statusCode).toBe(200);
