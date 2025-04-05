@@ -41,16 +41,17 @@ export const Question = ({ statisticsUpdater = defaultStatisticsUpdater }) => {
 
     // Timer effect
     useEffect(() => {
-        if (timeLeft <= 0) {
+        if (timeLeft <= 0 && !isTimeUp) {
             setIsTimeUp(true);
             setTimeout(() => {
-                setIsTimeUp(false);
-                requestQuestion(false);
+                requestQuestion(false).finally(() => {
+                    setIsTimeUp(false); // Reset isTimeUp after the question is fetched
+                });
             }, 2000); // Show "time up" message for 2 seconds before restarting
             return;
         }
 
-        if (isPaused) return; // Pause the timer if isPaused is true
+        if (isPaused || isTimeUp) return; // Pause the timer if isPaused is true
 
         const timerId = setInterval(() => {
             setTimeLeft((prevTime) => prevTime - 1)
@@ -109,7 +110,7 @@ export const Question = ({ statisticsUpdater = defaultStatisticsUpdater }) => {
         setSelectedAnswer(answer);
         setIsPaused(true); // Pause the timer when an answer is selected
 
-        try { 
+        try {
             let response = await axios.post(`${gatewayEndpoint}/answer`, { questionId: question.id, answer: answer });
 
             if (response.data.correct) {
