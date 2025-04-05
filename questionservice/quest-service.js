@@ -75,20 +75,20 @@ app.post("/answer", [
 
 const server = app.listen(port, () => {
     console.log(`Question Service listening at http://localhost:${port}`)
-})
-
-new CronJob(
-    '0 * * * *', // every hour
-    async() => {
-        await wikidataController.preSaveWikidataItems();
-    }, // onTick
-    null, // onComplete
-    true, // start
-    'Europe/Madrid' // timeZone
-);
+});
 
 // a equivalent for if __name__ == "__main__": (when running the file directly)
 if (require.main === module) {
+    new CronJob(
+        '0 * * * *', // every hour
+        async() => {
+            await wikidataController.preSaveWikidataItems();
+        }, // onTick
+        null, // onComplete
+        true, // start
+        'Europe/Madrid' // timeZone
+    );
+
     wikidataController.preSaveWikidataItems(); // initial run to save
 }
 
