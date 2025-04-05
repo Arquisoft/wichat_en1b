@@ -1,11 +1,17 @@
 const express = require("express");
-const cors  = require("cors");
+const cors = require("cors");
 const WikidataController = require("./controllers/WikidataController");
+const CronJob = require("cron").CronJob;
+const mongoose = require("mongoose");
+const { check, validationResult } = require('express-validator');
 
 const app = express();
-const port = 8004
+const port = 8004;
 
-const wikidataController = new WikidataController()
+const mongoUri = process.env.MONGODB_URI || 'mongodb://localhost:27017/questiondb';
+mongoose.connect(mongoUri);
+
+const wikidataController = new WikidataController();
 
 app.use(express.json());
 app.use(cors());
@@ -41,18 +47,46 @@ app.get("/question", async(req, _res, next) => {
 app.get("/question/:questionType", getWikidataQuestion);
 
 // Validate an answer submitted by the game
-app.post("/answer", async(req, res) => {
-    try {
-        const { questionId, answer } = req.body
-        const isCorrect = wikidataController.isQuestionCorrect(questionId, answer)
-        res.json({ correct: isCorrect })
-    } catch (error) {
-        res.status(500).json({ error: "Failed to validate answer" })
+app.post("/answer", [
+        check('questionId').notEmpty().withMessage('The question id is required'),
+        check('answer').notEmpty().withMessage('The answer is required')
+    ],
+    async(req, res) => {
+        try {
+            const errors = validationResult(req);
+
+            if (!errors.isEmpty()) {
+                return res.status(400).json({ errors: errors['errors'] });
+            }
+
+            const { questionId, answer } = req.body
+            const isCorrect = await wikidataController.isQuestionCorrect(questionId, answer)
+            res.json({ correct: isCorrect })
+        } catch (error) {
+            console.error(error)
+            res.status(500).json({ error: "Failed to validate answer" })
+        }
     }
-})
+)
 
 const server = app.listen(port, () => {
     console.log(`Question Service listening at http://localhost:${port}`)
 })
 
-module.exports = server
+new CronJob(
+    '0 * * * *', // every hour
+    async() => {
+        await wikidataController.preSaveWikidataItems();
+    }, // onTick
+    null, // onComplete
+    true, // start
+    'Europe/Madrid' // timeZone
+);
+
+// a equivalent for if __name__ == "__main__": (when running the file directly)
+if (require.main === module) {
+    console.log(1);
+    wikidataController.preSaveWikidataItems(); // initial run to save
+}
+
+module.exports = server;

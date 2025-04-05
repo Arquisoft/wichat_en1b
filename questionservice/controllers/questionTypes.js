@@ -11,7 +11,7 @@ module.exports = {
         VALUES ?foodType { wd:Q2095 wd:Q746549 wd:Q1778821 wd:Q980394 wd:Q185578 }
         }
         ORDER BY RAND()  # Randomize results
-        LIMIT 20
+        LIMIT 200
         `,
         imgTypeName: "images",
         relation: "corresponds to"
@@ -25,7 +25,7 @@ module.exports = {
                 wdt:P18 ?image.       # Ensure the entity has an image
         }
         ORDER BY RAND()  # Randomize results
-        LIMIT 20
+        LIMIT 200
         `,
         imgTypeName: "images",
         relation: "corresponds to the"
@@ -42,7 +42,7 @@ module.exports = {
             ?item wdt:P171 ?parentTaxon.
         }
         ORDER BY RAND()  # Randomize the order of results
-        LIMIT 20
+        LIMIT 200
         `,
         imgTypeName: "images",
         relation: "is a"
@@ -53,7 +53,7 @@ module.exports = {
             SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". } 
             ?item wdt:P31 wd:Q6256; 
             wdt:P41 ?image. 
-        } LIMIT 20
+        } LIMIT 200
         `,
         imgTypeName: "flags",
         relation: "belongs to"

@@ -3,7 +3,10 @@ const wbk = WBK({
     instance: 'https://www.wikidata.org',
     sparqlEndpoint: 'https://query.wikidata.org/sparql' // Required to use `sparqlQuery` and `getReverseClaims` functions, optional otherwise
 })
-const questionTypes = require('./questionTypes')
+const questionTypes = require('./questionTypes');
+
+const WikidataItemRepository = require('../repositories/WikidataItemRepository');
+const QuestionRepository = require('../repositories/QuestionRepository');
 
 const ANSWERS_PER_QUESTION = 4
 const INCORRECT_NAME_REGEX = /[QL]\d+/;
@@ -11,7 +14,8 @@ const INCORRECT_NAME_REGEX = /[QL]\d+/;
 class WikidataController {
 
     constructor() {
-        this.questionToCorrectImage = new Map()
+        this.wikidataItemRepository = new WikidataItemRepository();
+        this.questionRepository = new QuestionRepository();
     }
 
     getRandomNumNotInSetAndUpdate(numLimit, set) {
@@ -41,6 +45,10 @@ class WikidataController {
         return questionKeys[Math.floor(Math.random() * questionKeys.length)];
     }
 
+    filterIncorrectNameItems(items) {
+        return items.filter(item => !INCORRECT_NAME_REGEX.test(item.itemLabel.value));
+    }
+
     async getWikidataResults(query) {
         //Constructing the url for the wikidata request
         let url = wbk.sparqlQuery(query);
@@ -54,25 +62,12 @@ class WikidataController {
         return data.results.bindings;
     }
 
-    getRandomQuestionSelection(wikidataResults) {
-        let chosenItems = [];
-        let chosenNums = [];
-        let pendingQuestions = ANSWERS_PER_QUESTION;
-        wikidataResults = wikidataResults.filter(item => !INCORRECT_NAME_REGEX.test(item.itemLabel.value));
-
-        while (pendingQuestions > 0) {
-            const randomNum = this.getRandomNumNotInSetAndUpdate(wikidataResults.length, chosenNums);
-            const randItem = wikidataResults[randomNum];
-            // Make sure label is not a QID and is not already chosen
-            if (!chosenItems.some(item => item.label === randItem.itemLabel.value)) {
-                chosenItems.push({
-                    label: randItem.itemLabel.value,
-                    image: randItem.image.value
-                })
-                chosenNums.push(randomNum);
-                pendingQuestions--;
-            }
-        }
+    async getRandomQuestionSelection(queryName) {
+        const randomItems = await this.wikidataItemRepository.getRandomByType(queryName, ANSWERS_PER_QUESTION);
+        let chosenItems = randomItems.map(item => ({
+            label: item.label,
+            image: item.image
+        }));
 
         return chosenItems;
     }
@@ -88,38 +83,72 @@ class WikidataController {
     async getQuestionAndImages(queryName) {
 
         if (queryName == "random") {
-            // queryName = this.getRandomQuestionType();
-            queryName = "flags";
+            queryName = this.getRandomQuestionType();
         }
 
         if (!questionTypes[queryName]) {
-            throw new Error("Invalid question type");
+            throw new Error("Invalid question type: " + queryName);
         }
 
         console.log(`[WikidataController] Getting question for: ${queryName}`);
 
-        const { imgTypeName, relation, query } = questionTypes[queryName];
-        const wikidataResults = await this.getWikidataResults(query);
+        const { imgTypeName, relation } = questionTypes[queryName];
 
-        const chosenItems = this.getRandomQuestionSelection(wikidataResults);
+        const chosenItems = await this.getRandomQuestionSelection(queryName);
+        if (chosenItems.length !== ANSWERS_PER_QUESTION) {
+            throw new Error("Not enough items found");
+        }
 
-        const randomId = this.getRandomStringId();
         const chosenItem = chosenItems[this.getRandomInt(0, chosenItems.length - 1)];
         const question = `Which of the following ${imgTypeName} ${relation} ${chosenItem.label}?`;
-        this.questionToCorrectImage.set(randomId, chosenItem.image);
 
         const questionAndImages = {
-            id: randomId,
             question: question,
             images: chosenItems.map(item => item.image)
         }
 
-        return questionAndImages;
+        const savedQuestion = await this.questionRepository.newQuestion({
+            ...questionAndImages,
+            correctOption: chosenItem.image
+        });
+
+        return {
+            id: savedQuestion._id,
+            ...questionAndImages
+        };
     }
 
-    isQuestionCorrect(questionId, answer) {
-        return this.questionToCorrectImage.get(questionId) === answer;
+    async isQuestionCorrect(questionId, answer) {
+        return await this.questionRepository.isAnswerCorrect(questionId, answer);
     }
+
+    async preSaveWikidataItems(explicitQuestionTypes = null) {
+        let resultReport = { fetchedItems: 0 };
+
+        const fetchQuestionTypes = explicitQuestionTypes ? explicitQuestionTypes : Object.keys(questionTypes);
+
+        for (const questionKey of fetchQuestionTypes) {
+            try {
+                const { query } = questionTypes[questionKey];
+                const wikidataResults = await this.getWikidataResults(query);
+
+                const bulkOps = this.filterIncorrectNameItems(wikidataResults).map(result => ({
+                    wikidataId: result.item.value.split('/').pop(),
+                    label: result.itemLabel.value,
+                    image: result.image.value,
+                    type: questionKey
+                }));
+
+                await this.wikidataItemRepository.bulkWrite(bulkOps);
+
+                resultReport.fetchedItems += bulkOps.length;
+            } catch (err) {
+                console.error(`Error fetching items for ${questionKey}:`, err);
+            }
+        }
+        return resultReport;
+    }
+
 }
 
 module.exports = WikidataController;
