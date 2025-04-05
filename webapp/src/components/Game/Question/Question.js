@@ -5,6 +5,7 @@ import AccessTimeIcon from "@mui/icons-material/AccessTime"
 import axios from 'axios';
 import { useGame } from "../GameContext";
 import StatisticsUpdater from "./StatisticsUpdater";
+import { QuestionTypeSelector } from "./QuestionTypeSelector";
 
 // Create a theme with the blue color from the login screen
 const theme = createTheme({
@@ -27,15 +28,15 @@ export const Question = ({ statisticsUpdater = defaultStatisticsUpdater }) => {
     const [imagesLoaded, setImagesLoaded] = useState(false);
     const [isPaused, setIsPaused] = useState(false);
 
-    const { question, setQuestion, setGameEnded } = useGame();
+    const { question, setQuestion, setGameEnded, questionType } = useGame();
     const gatewayEndpoint = process.env.GATEWAY_SERVICE_URL || 'http://localhost:8000';
 
     useEffect(() => {
-        const fetchData = async () => {
+        const fetchInitialQuesiton = async () => {
             await requestQuestion(true); // Pass true to indicate it's the initial load
-        };
-        fetchData();
-    }, [])
+        }
+        fetchInitialQuesiton();
+    }, [questionType])
 
     const progressPercentage = (timeLeft / 60) * 100
 
@@ -65,7 +66,7 @@ export const Question = ({ statisticsUpdater = defaultStatisticsUpdater }) => {
         setIsPaused(true);
         setGameEnded(true);
         try {
-            let questionResponse = await axios.get(`${gatewayEndpoint}/question`)
+            let questionResponse = await axios.get(`${gatewayEndpoint}/question/${questionType}`);
             setQuestion(questionResponse.data);
 
             // Update gamesPlayed only on the first load
@@ -156,7 +157,28 @@ export const Question = ({ statisticsUpdater = defaultStatisticsUpdater }) => {
         <ThemeProvider theme={theme}>
             <Container maxWidth="md" sx={{ py: 4 }}>
                 {/* Large Timer at the top */}
-                <Box sx={{ display: "flex", justifyContent: "center", mb: 3 }}>
+                <Box sx={{
+                    display: "flex",
+                    flexDirection: { xs: "column", sm: "row" }, // Column for mobile, row for larger screens
+                    justifyContent: "center",
+                    alignItems: "center", // Align items vertically
+                    mb: 3,
+                    gap: { xs: 1, sm: 2 }, // Smaller gap for mobile, larger for larger screens
+                }}>
+                    <Paper
+                        elevation={3}
+                        sx={{
+                            display: "flex",
+                            alignItems: "center",
+                            padding: "12px 24px",
+                            borderRadius: "24px",
+                            backgroundColor: "white",
+                            border: "2px solid #1976d2",
+                            width: { xs: "80%", sm: "30%" }, // Full width on mobile, smaller on larger screens
+                        }}
+                    >
+                        <QuestionTypeSelector />
+                    </Paper>
                     <Paper
                         elevation={3}
                         sx={{
@@ -166,6 +188,7 @@ export const Question = ({ statisticsUpdater = defaultStatisticsUpdater }) => {
                             borderRadius: "24px",
                             backgroundColor: timeLeft <= 10 ? "#ffebee" : "white",
                             border: timeLeft <= 10 ? "2px solid #f44336" : "1px solid #e0e0e0",
+                            width: { xs: "80%", sm: "30%" }
                         }}
                     >
                         <Box sx={{ position: "relative", display: "inline-flex", mr: 2 }}>
