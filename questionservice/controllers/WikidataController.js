@@ -16,6 +16,11 @@ class WikidataController {
     constructor() {
         this.wikidataItemRepository = new WikidataItemRepository();
         this.questionRepository = new QuestionRepository();
+        this.getTestQuestions = true;
+    }
+
+    setTestQuestions(value) {
+        this.getTestQuestions = value;
     }
 
 
@@ -47,7 +52,7 @@ class WikidataController {
     }
 
     async getRandomQuestionSelection(queryName) {
-        const randomItems = await this.wikidataItemRepository.getRandomByType(queryName, ANSWERS_PER_QUESTION);
+        const randomItems = await this.wikidataItemRepository.getRandomByType(queryName, this.getTestQuestions, ANSWERS_PER_QUESTION);
         let chosenItems = randomItems.map(item => ({
             label: item.label,
             image: item.image
@@ -120,7 +125,8 @@ class WikidataController {
                     wikidataId: result.item.value.split('/').pop(),
                     label: result.itemLabel.value,
                     image: result.image.value,
-                    type: questionKey
+                    type: questionKey,
+                    isTest: this.getTestQuestions
                 }));
 
                 await this.wikidataItemRepository.bulkWrite(bulkOps);
