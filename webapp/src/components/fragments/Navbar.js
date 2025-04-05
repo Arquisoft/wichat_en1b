@@ -21,10 +21,10 @@ export const Navbar = () => {
     }, [])
 
     React.useEffect(() => {
-        setIsMobile(window.innerWidth < 600)
+        setIsMobile(window.innerWidth < 900)
 
         const handleResize = () => {
-            setIsMobile(window.innerWidth < 600)
+            setIsMobile(window.innerWidth < 900)
         }
 
         window.addEventListener("resize", handleResize)
