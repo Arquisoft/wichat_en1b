@@ -11,10 +11,6 @@ class QuestionRepository {
         return question.correctOption === answer;
     }
 
-    async getQuestion(questionId) {
-        return Question.findById(questionId);
-    }
-
 }
 
 module.exports = QuestionRepository;

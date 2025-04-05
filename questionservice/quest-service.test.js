@@ -1,8 +1,10 @@
 const request = require('supertest');
 const WikidataItemRepository = require('./repositories/WikidataItemRepository');
 const mongoose = require('mongoose');
+const { MongoMemoryServer } = require('mongodb-memory-server');
+const WikidataController = require('./controllers/WikidataController');
 
-let app;
+let app, mongoServer;
 
 const mockItems = [{
         wikidataId: 'Q1',
@@ -32,6 +34,12 @@ const mockItems = [{
 
 
 beforeAll(async() => {
+    mongoServer = await MongoMemoryServer.create();
+    const mongoUri = mongoServer.getUri();
+    console.log("mongoUri");
+    console.log(mongoUri);
+    process.env.MONGODB_URI = mongoUri;
+
     app = require('./quest-service');
 
     const repo = new WikidataItemRepository();
@@ -42,7 +50,10 @@ afterAll(async() => {
     if (app && app.listening) {
         await new Promise((resolve) => app.close(resolve));
     }
-    await mongoose.connection.close(); // Close Mongoose connection
+    await mongoose.connection.close();
+    if (mongoServer) {
+        await mongoServer.stop();
+    }
 })
 
 describe('Question Service', () => {
@@ -79,4 +90,11 @@ describe('Question Service', () => {
         expect(response.status).toBe(500); // In my opinion, this should be a 400 response code
         expect(response.body).toHaveProperty('error', 'Failed to fetch question');
     });
+
+    it('More than 0 wikidata items should be fetched for presaving', async() => {
+        const controller = new WikidataController();
+        const result = await controller.preSaveWikidataItems(["flags"]);
+
+        expect(result.fetchedItems).toBeGreaterThan(0);
+    })
 })

@@ -8,8 +8,12 @@ const { check, validationResult } = require('express-validator');
 const app = express();
 const port = 8004;
 
-const mongoUri = process.env.MONGODB_URI || 'mongodb://localhost:27017/questiondb';
-mongoose.connect(mongoUri);
+if (mongoose.connection.readyState === 0) {
+    const mongoUri = process.env.MONGODB_URI || 'mongodb://localhost:27017/questiondb';
+    mongoose.connect(mongoUri)
+        .then(() => console.log('Connected to MongoDB'))
+        .catch(err => console.error('MongoDB connection error:', err));
+};
 
 const wikidataController = new WikidataController();
 

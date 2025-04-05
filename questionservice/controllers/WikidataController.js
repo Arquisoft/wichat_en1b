@@ -18,27 +18,11 @@ class WikidataController {
         this.questionRepository = new QuestionRepository();
     }
 
-    getRandomNumNotInSetAndUpdate(numLimit, set) {
-        // Check if we've exhausted all possible numbers
-        if (set.length >= numLimit) {
-            throw new Error('No more unique numbers available');
-        }
-
-        let randomNumber;
-        do {
-            randomNumber = Math.floor(Math.random() * numLimit);
-        } while (set.includes(randomNumber)); // Ensure the number is unique
-        set.push(randomNumber);
-        return randomNumber
-    }
 
     getRandomInt(min, max) {
         return Math.floor(Math.random() * (max - min + 1)) + min;
     }
 
-    getRandomStringId() {
-        return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
-    }
 
     getRandomQuestionType() {
         const questionKeys = Object.keys(questionTypes);
