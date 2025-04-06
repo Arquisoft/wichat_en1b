@@ -108,45 +108,40 @@ Here you can see the internal structure of (some) infrastructure elements from l
 ==== _Server Side_
 [plantuml,"Deployment view L2",png]
 ----
-node "Server Side"{
-  component GS as "Gateway Service"
+node "Server Side" {
   component WA as "Web Application"
+  component GS as "Gateway Service"
   component US as "User Service"
-  component AS as "Authorization Service"
   component QS as "Question Service"
+  component AS as "Authorization Service"
   component LLMS as "LLM Service"
   component SS as "Statistics Service"
   database MDB as "Mongo DB"
+
+  GS -[dashed]-> WA
+  WA -[dashed]-> GS
+
+  GS -[dashed]-> US
+  US -[dashed]-> GS
+
+  GS -[dashed]-> AS
+  AS -[dashed]-> GS
+
+  GS -[dashed]-> QS
+  QS -[dashed]-> GS
+
+  GS -[dashed]-> LLMS
+  LLMS -[dashed]-> GS
+
+  GS -[dashed]-> SS
+  SS -[dashed]-> GS
+
+  US -[dashed]-> MDB
+  AS -[dashed]-> MDB
+  SS -[dashed]-> MDB
 }
-
-
-
-
-GS-[dashed]->WA
-WA-[dashed]->GS
-
-GS-[dashed]->AS
-AS-[dashed]->GS
-
-GS-[dashed]->US
-US-[dashed]->GS
-
-GS-[dashed]->QS
-QS-[dashed]->GS
-
-GS-[dashed]->SS
-SS-[dashed]->GS
-
-AS-[dashed]->MDB
-MDB-[dashed]->AS
-
-US-[dashed]->MDB
-MDB-[dashed]->US
-
-GS-[dashed]->LLMS
-LLMS-[dashed]->GS
-
 ----
+
 The gateway service works as an adapter between the micro services and the web client. The web application is the main interface for the user to interact with the system.
 
 We've opted for a microservices architecture using Docker containers instead of a monolithic setup. Each service has its own Docker image. This Docker-based approach streamlines deployment, management, and resource utilization while enhancing the overall flexibility and scalability of our system.

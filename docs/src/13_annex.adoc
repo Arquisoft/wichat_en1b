@@ -1,4 +1,0 @@
-ifndef::imagesdir[:imagesdir: ../images]
-
-[[section-annex]]
-== Annex
