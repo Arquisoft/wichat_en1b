@@ -52,10 +52,10 @@ endif::arc42help[]
 * The system must only be used by registered users.
 * The system will have at least a Web frontend which will show the pictures and answers as well as the hint system where the users can interact with the system to obtain hints about the pictures.
 * The Web application should be deployed and accessible through the web.
-* Users will be able to register to the system and obtain the historical data from their participation: number of games, questions passed and failed and times.
-* Information about the questions will be automatically generated from Wikidata. 
+* Users will be able to register to the system and obtain the historical data from their participation: number of games, questions passed and failed, streak of questions and date of register.
+* Information about the questions will be automatically generated from Wikidata.
 * It should be possible to interact with the application in each question to obtain hints about the questions. For that, an LLM will be used which will be accessible through an API.
-* It should be possible to use an approach to generate hints from Wikidata that mitigates the generation of incorrect answers or hallucinations. 
+* It should be possible to use an approach to generate hints from Wikidata that mitigates the generation of incorrect answers or hallucinations.
 * The questions should be answered before some specific time.
 * Each question should have a correct answer and several incorrect ones or distractors. The right answer and the distractors should be automatically generated.
 * The system will give access to the information about the users through an API which should be documented.
