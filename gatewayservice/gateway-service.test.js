@@ -142,27 +142,22 @@ describe('Gateway Service', () => {
     expect(response.body.error).toBe('Authorization header missing');
   });
 
-  // Test /question endpoint
-  it('should retrieve a question from the question service', async () => {
+  const verifyMockQuestion = async (endpoint) => {
     const response = await request(app)
-      .get('/question');
-
-    console.log(response.body);
+      .get(endpoint);
     expect(response.statusCode).toBe(200);
     expect(response.body.id).toBe('mpzulblyui9du98pmodg5o');
     expect(response.body.question).toBe('Which of the following flags belongs to Nepal?');
     expect(response.body.images).toHaveLength(4);
+  };
+
+  // Test /question endpoint
+  it('should retrieve a question from the question service', async () => {
+    await verifyMockQuestion('/question');
   });
 
   it('should retrieve a question from the question service by specific question type', async () => {
-    const response = await request(app)
-      .get('/question/flags');
-
-    console.log(response.body);
-    expect(response.statusCode).toBe(200);
-    expect(response.body.id).toBe('mpzulblyui9du98pmodg5o');
-    expect(response.body.question).toBe('Which of the following flags belongs to Nepal?');
-    expect(response.body.images).toHaveLength(4);
+    await verifyMockQuestion('/question/flags');;
   });
 
   // Test /answer endpoint
