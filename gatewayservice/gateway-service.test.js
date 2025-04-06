@@ -49,7 +49,7 @@ describe('Gateway Service', () => {
                                      }
                             });
 
-    } else if (url.endsWith('/question')) {
+    } else if (url.endsWith('/question') || url.endsWith('/question/flags')) {
       return Promise.resolve({ data: { id: "mpzulblyui9du98pmodg5o", 
                                        question: "Which of the following flags belongs to Nepal?",
                                        images: [
@@ -61,7 +61,6 @@ describe('Gateway Service', () => {
                                      } 
                             });
     }
-    
       throw new Error(`Unhandled GET request to ${url}`);
   });
 
@@ -143,15 +142,22 @@ describe('Gateway Service', () => {
     expect(response.body.error).toBe('Authorization header missing');
   });
 
-  // Test /question endpoint
-  it('should retrieve a question from the question service', async () => {
+  const verifyMockQuestion = async (endpoint) => {
     const response = await request(app)
-      .get('/question');
-
+      .get(endpoint);
     expect(response.statusCode).toBe(200);
     expect(response.body.id).toBe('mpzulblyui9du98pmodg5o');
     expect(response.body.question).toBe('Which of the following flags belongs to Nepal?');
     expect(response.body.images).toHaveLength(4);
+  };
+
+  // Test /question endpoint
+  it('should retrieve a question from the question service', async () => {
+    await verifyMockQuestion('/question');
+  });
+
+  it('should retrieve a question from the question service by specific question type', async () => {
+    await verifyMockQuestion('/question/flags');;
   });
 
   // Test /answer endpoint

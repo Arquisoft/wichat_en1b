@@ -2,9 +2,9 @@ const WikidataItem = require('../models/wikidata-item-model');
 
 class WikidataItemRepository {
 
-    async getRandomByType(type, limit = 4) {
+    async getRandomByType(type, isTest, limit = 4) {
         return WikidataItem.aggregate([
-            { $match: { type } },
+            { $match: { type, isTest } },
             { $sample: { size: limit } }
         ]);
     }
@@ -17,7 +17,8 @@ class WikidataItemRepository {
                     $set: {
                         label: result.label,
                         image: result.image,
-                        type: result.type
+                        type: result.type,
+                        isTest: result.isTest
                     }
                 },
                 upsert: true // Create if doesn't exist

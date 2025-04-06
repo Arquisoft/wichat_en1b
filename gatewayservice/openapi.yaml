@@ -10,105 +10,105 @@ servers:
     description: Production server
 paths:
   /login:
-      post:
-        summary: Log in to the system.
-        operationId: loginUser
-        requestBody:
-          required: true
+    post:
+      summary: Log in to the system.
+      operationId: loginUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                  description: User ID.
+                  example: student
+                password:
+                  type: string
+                  description: User password.
+                  example: pass
+      responses:
+        '200':
+          description: Login successful. Returns user token, username, and creation date.
           content:
             application/json:
               schema:
                 type: object
                 properties:
+                  token:
+                    type: string
+                    description: User token.
+                    example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2N2UzY2ZiZGY1MzJmZmMwYTk1MzNjMmUiLCJ1c2VybmFtZSI6IlRlc3QiLCJpYXQiOjE3NDM0MzIwODUsImV4cCI6MTc0MzQzNTY4NX0.2O6lbAOkuEdJBaZNP7YmfAGgrL6gGt9E6dEa1Lrb7R4
                   username:
                     type: string
-                    description: User ID.
+                    description: Username.
                     example: student
-                  password:
+                  createdAt:
                     type: string
-                    description: User password.
-                    example: pass
-        responses:
-          '200':
-            description: Login successful. Returns user token, username, and creation date.
-            content:
-              application/json:
-                schema:
-                  type: object
-                  properties:
-                    token:
-                      type: string
-                      description: User token.
-                      example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2N2UzY2ZiZGY1MzJmZmMwYTk1MzNjMmUiLCJ1c2VybmFtZSI6IlRlc3QiLCJpYXQiOjE3NDM0MzIwODUsImV4cCI6MTc0MzQzNTY4NX0.2O6lbAOkuEdJBaZNP7YmfAGgrL6gGt9E6dEa1Lrb7R4
-                    username:
-                      type: string
-                      description: Username.
-                      example: student
-                    createdAt:
-                      type: string
-                      description: Creation date.
-                      example: '2025-03-26T09:58:21.422Z'
-          '400':
-            description: Invalid request parameters.
-            content:
-              application/json:
-                schema:
-                  type: object
-                  properties:
-                    errors:
-                      type: array
-                      description: List of validation errors.
-                      items:
-                        type: object
-                        properties:
-                          type:
-                            type: string
-                            description: Type of error.
-                            example: field
-                          msg:
-                            type: string
-                            description: Error message.
-                            example: Invalid value
-                          path:
-                            type: string
-                            description: Field that caused the error.
-                            example: username
-                          location:
-                            type: string
-                            description: Location of the error in the request.
-                            example: body
-                example:
+                    description: Creation date.
+                    example: '2025-03-26T09:58:21.422Z'
+        '400':
+          description: Invalid request parameters.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
                   errors:
-                    - type: field
-                      msg: Invalid value
-                      path: username
-                      location: body
-                    - type: field
-                      msg: Invalid value
-                      path: password
-                      location: body
-          '401':
-            description: Invalid credentials.
-            content:
-              application/json:
-                schema:
-                  type: object
-                  properties:
-                    error:
-                      type: string
-                      description: Shows the error info..
-                      example: Invalid credentials
-          '500':
-            description: Some error ocurred in the server when processing the request.
-            content:
-              application/json:
-                schema:
-                  type: object
-                  properties:
-                    error:
-                      type: string
-                      description: Error information.
-                      example: Internal Server Error
+                    type: array
+                    description: List of validation errors.
+                    items:
+                      type: object
+                      properties:
+                        type:
+                          type: string
+                          description: Type of error.
+                          example: field
+                        msg:
+                          type: string
+                          description: Error message.
+                          example: Invalid value
+                        path:
+                          type: string
+                          description: Field that caused the error.
+                          example: username
+                        location:
+                          type: string
+                          description: Location of the error in the request.
+                          example: body
+              example:
+                errors:
+                  - type: field
+                    msg: Invalid value
+                    path: username
+                    location: body
+                  - type: field
+                    msg: Invalid value
+                    path: password
+                    location: body
+        '401':
+          description: Invalid credentials.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    description: Shows the error info..
+                    example: Invalid credentials
+        '500':
+          description: Some error ocurred in the server when processing the request.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    description: Error information.
+                    example: Internal Server Error
   /adduser:
     post:
       summary: Add a new user to the database.
@@ -147,7 +147,7 @@ paths:
                   createdAt:
                     type: string
                     description: Creation date.
-                    example: '2025-03-31T14:39:31.025Z'                                     
+                    example: '2025-03-31T14:39:31.025Z'
         '500':
           description: Failed to add user, there was an error in the server.
           content:
@@ -189,7 +189,7 @@ paths:
                   answer:
                     type: string
                     description: LLM answer.
-                    example: The color of the flag is a key indicator. It starts with a simple yet distinctive design that many people recognize.                
+                    example: The color of the flag is a key indicator. It starts with a simple yet distinctive design that many people recognize.
         '400':
           description: Some required data is missing (gameQuestion or userQuestion).
           content:
@@ -309,10 +309,10 @@ paths:
                       type: string
                       format: uri
                     example:
-                      - "http://commons.wikimedia.org/wiki/Special:FilePath/Flag%20of%20Nepal.svg"
-                      - "http://commons.wikimedia.org/wiki/Special:FilePath/Flag%20of%20Myanmar.svg"
-                      - "http://commons.wikimedia.org/wiki/Special:FilePath/Flag%20of%20Costa%20Rica.svg"
-                      - "http://commons.wikimedia.org/wiki/Special:FilePath/Flag%20of%20Yemen.svg"
+                      - 'http://commons.wikimedia.org/wiki/Special:FilePath/Flag%20of%20Nepal.svg'
+                      - 'http://commons.wikimedia.org/wiki/Special:FilePath/Flag%20of%20Myanmar.svg'
+                      - 'http://commons.wikimedia.org/wiki/Special:FilePath/Flag%20of%20Costa%20Rica.svg'
+                      - 'http://commons.wikimedia.org/wiki/Special:FilePath/Flag%20of%20Yemen.svg'
         '500':
           description: The question could not be retrieved.
           content:
@@ -324,6 +324,67 @@ paths:
                     type: string
                     description: The error message.
                     example: Failed to fetch question
+  /question/{questionType}:
+    get:
+      summary: Retrieves a question of a specific type.
+      operationId: getQuestionByType
+      parameters:
+        - name: questionType
+          in: path
+          required: true
+          description: The type of question to retrieve.
+          schema:
+            type: string
+            example: flags
+      responses:
+        '200':
+          description: The question was retrieved successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    description: Unique identifier for the question.
+                    example: mpzulblyui9du98pmodg5o
+                  question:
+                    type: string
+                    description: The text of the question.
+                    example: Which of the following flags belongs to Nepal?
+                  images:
+                    type: array
+                    description: List of image URLs related to the question.
+                    items:
+                      type: string
+                      format: uri
+                    example:
+                      - 'http://commons.wikimedia.org/wiki/Special:FilePath/Flag%20of%20Nepal.svg'
+                      - 'http://commons.wikimedia.org/wiki/Special:FilePath/Flag%20of%20Myanmar.svg'
+                      - 'http://commons.wikimedia.org/wiki/Special:FilePath/Flag%20of%20Costa%20Rica.svg'
+                      - 'http://commons.wikimedia.org/wiki/Special:FilePath/Flag%20of%20Yemen.svg'
+        '400':
+          description: Invalid question type provided.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    description: Error message.
+                    example: Invalid question type
+        '500':
+          description: The question could not be retrieved due to a server error.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    description: Error message.
+                    example: Internal Server Error
   /statistics:
     get:
       summary: Retrieves the statistics for the user in session.
@@ -337,19 +398,19 @@ paths:
                 type: object
                 properties:
                   gamesPlayed:
-                    type: int
+                    type: integer
                     description: Number of games played.
                     example: 17
                   questionsAnswered:
-                    type: int
+                    type: integer
                     description: Number of questions answered.
                     example: 34
                   correctAnswers:
-                    type: int
+                    type: integer
                     description: Number of correct answers.
                     example: 26
                   incorrectAnswers:
-                    type: int
+                    type: integer
                     description: Number of incorrect answers.
                     example: 8
         '403':
@@ -390,19 +451,19 @@ paths:
                 type: object
                 properties:
                   gamesPlayed:
-                    type: int
+                    type: integer
                     description: Number of games played.
                     example: 17
                   questionsAnswered:
-                    type: int
+                    type: integer
                     description: Number of questions answered.
                     example: 34
                   correctAnswers:
-                    type: int
+                    type: integer
                     description: Number of correct answers.
                     example: 26
                   incorrectAnswers:
-                    type: int
+                    type: integer
                     description: Number of incorrect answers.
                     example: 8
         '400':
@@ -415,7 +476,7 @@ paths:
                   error:
                     type: string
                     description: The error message.
-                    example: "Invalid input: All statistics must be numbers."
+                    example: 'Invalid input: All statistics must be numbers.'
         '401':
           description: User token is missing.
           content:

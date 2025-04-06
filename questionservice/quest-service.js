@@ -24,7 +24,7 @@ app.get('/', (req, res) => {
     res.status(200).json({ message: "Server working" });
 })
 
-const getWikidataQuestion = async(req, res) => {
+const getWikidataQuestion = async (req, res) => {
     try {
         const questionType = req.params.questionType;
         const question = await wikidataController.getQuestionAndImages(questionType);
@@ -39,7 +39,7 @@ const getWikidataQuestion = async(req, res) => {
  * Get a random question
  * (using flags as the default question type temporaly)
  */
-app.get("/question", async(req, _res, next) => {
+app.get("/question", async (req, _res, next) => {
     req.params.questionType = "random";
     next();
 }, getWikidataQuestion);
@@ -52,10 +52,10 @@ app.get("/question/:questionType", getWikidataQuestion);
 
 // Validate an answer submitted by the game
 app.post("/answer", [
-        check('questionId').notEmpty().withMessage('The question id is required'),
-        check('answer').notEmpty().withMessage('The answer is required')
-    ],
-    async(req, res) => {
+    check('questionId').notEmpty().withMessage('The question id is required'),
+    check('answer').notEmpty().withMessage('The answer is required')
+],
+    async (req, res) => {
         try {
             const errors = validationResult(req);
 
@@ -79,9 +79,11 @@ const server = app.listen(port, () => {
 
 // a equivalent for if __name__ == "__main__": (when running the file directly)
 if (require.main === module) {
+    wikidataController.setTestQuestions(false);
+
     new CronJob(
         '0 * * * *', // every hour
-        async() => {
+        async () => {
             await wikidataController.preSaveWikidataItems();
         }, // onTick
         null, // onComplete

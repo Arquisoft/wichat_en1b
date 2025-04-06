@@ -17,6 +17,10 @@ const wikidataItemSchema = new mongoose.Schema({
     image: {
         type: String,
         required: true,
+    },
+    isTest: {
+        type: Boolean,
+        default: false,
     }
 });
 

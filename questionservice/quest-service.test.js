@@ -4,36 +4,41 @@ const mongoose = require('mongoose');
 const { MongoMemoryServer } = require('mongodb-memory-server');
 const WikidataController = require('./controllers/WikidataController');
 
-let app, mongoServer;
+let app, mongoServer, wikidataController;
 
 const mockItems = [{
-        wikidataId: 'Q1',
-        type: 'flags',
-        label: 'Test Item',
-        image: 'https://example.com/test-item.jpg'
-    },
-    {
-        wikidataId: 'Q2',
-        type: 'flags',
-        label: 'Test Item 2',
-        image: 'https://example.com/test-item2.jpg'
-    },
-    {
-        wikidataId: 'Q3',
-        type: 'flags',
-        label: 'Test Item 3',
-        image: 'https://example.com/test-item3.jpg'
-    },
-    {
-        wikidataId: 'Q4',
-        type: 'flags',
-        label: 'Test Item 4',
-        image: 'https://example.com/test-item4.jpg'
-    }
-]
+    wikidataId: 'Q1',
+    type: 'flags',
+    label: 'Test Item',
+    image: 'https://example.com/test-item.jpg',
+    isTest: true
+},
+{
+    wikidataId: 'Q2',
+    type: 'flags',
+    label: 'Test Item 2',
+    image: 'https://example.com/test-item2.jpg',
+    isTest: true
+},
+{
+    wikidataId: 'Q3',
+    type: 'flags',
+    label: 'Test Item 3',
+    image: 'https://example.com/test-item3.jpg',
+    isTest: true
+},
+{
+    wikidataId: 'Q4',
+    type: 'flags',
+    label: 'Test Item 4',
+    image: 'https://example.com/test-item4.jpg',
+    isTest: true
+}]
 
 
-beforeAll(async() => {
+beforeAll(async () => {
+    wikidataController = new WikidataController();
+
     mongoServer = await MongoMemoryServer.create();
     const mongoUri = mongoServer.getUri();
     console.log("mongoUri");
@@ -46,7 +51,7 @@ beforeAll(async() => {
     await repo.bulkWrite(mockItems);
 });
 
-afterAll(async() => {
+afterAll(async () => {
     if (app && app.listening) {
         await new Promise((resolve) => app.close(resolve));
     }
@@ -57,12 +62,12 @@ afterAll(async() => {
 })
 
 describe('Question Service', () => {
-    it('Should give a status 200 when a GET request is sent to /', async() => {
+    it('Should give a status 200 when a GET request is sent to /', async () => {
         let response = await request(app).get('/');
         expect(response.status).toBe(200);
     });
 
-    it('Should retrieve questions through the /question endpoint', async() => {
+    it('Should retrieve questions through the /question endpoint', async () => {
         let response = await request(app).get('/question/flags');
 
         expect(response.status).toBe(200);
@@ -72,7 +77,7 @@ describe('Question Service', () => {
         expect(response.body.images).toHaveLength(4);
     });
 
-    it('Should validate correctly an answer', async() => {
+    it('Should validate correctly an answer', async () => {
         let response = await request(app)
             .post('/answer')
             .send({
@@ -84,16 +89,15 @@ describe('Question Service', () => {
         expect(response.body).toHaveProperty('correct');
     });
 
-    it('Should fail when the /question endpoint receiven an invalid question type', async() => {
+    it('Should fail when the /question endpoint receiven an invalid question type', async () => {
         let response = await request(app).get('/question/dogs');
 
         expect(response.status).toBe(500); // In my opinion, this should be a 400 response code
         expect(response.body).toHaveProperty('error', 'Failed to fetch question');
     });
 
-    it('More than 0 wikidata items should be fetched for presaving', async() => {
-        const controller = new WikidataController();
-        const result = await controller.preSaveWikidataItems(["flags"]);
+    it('More than 0 wikidata items should be fetched for presaving', async () => {
+        const result = await wikidataController.preSaveWikidataItems(["flags"]);
 
         expect(result.fetchedItems).toBeGreaterThan(0);
     })

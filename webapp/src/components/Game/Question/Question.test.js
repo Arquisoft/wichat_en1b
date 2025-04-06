@@ -15,10 +15,10 @@ jest.mock('../GameContext', () => ({
 jest.mock('./StatisticsUpdater');
 
 global.Image = function imageFunction() {
-        setTimeout(() => {
-            if (this.onload) this.onload();
-        }, 100);
-    }
+    setTimeout(() => {
+        if (this.onload) this.onload();
+    }, 100);
+}
 
 
 describe('Question Component', () => {
@@ -36,11 +36,13 @@ describe('Question Component', () => {
     const mockGameContext = {
         question: mockQuestion,
         setQuestion: jest.fn(),
-        setGameEnded: jest.fn()
+        setGameEnded: jest.fn(),
+        questionType: 'random',
+        setQuestionType: jest.fn()
     };
 
     const mockUserCookie = JSON.stringify({ token: 'fake-jwt-token' });
-    
+
     // Mock StatisticsUpdater instance with jest functions
     const mockStatisticsUpdater = {
         incrementGamesPlayed: jest.fn().mockResolvedValue({}),
@@ -62,7 +64,7 @@ describe('Question Component', () => {
         axios.get.mockResolvedValue({ data: mockQuestion });
 
         jest.useFakeTimers();
-        
+
         // Reset the mock statistics updater methods
         mockStatisticsUpdater.incrementGamesPlayed.mockClear();
         mockStatisticsUpdater.recordCorrectAnswer.mockClear();
@@ -86,7 +88,7 @@ describe('Question Component', () => {
     test('fetches a question on initial render', async () => {
         render(<Question statisticsUpdater={mockStatisticsUpdater} />);
 
-        expect(axios.get).toHaveBeenCalledWith('http://test-gateway.com/question');
+        expect(axios.get).toHaveBeenCalledWith('http://test-gateway.com/question/random');
 
         await waitFor(() => {
             expect(mockGameContext.setQuestion).toHaveBeenCalled();
@@ -219,7 +221,7 @@ describe('Question Component', () => {
 
     test('increments games played on initial load', async () => {
         render(<Question statisticsUpdater={mockStatisticsUpdater} />);
-        
+
         await waitFor(() => {
             expect(mockStatisticsUpdater.incrementGamesPlayed).toHaveBeenCalledTimes(1);
         });
