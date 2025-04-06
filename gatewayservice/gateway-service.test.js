@@ -61,7 +61,6 @@ describe('Gateway Service', () => {
                                      } 
                             });
     }
-    
       throw new Error(`Unhandled GET request to ${url}`);
   });
 
