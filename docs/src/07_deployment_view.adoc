@@ -111,10 +111,10 @@ Here you can see the internal structure of (some) infrastructure elements from l
 node "Server Side" {
   component WA as "Web Application"
   component GS as "Gateway Service"
-  component US as "User Service"
   component QS as "Question Service"
-  component AS as "Authorization Service"
+  component US as "User Service"
   component LLMS as "LLM Service"
+  component AS as "Authorization Service"
   component SS as "Statistics Service"
   database MDB as "Mongo DB"
 
