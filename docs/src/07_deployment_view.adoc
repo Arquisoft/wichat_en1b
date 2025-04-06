@@ -139,6 +139,7 @@ node "Server Side" {
   US -[dashed]-> MDB
   AS -[dashed]-> MDB
   SS -[dashed]-> MDB
+  QS -[dashed]-> MDB
 }
 ----
 
