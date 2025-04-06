@@ -59,7 +59,7 @@ describe('Question Component', () => {
             return null;
         });
 
-        process.env.GATEWAY_SERVICE_URL = 'http://test-gateway.com';
+        process.env.REACT_APP_API_ENDPOINT = 'http://test-gateway.com';
 
         axios.get.mockResolvedValue({ data: mockQuestion });
 
