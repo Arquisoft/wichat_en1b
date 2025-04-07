@@ -10,7 +10,7 @@
 </p>
 
 ## Deployment Server
-http://wichat-en1b.francecentral.cloudapp.azure.com:3000/
+http://wichat-en1b.francecentral.cloudapp.azure.com:3000
 
 ## Introduction
 This is a base project for the Software Architecture course in 2024/2025. It is a basic application composed of several components.
