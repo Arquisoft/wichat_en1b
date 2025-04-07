@@ -9,6 +9,10 @@
 <img src="https://miro.medium.com/max/365/1*Jr3NFSKTfQWRUyjblBSKeg.png" height="100">
 </p>
 
+## Deployment Server
+http://wichat-en1b.francecentral.cloudapp.azure.com:3000/
+
+## Introduction
 This is a base project for the Software Architecture course in 2024/2025. It is a basic application composed of several components.
 
 - **User service**. Express service that handles the insertion of new users in the system.
