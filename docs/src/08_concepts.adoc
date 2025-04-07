@@ -60,7 +60,7 @@ endif::arc42help[]
 |===
 | *Class* | *Explanation*
 | Question | The model of the questions stores both right and wrong answers.
-| User | The people using the application, they have statistics and take part in a ranking to compete.
+| User | The people using the application, they have statistics.
 | Answer | Models each possible answer, created to reuse answers that are common to different questions, as well as distractors.
 | Game | It is created when the user starts a game and includes the rounds that the user has to answer.
 | Statistics | Stores information about the amount of correct and wrong answers that each user has answered.
@@ -80,5 +80,3 @@ As this is a game, the focus must be in our users so players can have a good exp
 
 === Robustness:
 It is desired to make the application as independant as possible from Wikidata. This way, if Wikidata is down our application can still manage to be available for our users.
-
-=== Under-the-hood:

@@ -157,7 +157,7 @@ Represents the interacting point of the application. It contains the different m
 Represents the services that the WIChat module provides. It represents the back-end of the application.
 
 ===== Interfaces
-* **Gateway Service**: Communicate with the front-end.
+* **Gateway Service**: Communicate with the front- with back-end.
 * **LLM Provider**: Retrieve hints for the user.
 * **Wikidata**: Retrieve questions and answers.
 
