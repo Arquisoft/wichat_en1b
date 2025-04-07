@@ -503,7 +503,6 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <li><a href="#_development_concepts">8.3. Development concepts:</a></li>
 <li><a href="#_user_experience">8.4. User Experience:</a></li>
 <li><a href="#_robustness">8.5. Robustness:</a></li>
-<li><a href="#_under_the_hood">8.6. Under-the-hood:</a></li>
 </ul>
 </li>
 <li><a href="#section-design-decisions">9. Architecture Decisions</a>
@@ -519,7 +518,6 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 </li>
 <li><a href="#section-technical-risks">11. Risks and Technical Debts</a></li>
 <li><a href="#section-glossary">12. Glossary</a></li>
-<li><a href="#section-annex">13. Annex</a></li>
 </ul>
 </div>
 </div>
@@ -654,7 +652,7 @@ If requirements documents exist this overview should refer to these documents.</
 <p>The Web application should be deployed and accessible through the web.</p>
 </li>
 <li>
-<p>Users will be able to register to the system and obtain the historical data from their participation: number of games, questions passed and failed and times.</p>
+<p>Users will be able to register to the system and obtain the historical data from their participation: number of games, questions passed and failed, streak of questions and date of register.</p>
 </li>
 <li>
 <p>Information about the questions will be automatically generated from Wikidata.</p>
@@ -673,9 +671,6 @@ If requirements documents exist this overview should refer to these documents.</
 </li>
 <li>
 <p>The system will give access to the information about the users through an API which should be documented.</p>
-</li>
-<li>
-<p>The system will give access to information about the generated questions through an API.</p>
 </li>
 </ul>
 </div>
@@ -698,10 +693,7 @@ If requirements documents exist this overview should refer to these documents.</
 <p>UR 2.1.1. Username.</p>
 </li>
 <li>
-<p>UR 2.1.2. Email address.</p>
-</li>
-<li>
-<p>UR 2.1.3. Password.</p>
+<p>UR 2.1.2. Password.</p>
 </li>
 </ul>
 </div>
@@ -714,10 +706,10 @@ If requirements documents exist this overview should refer to these documents.</
 <div class="ulist none or no-bullet">
 <ul class="none or no-bullet">
 <li>
-<p>UR 4.1. The system shouldn&#8217;t allow the user to create a new account if the email matches with an existing user.</p>
+<p>UR 4.1. The system shouldn&#8217;t allow the user to create a new account if the username matches with an existing user.</p>
 </li>
 <li>
-<p>UR 4.2. The system should allow the user to create a new account if the email does not match with an existing user.</p>
+<p>UR 4.2. The system should allow the user to create a new account if the username does not match with an existing user.</p>
 </li>
 </ul>
 </div>
@@ -808,9 +800,6 @@ If requirements documents exist this overview should refer to these documents.</
 </ul>
 </div>
 </li>
-<li>
-<p>UD 1.2. Identified users must be able to access the ranking of the game.</p>
-</li>
 </ul>
 </div>
 </li>
@@ -838,7 +827,7 @@ If requirements documents exist this overview should refer to these documents.</
 </div>
 </li>
 <li>
-<p>PWIC 4. The game consists of nine rounds by default.</p>
+<p>PWIC 4. The game contains an unlimited number of rounds. User decides when to finish answering questions.</p>
 <div class="ulist none or no-bullet">
 <ul class="none or no-bullet">
 <li>
@@ -875,9 +864,6 @@ If requirements documents exist this overview should refer to these documents.</
 </li>
 </ul>
 </div>
-</li>
-<li>
-<p>PWIC 6. The system must terminate the game and give a score when the last round is over.</p>
 </li>
 </ul>
 </div>
@@ -1123,7 +1109,7 @@ conventions (e.g. programming or versioning guidelines, documentation or naming 
 <tbody>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Web App</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The application should be a web application</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The application should be a web application.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Wikidata</p></td>
@@ -1131,15 +1117,15 @@ conventions (e.g. programming or versioning guidelines, documentation or naming 
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">LLM Integration</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The system must handle the interaction of a user with a LLM chat</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The system must handle the interaction of a user with a LLM chat.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Data Storage</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The system will use a database to store data about the users. The nature of this database is not decided yet</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The system will use a database to store data about the users.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Deployment</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The system must be accesible via web and it must be deployed using GitHub actions</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The system must be accesible via web and it must be deployed using GitHub actions.</p></td>
 </tr>
 </tbody>
 </table>
@@ -1160,35 +1146,35 @@ conventions (e.g. programming or versioning guidelines, documentation or naming 
 <tbody>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Development Process</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">This product will be built following Scrum/Kanban methodologies</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">This product will be built following Scrum/Kanban methodologies.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">GitHub Issues</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The team will work using GitHub Issues as a way of documenting what is done in the project and to distribute the work among the team members</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The team will work using GitHub Issues as a way of documenting what is done in the project and to distribute the work among the team members.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Pull requests</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The team will use pull requests in order to integrate their work with the main one. Each pull request must be reviewed by another team member</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The team will use pull requests in order to integrate their work with the main one. Each pull request must be reviewed by another team member.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Time</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">This application should be developed in a couple of months</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">This application should be developed in a couple of months.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Team meetings</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The team will have at least 1 weekly meeting</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The team will have at least 1 weekly meeting.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Continuous integration</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">This project will use continuous integration using Github Actions</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">This project will use continuous integration using Github Actions.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Testing</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The system must have robust and meaningful tests to make the application as secure as possible</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The system must have robust and meaningful tests to make the application as secure as possible.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Version Control System</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The development process of the application must use GitHub as Version Control System</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The development process of the application must use GitHub as Version Control System.</p></td>
 </tr>
 </tbody>
 </table>
@@ -1209,15 +1195,15 @@ conventions (e.g. programming or versioning guidelines, documentation or naming 
 <tbody>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Data protection</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The information about the useres must be properly stored and secured</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The information about the useres must be properly stored and secured.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Open source</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">This project is an open source project, and it could use other pieces of open source code of another related code</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">This project is an open source project, and it could use other pieces of open source code of another related code.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Code reuse</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">In case that this system requires to use code from other project, this must be specified in the documentation</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">In case that this system requires to use code from other project, this must be specified in the documentation.</p></td>
 </tr>
 </tbody>
 </table>
@@ -1238,15 +1224,15 @@ conventions (e.g. programming or versioning guidelines, documentation or naming 
 <tbody>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">English</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The members of the team will use english as main language to communicate and write documentation</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The members of the team will use english as main language to communicate and write documentation.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">ARC42</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The documentation will be written using ARC42 technology</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The documentation will be written using ARC42 technology.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Branching strategy</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Each issue will require a branch that must be merged with the main project using pull requests</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Each issue will require a branch that must be merged with the main project using pull requests.</p></td>
 </tr>
 </tbody>
 </table>
@@ -1314,7 +1300,7 @@ conventions (e.g. programming or versioning guidelines, documentation or naming 
 </div>
 <div class="imageblock">
 <div class="content">
-<img src="./images/System%20Context%20Diagram.png" alt="System Context Diagram" width="469" height="550">
+<img src="./images/System%20Context%20Diagram.png" alt="System Context Diagram" width="487" height="538">
 </div>
 </div>
 </div>
@@ -1375,7 +1361,7 @@ conventions (e.g. programming or versioning guidelines, documentation or naming 
 </div>
 <div class="imageblock">
 <div class="content">
-<img src="./images/Deployment%20Diagram.png" alt="Deployment Diagram" width="520" height="556">
+<img src="./images/Deployment%20Diagram.png" alt="Deployment Diagram" width="547" height="542">
 </div>
 </div>
 <div class="paragraph">
@@ -1803,7 +1789,7 @@ Leave out normal, simple, boring or standardized parts of your system</p>
 <div class="ulist">
 <ul>
 <li>
-<p><strong>Gateway Service</strong>: Communicate with the front-end.</p>
+<p><strong>Gateway Service</strong>: Communicate with the front- with back-end.</p>
 </li>
 <li>
 <p><strong>LLM Provider</strong>: Retrieve hints for the user.</p>
@@ -2093,7 +2079,7 @@ You will mainly capture scenarios in your documentation to communicate your arch
 <h4 id="_sign_up_flow">6.1.1. Sign up Flow</h4>
 <div class="imageblock">
 <div class="content">
-<img src="./images/Authentication%20Sign%20Up%20Sequence.png" alt="Authentication Sign Up Sequence" width="940" height="926">
+<img src="./images/Authentication%20Sign%20Up%20Sequence.png" alt="Authentication Sign Up Sequence" width="1009" height="899">
 </div>
 </div>
 <div class="paragraph">
@@ -2104,7 +2090,7 @@ You will mainly capture scenarios in your documentation to communicate your arch
 <h4 id="_log_in_flow">6.1.2. Log in Flow</h4>
 <div class="imageblock">
 <div class="content">
-<img src="./images/Authentication%20Log%20In%20Sequence.png" alt="Authentication Log In Sequence" width="829" height="885">
+<img src="./images/Authentication%20Log%20In%20Sequence.png" alt="Authentication Log In Sequence" width="887" height="858">
 </div>
 </div>
 <div class="paragraph">
@@ -2116,7 +2102,7 @@ You will mainly capture scenarios in your documentation to communicate your arch
 <h3 id="_quiz_question_retrieval_flow">6.2. Quiz Question Retrieval Flow</h3>
 <div class="imageblock">
 <div class="content">
-<img src="./images/Quiz%20Question%20Retrieval.png" alt="Quiz Question Retrieval" width="1076" height="918">
+<img src="./images/Quiz%20Question%20Retrieval.png" alt="Quiz Question Retrieval" width="1155" height="892">
 </div>
 </div>
 <div class="paragraph">
@@ -2127,7 +2113,7 @@ You will mainly capture scenarios in your documentation to communicate your arch
 <h3 id="_llm_chat_interaction_flow">6.3. LLM Chat Interaction Flow</h3>
 <div class="imageblock">
 <div class="content">
-<img src="./images/LLM%20Chat%20Interaction.png" alt="LLM Chat Interaction" width="794" height="609">
+<img src="./images/LLM%20Chat%20Interaction.png" alt="LLM Chat Interaction" width="854" height="592">
 </div>
 </div>
 <div class="paragraph">
@@ -2138,7 +2124,7 @@ You will mainly capture scenarios in your documentation to communicate your arch
 <h3 id="_question_game_interaction_flow">6.4. Question Game Interaction Flow</h3>
 <div class="imageblock">
 <div class="content">
-<img src="./images/Question%20Game%20Interaction.png" alt="Question Game Interaction" width="1162" height="878">
+<img src="./images/Question%20Game%20Interaction.png" alt="Question Game Interaction" width="1227" height="853">
 </div>
 </div>
 </div>
@@ -2146,7 +2132,7 @@ You will mainly capture scenarios in your documentation to communicate your arch
 <h3 id="_statistics_interaction_flow">6.5. Statistics Interaction Flow</h3>
 <div class="imageblock">
 <div class="content">
-<img src="./images/Statistics%20Interaction.png" alt="Statistics Interaction" width="852" height="639">
+<img src="./images/Statistics%20Interaction.png" alt="Statistics Interaction" width="920" height="621">
 </div>
 </div>
 <div style="page-break-after: always;"></div>
@@ -2250,7 +2236,7 @@ We have configured in github a set of secrets: DEPLOY_HOST (the IP address of th
 </div>
 <div class="imageblock">
 <div class="content">
-<img src="./images/Deployment%20view%20L1.png" alt="Deployment view L1" width="382" height="234">
+<img src="./images/Deployment%20view%20L1.png" alt="Deployment view L1" width="390" height="230">
 </div>
 </div>
 <div class="dlist">
@@ -2291,7 +2277,7 @@ We have configured in github a set of secrets: DEPLOY_HOST (the IP address of th
 <h4 id="_server_side">7.2.1. <em>Server Side</em></h4>
 <div class="imageblock">
 <div class="content">
-<img src="./images/Deployment%20view%20L2.png" alt="Deployment view L2" width="913" height="448">
+<img src="./images/Deployment%20view%20L2.png" alt="Deployment view L2" width="934" height="442">
 </div>
 </div>
 <div class="paragraph">
@@ -2424,7 +2410,7 @@ on this list.</p>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">User</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The people using the application, they have statistics and take part in a ranking to compete.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The people using the application, they have statistics.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Answer</p></td>
@@ -2473,9 +2459,6 @@ on this list.</p>
 <div class="paragraph">
 <p>It is desired to make the application as independant as possible from Wikidata. This way, if Wikidata is down our application can still manage to be available for our users.</p>
 </div>
-</div>
-<div class="sect2">
-<h3 id="_under_the_hood">8.6. Under-the-hood:</h3>
 <div style="page-break-after: always;"></div>
 </div>
 </div>
@@ -2585,7 +2568,7 @@ on this list.</p>
 <h3 id="_quality_tree">10.1. Quality Tree</h3>
 <div class="imageblock">
 <div class="content">
-<img src="./images/Quality%20Tree.png" alt="Quality Tree" width="224" height="784">
+<img src="./images/Quality%20Tree.png" alt="Quality Tree" width="236" height="774">
 </div>
 </div>
 </div>
@@ -2839,17 +2822,11 @@ on this list.</p>
 <div style="page-break-after: always;"></div>
 </div>
 </div>
-<div class="sect1">
-<h2 id="section-annex">13. Annex</h2>
-<div class="sectionbody">
-
-</div>
-</div>
 </div>
 <div id="footer">
 <div id="footer-text">
 Version 8.2 EN<br>
-Last updated 2025-02-24 11:08:41 +0100
+Last updated 2025-02-23 22:33:11 +0100
 </div>
 </div>
 </body>
