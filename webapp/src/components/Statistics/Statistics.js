@@ -74,7 +74,7 @@ export const Statistics = () => {
   useEffect(() => {
     const getRecords = async () => {
       try {
-        const {statsData, username} = await retriever.getRecords();
+        const {statsData, username, image} = await retriever.getRecords();
         setStatistics(statsData);
   
         setUsername(username || "User");        
@@ -200,9 +200,7 @@ export const Statistics = () => {
             {/* User Profile Header */}
             <Paper elevation={3} sx={{ p: 3, mb: 3, borderRadius: 2 }}>
               <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-                <Avatar sx={{ width: 64, height: 64, bgcolor: "primary.main", mr: 2 }}>
-                  <AccountCircleIcon sx={{ fontSize: 40 }} />
-                </Avatar>
+                <Avatar alt={`${username}'s profile picture`} sx={{ width: 64, height: 64, bgcolor: "primary.main", mr: 2 }} />
                 <Box>
                   <Typography variant="h4">{username}'s Statistics</Typography>
                   <Box sx={{ display: "flex", alignItems: "center", mt: 1 }}>

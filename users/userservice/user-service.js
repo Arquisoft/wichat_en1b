@@ -39,6 +39,20 @@ function validateUsername(username) {
   return usernameStr;
 }
 
+app.get('/users/:username/image', async (req, res) => {
+  try {
+    let user = await User.findOne({ username: { $eq: validateUsername(req.params.username) }});
+
+    if (user) {
+      return res.json({ image: user.image });
+    }
+    return res.status(404).json({ error: 'User not found' });
+  }
+  catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 app.post('/adduser', async (req, res) => {
   try {
     // Check if required fields are present in the request body
@@ -54,9 +68,13 @@ app.post('/adduser', async (req, res) => {
     // Encrypt the password before saving it
     const hashedPassword = await bcrypt.hash(req.body.password, 10);
 
+    // Assign a random image from the default images
+    let image = `/default/image_${Math.floor(Math.random() * 16) + 1}.png`;
+
     const newUser = new User({
       username: validatedUsername,
       passwordHash: hashedPassword,
+      image: image
     });
 
     await newUser.save();

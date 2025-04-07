@@ -7,6 +7,7 @@ const swaggerUi = require('swagger-ui-express');
 const fs = require("fs")
 const YAML = require('yaml')
 const jwt = require('jsonwebtoken');
+const { response } = require('express');
 require('dotenv').config();
 
 const app = express();
@@ -20,7 +21,6 @@ const authServiceUrl = process.env.AUTH_SERVICE_URL || 'http://localhost:8002';
 const userServiceUrl = process.env.USER_SERVICE_URL || 'http://localhost:8001';
 
 app.use(cors());
-
 app.use(express.json());
 
 //Prometheus configuration
@@ -71,6 +71,19 @@ app.post('/adduser', async (req, res) => {
     // Forward the add user request to the user service
     const userResponse = await axios.post(userServiceUrl + '/adduser', req.body);
     res.json(userResponse.data);
+  } catch (error) {
+    manageError(res, error);
+  }
+});
+
+app.get('/users/:username/image', async (req, res) => {
+  try {
+    let userResponse = await axios.get(userServiceUrl + '/users/' + req.params.username + '/image');
+    if (userResponse.data.image) {
+      return res.redirect(response.data.image);
+    }
+
+    res.status(userResponse.status).json(userResponse.data);
   } catch (error) {
     manageError(res, error);
   }
