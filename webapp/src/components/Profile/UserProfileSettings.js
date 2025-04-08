@@ -2,29 +2,41 @@ import axios from "axios";
 
 export default class UserProfileSettings {
   
-  async changeProfileImage(username, cookie, file) {
+  API_GATEWAY = process.env.REACT_APP_API_ENDPOINT || 'http://localhost:8000';
 
-    if (file) {
-      let formData = new FormData();
-      formData.append("image", file);
-
-      try {
-        const response = await axios.post(
-          `${process.env.REACT_APP_API_ENDPOINT || 'http://localhost:8000'}/users/${username}/image`,
-          formData,
+  async changeDefaultProfileImage(username, cookie, image) {
+    try {
+      if (image) {
+        await axios.post(this.API_GATEWAY + `/users/${username}/default-image`, { image: image },
           {
             headers: {
-              "Content-Type": "multipart/form-data",
-              "Authorization": `Bearer ${cookie}`,
-            },
+              "Authorization": `Bearer ${JSON.parse(cookie).token}`,
+            }
           }
         );
-
-        return response.data.imageUrl;
-      } catch (error) {
-        console.error("Error uploading profile image:", error);
-        throw error;
       }
-        }
+    } catch (error) {
+      throw new Error("Failed to change profile image: " + error.response?.data?.error || error.message);
+    }
+  }
+
+  async changeCustomProfileImage(username, cookie, file) {
+    try {
+      if (file) {
+        let formData = new FormData();
+        formData.append("image", file);
+
+        await axios.post(this.API_GATEWAY + `/users/${username}/custom-image`, formData,
+            {
+              headers: {
+                "Content-Type": "multipart/form-data",
+                "Authorization": `Bearer ${JSON.parse(cookie).token}`,
+              },
+            }
+          );
+      }
+    } catch (error) {
+      throw new Error("Failed to change profile image: " + error.response?.data?.error || error.message);
+    }
   }
 }

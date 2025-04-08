@@ -9,6 +9,7 @@ const jwt = require('jsonwebtoken');
 const multer = require('multer');
 const { response } = require('express');
 const FormData = require('form-data');
+const path = require('path');
 require('dotenv').config();
 
 const app = express();
@@ -100,33 +101,48 @@ app.get('/users/:username/image', async (req, res) => {
   }
 });
 
-app.post('/users/:username/image', upload.single('image'), async (req, res) => {
+app.post('/users/:username/custom-image', upload.single('image'), async (req, res) => {
   try {
     if (!req.file) {
       return res.status(400).json({ error: 'No image file provided' });
     }
 
-    // Prepare the form data to send to the user service
     const formData = new FormData();
     formData.append('image', req.file.buffer, req.file.originalname);
 
-    console.log('FormData Headers:', formData.getHeaders());
-    console.log('File being sent:', req.file.originalname);
-
-    // Send the image to the user service
     const response = await axios.post(
-      `${userServiceUrl}/users/${req.params.username}/image`,
-      formData,
-      {
-        headers: formData.getHeaders(), // Use headers from FormData
-      }
+      `${userServiceUrl}/users/${req.params.username}/custom-image`,
+      formData, { headers: formData.getHeaders() }
     );
 
-    console.log('Response from user service:', response.data);
-
-    return obtainUserImage(req.params.username, res);
+    return res.status(response.status).json(response.data);
   } catch (error) {
-    console.error('Error sending image to user service:', error.message);
+    manageError(res, error);
+  }
+});
+
+app.post('/users/:username/default-image', async (req, res) => {
+  try {
+    if (!req.body.image) {
+      return res.status(400).json({ error: 'No default image provided' });
+    }
+
+    let response = await axios.post(`${userServiceUrl}/users/${req.params.username}/default-image`, req.body);
+    return res.status(response.status).json(response.data);
+  } catch (error) {
+    manageError(res, error);
+  }
+});
+
+app.get('/default-images/:imageName', async (req, res) => {
+  try {
+    const imageName = req.params.imageName;
+    const imageResponse = await axios.get(`${userServiceUrl}/images/default/${imageName}`, {
+      responseType: 'arraybuffer',
+    });
+    res.setHeader('Content-Type', 'image/png');
+    res.send(imageResponse.data);
+  } catch (error) {
     manageError(res, error);
   }
 });

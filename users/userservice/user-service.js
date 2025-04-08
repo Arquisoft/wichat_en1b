@@ -51,6 +51,28 @@ function validateUsername(username) {
   return usernameStr;
 }
 
+// Helper function to delete an image file if it exists
+function deleteImageFile(imagePath) {
+  if (fs.existsSync(imagePath)) {
+    fs.unlinkSync(imagePath);
+  }
+}
+
+// Refactor validateImageResource to handle both custom and default images
+async function validateAndDeleteCurrentImage(username) {
+  const user = await User.findOne({ username: { $eq: validateUsername(username) } });
+  if (!user) {
+    throw new Error('User not found');
+  }
+
+  if (user.image && user.image.startsWith('/images/custom/')) {
+    const currentImagePath = path.join(__dirname, 'public', user.image);
+    deleteImageFile(currentImagePath);
+  }
+
+  return user;
+}
+
 app.get('/users/:username/image', async (req, res) => {
   try {
     let user = await User.findOne({ username: { $eq: validateUsername(req.params.username) }});
@@ -66,51 +88,44 @@ app.get('/users/:username/image', async (req, res) => {
   }
 });
 
-app.post('/users/:username/image', upload.single('image'), async (req, res) => {
+app.post('/users/:username/custom-image', upload.single('image'), async (req, res) => {
   try {
     if (!req.file) {
       return res.status(400).json({ error: 'No image file provided' });
     }
 
     const username = validateUsername(req.params.username);
+    const user = await validateAndDeleteCurrentImage(username);
 
-    // Find the user to check the current image path
-    const user = await User.findOne({ username: { $eq: username } });
-    if (!user) {
-      return res.status(404).json({ error: 'User not found' });
-    }
-
-    // Check if the current image is a custom image and delete it
-    if (user.image && user.image.startsWith('/images/custom/')) {
-      const currentImagePath = path.join(__dirname, 'public', user.image);
-      if (fs.existsSync(currentImagePath)) {
-        fs.unlinkSync(currentImagePath); // Delete the existing custom image
-      }
-    }
-
-    // Define the custom images directory
     const customImagesDir = path.join(__dirname, 'public', 'images', 'custom');
-
-    // Ensure the directory exists
-    if (!fs.existsSync(customImagesDir)) {
-      fs.mkdirSync(customImagesDir, { recursive: true });
-    }
-
-    // Define the file path for the uploaded image
     const filePath = path.join(customImagesDir, `${username}-${Date.now()}-${req.file.originalname}`);
-
-    // Save the file to the custom images directory
     fs.writeFileSync(filePath, req.file.buffer);
 
-    let image = `/images/custom/${path.basename(filePath)}`;
-
-    // Update the user's image path in the database
+    const image = `/images/custom/${path.basename(filePath)}`;
     user.image = image;
     await user.save();
 
-    res.json({ image: image });
+    res.json({ success: true, message: 'Image updated successfully', imagePath: image });
   } catch (error) {
-    console.error('Error processing image upload:', error.message);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.post('/users/:username/default-image', async (req, res) => {
+  try {
+    if (!req.body.image) {
+      return res.status(400).json({ error: 'No default image provided' });
+    }
+
+    const username = validateUsername(req.params.username);
+    const user = await validateAndDeleteCurrentImage(username);
+
+    const image = `/images/default/${req.body.image}`;
+    user.image = image;
+    await user.save();
+
+    res.json({ success: true, message: 'Default image set successfully', imagePath: image });
+  } catch (error) {
     res.status(500).json({ error: error.message });
   }
 });
