@@ -26,8 +26,8 @@ const mongoUri = process.env.MONGODB_URI || 'mongodb://localhost:27017/userdb';
 mongoose.connect(mongoUri);
 
 // Configure multer for file uploads
-const storage = multer.memoryStorage(); // Store files in memory
-const upload = multer({ storage });
+const storage = multer.memoryStorage();
+const upload = multer({ storage, limits: { fileSize: 5 * 1024 * 1024 } });
 
 // Function to validate required fields in the request body
 function validateRequiredFields(req, requiredFields) {

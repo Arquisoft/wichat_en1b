@@ -29,8 +29,8 @@ const metricsMiddleware = promBundle({ includeMethod: true });
 app.use(metricsMiddleware);
 
 // Configure multer for file uploads
-const storage = multer.memoryStorage(); // Store files in memory
-const upload = multer({ storage });
+const storage = multer.memoryStorage();
+const upload = multer({ storage, limits: { fileSize: 5 * 1024 * 1024 } });
 
 // Middleware to verify JWT token and attach the user to the request (usued in the statistics service)
 const authMiddleware = (req, res, next) => {
