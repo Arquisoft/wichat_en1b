@@ -53,11 +53,9 @@ app.get('/users/:username/image', async (req, res) => {
       return res.status(404).json({ error: 'User not found' });
     }
 
-    if (!user.image) {
-      return res.status(500).json({ error: 'Image not found' });
-    }
+    let image = user.image ?? '/images/default/image_1.png';
 
-    res.json({ image: user.image });
+    res.json({ image: image });
   }
   catch (error) {
     console.log('Error fetching user image:', error);
