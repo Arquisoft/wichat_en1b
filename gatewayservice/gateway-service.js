@@ -66,6 +66,11 @@ app.post('/login', async (req, res) => {
   }
 });
 
+/**
+ * Accepts a POST request containing user details in the request body and forwards it to the user service at /adduser.
+ * Returns the response from the user service.
+ * Handles errors using a centralized error manager.
+ */
 app.post('/adduser', async (req, res) => {
   try {
     // Forward the add user request to the user service
@@ -76,6 +81,11 @@ app.post('/adduser', async (req, res) => {
   }
 });
 
+/**
+ * Accepts a POST request with a query payload in the request body and forwards it to the LLM service at /ask.
+ * Returns the generated response from the LLM service.
+ * Errors are managed via a centralized error handler.
+ */
 app.post('/askllm', async (req, res) => {
   try {
     // Forward the add user request to the user service
@@ -86,6 +96,11 @@ app.post('/askllm', async (req, res) => {
   }
 });
 
+/**
+ * Accepts a GET request to retrieve a question from the question service.
+ * Forwards the request to /question endpoint of the question service and returns the response.
+ * Uses a centralized error handler for managing failures.
+ */
 app.get('/question', async (req, res) => {
   try {
     //Forward the asking for a question to the question service
@@ -96,6 +111,11 @@ app.get('/question', async (req, res) => {
   }
 });
 
+/**
+ * Accepts a GET request to retrieve a question of a specific type from the question service.
+ * The questionType parameter is passed in the URL and forwarded to the question service’s /question/:questionType endpoint.
+ * Returns the response from the question service and handles errors appropriately.
+ */
 app.get('/question/:questionType', async (req, res) => {
   try {
     const questionType = req.params.questionType;
