@@ -63,6 +63,8 @@ services:
       - mynetwork
     environment:
       MONGODB_URI: mongodb://mongodb:27017/userdb
+    volumes:
+      - user_images:/usr/src/userservice/public/images
 
   llmservice:
     container_name: llmservice-wichat_en1b
@@ -246,6 +248,7 @@ volumes:
   mongodb_data:
   prometheus_data: 
   grafana_data: 
+  user_images:
 
 networks:
   mynetwork:
