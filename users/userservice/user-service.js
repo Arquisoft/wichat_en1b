@@ -98,7 +98,7 @@ app.post('/users/:username/custom-image', upload.single('image'), async (req, re
     const user = await validateAndDeleteCurrentImage(username);
 
     const customImagesDir = path.join(__dirname, 'public', 'images', 'custom');
-    const filePath = path.join(customImagesDir, `${username}-${Date.now()}-${req.file.originalname}`);
+    const filePath = path.join(customImagesDir, `${username}-${Date.now()}`);
     fs.writeFileSync(filePath, req.file.buffer);
 
     const image = `/images/custom/${path.basename(filePath)}`;
