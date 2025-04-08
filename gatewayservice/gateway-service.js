@@ -7,9 +7,8 @@ const fs = require("fs")
 const YAML = require('yaml')
 const jwt = require('jsonwebtoken');
 const multer = require('multer');
-const { response } = require('express');
 const FormData = require('form-data');
-const path = require('path');
+
 require('dotenv').config();
 
 const app = express();
@@ -69,7 +68,7 @@ function manageError(res, error) {
 }
 
 // Health check endpoint
-app.get('/health', (req, res) => {
+app.get('/health', (_req, res) => {
   res.json({ status: 'OK' });
 });
 
@@ -101,7 +100,7 @@ app.get('/users/:username/image', async (req, res) => {
   }
 });
 
-app.post('/users/:username/custom-image', upload.single('image'), async (req, res) => {
+app.post('/users/:username/custom-image', authMiddleware, upload.single('image'), async (req, res) => {
   try {
     if (!req.file) {
       return res.status(400).json({ error: 'No image file provided' });
@@ -121,7 +120,7 @@ app.post('/users/:username/custom-image', upload.single('image'), async (req, re
   }
 });
 
-app.post('/users/:username/default-image', async (req, res) => {
+app.post('/users/:username/default-image', authMiddleware, async (req, res) => {
   try {
     if (!req.body.image) {
       return res.status(400).json({ error: 'No default image provided' });
@@ -157,7 +156,7 @@ app.post('/askllm', async (req, res) => {
   }
 });
 
-app.get('/question', async (req, res) => {
+app.get('/question', async (_req, res) => {
   try {
     //Forward the asking for a question to the question service
     const questionResponse = await axios.get(`${questionServiceUrl}/question`);
