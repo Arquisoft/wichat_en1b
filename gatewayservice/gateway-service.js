@@ -106,6 +106,10 @@ app.post('/users/:username/custom-image', authMiddleware, upload.single('image')
       return res.status(400).json({ error: 'No image file provided' });
     }
 
+    if (!req.file.mimetype.startsWith('image/')) {
+      return res.status(400).json({ error: 'Uploaded file is not an image' });
+    }
+
     const formData = new FormData();
     formData.append('image', req.file.buffer, req.file.originalname);
 

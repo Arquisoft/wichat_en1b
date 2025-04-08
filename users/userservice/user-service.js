@@ -7,8 +7,7 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const path = require('path');
 const fs = require('fs');
-const { check, validationResult } = require('express-validator');
-const multer = require('multer'); // Import multer
+const multer = require('multer');
 
 require('dotenv').config();
 
@@ -98,7 +97,7 @@ app.post('/users/:username/custom-image', upload.single('image'), async (req, re
     const user = await validateAndDeleteCurrentImage(username);
 
     const customImagesDir = path.join(__dirname, 'public', 'images', 'custom');
-    
+
     if (!fs.existsSync(customImagesDir)) {
       fs.mkdirSync(customImagesDir, { recursive: true });
     }
