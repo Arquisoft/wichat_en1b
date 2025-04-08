@@ -7,17 +7,18 @@ import {
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import Cookies from "js-cookie";
 import RecordRetriever from "./RecordRetriever";
+import UserProfileSettings from "../Profile/UserProfileSettings";
 import { 
   PieChart, Pie, Cell, ResponsiveContainer, 
   Tooltip, Legend
 } from "recharts";
-import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
 
 const REACT_APP_API_ENDPOINT = process.env.REACT_APP_API_ENDPOINT || 'http://localhost:8000';
 
 const retriever = new RecordRetriever();
+const userProfileSettings = new UserProfileSettings();
 
 // Enhanced theme with more color options
 const theme = createTheme({
@@ -67,10 +68,15 @@ export const Statistics = () => {
   const [error, setError] = useState(null);
   const [username, setUsername] = useState("");
   const [registrationDate, setRegistrationDate] = useState(null);
+  const [profileImage, setProfileImage] = useState(null);
 
   const handleLogout = () => {
     Cookies.remove('user', { path: '/' });
     navigate('/login');
+  };
+
+  const handleProfileImageChange = async (event) => {
+    userProfileSettings.changeProfileImage(username, Cookies.get('user'), event.target.files[0]);
   };
 
   useEffect(() => {
@@ -203,7 +209,11 @@ export const Statistics = () => {
             {/* User Profile Header */}
             <Paper elevation={3} sx={{ p: 3, mb: 3, borderRadius: 2 }}>
               <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-                <Avatar src={`${REACT_APP_API_ENDPOINT}/users/${username}/image`} alt={`${username}'s profile picture`} sx={{ width: 64, height: 64, bgcolor: "primary.main", mr: 2 }} />
+                <Avatar
+                  src={profileImage || `${REACT_APP_API_ENDPOINT}/users/${username}/image`}
+                  alt={`${username}'s profile picture`}
+                  sx={{ width: 64, height: 64, bgcolor: "primary.main", mr: 2 }}
+                />
                 <Box>
                   <Typography variant="h4">{username}'s Statistics</Typography>
                   <Box sx={{ display: "flex", alignItems: "center", mt: 1 }}>
@@ -214,6 +224,19 @@ export const Statistics = () => {
                   </Box>
                 </Box>
               </Box>
+              <Button
+                variant="outlined"
+                component="label"
+                sx={{ mt: 2 }}
+              >
+                Edit Profile Picture
+                <input
+                  type="file"
+                  accept="image/*"
+                  hidden
+                  onChange={handleProfileImageChange}
+                />
+              </Button>
             </Paper>
 
             {/* Key Metrics */}

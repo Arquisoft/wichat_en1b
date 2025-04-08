@@ -6,7 +6,9 @@ const User = require('./user-model');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const path = require('path');
+const fs = require('fs');
 const { check, validationResult } = require('express-validator');
+const multer = require('multer'); // Import multer
 
 require('dotenv').config();
 
@@ -22,6 +24,10 @@ app.use(express.static('public'));
 // Connect to MongoDB
 const mongoUri = process.env.MONGODB_URI || 'mongodb://localhost:27017/userdb';
 mongoose.connect(mongoUri);
+
+// Configure multer for file uploads
+const storage = multer.memoryStorage(); // Store files in memory
+const upload = multer({ storage });
 
 // Function to validate required fields in the request body
 function validateRequiredFields(req, requiredFields) {
@@ -53,12 +59,58 @@ app.get('/users/:username/image', async (req, res) => {
       return res.status(404).json({ error: 'User not found' });
     }
 
-    let image = user.image ?? '/images/default/image_1.png';
-
-    res.json({ image: image });
+    res.json({ image: user.image ?? '/images/default/image_1.png' });
   }
   catch (error) {
-    console.log('Error fetching user image:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.post('/users/:username/image', upload.single('image'), async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ error: 'No image file provided' });
+    }
+
+    const username = validateUsername(req.params.username);
+
+    // Find the user to check the current image path
+    const user = await User.findOne({ username: { $eq: username } });
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    // Check if the current image is a custom image and delete it
+    if (user.image && user.image.startsWith('/images/custom/')) {
+      const currentImagePath = path.join(__dirname, 'public', user.image);
+      if (fs.existsSync(currentImagePath)) {
+        fs.unlinkSync(currentImagePath); // Delete the existing custom image
+      }
+    }
+
+    // Define the custom images directory
+    const customImagesDir = path.join(__dirname, 'public', 'images', 'custom');
+
+    // Ensure the directory exists
+    if (!fs.existsSync(customImagesDir)) {
+      fs.mkdirSync(customImagesDir, { recursive: true });
+    }
+
+    // Define the file path for the uploaded image
+    const filePath = path.join(customImagesDir, `${username}-${Date.now()}-${req.file.originalname}`);
+
+    // Save the file to the custom images directory
+    fs.writeFileSync(filePath, req.file.buffer);
+
+    let image = `/images/custom/${path.basename(filePath)}`;
+
+    // Update the user's image path in the database
+    user.image = image;
+    await user.save();
+
+    res.json({ image: image });
+  } catch (error) {
+    console.error('Error processing image upload:', error.message);
     res.status(500).json({ error: error.message });
   }
 });

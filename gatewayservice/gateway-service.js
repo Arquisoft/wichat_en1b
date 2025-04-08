@@ -2,16 +2,16 @@ const express = require('express');
 const axios = require('axios');
 const cors = require('cors');
 const promBundle = require('express-prom-bundle');
-//libraries required for OpenAPI-Swagger
 const swaggerUi = require('swagger-ui-express');
 const fs = require("fs")
 const YAML = require('yaml')
 const jwt = require('jsonwebtoken');
+const multer = require('multer');
 const { response } = require('express');
+const FormData = require('form-data');
 require('dotenv').config();
 
 const app = express();
-
 const port = 8000;
 
 const statisticsServiceUrl = process.env.STATS_SERVICE_URL || 'http://localhost:8005';
@@ -26,6 +26,10 @@ app.use(express.json());
 //Prometheus configuration
 const metricsMiddleware = promBundle({ includeMethod: true });
 app.use(metricsMiddleware);
+
+// Configure multer for file uploads
+const storage = multer.memoryStorage(); // Store files in memory
+const upload = multer({ storage });
 
 // Middleware to verify JWT token and attach the user to the request (usued in the statistics service)
 const authMiddleware = (req, res, next) => {
@@ -43,6 +47,18 @@ const authMiddleware = (req, res, next) => {
     next();
   });
 };
+
+async function obtainUserImage(username, res) {
+    let userResponse = await axios.get(`${userServiceUrl}/users/${username}/image`);
+
+    if (userResponse.data.image) {
+      let userImageResponse = await axios.get(`${userServiceUrl}${userResponse.data.image}`, { responseType: 'arraybuffer' });
+      res.setHeader('Content-Type', 'image/png');
+      return res.send(userImageResponse.data);
+    }
+
+    res.status(userResponse.status).json(userResponse.data);
+}
 
 function manageError(res, error) {
   if (error.response) //Some microservice responded with an error
@@ -78,16 +94,39 @@ app.post('/adduser', async (req, res) => {
 
 app.get('/users/:username/image', async (req, res) => {
   try {
-    let userResponse = await axios.get(`${userServiceUrl}/users/${req.params.username}/image`);
+    return await obtainUserImage(req.params.username, res);
+  } catch (error) {
+    manageError(res, error);
+  }
+});
 
-    if (userResponse.data.image) {
-      let userImageResponse = await axios.get(`${userServiceUrl}${userResponse.data.image}`, { responseType: 'arraybuffer' });
-      res.setHeader('Content-Type', 'image/png');
-      return res.send(userImageResponse.data);
+app.post('/users/:username/image', upload.single('image'), async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ error: 'No image file provided' });
     }
 
-    res.status(userResponse.status).json(userResponse.data);
+    // Prepare the form data to send to the user service
+    const formData = new FormData();
+    formData.append('image', req.file.buffer, req.file.originalname);
+
+    console.log('FormData Headers:', formData.getHeaders());
+    console.log('File being sent:', req.file.originalname);
+
+    // Send the image to the user service
+    const response = await axios.post(
+      `${userServiceUrl}/users/${req.params.username}/image`,
+      formData,
+      {
+        headers: formData.getHeaders(), // Use headers from FormData
+      }
+    );
+
+    console.log('Response from user service:', response.data);
+
+    return obtainUserImage(req.params.username, res);
   } catch (error) {
+    console.error('Error sending image to user service:', error.message);
     manageError(res, error);
   }
 });
