@@ -98,7 +98,12 @@ app.post('/users/:username/custom-image', upload.single('image'), async (req, re
     const user = await validateAndDeleteCurrentImage(username);
 
     const customImagesDir = path.join(__dirname, 'public', 'images', 'custom');
-    const filePath = path.join(customImagesDir, `${username}-${Date.now()}`);
+    
+    if (!fs.existsSync(customImagesDir)) {
+      fs.mkdirSync(customImagesDir, { recursive: true });
+    }
+
+    const filePath = path.join(customImagesDir, `${username}-${Date.now()}.png`);
     fs.writeFileSync(filePath, req.file.buffer);
 
     const image = `/images/custom/${path.basename(filePath)}`;
@@ -124,7 +129,7 @@ app.post('/users/:username/default-image', async (req, res) => {
     user.image = image;
     await user.save();
 
-    res.json({ success: true, message: 'Default image set successfully', imagePath: image });
+    res.json({ success: true, message: 'Image updated successfully', imagePath: image });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
