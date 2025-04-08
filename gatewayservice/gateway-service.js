@@ -78,9 +78,12 @@ app.post('/adduser', async (req, res) => {
 
 app.get('/users/:username/image', async (req, res) => {
   try {
-    let userResponse = await axios.get(userServiceUrl + '/users/' + req.params.username + '/image');
+    let userResponse = await axios.get(`${userServiceUrl}/users/${req.params.username}/image`);
+
     if (userResponse.data.image) {
-      return res.redirect(response.data.image);
+      let userImageResponse = await axios.get(`${userServiceUrl}${userResponse.data.image}`, { responseType: 'arraybuffer' });
+      res.setHeader('Content-Type', 'image/png');
+      return res.send(userImageResponse.data);
     }
 
     res.status(userResponse.status).json(userResponse.data);

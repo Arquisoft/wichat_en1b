@@ -1,10 +1,13 @@
 // user-service.js
 const express = require('express');
+
 const mongoose = require('mongoose');
 const User = require('./user-model');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const path = require('path');
 const { check, validationResult } = require('express-validator');
+
 require('dotenv').config();
 
 const app = express();
@@ -12,6 +15,9 @@ const port = 8001;
 
 // Middleware to parse JSON in request body
 app.use(express.json());
+
+// Serve static files from the public directory
+app.use(express.static('public'));
 
 // Connect to MongoDB
 const mongoUri = process.env.MONGODB_URI || 'mongodb://localhost:27017/userdb';
@@ -43,12 +49,18 @@ app.get('/users/:username/image', async (req, res) => {
   try {
     let user = await User.findOne({ username: { $eq: validateUsername(req.params.username) }});
 
-    if (user) {
-      return res.json({ image: user.image });
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
     }
-    return res.status(404).json({ error: 'User not found' });
+
+    if (!user.image) {
+      return res.status(500).json({ error: 'Image not found' });
+    }
+
+    res.json({ image: user.image });
   }
   catch (error) {
+    console.log('Error fetching user image:', error);
     res.status(500).json({ error: error.message });
   }
 });
@@ -69,7 +81,7 @@ app.post('/adduser', async (req, res) => {
     const hashedPassword = await bcrypt.hash(req.body.password, 10);
 
     // Assign a random image from the default images
-    let image = `/default/image_${Math.floor(Math.random() * 16) + 1}.png`;
+    let image = `/images/default/image_${Math.floor(Math.random() * 16) + 1}.png`;
 
     const newUser = new User({
       username: validatedUsername,

@@ -15,6 +15,8 @@ import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
 
+const REACT_APP_API_ENDPOINT = process.env.REACT_APP_API_ENDPOINT || 'http://localhost:8000';
+
 const retriever = new RecordRetriever();
 
 // Enhanced theme with more color options
@@ -86,6 +88,7 @@ export const Statistics = () => {
         
         setLoading(false);
       } catch (error) {
+        console.log(error);
         setError(error.message || "Failed to load statistics");
         setLoading(false);
       }
@@ -200,7 +203,7 @@ export const Statistics = () => {
             {/* User Profile Header */}
             <Paper elevation={3} sx={{ p: 3, mb: 3, borderRadius: 2 }}>
               <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-                <Avatar alt={`${username}'s profile picture`} sx={{ width: 64, height: 64, bgcolor: "primary.main", mr: 2 }} />
+                <Avatar src={`${REACT_APP_API_ENDPOINT}/users/${username}/image`} alt={`${username}'s profile picture`} sx={{ width: 64, height: 64, bgcolor: "primary.main", mr: 2 }} />
                 <Box>
                   <Typography variant="h4">{username}'s Statistics</Typography>
                   <Box sx={{ display: "flex", alignItems: "center", mt: 1 }}>
