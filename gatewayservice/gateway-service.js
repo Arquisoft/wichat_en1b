@@ -48,18 +48,6 @@ const authMiddleware = (req, res, next) => {
   });
 };
 
-async function obtainUserImage(username, res) {
-    let userResponse = await axios.get(`${userServiceUrl}/users/${username}/image`);
-
-    if (userResponse.data.image) {
-      let userImageResponse = await axios.get(`${userServiceUrl}${userResponse.data.image}`, { responseType: 'arraybuffer' });
-      res.setHeader('Content-Type', 'image/png');
-      return res.send(userImageResponse.data);
-    }
-
-    res.status(userResponse.status).json(userResponse.data);
-}
-
 function manageError(res, error) {
   if (error.response) //Some microservice responded with an error
     res.status(error.response.status).json(error.response.data);
@@ -92,9 +80,39 @@ app.post('/adduser', async (req, res) => {
   }
 });
 
+app.get('/default-images/:imageName', async (req, res) => {
+  try {
+    const imageName = req.params.imageName;
+    const imageResponse = await axios.get(`${userServiceUrl}/images/default/${imageName}`, {
+      responseType: 'arraybuffer',
+    });
+    res.setHeader('Content-Type', 'image/png');
+    res.send(imageResponse.data);
+  } catch (error) {
+    manageError(res, error);
+  }
+});
+
 app.get('/users/:username/image', async (req, res) => {
   try {
-    return await obtainUserImage(req.params.username, res);
+    let userResponse = await axios.get(`${userServiceUrl}/users/${req.params.username}/image`);
+    let userImageResponse = await axios.get(`${userServiceUrl}${userResponse.data.image}`, { responseType: 'arraybuffer' });
+    
+    res.setHeader('Content-Type', 'image/png');
+    return res.send(userImageResponse.data);
+  } catch (error) {
+    manageError(res, error);
+  }
+});
+
+app.post('/users/:username/default-image', authMiddleware, async (req, res) => {
+  try {
+    if (!req.body.image) {
+      return res.status(400).json({ error: 'No default image provided' });
+    }
+
+    let response = await axios.post(`${userServiceUrl}/users/${req.params.username}/default-image`, req.body);
+    return res.json(response.data);
   } catch (error) {
     manageError(res, error);
   }
@@ -118,33 +136,7 @@ app.post('/users/:username/custom-image', authMiddleware, upload.single('image')
       formData, { headers: formData.getHeaders() }
     );
 
-    return res.status(response.status).json(response.data);
-  } catch (error) {
-    manageError(res, error);
-  }
-});
-
-app.post('/users/:username/default-image', authMiddleware, async (req, res) => {
-  try {
-    if (!req.body.image) {
-      return res.status(400).json({ error: 'No default image provided' });
-    }
-
-    let response = await axios.post(`${userServiceUrl}/users/${req.params.username}/default-image`, req.body);
-    return res.status(response.status).json(response.data);
-  } catch (error) {
-    manageError(res, error);
-  }
-});
-
-app.get('/default-images/:imageName', async (req, res) => {
-  try {
-    const imageName = req.params.imageName;
-    const imageResponse = await axios.get(`${userServiceUrl}/images/default/${imageName}`, {
-      responseType: 'arraybuffer',
-    });
-    res.setHeader('Content-Type', 'image/png');
-    res.send(imageResponse.data);
+    return res.json(response.data);
   } catch (error) {
     manageError(res, error);
   }

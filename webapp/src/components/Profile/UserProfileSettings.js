@@ -16,7 +16,7 @@ export default class UserProfileSettings {
         );
       }
     } catch (error) {
-      throw new Error("Failed to change profile image: " + error.response?.data?.error || error.message);
+      throw new Error("Failed changing default profile image: " + error.response?.data?.error || error.message);
     }
   }
 
@@ -36,7 +36,7 @@ export default class UserProfileSettings {
           );
       }
     } catch (error) {
-      throw new Error("Failed to change profile image: " + error.response?.data?.error || error.message);
+      throw new Error("Failed to upload the image: " + error.response?.data?.error || error.message);
     }
   }
 }

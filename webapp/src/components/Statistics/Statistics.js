@@ -71,20 +71,33 @@ export const Statistics = () => {
   const [profileImage, setProfileImage] = useState("");
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [DEFAULT_IMAGES, setDefaultImages] = useState([]);
-
+  const [uploadError, setUploadError] = useState(null);
+  const [defaultImageError, setDefaultImageError] = useState(null);
   const handleLogout = () => {
     Cookies.remove('user', { path: '/' });
     navigate('/login');
   };
 
-  const handleProfileImageChange = async (event) => {
+  const handleCustomProfileImageChange = async (event) => {
+    try {
+      setUploadError(null);
+      setDefaultImageError(null);
       await userProfileSettings.changeCustomProfileImage(username, Cookies.get('user'), event.target.files[0]);
       setProfileImage(`${REACT_APP_API_ENDPOINT}/users/${username}/image?timestamp=${Date.now()}`);
+    } catch (error) {
+      setUploadError(error.message);
+    }
   };
 
-  const handleDefaultImageSelect = async (image) => {
-    await userProfileSettings.changeDefaultProfileImage(username, Cookies.get('user'), image.split('/').pop());
-    setProfileImage(`${REACT_APP_API_ENDPOINT}/users/${username}/image?timestamp=${Date.now()}`);
+  const handleDefaultProfileImageChange = async (image) => {
+    try {
+      setUploadError(null);
+      setDefaultImageError(null);
+      await userProfileSettings.changeDefaultProfileImage(username, Cookies.get('user'), image.split('/').pop());
+      setProfileImage(`${REACT_APP_API_ENDPOINT}/users/${username}/image?timestamp=${Date.now()}`);
+    } catch (error) {
+      setDefaultImageError(error.message);
+    }
   };
 
   const handleOpenSettings = () => setSettingsOpen(true);
@@ -103,7 +116,6 @@ export const Statistics = () => {
           setRegistrationDate(new Date(statsData.registrationDate));
         }
 
-        // Force image refresh when loading initially
         const initialImageUrl = `${REACT_APP_API_ENDPOINT}/users/${username}/image?timestamp=${Date.now()}`;
         setProfileImage(initialImageUrl);
         setLoading(false);
@@ -208,9 +220,14 @@ export const Statistics = () => {
             type="file"
             accept="image/*"
             hidden
-            onChange={handleProfileImageChange}
+            onChange={handleCustomProfileImageChange}
           />
         </Button>
+        {uploadError && (
+          <Typography variant="body2" color="error" sx={{ mt: 1 }}>
+            {uploadError}
+          </Typography>
+        )}
         <Typography variant="body2" sx={{ mt: 2, mb: 1 }}>Or select a default image:</Typography>
         <Box sx={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(48px, 1fr))", gap: 2 }}>
           {DEFAULT_IMAGES.map((image, index) => (
@@ -223,10 +240,15 @@ export const Statistics = () => {
                 height: "auto",
                 cursor: "pointer",
               }}
-              onClick={() => handleDefaultImageSelect(image)}
+              onClick={() => handleDefaultProfileImageChange(image)}
             />
           ))}
         </Box>
+        {defaultImageError && (
+          <Typography variant="body2" color="error" sx={{ mt: 1 }}>
+            {defaultImageError}
+          </Typography>
+        )}
       </DialogContent>
       <DialogActions>
         <Button onClick={handleCloseSettings} color="primary">
@@ -282,7 +304,7 @@ export const Statistics = () => {
             <Paper elevation={3} sx={{ p: 3, mb: 3, borderRadius: 2 }}>
               <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
                 <Avatar
-                  src={profileImage} // Ensure the updated profileImage is used
+                  src={profileImage}
                   alt={`${username}'s profile picture`}
                   sx={{ width: 64, height: 64, bgcolor: "primary.main", mr: 2 }}
                 />
