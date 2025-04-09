@@ -249,6 +249,8 @@ paths:
     post:
       summary: Updates the image of some user to a default one.
       operationId: defaultUserImage
+      security:
+        - bearerAuth: []
       requestBody:
         required: true
         content:
@@ -317,6 +319,8 @@ paths:
     post:
       summary: Updates the image of some user, uploading a new one.
       operationId: customUserImage
+      security:
+        - bearerAuth: []
       requestBody:
         required: true
         content:
@@ -748,3 +752,9 @@ paths:
                     type: string
                     description: Health status.
                     example: OK
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
