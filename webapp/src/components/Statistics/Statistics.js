@@ -47,7 +47,7 @@ export const Statistics = () => {
         }
 
         const initialImageUrl = `${REACT_APP_API_ENDPOINT}/users/${username}/image?timestamp=${Date.now()}`;
-        setProfileImage(initialImageUrl);
+        //setProfileImage(initialImageUrl);
         setLoading(false);
       } catch (error) {
         setError(error.message || "Failed to load statistics");

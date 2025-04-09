@@ -57,10 +57,20 @@ export const Navbar = () => {
     const handleNavigation = (path) => {
         window.location.href = path
     }
+    const userCookie = Cookies.get('user');
+    let username = '';
+    if (userCookie) {
+        try {
+            const parsedUser = JSON.parse(userCookie);
+            username = parsedUser.username || '';
+        } catch (e) {
+            console.error('Error parsing user cookie', e);
+        }
+    }
 
     const navLinks = isLoggedIn
         ? [ { title: "Home", path: "/home" },
-            { title: "Profile", path: "/profile" },
+            { title: "Profile", path: `/profile/${username}` },
             { title: "New game", path: "/game" },
             { title: "Statistics", path: "/statistics" },
             { title: "Game modes", path: "/game-modes" },
