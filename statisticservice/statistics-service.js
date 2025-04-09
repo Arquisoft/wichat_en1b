@@ -21,20 +21,25 @@ if (mongoose.connection.readyState === 0) {
 
 // GET endpoint to retrieve user statistics
 app.get('/statistics', async (req, res) => {
+  console.log("arrived at statistics endpoint")
     const currentUsername = req.headers['currentuser'];
     if (!currentUsername) return res.status(400).json({ error: 'Current user missing in request' });
+
+    console.log("currentUsername: ", currentUsername)
 
     const targetUsername = req.headers['targetusername'];
     if (!targetUsername) return res.status(400).json({ error: 'Target user missing in request' });
 
+    console.log("targetUsername: ", targetUsername)
+
     const usernameRegex = /^[a-zA-Z0-9_-]{3,30}$/;
     if (!usernameRegex.test(targetUsername)) return res.status(400).json({ error: 'Invalid username format' });  
-
-    const targetUser = await User.findOne({ targetUsername });
+    
+    const targetUser = await User.findOne({ username: targetUsername });
     if (!targetUser) return res.status(404).json({ error: 'User not found' });
 
-     // Record the profile visit if the visitor is not the profile owner
-     if (currentUsername !== targetUsername) {
+    // Record the profile visit if the visitor is not the profile owner
+    if (currentUsername !== targetUsername) {
       // Use findOneAndUpdate to atomically update the document
       await User.findOneAndUpdate(
           { username: targetUsername },
@@ -89,7 +94,7 @@ app.get('/statistics/visits', async (req, res) => {
       const username = req.user;
       
       // Find the user
-      const user = await User.findOne({ username });
+      const user = await User.findOne({ username: username });
       
       if (!user) {
           return res.status(404).json({ error: 'User not found' });
@@ -143,7 +148,7 @@ app.post('/statistics', async (req, res) => {
     return res.status(400).json({ error: 'Invalid input: All statistics must be numbers.' });
   }
 
-  const user = await User.findOne({ username });
+  const user = await User.findOne({ username: username });
 
   if (user) {
     if (gamesPlayed !== undefined) user.gamesPlayed += parseInt(gamesPlayed);

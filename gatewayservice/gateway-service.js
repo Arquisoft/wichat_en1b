@@ -144,7 +144,6 @@ app.post('/users/:username/custom-image', authMiddleware, upload.single('image')
 
 app.get('/profile/:username', authMiddleware, async (req, res) => {
   try {
-    console.log("arrived to gateway service")
     const targetUsername = req.params.username;
     
     // Input validation for username parameter

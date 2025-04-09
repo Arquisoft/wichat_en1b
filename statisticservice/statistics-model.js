@@ -68,9 +68,6 @@ const userSchema = new mongoose.Schema({
     }
 });
 
-// Add index to improve performance when searching by username
-userSchema.index({ username: 1 });
-
 const User = mongoose.model('User', userSchema);
 
 module.exports = User;
