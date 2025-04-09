@@ -1,7 +1,7 @@
 import axios from "axios";
 import Cookies from "js-cookie";
 
-class RecordRetriever {
+class RecordRetrieverProfile {
     constructor() {     
         this.apiUrl = process.env.REACT_APP_API_ENDPOINT || 'http://localhost:8000'
     }
@@ -12,6 +12,8 @@ class RecordRetriever {
      * @returns {boolean} - True if the username is valid, false otherwise
      */
     validateUsername(username) {
+        if (!username) return false;
+
         const usernameRegex = /^[a-zA-Z0-9_-]{3,30}$/;
         return usernameRegex.test(username);
     }
@@ -25,7 +27,7 @@ class RecordRetriever {
         try {
             // Validate the username to prevent NoSQL injection
             if (!this.validateUsername(targetUsername)) {
-                throw new Error("Invalid username format");
+                throw new Error("Invalid username format. Please use a valid username.");
             }
             
             // Retrieve the 'user' cookie
@@ -64,4 +66,4 @@ class RecordRetriever {
     }
 }
 
-export default RecordRetriever;
+export default RecordRetrieverProfile;

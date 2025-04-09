@@ -31,7 +31,7 @@ function App() {
             <Route path="/signup" element={isLoggedIn ? <Navigate to="/home" /> : <SignUp />} />
             <Route path="/game" element={isLoggedIn ? <GameWrapper /> : <Navigate to="/login" />} />
             <Route path="/statistics" element={isLoggedIn ? <Statistics /> : <Navigate to="/login" /> } />
-            <Route path="/profile" element={isLoggedIn ? <Profile /> : <Navigate to="/login" /> } />
+            <Route path="/profile/:username" element={isLoggedIn ? <Profile /> : <Navigate to="/login" />} />
           </Routes>
         </Container>
       </div>

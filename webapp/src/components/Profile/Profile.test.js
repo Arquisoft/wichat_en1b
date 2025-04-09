@@ -159,7 +159,7 @@ describe("Profile Component", () => {
 
     // Use await act for the button click to ensure all effects are processed
     await act(async () => {
-      const logInAgainButton = screen.getByRole('button', { name: /Log In Again/i });
+      const logInAgainButton = screen.getByRole('button', { name: /Go back to menu/i });
       await user.click(logInAgainButton);
     });
 
@@ -190,7 +190,7 @@ describe("Profile Component", () => {
 
     // Properly wait for the click action to complete
     await act(async () => {
-      const logInAgainButton = screen.getByRole('button', { name: /Log In Again/i });
+      const logInAgainButton = screen.getByRole('button', { name: /Go back to menu/i });
       await user.click(logInAgainButton);
     });
     

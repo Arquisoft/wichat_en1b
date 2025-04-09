@@ -1,6 +1,5 @@
 import { Typography, Box, Avatar, Button, Chip } from "@mui/material";
 import SettingsIcon from '@mui/icons-material/Settings';
-import { format } from 'date-fns';
 
 const ProfileHeader = ({ 
   username, 
@@ -10,6 +9,16 @@ const ProfileHeader = ({
   onOpenSettings,
   isOwnProfile
 }) => {
+
+  const formatDate = (date) => {
+    if (!date) return "N/A";
+    return date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+  };
+  
   return (
     <Box 
       sx={{ 
@@ -56,7 +65,7 @@ const ProfileHeader = ({
         
         {registrationDate && (
           <Typography variant="body1" color="text.secondary" sx={{ mb: 1 }}>
-            Member since {format(registrationDate, 'MMMM d, yyyy')}
+            Member since {formatDate(registrationDate, 'MMMM d, yyyy')}
           </Typography>
         )}
         

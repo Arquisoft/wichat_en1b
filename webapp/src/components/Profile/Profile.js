@@ -1,6 +1,5 @@
-// src/components/Profile/Profile.jsx
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import {
     Typography, Box, Container, Paper, Button, Grid
 } from "@mui/material";
@@ -18,15 +17,26 @@ import VisitorsSection from "./components/VisitorsSection";
 import LoadingState from "./components/LoadingState";
 import ErrorState from "./components/ErrorState";
 
-const REACT_APP_API_ENDPOINT = process.env.REACT_APP_API_ENDPOINT || 'http://localhost:8000';
-
 const retriever = new RecordRetrieverProfile();
 const userProfileSettings = new UserProfileSettings();
 
 export const Profile = () => {
 
     const navigate = useNavigate();
-    const { username: profileUsername } = useParams(); // Get username from URL params
+    const { username: profileUsernameParam } = useParams(); // Get username from URL params
+    
+    console.log(profileUsernameParam);
+
+    const [hasValidUsername, setHasValidUsername] = useState(true);
+
+    useEffect(() => {
+        if (!profileUsernameParam) {
+            console.log("No username available");
+            setHasValidUsername(false);
+            navigate('/home');
+        }
+    }, [profileUsernameParam, navigate]);
+
     const [statistics, setStatistics] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -46,26 +56,28 @@ export const Profile = () => {
     };
 
     const handleCustomProfileImageChange = async (event) => {
-        if (!isProfileOwner) return; // Additional safety check
+        if (!isProfileOwner) return;
 
         try {
             setUploadError(null);
             setDefaultImageError(null);
-            await userProfileSettings.changeCustomProfileImage(username, Cookies.get('user'), event.target.files[0]);
-            setProfileImage(`${REACT_APP_API_ENDPOINT}/users/${username}/image?timestamp=${Date.now()}`);
+    
+            await userProfileSettings.changeCustomProfileImage(profileUsernameParam, Cookies.get('user'), event.target.files[0]);
+            setProfileImage(userProfileSettings.getProfileImageUrl(profileUsernameParam));
         } catch (error) {
             setUploadError(error.message);
         }
     };
-
+    
     const handleDefaultProfileImageChange = async (image) => {
-        if (!isProfileOwner) return; // Additional safety check
-
+        if (!isProfileOwner) return;
+    
         try {
             setUploadError(null);
             setDefaultImageError(null);
-            await userProfileSettings.changeDefaultProfileImage(username, Cookies.get('user'), image.split('/').pop());
-            setProfileImage(`${REACT_APP_API_ENDPOINT}/users/${username}/image?timestamp=${Date.now()}`);
+    
+            await userProfileSettings.changeDefaultProfileImage(profileUsernameParam, Cookies.get('user'), image.split('/').pop());
+            setProfileImage(userProfileSettings.getProfileImageUrl(profileUsernameParam));
         } catch (error) {
             setDefaultImageError(error.message);
         }
@@ -105,8 +117,7 @@ export const Profile = () => {
                 setRecentVisitors(statsData.recentVisitors);
             }
 
-            const initialImageUrl = `${REACT_APP_API_ENDPOINT}/users/${targetUsername}/image?timestamp=${Date.now()}`;
-            setProfileImage(initialImageUrl);
+            setProfileImage(userProfileSettings.getProfileImageUrl(profileUsername));
             setLoading(false);
         } catch (error) {
             setError(error.message || "Failed to retrieve statistics");
@@ -115,21 +126,13 @@ export const Profile = () => {
     };
 
     useEffect(() => {
-        loadUserData();
-    }, [profileUsername]); // Reload when URL parameter changes
+        if (hasValidUsername) {
+            loadUserData();
+        }
+    }, [hasValidUsername, profileUsernameParam]); // Reload when URL parameter changes and username is valid
 
     useEffect(() => {
-        const fetchDefaultImages = async () => {
-            try {
-                const images = [];
-                for (let i = 1; i <= 16; i++) {
-                    images.push(`${REACT_APP_API_ENDPOINT}/default-images/image_${i}.png`);
-                }
-                setDefaultImages(images);
-            } catch (error) { }
-        };
-
-        fetchDefaultImages();
+        setDefaultImages(userProfileSettings.getDefaultImages());
     }, []);
 
     // Calculate derived statistics
@@ -175,16 +178,16 @@ export const Profile = () => {
                 ) : statistics ? (
                     <>
                         <ProfileHeader
-                            username={profileUsername || currentUsername}
+                            username={profileUsernameParam || currentUsername}
                             profileImage={profileImage}
                             registrationDate={registrationDate}
                             getMembershipDuration={getMembershipDuration}
-                            onOpenSettings={isOwnProfile ? handleOpenSettings : null} // Only show settings button for own profile
-                            isOwnProfile={isOwnProfile}
+                            onOpenSettings={isProfileOwner ? handleOpenSettings : null} // Only show settings button for own profile
+                            isProfileOwner={isProfileOwner}
                         />
 
                         {/* Account settings dialog only for own profile */}
-                        {isOwnProfile && (
+                        {isProfileOwner && (
                             <AccountSettingsDialog
                                 open={settingsOpen}
                                 onClose={handleCloseSettings}
@@ -216,8 +219,12 @@ export const Profile = () => {
                         />
 
                         {/* Only show visitors section if this is own profile */}
-                        {isOwnProfile && recentVisitors.length > 0 && (
-                            <VisitorsSection visitors={recentVisitors} totalVisits={statistics.totalVisits} />
+                        {isProfileOwner && recentVisitors.length > 0 && (
+                            <VisitorsSection
+                            visitors={recentVisitors}
+                            totalVisits={statistics.totalVisits}
+                            getImageUrl={userProfileSettings.getStaticProfileImageUrl.bind(userProfileSettings)}
+                          />
                         )}
 
                         {/* Actions */}

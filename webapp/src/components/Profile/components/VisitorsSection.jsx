@@ -11,15 +11,22 @@ import {
   Divider,
   Button
 } from "@mui/material";
-import { format } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 
-const REACT_APP_API_ENDPOINT = process.env.REACT_APP_API_ENDPOINT || 'http://localhost:8000';
 
-const VisitorsSection = ({ visitors, totalVisits }) => {
+const VisitorsSection = ({ visitors, totalVisits, getImageUrl }) => {
   const [expanded, setExpanded] = useState(false);
   const navigate = useNavigate();
+
+  const formatDate = (date) => {
+    if (!date) return "N/A";
+    return date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+  };
   
   // Show only 5 visitors initially unless expanded
   const displayVisitors = expanded ? visitors : visitors.slice(0, 5);
@@ -44,7 +51,7 @@ const VisitorsSection = ({ visitors, totalVisits }) => {
                 <ListItem alignItems="flex-start" sx={{ py: 1 }}>
                   <ListItemAvatar>
                     <Avatar 
-                      src={`${REACT_APP_API_ENDPOINT}/users/${visitor.username}/image`} 
+                      src={getImageUrl(visitor.username)}
                       alt={visitor.username}
                     />
                   </ListItemAvatar>
@@ -64,7 +71,7 @@ const VisitorsSection = ({ visitors, totalVisits }) => {
                     }
                     secondary={
                       <Typography component="span" variant="body2" color="text.secondary">
-                        Visited on {format(new Date(visitor.date), 'MMM d, yyyy h:mm a')}
+                        Visited on {formatDate(new Date(visitor.date), 'MMM d, yyyy h:mm a')}
                       </Typography>
                     }
                   />

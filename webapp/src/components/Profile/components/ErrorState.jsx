@@ -20,7 +20,7 @@ const ErrorState = ({ error, onRetry, onLogout }) => {
           size="large"
           onClick={onLogout}
         >
-          Log In Again
+          Go back to menu
         </Button>
       </Box>
     </Paper>
