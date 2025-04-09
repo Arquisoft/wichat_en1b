@@ -2,15 +2,16 @@ const express = require('express');
 const axios = require('axios');
 const cors = require('cors');
 const promBundle = require('express-prom-bundle');
-//libraries required for OpenAPI-Swagger
 const swaggerUi = require('swagger-ui-express');
 const fs = require("fs")
 const YAML = require('yaml')
 const jwt = require('jsonwebtoken');
+const multer = require('multer');
+const FormData = require('form-data');
+
 require('dotenv').config();
 
 const app = express();
-
 const port = 8000;
 
 const statisticsServiceUrl = process.env.STATS_SERVICE_URL || 'http://localhost:8005';
@@ -20,12 +21,15 @@ const authServiceUrl = process.env.AUTH_SERVICE_URL || 'http://localhost:8002';
 const userServiceUrl = process.env.USER_SERVICE_URL || 'http://localhost:8001';
 
 app.use(cors());
-
 app.use(express.json());
 
 //Prometheus configuration
 const metricsMiddleware = promBundle({ includeMethod: true });
 app.use(metricsMiddleware);
+
+// Configure multer for file uploads
+const storage = multer.memoryStorage();
+const upload = multer({ storage, limits: { fileSize: 5 * 1024 * 1024 } });
 
 // Middleware to verify JWT token and attach the user to the request (usued in the statistics service)
 const authMiddleware = (req, res, next) => {
@@ -52,7 +56,7 @@ function manageError(res, error) {
 }
 
 // Health check endpoint
-app.get('/health', (req, res) => {
+app.get('/health', (_req, res) => {
   res.json({ status: 'OK' });
 });
 
@@ -76,6 +80,92 @@ app.post('/adduser', async (req, res) => {
   }
 });
 
+app.get('/default-images/:imageName', async (req, res) => {
+  try {
+    const imageName = req.params.imageName;
+    const imageResponse = await axios.get(`${userServiceUrl}/images/default/${imageName}`, {
+      responseType: 'arraybuffer',
+    });
+    res.setHeader('Content-Type', 'image/png');
+    res.send(imageResponse.data);
+  } catch (error) {
+    manageError(res, error);
+  }
+});
+
+app.get('/users/:username/image', async (req, res) => {
+  try {
+    let userResponse = await axios.get(`${userServiceUrl}/users/${req.params.username}/image`);
+    let userImageResponse = await axios.get(`${userServiceUrl}${userResponse.data.image}`, { responseType: 'arraybuffer' });
+    
+    res.setHeader('Content-Type', 'image/png');
+    return res.send(userImageResponse.data);
+  } catch (error) {
+    manageError(res, error);
+  }
+});
+
+app.post('/users/:username/default-image', authMiddleware, async (req, res) => {
+  try {
+    if (!req.body.image) {
+      return res.status(400).json({ error: 'No default image provided' });
+    }
+
+    let response = await axios.post(`${userServiceUrl}/users/${req.params.username}/default-image`, req.body);
+    return res.json(response.data);
+  } catch (error) {
+    manageError(res, error);
+  }
+});
+
+app.post('/users/:username/custom-image', authMiddleware, upload.single('image'), async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ error: 'No image file provided' });
+    }
+
+    if (!req.file.mimetype.startsWith('image/')) {
+      return res.status(400).json({ error: 'Uploaded file is not an image' });
+    }
+
+    const formData = new FormData();
+    formData.append('image', req.file.buffer, req.file.originalname);
+
+    const response = await axios.post(
+      `${userServiceUrl}/users/${req.params.username}/custom-image`,
+      formData, { headers: formData.getHeaders() }
+    );
+
+    return res.json(response.data);
+  } catch (error) {
+    manageError(res, error);
+  }
+});
+
+app.get('/profile/:username', authMiddleware, async (req, res) => {
+  try {
+    const targetUsername = req.params.username;
+    
+    // Input validation for username parameter
+    const usernameRegex = /^[a-zA-Z0-9_-]{3,30}$/;
+    if (!usernameRegex.test(targetUsername)) {
+      return res.status(400).json({ error: 'Invalid username format' });
+    }
+    
+    // Forward the request to the statistics service
+    const statisticsResponse = await axios.get(`${statisticsServiceUrl}/statistics`, {
+      headers: {
+        'currentuser': req.user,
+        'targetusername': targetUsername
+      }
+    });
+    
+    res.json(statisticsResponse.data);
+  } catch (error) {
+    manageError(res, error);
+  }
+});
+
 app.post('/askllm', async (req, res) => {
   try {
     // Forward the add user request to the user service
@@ -86,7 +176,7 @@ app.post('/askllm', async (req, res) => {
   }
 });
 
-app.get('/question', async (req, res) => {
+app.get('/question', async (_req, res) => {
   try {
     //Forward the asking for a question to the question service
     const questionResponse = await axios.get(`${questionServiceUrl}/question`);

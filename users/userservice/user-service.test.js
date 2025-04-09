@@ -1,5 +1,4 @@
 const request = require('supertest');
-const bcrypt = require('bcrypt');
 const { MongoMemoryServer } = require('mongodb-memory-server');
 const User = require('./user-model');
 const jwt = require('jsonwebtoken');
@@ -130,5 +129,11 @@ describe('User Service Validation', () => {
     
     expect(userInDb.registrationDate).toBeInstanceOf(Date);
     expect(response.body).toHaveProperty('createdAt');
+  });
+});
+
+describe('User Service Image Management', () => {
+  it('should retrieve the image for some user', async () => {
+
   });
 });

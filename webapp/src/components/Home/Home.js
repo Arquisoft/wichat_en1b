@@ -47,17 +47,27 @@ const Logo = () => {
 export const Home = () => {
     const [message, setMessage] = useState('');
     const [error, setError] = useState('');
+    
+    const userCookie = Cookies.get('user');
+    const isUserLogged = !!userCookie;
+    const apiEndpoint = process.env.REACT_APP_API_ENDPOINT || 'http://localhost:8000';
 
+    let username = '';
+    if (userCookie) {
+        try {
+            const parsedUser = JSON.parse(userCookie);
+            username = parsedUser.username || '';
+        } catch (e) {
+            console.error('Error parsing user cookie', e);
+        }
+    }
+    
     const menuItems = [
-        { id: 1, title: "Your Profile", icon: <User size={50} />, link: "/profile", color: "#A7E3FF" },
+        { id: 1, title: "Your Profile", icon: <User size={50} />, link: `/profile/${username}`, color: "#A7E3FF" },
         { id: 2, title: "New Game", icon: <Gamepad2 size={50} />, link: "/game", color: "#D0C3FF" },
         { id: 3, title: "Statistics", icon: <BarChart size={50} />, link: "/statistics", color: "#FFCF9D" },
         { id: 4, title: "Game Modes", icon: <Layers size={50} />, link: "/game-modes", color: "#C3CADF" },
     ];
-
-    const userCookie = Cookies.get('user');
-    const isUserLogged = !!userCookie;
-    const apiEndpoint = process.env.REACT_APP_API_ENDPOINT || 'http://localhost:8000';
 
     const getGreetingMessage = async () => {
 
