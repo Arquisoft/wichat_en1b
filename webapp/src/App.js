@@ -6,6 +6,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { Home } from './components/Home/Home';
 import { Navbar } from './components/fragments/Navbar';
 import { Statistics } from './components/Statistics/Statistics';
+import { Profile } from './components/Profile/Profile';
 import Cookies from 'js-cookie';
 import GameWrapper from './components/Game/GameWrapper';
 
@@ -30,6 +31,7 @@ function App() {
             <Route path="/signup" element={isLoggedIn ? <Navigate to="/home" /> : <SignUp />} />
             <Route path="/game" element={isLoggedIn ? <GameWrapper /> : <Navigate to="/login" />} />
             <Route path="/statistics" element={isLoggedIn ? <Statistics /> : <Navigate to="/login" /> } />
+            <Route path="/profile/:username" element={isLoggedIn ? <Profile /> : <Navigate to="/login" />} />
           </Routes>
         </Container>
       </div>

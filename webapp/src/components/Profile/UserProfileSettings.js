@@ -39,4 +39,18 @@ export default class UserProfileSettings {
       throw new Error("Failed to upload the image: " + error.response?.data?.error || error.message);
     }
   }
+
+  getProfileImageUrl(username) {
+    return `${this.API_GATEWAY}/users/${username}/image?timestamp=${Date.now()}`;
+  }
+  
+  getStaticProfileImageUrl(username) {
+    return `${this.API_GATEWAY}/users/${username}/image`;
+  }
+  
+  getDefaultImages(count = 16) {
+    return Array.from({ length: count }, (_, i) =>
+      `${this.API_GATEWAY}/default-images/image_${i + 1}.png`
+    );
+  }
 }
