@@ -24,9 +24,6 @@ export const Profile = () => {
 
     const navigate = useNavigate();
     const { username: profileUsernameParam } = useParams(); // Get username from URL params
-    
-    console.log(profileUsernameParam);
-
     const [hasValidUsername, setHasValidUsername] = useState(true);
 
     useEffect(() => {
@@ -98,7 +95,7 @@ export const Profile = () => {
 
     const loadUserData = async () => {
         try {
-            const { statsData, profileUsername } = await retriever.getRecords(profileUsername);
+            const { statsData, profileUsername } = await retriever.getRecords(profileUsernameParam);
 
             setStatistics(statsData);
             
