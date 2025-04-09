@@ -1,10 +1,14 @@
 // user-service.js
 const express = require('express');
+
 const mongoose = require('mongoose');
 const User = require('./user-model');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const { check, validationResult } = require('express-validator');
+const path = require('path');
+const fs = require('fs');
+const multer = require('multer');
+
 require('dotenv').config();
 
 const app = express();
@@ -13,9 +17,16 @@ const port = 8001;
 // Middleware to parse JSON in request body
 app.use(express.json());
 
+// Serve static files from the public directory
+app.use(express.static('public'));
+
 // Connect to MongoDB
 const mongoUri = process.env.MONGODB_URI || 'mongodb://localhost:27017/userdb';
 mongoose.connect(mongoUri);
+
+// Configure multer for file uploads
+const storage = multer.memoryStorage();
+const upload = multer({ storage, limits: { fileSize: 5 * 1024 * 1024 } });
 
 // Function to validate required fields in the request body
 function validateRequiredFields(req, requiredFields) {
@@ -39,6 +50,90 @@ function validateUsername(username) {
   return usernameStr;
 }
 
+// Helper function to delete an image file if it exists
+function deleteImageFile(imagePath) {
+  if (fs.existsSync(imagePath)) {
+    fs.unlinkSync(imagePath);
+  }
+}
+
+// Refactor validateImageResource to handle both custom and default images
+async function validateAndDeleteCurrentImage(username) {
+  const user = await User.findOne({ username: { $eq: validateUsername(username) } });
+  if (!user) {
+    throw new Error('User not found');
+  }
+
+  if (user.image && user.image.startsWith('/images/custom/')) {
+    const currentImagePath = path.join(__dirname, 'public', user.image);
+    deleteImageFile(currentImagePath);
+  }
+
+  return user;
+}
+
+app.get('/users/:username/image', async (req, res) => {
+  try {
+    let user = await User.findOne({ username: { $eq: validateUsername(req.params.username) }});
+
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    res.json({ image: user.image ?? '/images/default/image_1.png' });
+  }
+  catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.post('/users/:username/custom-image', upload.single('image'), async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ error: 'No image file provided' });
+    }
+
+    const username = validateUsername(req.params.username);
+    const user = await validateAndDeleteCurrentImage(username);
+
+    const customImagesDir = path.join(__dirname, 'public', 'images', 'custom');
+
+    if (!fs.existsSync(customImagesDir)) {
+      fs.mkdirSync(customImagesDir, { recursive: true });
+    }
+
+    const filePath = path.join(customImagesDir, `${username}-${Date.now()}.png`);
+    fs.writeFileSync(filePath, req.file.buffer);
+
+    const image = `/images/custom/${path.basename(filePath)}`;
+    user.image = image;
+    await user.save();
+
+    res.json({ success: true, message: 'Image updated successfully', imagePath: image });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.post('/users/:username/default-image', async (req, res) => {
+  try {
+    if (!req.body.image) {
+      return res.status(400).json({ error: 'No default image provided' });
+    }
+
+    const username = validateUsername(req.params.username);
+    const user = await validateAndDeleteCurrentImage(username);
+
+    const image = `/images/default/${req.body.image}`;
+    user.image = image;
+    await user.save();
+
+    res.json({ success: true, message: 'Image updated successfully', imagePath: image });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 app.post('/adduser', async (req, res) => {
   try {
     // Check if required fields are present in the request body
@@ -54,9 +149,13 @@ app.post('/adduser', async (req, res) => {
     // Encrypt the password before saving it
     const hashedPassword = await bcrypt.hash(req.body.password, 10);
 
+    // Assign a random image from the default images
+    let image = `/images/default/image_${Math.floor(Math.random() * 16) + 1}.png`;
+
     const newUser = new User({
       username: validatedUsername,
       passwordHash: hashedPassword,
+      image: image
     });
 
     await newUser.save();

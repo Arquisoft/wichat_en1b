@@ -2,20 +2,23 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { 
   Typography, Box, Container, Paper, CircularProgress, Grid, Button,
-  Card, CardContent, Divider, LinearProgress, Avatar
+  Card, CardContent, Divider, LinearProgress, Avatar, Dialog, DialogTitle, DialogContent, DialogActions
 } from "@mui/material";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import Cookies from "js-cookie";
 import RecordRetriever from "./RecordRetriever";
+import UserProfileSettings from "../Profile/UserProfileSettings";
 import { 
   PieChart, Pie, Cell, ResponsiveContainer, 
   Tooltip, Legend
 } from "recharts";
-import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
 
+const REACT_APP_API_ENDPOINT = process.env.REACT_APP_API_ENDPOINT || 'http://localhost:8000';
+
 const retriever = new RecordRetriever();
+const userProfileSettings = new UserProfileSettings();
 
 // Enhanced theme with more color options
 const theme = createTheme({
@@ -65,25 +68,56 @@ export const Statistics = () => {
   const [error, setError] = useState(null);
   const [username, setUsername] = useState("");
   const [registrationDate, setRegistrationDate] = useState(null);
-
+  const [profileImage, setProfileImage] = useState("");
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const [DEFAULT_IMAGES, setDefaultImages] = useState([]);
+  const [uploadError, setUploadError] = useState(null);
+  const [defaultImageError, setDefaultImageError] = useState(null);
   const handleLogout = () => {
     Cookies.remove('user', { path: '/' });
     navigate('/login');
   };
 
+  const handleCustomProfileImageChange = async (event) => {
+    try {
+      setUploadError(null);
+      setDefaultImageError(null);
+      await userProfileSettings.changeCustomProfileImage(username, Cookies.get('user'), event.target.files[0]);
+      setProfileImage(`${REACT_APP_API_ENDPOINT}/users/${username}/image?timestamp=${Date.now()}`);
+    } catch (error) {
+      setUploadError(error.message);
+    }
+  };
+
+  const handleDefaultProfileImageChange = async (image) => {
+    try {
+      setUploadError(null);
+      setDefaultImageError(null);
+      await userProfileSettings.changeDefaultProfileImage(username, Cookies.get('user'), image.split('/').pop());
+      setProfileImage(`${REACT_APP_API_ENDPOINT}/users/${username}/image?timestamp=${Date.now()}`);
+    } catch (error) {
+      setDefaultImageError(error.message);
+    }
+  };
+
+  const handleOpenSettings = () => setSettingsOpen(true);
+  const handleCloseSettings = () => setSettingsOpen(false);
+
   useEffect(() => {
     const getRecords = async () => {
       try {
-        const {statsData, username} = await retriever.getRecords();
+        const { statsData, username } = await retriever.getRecords();
         setStatistics(statsData);
-  
-        setUsername(username || "User");        
-      
+
+        setUsername(username || "User");
+
         // Set registration date if available
         if (statsData.registrationDate) {
           setRegistrationDate(new Date(statsData.registrationDate));
         }
-        
+
+        const initialImageUrl = `${REACT_APP_API_ENDPOINT}/users/${username}/image?timestamp=${Date.now()}`;
+        setProfileImage(initialImageUrl);
         setLoading(false);
       } catch (error) {
         setError(error.message || "Failed to load statistics");
@@ -92,6 +126,20 @@ export const Statistics = () => {
     };
 
     getRecords();
+  }, []);
+
+  useEffect(() => {
+    const fetchDefaultImages = async () => {
+      try {
+        const images = [];
+        for (let i = 1; i <= 16; i++) {
+          images.push(`${REACT_APP_API_ENDPOINT}/default-images/image_${i}.png`);
+        }
+        setDefaultImages(images);
+      } catch (error) {}
+    };
+
+    fetchDefaultImages();
   }, []);
 
   const handleRetry = () => {
@@ -155,6 +203,61 @@ export const Statistics = () => {
     });
   };
 
+  const AccountSettingsDialog = () => (
+    <Dialog open={settingsOpen} onClose={handleCloseSettings} maxWidth="sm" fullWidth>
+      <DialogTitle>Account Settings</DialogTitle>
+      <DialogContent>
+        <Typography variant="body1" sx={{ mb: 2 }}>
+          Manage your account settings below:
+        </Typography>
+        <Button
+          variant="outlined"
+          component="label"
+          sx={{ mb: 2 }}
+        >
+          Upload Profile Picture
+          <input
+            type="file"
+            accept="image/*"
+            hidden
+            onChange={handleCustomProfileImageChange}
+          />
+        </Button>
+        {uploadError && (
+          <Typography variant="body2" color="error" sx={{ mt: 1 }}>
+            {uploadError}
+          </Typography>
+        )}
+        <Typography variant="body2" sx={{ mt: 2, mb: 1 }}>Or select a default image:</Typography>
+        <Box sx={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(48px, 1fr))", gap: 2 }}>
+          {DEFAULT_IMAGES.map((image, index) => (
+            <Avatar
+              key={index}
+              src={image}
+              alt={`Default avatar ${index + 1}`}
+              sx={{
+                width: "100%",
+                height: "auto",
+                cursor: "pointer",
+              }}
+              onClick={() => handleDefaultProfileImageChange(image)}
+            />
+          ))}
+        </Box>
+        {defaultImageError && (
+          <Typography variant="body2" color="error" sx={{ mt: 1 }}>
+            {defaultImageError}
+          </Typography>
+        )}
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={handleCloseSettings} color="primary">
+          Close
+        </Button>
+      </DialogActions>
+    </Dialog>
+  );
+
   return (
     <ThemeProvider theme={theme}>
       <Container maxWidth="lg" sx={{ py: 4 }}>
@@ -200,9 +303,11 @@ export const Statistics = () => {
             {/* User Profile Header */}
             <Paper elevation={3} sx={{ p: 3, mb: 3, borderRadius: 2 }}>
               <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-                <Avatar sx={{ width: 64, height: 64, bgcolor: "primary.main", mr: 2 }}>
-                  <AccountCircleIcon sx={{ fontSize: 40 }} />
-                </Avatar>
+                <Avatar
+                  src={profileImage}
+                  alt={`${username}'s profile picture`}
+                  sx={{ width: 64, height: 64, bgcolor: "primary.main", mr: 2 }}
+                />
                 <Box>
                   <Typography variant="h4">{username}'s Statistics</Typography>
                   <Box sx={{ display: "flex", alignItems: "center", mt: 1 }}>
@@ -213,7 +318,15 @@ export const Statistics = () => {
                   </Box>
                 </Box>
               </Box>
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={handleOpenSettings}
+              >
+                Account Settings
+              </Button>
             </Paper>
+            <AccountSettingsDialog />
 
             {/* Key Metrics */}
             <Grid container spacing={3} sx={{ mb: 3 }}>

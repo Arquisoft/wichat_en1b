@@ -35,7 +35,7 @@ class RecordRetriever {
             // Return the response data (user statistics) and the username
             return {
                 statsData: response.data,
-                username: parsedUserCookie.username
+                username: parsedUserCookie.username,
             };
 
         } catch (error) {
