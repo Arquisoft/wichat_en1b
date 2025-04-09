@@ -90,43 +90,41 @@ export const Profile = () => {
     const handleRetry = () => {
         setLoading(true);
         setError(null);
-        loadUserData();
-    };
-
-    const loadUserData = async () => {
-        try {
-            const { statsData, profileUsername } = await retriever.getRecords(profileUsernameParam);
-
-            setStatistics(statsData);
-            
-            // Determine which profile to load
-            setIsProfileOwner(statsData.isProfileOwner);
-
-            setCurrentUsername(profileUsername);
-            
-            // Set registration date if available
-            if (statsData && statsData.registrationDate) {
-                setRegistrationDate(new Date(statsData.registrationDate));
-            }
-
-            // Set recent visitors if available (only provided if user is profile owner)
-            if (statsData && statsData.recentVisitors) {
-                setRecentVisitors(statsData.recentVisitors);
-            }
-
-            setProfileImage(userProfileSettings.getProfileImageUrl(profileUsername));
-            setLoading(false);
-        } catch (error) {
-            setError(error.message || "Failed to retrieve statistics");
-            setLoading(false);
-        }
     };
 
     useEffect(() => {
         if (hasValidUsername) {
+            const loadUserData = async () => {
+                try {
+                    const { statsData, username: fetchedUsername } = await retriever.getRecords(profileUsernameParam);
+
+                    setStatistics(statsData);
+                    
+                    // Determine which profile to load
+                    setIsProfileOwner(statsData.isProfileOwner);
+
+                    setCurrentUsername(fetchedUsername);
+                    
+                    // Set registration date if available
+                    if (statsData && statsData.registrationDate) {
+                        setRegistrationDate(new Date(statsData.registrationDate));
+                    }
+
+                    // Set recent visitors if available (only provided if user is profile owner)
+                    if (statsData && statsData.recentVisitors) {
+                        setRecentVisitors(statsData.recentVisitors);
+                    }
+
+                    setProfileImage(userProfileSettings.getProfileImageUrl(profileUsernameParam));
+                    setLoading(false);
+                } catch (error) {
+                    setError(error.message || "Failed to retrieve statistics");
+                    setLoading(false);
+                }
+            };
             loadUserData();
         }
-    }, [hasValidUsername, profileUsernameParam]); // Reload when URL parameter changes and username is valid
+    }, [hasValidUsername, profileUsernameParam, userProfileSettings, retriever]);
 
     useEffect(() => {
         setDefaultImages(userProfileSettings.getDefaultImages());

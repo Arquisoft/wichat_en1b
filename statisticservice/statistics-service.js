@@ -21,115 +21,81 @@ if (mongoose.connection.readyState === 0) {
 
 // GET endpoint to retrieve user statistics
 app.get('/statistics', async (req, res) => {
-  console.log("arrived at statistics endpoint")
-    const currentUsername = req.headers['currentuser'];
-    if (!currentUsername) return res.status(400).json({ error: 'Current user missing in request' });
+  const currentUsername = req.headers['currentuser'];
+  if (!currentUsername) return res.status(400).json({ error: 'Current user missing in request' });
 
-    console.log("currentUsername: ", currentUsername)
+  const targetUsername = req.headers['targetusername'];
+  if (!targetUsername) return res.status(400).json({ error: 'Target user missing in request' });
 
-    const targetUsername = req.headers['targetusername'];
-    if (!targetUsername) return res.status(400).json({ error: 'Target user missing in request' });
+  const usernameRegex = /^[a-zA-Z0-9_-]{3,30}$/;
+  if (!usernameRegex.test(targetUsername)) return res.status(400).json({ error: 'Invalid username format' });  
+  
+  const targetUser = await User.findOne({ username: targetUsername });
+  if (!targetUser) return res.status(404).json({ error: 'User not found' });
 
-    console.log("targetUsername: ", targetUsername)
+  // Record the profile visit if the visitor is not the profile owner
+  if (currentUsername !== targetUsername) {
+    console.log("currentUsername !== targetUsername")
+    // Use findOneAndUpdate to atomically update the document
+    await User.findOneAndUpdate(
+        { username: targetUsername },
+        { 
+            $push: { 
+                profileVisits: { 
+                    visitorUsername: currentUsername, 
+                    visitDate: new Date() 
+                } 
+            },
+            $inc: { totalVisits: 1 }
+        }
+    );
+  }
 
-    const usernameRegex = /^[a-zA-Z0-9_-]{3,30}$/;
-    if (!usernameRegex.test(targetUsername)) return res.status(400).json({ error: 'Invalid username format' });  
+  // Prepare response data
+  const responseData = {
+    username: targetUser.username,
+    gamesPlayed: targetUser.gamesPlayed,
+    questionsAnswered: targetUser.questionsAnswered,
+    correctAnswers: targetUser.correctAnswers,
+    incorrectAnswers: targetUser.incorrectAnswers,
+    registrationDate: targetUser.registrationDate,
+    totalVisits: targetUser.totalVisits
+  };
+  
+  // Only add sensitive data for the profile owner
+  if (currentUsername === targetUsername) {
     
-    const targetUser = await User.findOne({ username: targetUsername });
-    if (!targetUser) return res.status(404).json({ error: 'User not found' });
-
-    // Record the profile visit if the visitor is not the profile owner
-    if (currentUsername !== targetUsername) {
-      // Use findOneAndUpdate to atomically update the document
-      await User.findOneAndUpdate(
-          { username: targetUsername },
-          { 
-              $push: { 
-                  profileVisits: { 
-                      visitorUsername: currentUsername, 
-                      visitDate: new Date() 
-                  } 
-              },
-              $inc: { totalVisits: 1 }
-          }
-      );
-
-      // Base response that everyone can see
-      const responseData = {
-        username: targetUser.username,
-        gamesPlayed: targetUser.gamesPlayed,
-        questionsAnswered: targetUser.questionsAnswered,
-        correctAnswers: targetUser.correctAnswers,
-        incorrectAnswers: targetUser.incorrectAnswers,
-        registrationDate: targetUser.registrationDate,
-        totalVisits: targetUser.totalVisits
-      };
-
-      // Only add sensitive data for the profile owner
-      if (currentUsername === targetUsername) {
-
-        // Get the most recent visitors (limited to 10)
-        const recentVisitors = targetUser.profileVisits
-            .sort((a, b) => b.visitDate - a.visitDate)
-            .slice(0, 10)
-            .map(visit => ({
+    // Get the most recent visitors (each user appears once)
+    const recentVisitors = targetUser.profileVisits
+      ? (() => {
+          // Create a map to track the most recent visit for each unique visitor
+          const visitorMap = new Map();
+          
+          // For each visit, keep only the most recent one per visitor
+          targetUser.profileVisits.forEach(visit => {
+            const existingVisit = visitorMap.get(visit.visitorUsername);
+            if (!existingVisit || new Date(visit.visitDate) > new Date(existingVisit.visitDate)) {
+              visitorMap.set(visit.visitorUsername, {
                 username: visit.visitorUsername,
                 date: visit.visitDate
-            }));
-            
-        
-        responseData.recentVisitors = recentVisitors;
-        responseData.isProfileOwner = true;
-      } else {
-        responseData.isProfileOwner = false;
-      }
-      
-      res.json(responseData);
-    }
-});
-
-// GET endpoint to get detailed visit statistics
-app.get('/statistics/visits', async (req, res) => {
-  try {
-      const username = req.user;
-      
-      // Find the user
-      const user = await User.findOne({ username: username });
-      
-      if (!user) {
-          return res.status(404).json({ error: 'User not found' });
-      }
-      
-      // Process visit data for analysis
-      const visits = user.profileVisits;
-      
-      // Get count of unique visitors
-      const uniqueVisitors = [...new Set(visits.map(visit => visit.visitorUsername))].length;
-      
-      // Get visits per day for the last 30 days
-      const today = new Date();
-      const thirtyDaysAgo = new Date(today);
-      thirtyDaysAgo.setDate(today.getDate() - 30);
-      
-      const recentVisits = visits.filter(visit => visit.visitDate >= thirtyDaysAgo);
-      
-      // Group by date
-      const visitsPerDay = {};
-      recentVisits.forEach(visit => {
-          const dateStr = visit.visitDate.toISOString().split('T')[0];
-          visitsPerDay[dateStr] = (visitsPerDay[dateStr] || 0) + 1;
-      });
-      
-      res.json({
-          username: user.username,
-          totalVisits: user.totalVisits,
-          uniqueVisitors: uniqueVisitors,
-          visitsPerDay: visitsPerDay
-      });
-  } catch (error) {
-      console.error('Error retrieving visit statistics:', error);
-      res.status(500).json({ error: 'Failed to retrieve visit statistics' });
+              });
+            }
+          });
+          
+          // Convert map values to array, sort by date (most recent first), and limit to 10
+          return Array.from(visitorMap.values())
+            .sort((a, b) => new Date(b.date) - new Date(a.date))
+            .slice(0, 10);
+        })()
+      : [];
+   
+    responseData.recentVisitors = recentVisitors;
+    responseData.isProfileOwner = true;
+  } else {
+    responseData.isProfileOwner = false;
   }
+  
+  res.json(responseData);
 });
 
 // POST endpoint to update user statistics
