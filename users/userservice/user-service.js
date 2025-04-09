@@ -102,7 +102,9 @@ app.post('/users/:username/custom-image', upload.single('image'), async (req, re
       fs.mkdirSync(customImagesDir, { recursive: true });
     }
 
-    const filePath = path.join(customImagesDir, `${username}-${Date.now()}.png`);
+    const sanitizedFilename = `${username}-${Date.now()}.png`;
+    const filePath = path.join(customImagesDir, sanitizedFilename);
+
     fs.writeFileSync(filePath, req.file.buffer);
 
     const image = `/images/custom/${path.basename(filePath)}`;
