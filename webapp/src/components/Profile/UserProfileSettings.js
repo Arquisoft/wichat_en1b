@@ -27,13 +27,13 @@ export default class UserProfileSettings {
         formData.append("image", file);
 
         await axios.post(this.API_GATEWAY + `/users/${username}/custom-image`, formData,
-            {
-              headers: {
-                "Content-Type": "multipart/form-data",
-                "Authorization": `Bearer ${JSON.parse(cookie).token}`,
-              },
-            }
-          );
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+              "Authorization": `Bearer ${JSON.parse(cookie).token}`,
+            },
+          }
+        );
       }
     } catch (error) {
       throw new Error("Failed to upload the image: " + error.response?.data?.error || error.message);

@@ -159,6 +159,228 @@ paths:
                     type: string
                     description: Error information.
                     example: getaddrinfo ENOTFOUND mongodb
+  /default-images/{imageName}:
+    get:
+      summary: Retrieve a default profile image.
+      operationId: defaultImage
+      parameters:
+        - name: imageName
+          in: path
+          required: true
+          description: The name of the image to retrieve.
+          schema:
+            type: string
+            example: image_1.png
+      responses:
+        '200':
+          description: Image retrieved correctly.
+          content:
+            image/*:
+              schema:
+                type: string
+                format: binary
+                description: The image data.
+        '404':
+          description: Image not found.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    description: Error information.
+                    example: Request failed with status code 404
+        '500':
+          description: Failed to retrieve the image due to a server error.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    description: Error information.
+                    example: Internal Server Error
+  /users/{username}/image:
+    get:
+      summary: Retrieve the profile image of some user.
+      operationId: userImage
+      parameters:
+        - name: username
+          in: path
+          required: true
+          description: The username of the user to recover their image.
+          schema:
+            type: string
+            example: student
+      responses:
+        '200':
+          description: Image retrieved correctly.
+          content:
+            image/*:
+              schema:
+                type: string
+                format: binary
+                description: The image data.
+        '404':
+          description: User is not found.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    description: Error information.
+                    example: User not found
+        '500':
+          description: Failed to retrieve the image due to a server error.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    description: Error information.
+                    example: Internal Server Error
+  /users/{username}/default-image:
+    post:
+      summary: Updates the image of some user to a default one.
+      operationId: defaultUserImage
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                image:
+                  type: string
+                  description: The name of the default image to set.
+                  example: image_13.png
+      responses:
+        '200':
+          description: Image updated correctly.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    description: Indicates if the operation was successful.
+                    example: true
+                  message:
+                    type: string
+                    description: Message describing the result.
+                    example: Image updated successfully
+                  imagePath:
+                    type: string
+                    description: Path to the updated image.
+                    example: /images/default/image_13.png
+        '400':
+          description: Default image is missing in the body.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    description: Error information.
+                    example: No default image provided
+        '404':
+          description: User is not found.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    description: Error information.
+                    example: User not found
+        '500':
+          description: Failed to upload the image due to a server error.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    description: Error information.
+                    example: Internal Server Error
+  /users/{username}/custom-image:
+    post:
+      summary: Updates the image of some user, uploading a new one.
+      operationId: customUserImage
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                image:
+                  type: string
+                  format: binary
+                  description: The image file to upload.
+      responses:
+        '200':
+          description: Image updated correctly.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    description: Indicates if the operation was successful.
+                    example: true
+                  message:
+                    type: string
+                    description: Message describing the result.
+                    example: Image updated successfully
+                  imagePath:
+                    type: string
+                    description: Path to the updated image.
+                    example: /images/default/image_13.png
+        '400':
+          description: File is missing or is not an image.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    description: Error information.
+                    example: Uploaded file is not an image
+        '404':
+          description: User is not found.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    description: Error information.
+                    example: User not found
+        '500':
+          description: Failed to upload the image due to a server error.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    description: Error information.
+                    example: Internal Server Error
   /askllm:
     post:
       summary: Send a question to the LLM.
