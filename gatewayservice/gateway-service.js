@@ -89,7 +89,7 @@ app.get('/default-images/:imageName', async (req, res) => {
     res.setHeader('Content-Type', 'image/png');
     res.send(imageResponse.data);
   } catch (error) {
-    res.status(error.response?.status || 500).json({ error: error.message });
+    res.status(error.response?.status || 500).json({ error: error.response?.data?.error || 'Internal server error' });
   }
 });
 
