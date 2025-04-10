@@ -27,6 +27,10 @@ export const Question = ({ statisticsUpdater = defaultStatisticsUpdater }) => {
     const [isIncorrect, setIsIncorrect] = useState(false);
     const [imagesLoaded, setImagesLoaded] = useState(false);
     const [isPaused, setIsPaused] = useState(false);
+    const [round, setRound] = useState(1); // Track the round number
+    const [isGameEnded, setIsGameEnded] = useState(false); // Track if the game has ended
+
+    const maxRounds = 3;
 
     const { question, setQuestion, setGameEnded, questionType } = useGame();
     const gatewayEndpoint = process.env.REACT_APP_API_ENDPOINT || 'http://localhost:8000';
@@ -118,6 +122,7 @@ export const Question = ({ statisticsUpdater = defaultStatisticsUpdater }) => {
                 // Update statistics for correct answer
                 try {
                     await statisticsUpdater.recordCorrectAnswer();
+                    await statisticsUpdater.recordCorrectAnswer2(1000); // Assuming 1000 is the score for a correct answer
                 } catch (error) {
                     console.error("Error recording correct answer:", error.message);
                 }
@@ -131,6 +136,7 @@ export const Question = ({ statisticsUpdater = defaultStatisticsUpdater }) => {
                 // Update statistics for incorrect answer
                 try {
                     await statisticsUpdater.recordIncorrectAnswer();
+                    await statisticsUpdater.recordIncorrectAnswer2(); // Assuming no score for incorrect answer
                 } catch (error) {
                     console.error("Error recording incorrect answer:", error.message);
                 }
@@ -141,10 +147,38 @@ export const Question = ({ statisticsUpdater = defaultStatisticsUpdater }) => {
                     requestQuestion(false); // Not the first question
                 }, 2000);
             }
+            if(round == maxRounds) {
+                setGameEnded(true); // Notify the game context that the game has ended
+                const endGameAndSaveResults = async () => {
+                    try {
+                        await statisticsUpdater.endGame(); // Record the game statistics
+                    } catch (error) {
+                        console.error("Error recording game:", error.message);
+                    }
+                }
+                endGameAndSaveResults();
+                setTimeout(() => {
+    
+                }, 2000); // Show message for 2 seconds before resetting
+                setRound(1); // Reset round count
+                setGameEnded(false); // Reset game ended state
+            } else {
+                setRound(round + 1); // Increment round count
+            }
         } catch (error) {
             console.error("Error checking answer: ", error);
         }
     }
+
+    useEffect(() => {
+        if (isGameEnded) {
+            // Handle game end logic here, e.g., show a message or redirect to a different page
+            console.log("Game has ended. Show final score or redirect.");
+            // You can also reset the game state here if needed
+            // For example, you might want to reset the question and score
+           
+        }
+    }, [isGameEnded])
 
     // Format time as MM:SS
     const formatTime = (seconds) => {
@@ -156,6 +190,10 @@ export const Question = ({ statisticsUpdater = defaultStatisticsUpdater }) => {
     return (
         <ThemeProvider theme={theme}>
             <Container maxWidth="md" sx={{ py: 4 }}>
+                {/* Round counter */}
+                <Typography variant="p" component="p" align="center" sx={{ my: 3, fontWeight: 500 }}>
+                    {round} / {maxRounds}
+                </Typography>
                 {/* Large Timer at the top */}
                 <Box sx={{
                     display: "flex",
