@@ -8,10 +8,10 @@ const fs = require("fs")
 const YAML = require('yaml')
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
-
 const app = express();
-
 const port = 8000;
+
+
 
 const statisticsServiceUrl = process.env.STATS_SERVICE_URL || 'http://localhost:8005';
 const questionServiceUrl = process.env.QUESTION_SERVICE_URL || 'http://localhost:8004';
@@ -20,8 +20,8 @@ const authServiceUrl = process.env.AUTH_SERVICE_URL || 'http://localhost:8002';
 const userServiceUrl = process.env.USER_SERVICE_URL || 'http://localhost:8001';
 
 app.use(cors());
-
 app.use(express.json());
+
 
 //Prometheus configuration
 const metricsMiddleware = promBundle({ includeMethod: true });
@@ -126,6 +126,11 @@ app.get('/question/:questionType', async (req, res) => {
   }
 });
 
+/**
+ * Accepts a POST request with an answer payload in the request body and forwards it to the question service at /answer for validation.
+ * Returns the validation response from the question service.
+ * Errors are handled centrally.
+ */
 app.post('/answer', async (req, res) => {
   try {
     //Forward the answer for validation to the question service
@@ -136,6 +141,12 @@ app.post('/answer', async (req, res) => {
   }
 });
 
+/**
+ * Accepts an authenticated GET request to retrieve user-specific statistics.
+ * The username is extracted from the authenticated request and sent in the headers to the statistics service's /statistics endpoint.
+ * Returns the statistics response.
+ * Errors are handled centrally.
+ */
 app.get('/statistics', authMiddleware, async (req, res) => {
   try {
     // Forward the user information to the statistics service
@@ -151,6 +162,11 @@ app.get('/statistics', authMiddleware, async (req, res) => {
   }
 });
 
+/**
+ * Accepts an authenticated POST request containing updated statistics data in the request body.
+ * The username is extracted from the request and included in the headers when forwarding the request to the statistics service's /statistics endpoint.
+ * Returns the response from the statistics service and manages errors accordingly.
+ */
 app.post('/statistics', authMiddleware, async (req, res) => {
   try {
     // Forward the update statistics request to the statistics service
