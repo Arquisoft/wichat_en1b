@@ -71,7 +71,7 @@ export const Navbar = () => {
     const navLinks = isLoggedIn
         ? [ { title: "Home", path: "/home" },
             { title: "Profile", path: `/profile/${username}` },
-            { title: "New game", path: "/game" },
+            { title: "Classical game", path: "/game" },
             { title: "Statistics", path: "/statistics" },
             { title: "Game modes", path: "/game-modes" },
             { title: "Sign Out", action: handleSignOut }]

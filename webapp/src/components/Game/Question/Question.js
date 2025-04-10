@@ -17,7 +17,7 @@ const theme = createTheme({
 })
 
 // Create a default statistics updater instance
-const defaultStatisticsUpdater = new StatisticsUpdater();
+const defaultStatisticsUpdater = new StatisticsUpdater('classical');
 
 export const Question = ({ statisticsUpdater = defaultStatisticsUpdater }) => {
     const [selectedAnswer, setSelectedAnswer] = useState(null)
