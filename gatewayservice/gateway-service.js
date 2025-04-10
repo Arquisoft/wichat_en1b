@@ -60,6 +60,11 @@ app.get('/health', (_req, res) => {
   res.json({ status: 'OK' });
 });
 
+/**
+ * Accepts a POST request containing user login credentials in the request body and forwards it to the authentication service at /login.
+ * Returns the authentication result (such as a token or user data) from the authentication service.
+ * Errors are handled using a centralized error manager.
+ */
 app.post('/login', async (req, res) => {
   try {
     // Forward the login request to the authentication service
@@ -70,6 +75,11 @@ app.post('/login', async (req, res) => {
   }
 });
 
+/**
+ * Accepts a POST request containing user details in the request body and forwards it to the user service at /adduser.
+ * Returns the response from the user service.
+ * Handles errors using a centralized error manager.
+ */
 app.post('/adduser', async (req, res) => {
   try {
     // Forward the add user request to the user service
@@ -80,6 +90,12 @@ app.post('/adduser', async (req, res) => {
   }
 });
 
+/**
+ * Accepts a GET request to retrieve a default image by name.
+ * The imageName parameter is passed in the URL and forwarded to the user service's /images/default/:imageName endpoint.
+ * Returns the image data with Content-Type set to image/png.
+ * Handles errors by returning the appropriate status and error message.
+ */
 app.get('/default-images/:imageName', async (req, res) => {
   try {
     const imageName = req.params.imageName;
@@ -93,6 +109,11 @@ app.get('/default-images/:imageName', async (req, res) => {
   }
 });
 
+/**
+ * Accepts a GET request to retrieve a specific user’s profile image.
+ * First queries the user service for the image path using the provided username, then fetches and returns the image as a binary stream with Content-Type: image/png.
+ * Errors are handled using a centralized error manager.
+ */
 app.get('/users/:username/image', async (req, res) => {
   try {
     let userResponse = await axios.get(`${userServiceUrl}/users/${req.params.username}/image`);
@@ -105,6 +126,12 @@ app.get('/users/:username/image', async (req, res) => {
   }
 });
 
+/**
+ * Accepts an authenticated POST request to set a default image for a user. Requires an image field in the request body.
+ * Forwards the request to the user service’s /users/:username/default-image endpoint.
+ * Returns the result of the operation. If no image is provided, responds with a 400 Bad Request.
+ * Uses a centralized error manager for error handling.
+ */
 app.post('/users/:username/default-image', authMiddleware, async (req, res) => {
   try {
     if (!req.body.image) {
@@ -118,6 +145,14 @@ app.post('/users/:username/default-image', authMiddleware, async (req, res) => {
   }
 });
 
+/**
+ * Accepts an authenticated POST request to upload a custom profile image for a user.
+ * The request must include an image file in multipart/form-data format. Validates that the uploaded file is an image.
+ * Forwards the file to the user service’s /users/:username/custom-image endpoint using a FormData object. Returns the response from the user service.
+ * Handles missing or invalid image files with appropriate 400 Bad Request responses, and other errors through a centralized handler.
+
+
+ */
 app.post('/users/:username/custom-image', authMiddleware, upload.single('image'), async (req, res) => {
   try {
     if (!req.file) {
@@ -142,6 +177,12 @@ app.post('/users/:username/custom-image', authMiddleware, upload.single('image')
   }
 });
 
+/**
+ * Accepts an authenticated GET request to retrieve statistics for a specific user profile.
+ * Validates the username parameter using a regex to ensure it matches expected formatting.
+ * Forwards the request to the statistics service, sending both the current and target usernames in the headers.
+ * Returns the retrieved statistics. Invalid usernames trigger a 400 Bad Request response, and other errors are handled centrally.
+ */
 app.get('/profile/:username', authMiddleware, async (req, res) => {
   try {
     const targetUsername = req.params.username;
@@ -166,6 +207,11 @@ app.get('/profile/:username', authMiddleware, async (req, res) => {
   }
 });
 
+/**
+ * Accepts a POST request with a query payload in the request body and forwards it to the LLM service at /ask.
+ * Returns the generated response from the LLM service.
+ * Errors are managed via a centralized error handler.
+ */
 app.post('/askllm', async (req, res) => {
   try {
     // Forward the add user request to the user service
@@ -176,6 +222,11 @@ app.post('/askllm', async (req, res) => {
   }
 });
 
+/**
+ * Accepts a GET request to retrieve a question from the question service.
+ * Forwards the request to /question endpoint of the question service and returns the response.
+ * Uses a centralized error handler for managing failures.
+ */
 app.get('/question', async (_req, res) => {
   try {
     //Forward the asking for a question to the question service
@@ -186,6 +237,11 @@ app.get('/question', async (_req, res) => {
   }
 });
 
+/**
+ * Accepts a GET request to retrieve a question of a specific type from the question service.
+ * The questionType parameter is passed in the URL and forwarded to the question service’s /question/:questionType endpoint.
+ * Returns the response from the question service and handles errors appropriately.
+ */
 app.get('/question/:questionType', async (req, res) => {
   try {
     const questionType = req.params.questionType;
@@ -196,6 +252,11 @@ app.get('/question/:questionType', async (req, res) => {
   }
 });
 
+/**
+ * Accepts a POST request with an answer payload in the request body and forwards it to the question service at /answer for validation.
+ * Returns the validation response from the question service.
+ * Errors are handled centrally.
+ */
 app.post('/answer', async (req, res) => {
   try {
     //Forward the answer for validation to the question service
@@ -206,6 +267,11 @@ app.post('/answer', async (req, res) => {
   }
 });
 
+/**
+ * Accepts an authenticated GET request to retrieve user-specific statistics.
+ * The username is extracted from the authenticated request and sent in the headers to the statistics service's /statistics endpoint.
+ * Returns the statistics response and handles errors with a centralized handler.
+ */
 app.get('/statistics', authMiddleware, async (req, res) => {
   try {
     // Forward the user information to the statistics service
@@ -221,6 +287,11 @@ app.get('/statistics', authMiddleware, async (req, res) => {
   }
 });
 
+/**
+ * Accepts an authenticated POST request containing updated statistics data in the request body.
+ * The username is extracted from the request and included in the headers when forwarding the request to the statistics service's /statistics endpoint.
+ * Returns the response from the statistics service and manages errors accordingly.
+ */
 app.post('/statistics', authMiddleware, async (req, res) => {
   try {
     // Forward the update statistics request to the statistics service
