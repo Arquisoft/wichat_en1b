@@ -17,7 +17,7 @@ const theme = createTheme({
 })
 
 // Create a default statistics updater instance
-const defaultStatisticsUpdater = new StatisticsUpdater('classical');
+const defaultStatisticsUpdater = new StatisticsUpdater('suddenDeath');
 
 export const Question = ({ statisticsUpdater = defaultStatisticsUpdater }) => {
     const [selectedAnswer, setSelectedAnswer] = useState(null)
@@ -76,7 +76,7 @@ export const Question = ({ statisticsUpdater = defaultStatisticsUpdater }) => {
             // Update gamesPlayed only on the first load
             if (isInitialLoad) {
                 try {
-                    await statisticsUpdater.incrementGamesPlayed();
+                    await statisticsUpdater.newGame();
                 } catch (error) {
                     console.error("Error incrementing games played:", error.message);
                 }
@@ -121,8 +121,7 @@ export const Question = ({ statisticsUpdater = defaultStatisticsUpdater }) => {
             if (response.data.correct) {
                 // Update statistics for correct answer
                 try {
-                    await statisticsUpdater.recordCorrectAnswer();
-                    await statisticsUpdater.recordCorrectAnswer2(1000); // Assuming 1000 is the score for a correct answer
+                    await statisticsUpdater.recordCorrectAnswer(1000); // Assuming 1000 is the score for a correct answer
                 } catch (error) {
                     console.error("Error recording correct answer:", error.message);
                 }
@@ -135,8 +134,7 @@ export const Question = ({ statisticsUpdater = defaultStatisticsUpdater }) => {
             } else {
                 // Update statistics for incorrect answer
                 try {
-                    await statisticsUpdater.recordIncorrectAnswer();
-                    await statisticsUpdater.recordIncorrectAnswer2(); // Assuming no score for incorrect answer
+                    await statisticsUpdater.recordIncorrectAnswer(); // Assuming no score for incorrect answer
                 } catch (error) {
                     console.error("Error recording incorrect answer:", error.message);
                 }
@@ -152,6 +150,7 @@ export const Question = ({ statisticsUpdater = defaultStatisticsUpdater }) => {
                 const endGameAndSaveResults = async () => {
                     try {
                         await statisticsUpdater.endGame(); // Record the game statistics
+                        await statisticsUpdater.newGame(); // Record the game results
                     } catch (error) {
                         console.error("Error recording game:", error.message);
                     }

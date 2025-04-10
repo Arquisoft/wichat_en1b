@@ -145,7 +145,7 @@ app.post('/recordGame', async (req, res) => {
   else {
     // Find the user and update the statistics
     await User.findOneAndUpdate(
-      { username: targetUsername },
+      { username: username },
       {
         $push: {
           games: gameStats
@@ -197,35 +197,35 @@ app.get('/statistics', async (req, res) => {
       questionsAnswered: targetUser.games.reduce((acc, game) => acc + game.questionsAnswered, 0),
       correctAnswers: targetUser.games.reduce((acc, game) => acc + game.correctAnswers, 0),
       incorrectAnswers: targetUser.games.reduce((acc, game) => acc + game.incorrectAnswers, 0),
-      maxScore: targetUser.games.map(game => game.score).max() || 0,
+      maxScore: Math.max(targetUser.games.map(game => game.score)) || 0,
       gamesPlayed: targetUser.games.length,
     },
     classicalStatistics: {
       questionsAnswered: targetUser.games.filter(game => game.gameType === 'classical').reduce((acc, game) => acc + game.questionsAnswered, 0),
       correctAnswers: targetUser.games.filter(game => game.gameType === 'classical').reduce((acc, game) => acc + game.correctAnswers, 0),
       incorrectAnswers: targetUser.games.filter(game => game.gameType === 'classical').reduce((acc, game) => acc + game.incorrectAnswers, 0),
-      maxScore: targetUser.games.filter(game => game.gameType === 'classical').map(game => game.score).max() || 0,
+      maxScore: Math.max(targetUser.games.filter(game => game.gameType === 'classical').map(game => game.score)) || 0,
       gamesPlayed: targetUser.games.filter(game => game.gameType === 'classical').length,
     },
     suddenDeathStatistics: {
       questionsAnswered: targetUser.games.filter(game => game.gameType === 'suddenDeath').reduce((acc, game) => acc + game.questionsAnswered, 0),
       correctAnswers: targetUser.games.filter(game => game.gameType === 'suddenDeath').reduce((acc, game) => acc + game.correctAnswers, 0),
       incorrectAnswers: targetUser.games.filter(game => game.gameType === 'suddenDeath').reduce((acc, game) => acc + game.incorrectAnswers, 0),
-      maxScore: targetUser.games.filter(game => game.gameType === 'suddenDeath').map(game => game.score).max() || 0,
+      maxScore: Math.max(targetUser.games.filter(game => game.gameType === 'suddenDeath').map(game => game.score)) || 0,
       gamesPlayed: targetUser.games.filter(game => game.gameType === 'suddenDeath').length,
     },
     timeTrialStatistics: {
       questionsAnswered: targetUser.games.filter(game => game.gameType === 'timeTrial').reduce((acc, game) => acc + game.questionsAnswered, 0),
       correctAnswers: targetUser.games.filter(game => game.gameType === 'timeTrial').reduce((acc, game) => acc + game.correctAnswers, 0),
       incorrectAnswers: targetUser.games.filter(game => game.gameType === 'timeTrial').reduce((acc, game) => acc + game.incorrectAnswers, 0),
-      maxScore: targetUser.games.filter(game => game.gameType === 'timeTrial').map(game => game.score).max() || 0,
+      maxScore: Math.max(targetUser.games.filter(game => game.gameType === 'timeTrial').map(game => game.score)) || 0,
       gamesPlayed: targetUser.games.filter(game => game.gameType === 'timeTrial').length,
     },
     customStatistics: {
       questionsAnswered: targetUser.games.filter(game => game.gameType === 'custom').reduce((acc, game) => acc + game.questionsAnswered, 0),
       correctAnswers: targetUser.games.filter(game => game.gameType === 'custom').reduce((acc, game) => acc + game.correctAnswers, 0),
       incorrectAnswers: targetUser.games.filter(game => game.gameType === 'custom').reduce((acc, game) => acc + game.incorrectAnswers, 0),
-      maxScore: targetUser.games.filter(game => game.gameType === 'custom').map(game => game.score).max() || 0,
+      maxScore: Math.max(targetUser.games.filter(game => game.gameType === 'custom').map(game => game.score)) || 0,
       gamesPlayed: targetUser.games.filter(game => game.gameType === 'custom').length,
     },
   }
