@@ -6,6 +6,7 @@ import axios from 'axios';
 import { useGame } from "../GameContext";
 import StatisticsUpdater from "./StatisticsUpdater";
 import { QuestionTypeSelector } from "./QuestionTypeSelector";
+import { DoNotDisturbOnTotalSilence } from "@mui/icons-material";
 
 // Create a theme with the blue color from the login screen
 const theme = createTheme({
@@ -20,8 +21,12 @@ const theme = createTheme({
 const defaultStatisticsUpdater = new StatisticsUpdater('suddenDeath');
 
 export const Question = ({ statisticsUpdater = defaultStatisticsUpdater }) => {
+    const maxRounds = 10;
+    const basePoints = 1000; // Base points for a correct answer
+    const totalTime = 60;
+
     const [selectedAnswer, setSelectedAnswer] = useState(null)
-    const [timeLeft, setTimeLeft] = useState(60)
+    const [timeLeft, setTimeLeft] = useState(totalTime)
     const [isCorrect, setIsCorrect] = useState(false);
     const [isTimeUp, setIsTimeUp] = useState(false);
     const [isIncorrect, setIsIncorrect] = useState(false);
@@ -29,10 +34,10 @@ export const Question = ({ statisticsUpdater = defaultStatisticsUpdater }) => {
     const [isPaused, setIsPaused] = useState(false);
     const [round, setRound] = useState(1); // Track the round number
     const [isGameEnded, setIsGameEnded] = useState(false); // Track if the game has ended
+    const [streak, setStreak] = useState(0); // Track the streak of correct answers
+    const [score, setScore] = useState(0); // Track the score
 
-    const maxRounds = 3;
-
-    const { question, setQuestion, setGameEnded, questionType } = useGame();
+    const { question, setQuestion, setGameEnded, questionType, AIAttempts, setAIAttempts, maxAIAttempts } = useGame();
     const gatewayEndpoint = process.env.REACT_APP_API_ENDPOINT || 'http://localhost:8000';
 
     useEffect(() => {
@@ -42,7 +47,7 @@ export const Question = ({ statisticsUpdater = defaultStatisticsUpdater }) => {
         fetchInitialQuesiton();
     }, [questionType])
 
-    const progressPercentage = (timeLeft / 60) * 100
+    const progressPercentage = (timeLeft / totalTime) * 100
 
     // Timer effect
     useEffect(() => {
@@ -100,7 +105,7 @@ export const Question = ({ statisticsUpdater = defaultStatisticsUpdater }) => {
 
             Promise.all(imagePromises).then(() => {
                 setImagesLoaded(true);
-                setTimeLeft(60);
+                setTimeLeft(totalTime); // Reset time left to total time
                 setSelectedAnswer(null);    // Fix the problem of having selected an image from the previous round
                 setIsPaused(false);         // Resume the timer after images are loaded
             });
@@ -120,6 +125,8 @@ export const Question = ({ statisticsUpdater = defaultStatisticsUpdater }) => {
 
             if (response.data.correct) {
                 // Update statistics for correct answer
+                setStreak(streak + 1); // Increment streak on correct answer
+                setScore(basePoints - (((totalTime - timeLeft) * 600) / totalTime) - AIAttempts*100 + getStreakBonus()); // Calculate score based on time left
                 try {
                     await statisticsUpdater.recordCorrectAnswer(1000); // Assuming 1000 is the score for a correct answer
                 } catch (error) {
@@ -127,6 +134,7 @@ export const Question = ({ statisticsUpdater = defaultStatisticsUpdater }) => {
                 }
 
                 setIsCorrect(true);
+                
                 setTimeout(() => {
                     setIsCorrect(false);
                     requestQuestion(false); // Not the first question
@@ -135,6 +143,7 @@ export const Question = ({ statisticsUpdater = defaultStatisticsUpdater }) => {
                 // Update statistics for incorrect answer
                 try {
                     await statisticsUpdater.recordIncorrectAnswer(); // Assuming no score for incorrect answer
+                    setStreak(0); // Reset streak on incorrect answer
                 } catch (error) {
                     console.error("Error recording incorrect answer:", error.message);
                 }
@@ -145,7 +154,8 @@ export const Question = ({ statisticsUpdater = defaultStatisticsUpdater }) => {
                     requestQuestion(false); // Not the first question
                 }, 2000);
             }
-            if(round == maxRounds) {
+            setAIAttempts(0); // Reset AI attempts on each question
+            if (round == maxRounds) {
                 setGameEnded(true); // Notify the game context that the game has ended
                 const endGameAndSaveResults = async () => {
                     try {
@@ -157,10 +167,11 @@ export const Question = ({ statisticsUpdater = defaultStatisticsUpdater }) => {
                 }
                 endGameAndSaveResults();
                 setTimeout(() => {
-    
+
                 }, 2000); // Show message for 2 seconds before resetting
-                setRound(1); // Reset round count
                 setGameEnded(false); // Reset game ended state
+                setRound(1); // Reset round count
+                setStreak(0); // Reset streak count
             } else {
                 setRound(round + 1); // Increment round count
             }
@@ -169,13 +180,14 @@ export const Question = ({ statisticsUpdater = defaultStatisticsUpdater }) => {
         }
     }
 
+
     useEffect(() => {
         if (isGameEnded) {
             // Handle game end logic here, e.g., show a message or redirect to a different page
             console.log("Game has ended. Show final score or redirect.");
             // You can also reset the game state here if needed
             // For example, you might want to reset the question and score
-           
+
         }
     }, [isGameEnded])
 
@@ -186,12 +198,24 @@ export const Question = ({ statisticsUpdater = defaultStatisticsUpdater }) => {
         return `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`
     }
 
+    const getStreakBonus = () => {
+        if(streak < 3) return 0; // No bonus for streaks less than 3
+        let base = 50;
+        return base + 15*(streak - 3); // 50 points for 3 streak, 15 points for each additional streak
+    }
+
+
     return (
         <ThemeProvider theme={theme}>
             <Container maxWidth="md" sx={{ py: 4 }}>
                 {/* Round counter */}
                 <Typography variant="p" component="p" align="center" sx={{ my: 3, fontWeight: 500 }}>
-                    {round} / {maxRounds}
+                    {round} / {maxRounds} {streak >= 3 && (
+                        <Typography variant="span" component="span" align="center" sx={{ my: 3, fontWeight: 500, color: "red" }}>
+                            {streak} 🔥
+                        </Typography>
+                    ) 
+                    }
                 </Typography>
                 {/* Large Timer at the top */}
                 <Box sx={{
@@ -270,7 +294,7 @@ export const Question = ({ statisticsUpdater = defaultStatisticsUpdater }) => {
 
                 {isCorrect && (
                     <Typography variant="h6" component="p" align="center" sx={{ my: 2, color: "green" }}>
-                        Correct!
+                        Correct! +{score} points
                     </Typography>
                 )}
 
