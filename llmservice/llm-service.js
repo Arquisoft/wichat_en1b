@@ -15,9 +15,10 @@ require('dotenv').config();
 const llmConfig = {
   url: 'https://empathyai.prod.empathy.co/v1/chat/completions',
   transformRequest: (gameQuestion, userQuestion) => ({
-    model: "qwen/Qwen2.5-Coder-7B-Instruct",
+    model: "mistralai/Mistral-7B-Instruct-v0.3",
     messages: [
-      { role: "system", content: `You are an AI designed to provide hints about a hidden answer.\
+      {
+        role: "system", content: `You are an AI designed to provide hints about a hidden answer.\
                                   \
                                   Rules for responses:\
                                   You must respond to the user's message with a single relevant hint.\
@@ -38,7 +39,8 @@ const llmConfig = {
                                   AI: "Sometimes it's warm, sometimes it's cold, and it affects how we dress."\
                                   \
                                   Adapt each hint based on the context of the initial question and the user's response.\
-                                  The question the user needs to answer is the following: ${gameQuestion}.` },
+                                  The question the user needs to answer is the following: ${gameQuestion}.`
+      },
       { role: "user", content: userQuestion }
     ]
   }),
