@@ -105,6 +105,15 @@ app.get('/users/:username/image', async (req, res) => {
   }
 });
 
+app.post('/users/:username/update', authMiddleware,  async (req, res) => {
+  try {
+    let userResponse = await axios.post(`${userServiceUrl}/users/${req.params.username}/update`, { currentUser: req.user, newUser: req.body.username, newPassword: req.body.password });
+    return res.json(userResponse.data);
+  } catch (error) {
+    manageError(res, error);
+  }
+});
+
 app.post('/users/:username/default-image', authMiddleware, async (req, res) => {
   try {
     if (!req.body.image) {
