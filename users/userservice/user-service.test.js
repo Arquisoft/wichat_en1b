@@ -4,7 +4,6 @@ const User = require('./user-model');
 const jwt = require('jsonwebtoken');
 const path = require('path');
 const fs = require('fs');
-const multer = require('multer');
 
 let mongoServer;
 let app;
@@ -345,65 +344,57 @@ describe('User Service Default Image Update', () => {
     expect(response.body).toHaveProperty('error', 'Invalid username. It must be 3-20 characters long and contain only letters, numbers and underscores.');
   });
 });
+
+const checkInvalidPasswordResponse = async (invalidUser) => {
+  const response = await request(app).post('/adduser').send(invalidUser);
+  expect(response.status).toBe(400);
+  expect(response.body.error).toContain('Invalid password. It must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, one number, and one special character.');
+};
+
 describe('Password Validation Tests', () => {
 
   it('should reject passwords without a length lower than eight', async () => {
-    const invalidUser = {
+    const shortUser = {
       username: 'user1',
       password: 'Sh0rt!'
     };
 
-    const response = await request(app).post('/adduser').send(invalidUser);
-
-    expect(response.status).toBe(400);
-    expect(response.body.error).toContain('Invalid password. It must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, one number, and one special character.');
+    await checkInvalidPasswordResponse(shortUser);
   });
 
   it('should reject passwords without a lowercase letter', async () => {
-    const invalidUser = {
+    const noLowerUser = {
       username: 'user1',
       password: 'NOLOWERCASE1@'
     };
 
-    const response = await request(app).post('/adduser').send(invalidUser);
-
-    expect(response.status).toBe(400);
-    expect(response.body.error).toContain('Invalid password. It must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, one number, and one special character.');
+    await checkInvalidPasswordResponse(noLowerUser);
   });
 
   it('should reject passwords without an uppercase letter', async () => {
-    const invalidUser = {
+    const noUpperUser = {
       username: 'user2',
       password: 'nouppercase1@'
     };
 
-    const response = await request(app).post('/adduser').send(invalidUser);
-
-    expect(response.status).toBe(400);
-    expect(response.body.error).toContain('Invalid password. It must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, one number, and one special character.');
+    await checkInvalidPasswordResponse(noUpperUser);
   });
 
   it('should reject passwords without a number', async () => {
-    const invalidUser = {
+    const noNumberUser = {
       username: 'user3',
       password: 'NoNumber@!'
     };
 
-    const response = await request(app).post('/adduser').send(invalidUser);
-
-    expect(response.status).toBe(400);
-    expect(response.body.error).toContain('Invalid password. It must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, one number, and one special character.');
+    await checkInvalidPasswordResponse(noNumberUser);
   });
 
   it('should reject passwords without a special character', async () => {
-    const invalidUser = {
+    const noSpecialUser = {
       username: 'user4',
       password: 'NoSpecial123'
     };
 
-    const response = await request(app).post('/adduser').send(invalidUser);
-
-    expect(response.status).toBe(400);
-    expect(response.body.error).toContain('Invalid password. It must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, one number, and one special character.');
+    await checkInvalidPasswordResponse(noSpecialUser);
   });
 });
