@@ -50,6 +50,21 @@ function validateUsername(username) {
   return usernameStr;
 }
 
+function validatePassword(password) {
+  //convert to string
+  const passwordStr = String(password);
+
+  const strongPasswordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/;
+
+  if (!strongPasswordRegex.test(passwordStr)) {
+    throw new Error(
+      'Invalid password. It must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, one number, and one special character.'
+    );
+  }
+
+  return passwordStr;
+}
+
 // Helper function to delete an image file if it exists
 function deleteImageFile(imagePath) {
   if (fs.existsSync(imagePath)) {
@@ -148,8 +163,10 @@ app.post('/adduser', async (req, res) => {
       throw new Error('The username provided is already in use. Please choose a different one.');
     }
 
+    const password = validatePassword(req.body.password);
+    
     // Encrypt the password before saving it
-    const hashedPassword = await bcrypt.hash(req.body.password, 10);
+    const hashedPassword = await bcrypt.hash(password, 10);
 
     // Assign a random image from the default images
     let image = `/images/default/image_${Math.floor(Math.random() * 16) + 1}.png`;
