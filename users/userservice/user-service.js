@@ -154,7 +154,7 @@ app.post('/users/:username/default-image', async (req, res) => {
 app.post('/adduser', async (req, res) => {
   try {
     // Check if required fields are present in the request body
-    validateRequiredFields(req, ['username', 'password']);
+    validateRequiredFields(req, ['username', 'password', 'confirmpassword']);
 
     // Check if a user with the same username already exists
     const validatedUsername = validateUsername(req.body.username);  // Validate to prevent NoSQL injection
@@ -163,6 +163,9 @@ app.post('/adduser', async (req, res) => {
       throw new Error('The username provided is already in use. Please choose a different one.');
     }
 
+    if(req.body.password!==req.body.confirmpassword){
+      throw new Error('The password and the confirmation do not match, please try again.');
+    }
     const password = validatePassword(req.body.password);
     
     // Encrypt the password before saving it
