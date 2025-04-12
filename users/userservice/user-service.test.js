@@ -347,6 +347,18 @@ describe('User Service Default Image Update', () => {
 });
 describe('Password Validation Tests', () => {
 
+  it('should reject passwords without a length lower than eight', async () => {
+    const invalidUser = {
+      username: 'user1',
+      password: 'Sh0rt!'
+    };
+
+    const response = await request(app).post('/adduser').send(invalidUser);
+
+    expect(response.status).toBe(400);
+    expect(response.body.error).toContain('Invalid password. It must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, one number, and one special character.');
+  });
+
   it('should reject passwords without a lowercase letter', async () => {
     const invalidUser = {
       username: 'user1',
