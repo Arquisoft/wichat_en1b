@@ -11,17 +11,26 @@ export const useAuth = () => {
     const [error, setError] = useState('');
     const navigate = useNavigate();    
     
-    const authenticateUser = async (action, username, password) => {
+    const authenticateUser = async (action, username, password, confirmpassword) => {
         try {
-            const response = await axios.post(`${apiEndpoint}/${action}`, { username, password });
+            const payload = action === 'addUser'
+            ? { username, password, confirmpassword }
+            : { username, password };
+
+            const response = await axios.post(`${apiEndpoint}/${action}`, payload);
+
             let oneHourAfter = new Date().getTime() + (1 * 60 * 60 * 1000)
             Cookies.set('user', JSON.stringify({ username: response.data.username, token: response.data.token })
                 , { expires: oneHourAfter });
             navigate('/home');
             window.location.reload();
         } catch (error) {
-            setError(error.response.data.error);
-            console.error(error.response.data.error);
+            const message =
+            error?.response?.data?.error ??
+            error?.message ??
+            'An unknown error occurred';
+            setError(String(message));
+            console.error(message);
         }
     }
 
