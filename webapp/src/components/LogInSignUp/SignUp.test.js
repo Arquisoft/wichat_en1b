@@ -63,13 +63,13 @@ describe('SignUp Component', () => {
     fireEvent.change(screen.getByLabelText('Password'), { target: { value: 'weakpass' } }); // no mayus, no symbols
     fireEvent.change(screen.getByLabelText('Confirm password'), { target: { value: 'weakpass' } });
   
-    axios.post.mockRejectedValueOnce({ response: { data: { error: 'Invalid password, it must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, one number, and one special character.'}}});
+    axios.post.mockRejectedValueOnce({ response: { data: { error: 'Invalid password. It must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, one number, and one special character.'}}});
   
     const signUpButton = screen.getByRole('button', { name: /Sign Up/i });
     fireEvent.click(signUpButton);
   
     await waitFor(() => {
-      expect(screen.getByText('Invalid password, it must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, one number, and one special character.')).toBeInTheDocument();
+      expect(screen.getByText('Invalid password. It must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, one number, and one special character.')).toBeInTheDocument();
     });
   });
 

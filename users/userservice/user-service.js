@@ -58,7 +58,7 @@ function validatePassword(password) {
 
   if (!strongPasswordRegex.test(passwordStr)) {
     throw new Error(
-      'Invalid password, it must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, one number, and one special character.'
+      'Invalid password. It must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, one number, and one special character.'
     );
   }
 
