@@ -1,11 +1,10 @@
+process.env.LLM_API_KEY = 'test-empathy-api-key';
+process.env.GEMINI_API_KEY = 'test-gemini-api-key';
+
 const request = require('supertest');
 const axios = require('axios');
 
 const app = require('./llm-service');
-
-beforeEach(() => {
-    process.env.LLM_API_KEY = 'test-api-key';
-});
 
 afterAll(async () => {
     app.close();
