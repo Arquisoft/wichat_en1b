@@ -16,7 +16,7 @@ const GeminiController = require('./controllers/GeminiController');
 const empathyController = new EmpathyController();
 const geminiController = new GeminiController();
 const LLM_CONTROLLERS = [empathyController, geminiController];
-let currentControllerIndex = 0;
+let currentControllerIndex = 1;
 
 const LLM_CONTROLLERS_TIMEOUT = 10000;
 
@@ -60,7 +60,7 @@ const dynamicSendToLLM = async (gameQuestion, userQuestion) => {
   }
 }
 
-const handleResponse = async (req, res, specificController = null) => {
+const handleGameHintResponse = async (req, res, specificController = null) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({ errors: errors['errors'] });
@@ -83,25 +83,54 @@ const llmQuestionValidation = [
 ];
 
 app.post('/ask', llmQuestionValidation, async (req, res) => {
-  handleResponse(req, res);
+  handleGameHintResponse(req, res);
 });
 
 app.post('/ask/gemini', llmQuestionValidation, async (req, res) => {
   if (!geminiController.hasApiKey()) {
     return res.status(500).json({ error: 'GEMINI API key is missing.' });
   }
-  handleResponse(req, res, geminiController);
+  handleGameHintResponse(req, res, geminiController);
 });
 
 app.post('/ask/empathy', llmQuestionValidation, async (req, res) => {
   if (!empathyController.hasApiKey()) {
     return res.status(500).json({ error: 'EMPATHY API key is missing.' });
   }
-  handleResponse(req, res, empathyController);
+  handleGameHintResponse(req, res, empathyController);
 });
+
+const handleSimpleMessageResponse = async (req, res, specificController = null) => {
+
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors['errors'] });
+  };
+
+  const { message } = req.body;
+
+  const controller = specificController ? specificController : LLM_CONTROLLERS[currentControllerIndex];
+
+  if (!controller.hasApiKey()) {
+    return res.status(500).json({ error: 'LLM API key is missing.' });
+  }
+  const response = await controller.sendSimpleMessageToLLM(message);
+  res.json({ response });
+
+}
+
+const simpleMessageValidation = [
+  body('message').notEmpty().withMessage('The message is required')
+];
+
+app.post('/simpleMessage', simpleMessageValidation, (req, res) => handleSimpleMessageResponse(req, res));
+app.post('/simpleMessage/gemini', simpleMessageValidation, (req, res) => handleSimpleMessageResponse(req, res, geminiController));
+app.post('/simpleMessage/empathy', simpleMessageValidation, (req, res) => handleSimpleMessageResponse(req, res, empathyController));
 
 const server = app.listen(port, () => {
   console.log(`LLM Service listening at http://localhost:${port}`);
 });
+
+
 
 module.exports = server;

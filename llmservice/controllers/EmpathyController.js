@@ -12,15 +12,11 @@ class EmpathyController {
         return !!this.apiKey;
     }
 
-    _sendRequest(gameQuestion, userQuestion) {
-        return axios.post('https://empathyai.prod.empathy.co/v1/chat/completions', {
+    async _sendRequest(messages) {
+        console.log(messages);
+        const response = await axios.post('https://empathyai.prod.empathy.co/v1/chat/completions', {
             model: "mistralai/Mistral-7B-Instruct-v0.3",
-            messages: [
-                {
-                    role: "system", content: getSystemPrompt(gameQuestion)
-                },
-                { role: "user", content: userQuestion }
-            ]
+            messages: messages
         },
             {
                 headers: {
@@ -29,11 +25,22 @@ class EmpathyController {
                 }
             }
         );
+        return response.data.choices[0]?.message?.content;
     }
 
     async sendQuestionToLLM(gameQuestion, userQuestion) {
-        const response = await this._sendRequest(gameQuestion, userQuestion);
-        return response.data.choices[0]?.message?.content
+        return await this._sendRequest([
+            {
+                role: "system", content: getSystemPrompt(gameQuestion)
+            },
+            { role: "user", content: userQuestion }
+        ]);
+    }
+
+    async sendSimpleMessageToLLM(message) {
+        return await this._sendRequest([
+            { role: "user", content: message }
+        ]);
     }
 }
 

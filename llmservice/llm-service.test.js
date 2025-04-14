@@ -66,4 +66,35 @@ describe('LLM Service', () => {
         expect(response.body.errors[0].msg).toBe('The user question is required');
     });
 
+
+
+    const successfullSimpleMessageResponseExpect = async (path) => {
+        const response = await request(app)
+            .post(path)
+            .send({ message: 'Hello, world!' });
+
+        expect(response.statusCode).toBe(200);
+    }
+
+    it('A valid simple message POST request', async () => {
+        await successfullSimpleMessageResponseExpect('/simpleMessage');
+    });
+
+    it('A valid simple message POST request with gemini', async () => {
+        await successfullSimpleMessageResponseExpect('/simpleMessage/gemini');
+    });
+
+    it('A valid simple message POST request with empathy', async () => {
+        await successfullSimpleMessageResponseExpect('/simpleMessage/empathy');
+    });
+
+    it('An invalid simple message POST request, message is missing', async () => {
+        const response = await request(app)
+            .post('/simpleMessage')
+            .send({});
+
+        expect(response.statusCode).toBe(400);
+    });
+
+
 });
