@@ -15,7 +15,7 @@ const GeminiController = require('./controllers/GeminiController');
 
 const empathyController = new EmpathyController();
 const geminiController = new GeminiController();
-const LLM_CONTROLLERS = [geminiController, empathyController];
+const LLM_CONTROLLERS = [empathyController, geminiController];
 let currentControllerIndex = 0;
 
 const LLM_CONTROLLERS_TIMEOUT = 10000;
@@ -32,7 +32,7 @@ const dynamicSendToLLM = async (gameQuestion, userQuestion) => {
 
   while (attempts < LLM_CONTROLLERS.length) {
     const controller = LLM_CONTROLLERS[currentControllerIndex];
-    console.log(`Trying controller ${currentControllerIndex}`);
+
     try {
       // Create a promise that will timeout after 10 seconds
       const timeoutPromise = new Promise((_, reject) => {

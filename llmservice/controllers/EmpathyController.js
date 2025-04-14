@@ -9,8 +9,7 @@ class EmpathyController {
     }
 
     hasApiKey() {
-        console.log(this.apiKey);
-        return this.apiKey !== undefined && this.apiKey !== '';
+        return !!this.apiKey;
     }
 
     _sendRequest(gameQuestion, userQuestion) {
