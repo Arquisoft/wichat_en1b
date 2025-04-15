@@ -29,10 +29,16 @@ function App() {
             <Route path="/home" element={<Home />} />
             <Route path="/login" element={isLoggedIn ? <Navigate to="/home" /> : <Login />} />
             <Route path="/signup" element={isLoggedIn ? <Navigate to="/home" /> : <SignUp />} />
-            <Route path="/game" element={isLoggedIn ? <GameWrapper /> : <Navigate to="/login" />} />
             <Route path="/statistics" element={isLoggedIn ? <Statistics /> : <Navigate to="/login" /> } />
             <Route path="/profile/:username" element={isLoggedIn ? <Profile /> : <Navigate to="/login" />} />
+            <Route path="/game/classical" element={isLoggedIn ? <GameWrapper type={"classical"}/> : <Navigate to="/login" />} />
+            <Route path="/game/suddenDeath" element={isLoggedIn ? <GameWrapper type={"suddenDeath"}/> : <Navigate to="/login" />} />
+            <Route path="/game/timeTrial" element={isLoggedIn ? <GameWrapper type={"timeTrial"}/> : <Navigate to="/login" />} />
+            <Route path="/game/qod" element={isLoggedIn ? <GameWrapper type={"qod"}/> : <Navigate to="/login" />} />
+            <Route path="/game/custom" element={isLoggedIn ? <GameWrapper type={"custom"}/> : <Navigate to="/login" />} />
+            <Route path="/game" element={isLoggedIn ? <Navigate to="/game/classical" /> : <Navigate to="/login" />} />
           </Routes>
+
         </Container>
       </div>
     </Router>
