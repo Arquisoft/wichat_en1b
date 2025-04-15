@@ -9,6 +9,7 @@ import { Statistics } from './components/Statistics/Statistics';
 import { Profile } from './components/Profile/Profile';
 import Cookies from 'js-cookie';
 import GameWrapper from './components/Game/GameWrapper';
+import GameModes from './components/GameModes/GameModes';
 
 
 function App() {
@@ -29,9 +30,16 @@ function App() {
             <Route path="/home" element={<Home />} />
             <Route path="/login" element={isLoggedIn ? <Navigate to="/home" /> : <Login />} />
             <Route path="/signup" element={isLoggedIn ? <Navigate to="/home" /> : <SignUp />} />
-            <Route path="/game" element={isLoggedIn ? <GameWrapper /> : <Navigate to="/login" />} />
             <Route path="/statistics" element={isLoggedIn ? <Statistics /> : <Navigate to="/login" /> } />
             <Route path="/profile/:username" element={isLoggedIn ? <Profile /> : <Navigate to="/login" />} />
+            <Route path="/game/classical" element={isLoggedIn ? <GameWrapper type={"classical"}/> : <Navigate to="/login" />} />
+            <Route path="/game/suddenDeath" element={isLoggedIn ? <GameWrapper type={"suddenDeath"}/> : <Navigate to="/login" />} />
+            <Route path="/game/timeTrial" element={isLoggedIn ? <GameWrapper type={"timeTrial"}/> : <Navigate to="/login" />} />
+            <Route path="/game/qod" element={isLoggedIn ? <GameWrapper type={"qod"}/> : <Navigate to="/login" />} />
+            <Route path="/game/custom" element={isLoggedIn ? <GameWrapper type={"custom"}/> : <Navigate to="/login" />} />
+            <Route path="/game" element={isLoggedIn ? <Navigate to="/game/classical" /> : <Navigate to="/login" />} />
+            <Route path="/game-modes" element={isLoggedIn ? <GameModes /> : <Navigate to="/login" />} />
+            <Route path="*" element={<Navigate to="/home" />} />
           </Routes>
         </Container>
       </div>

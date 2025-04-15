@@ -1,7 +1,7 @@
 import { Typography, Box, Card, CardContent, Divider, Grid } from "@mui/material";
 import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
 
-const AdditionalInsights = ({ avgQuestionsPerGame, successRate, membershipDuration }) => {
+const AdditionalInsights = ({ avgQuestionsPerGame, successRate, maxScore }) => {
   return (
     <Grid container spacing={3} sx={{ mb: 3 }}>
       <Grid item xs={12} md={12}>
@@ -30,8 +30,8 @@ const AdditionalInsights = ({ avgQuestionsPerGame, successRate, membershipDurati
               
               <Grid item xs={12} md={4}>
                 <Box>
-                  <Typography variant="body2" color="text.secondary">Member For</Typography>
-                  <Typography variant="h5">{membershipDuration} days</Typography>
+                  <Typography variant="body2" color="text.secondary">Max Score:</Typography>
+                  <Typography variant="h5">{maxScore} points</Typography>
                 </Box>
               </Grid>
             </Grid>

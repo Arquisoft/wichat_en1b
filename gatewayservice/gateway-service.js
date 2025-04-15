@@ -241,6 +241,22 @@ app.post('/statistics', authMiddleware, async (req, res) => {
   }
 });
 
+app.post('/recordGame', authMiddleware, async (req, res) => {
+  try {
+    // Forward the record game request to the statistics service
+    const gameData = req.body;
+    const statisticsResponse = await axios.post(`${statisticsServiceUrl}/recordGame`, gameData, {
+      headers: {
+        'username': req.user  // Send username in the headers
+      }
+    });
+    res.json(statisticsResponse.data);
+  } catch (error) {
+    manageError(res, error);
+  }
+}
+);
+
 // Read the OpenAPI YAML file synchronously
 openapiPath = __dirname + '/openapi.yaml'
 const file = fs.readFileSync(openapiPath, 'utf8');
