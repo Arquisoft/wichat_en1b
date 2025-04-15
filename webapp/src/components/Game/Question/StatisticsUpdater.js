@@ -16,25 +16,25 @@ class StatisticsUpdater {
         }
     }
 
-    async newGame() {
-        this.statsData = { 
-            questionsAnswered: 0,
-            correctAnswers: 0,
-            incorrectAnswers: 0,
-            score: 0,
-            gameType: this.type || 'classical',
-            registrationDate: Date.now(),
-            endDate: null
-        }
+    newGame() {
+        console.log("Starting new game of type:", this.type);
+        this.statsData.endDate = null;
+        this.statsData.gameType = this.type || 'classical';
+        this.statsData.score = 0;
+        this.statsData.questionsAnswered = 0;
+        this.statsData.correctAnswers = 0;
+        this.statsData.incorrectAnswers = 0;
+        this.statsData.registrationDate = Date.now();
+        console.log("New game stats initialized:", this.statsData);
     }
 
-    async recordCorrectAnswer(score) {
+    recordCorrectAnswer(score) {
         this.statsData.correctAnswers += 1;
         this.statsData.score += score;
         this.statsData.questionsAnswered += 1;
     }
 
-    async recordIncorrectAnswer() {
+    recordIncorrectAnswer() {
         this.statsData.incorrectAnswers += 1;
         this.statsData.questionsAnswered += 1;
     }

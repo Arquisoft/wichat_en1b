@@ -18,7 +18,7 @@ const theme = createTheme({
 })
 
 // Create a default statistics updater instance
-const defaultStatisticsUpdater = new StatisticsUpdater('suddenDeath');
+const defaultStatisticsUpdater = new StatisticsUpdater('classical');
 
 export const Question = ({ statisticsUpdater = defaultStatisticsUpdater }) => {
     const maxRounds = 10;
@@ -81,7 +81,7 @@ export const Question = ({ statisticsUpdater = defaultStatisticsUpdater }) => {
             // Update gamesPlayed only on the first load
             if (isInitialLoad) {
                 try {
-                    await statisticsUpdater.newGame();
+                    statisticsUpdater.newGame();
                 } catch (error) {
                     console.error("Error incrementing games played:", error.message);
                 }
@@ -128,7 +128,7 @@ export const Question = ({ statisticsUpdater = defaultStatisticsUpdater }) => {
                 setStreak(streak + 1); // Increment streak on correct answer
                 setScore(basePoints - (((totalTime - timeLeft) * 600) / totalTime) - AIAttempts*100 + getStreakBonus()); // Calculate score based on time left
                 try {
-                    await statisticsUpdater.recordCorrectAnswer(score); // Assuming 1000 is the score for a correct answer
+                    statisticsUpdater.recordCorrectAnswer(score); // Assuming 1000 is the score for a correct answer
                 } catch (error) {
                     console.error("Error recording correct answer:", error.message);
                 }
@@ -142,7 +142,7 @@ export const Question = ({ statisticsUpdater = defaultStatisticsUpdater }) => {
             } else {
                 // Update statistics for incorrect answer
                 try {
-                    await statisticsUpdater.recordIncorrectAnswer(); // Assuming no score for incorrect answer
+                    statisticsUpdater.recordIncorrectAnswer(); // Assuming no score for incorrect answer
                     setStreak(0); // Reset streak on incorrect answer
                 } catch (error) {
                     console.error("Error recording incorrect answer:", error.message);
@@ -160,7 +160,6 @@ export const Question = ({ statisticsUpdater = defaultStatisticsUpdater }) => {
                 const endGameAndSaveResults = async () => {
                     try {
                         await statisticsUpdater.endGame(); // Record the game statistics
-                        await statisticsUpdater.newGame(); // Record the game results
                     } catch (error) {
                         console.error("Error recording game:", error.message);
                     }
@@ -168,7 +167,8 @@ export const Question = ({ statisticsUpdater = defaultStatisticsUpdater }) => {
                 endGameAndSaveResults();
                 setTimeout(() => {
 
-                }, 2000); // Show message for 2 seconds before resetting
+                }, 10000); // Show message for 2 seconds before resetting
+                statisticsUpdater.newGame(); // Reset statistics for a new game
                 setGameEnded(false); // Reset game ended state
                 setRound(1); // Reset round count
                 setStreak(0); // Reset streak count
