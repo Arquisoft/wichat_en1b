@@ -8,7 +8,7 @@ export const GameProvider = ({ children }) => {
     const [questionType, setQuestionType] = useState("random");
     const [AIAttempts, setAIAttempts] = useState(0); // Track AI attempts
     const maxAIAttempts = 3; // Maximum AI attempts before showing the correct answer
-
+    
 
     return (
         <GameContext.Provider value={{ question, setQuestion, gameEnded, setGameEnded, questionType, setQuestionType, AIAttempts, setAIAttempts, maxAIAttempts }}>

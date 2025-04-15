@@ -6,8 +6,8 @@ import StatisticsUpdater from "./Question/StatisticsUpdater";
 export default function GameWrapper({type}) {
     const statsUpdater = new StatisticsUpdater(type);
     return (
-        <GameProvider type={type}>
-            <Question statisticsUpdater={statsUpdater}/>
+        <GameProvider>
+            <Question statisticsUpdater={statsUpdater} type={type}/>
             <Chat />
         </GameProvider>
     );

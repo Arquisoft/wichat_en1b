@@ -9,6 +9,7 @@ import { Statistics } from './components/Statistics/Statistics';
 import { Profile } from './components/Profile/Profile';
 import Cookies from 'js-cookie';
 import GameWrapper from './components/Game/GameWrapper';
+import GameModes from './components/GameModes/GameModes';
 
 
 function App() {
@@ -37,8 +38,9 @@ function App() {
             <Route path="/game/qod" element={isLoggedIn ? <GameWrapper type={"qod"}/> : <Navigate to="/login" />} />
             <Route path="/game/custom" element={isLoggedIn ? <GameWrapper type={"custom"}/> : <Navigate to="/login" />} />
             <Route path="/game" element={isLoggedIn ? <Navigate to="/game/classical" /> : <Navigate to="/login" />} />
+            <Route path="/game-modes" element={isLoggedIn ? <GameModes /> : <Navigate to="/login" />} />
+            <Route path="*" element={<Navigate to="/home" />} />
           </Routes>
-
         </Container>
       </div>
     </Router>

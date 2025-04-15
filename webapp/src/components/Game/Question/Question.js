@@ -20,7 +20,7 @@ const theme = createTheme({
 // Create a default statistics updater instance
 const defaultStatisticsUpdater = new StatisticsUpdater('classical');
 
-export const Question = ({ statisticsUpdater = defaultStatisticsUpdater }) => {
+export const Question = ({ statisticsUpdater = defaultStatisticsUpdater, type='random' }) => {
     const maxRounds = 10;
     const basePoints = 1000; // Base points for a correct answer
     const totalTime = 60;
@@ -37,8 +37,19 @@ export const Question = ({ statisticsUpdater = defaultStatisticsUpdater }) => {
     const [streak, setStreak] = useState(0); // Track the streak of correct answers
     const [score, setScore] = useState(0); // Track the score
 
-    const { question, setQuestion, setGameEnded, questionType, AIAttempts, setAIAttempts, maxAIAttempts } = useGame();
+    const { question, setQuestion, setGameEnded, questionType, setQuestionType, AIAttempts, setAIAttempts, maxAIAttempts } = useGame();
     const gatewayEndpoint = process.env.REACT_APP_API_ENDPOINT || 'http://localhost:8000';
+
+    const topic = localStorage.getItem("topic") || "random"; // Default to "random" if not set
+    setQuestionType(topic); // Set the question type based on the topic
+
+
+    const [customSettings, setCustomSettings] = useState(localStorage.getItem('customSettings') ? JSON.parse(localStorage.getItem('customSettings')) : {
+            rounds: 5,
+            timePerQuestion: 30,
+            aiAttempts: 3,
+        });
+
 
     useEffect(() => {
         const fetchInitialQuesiton = async () => {
@@ -208,6 +219,13 @@ export const Question = ({ statisticsUpdater = defaultStatisticsUpdater }) => {
     return (
         <ThemeProvider theme={theme}>
             <Container maxWidth="md" sx={{ py: 4 }}>
+                <p>{type}</p>
+                <p>Custom settings:</p>
+                <ul>
+                    <li>Rounds: {customSettings.rounds}</li>
+                    <li>Time per question: {customSettings.timePerQuestion} seconds</li>
+                    <li>AI attempts: {customSettings.aiAttempts}</li>
+                </ul>
                 {/* Round counter */}
                 <Typography variant="p" component="p" align="center" sx={{ my: 3, fontWeight: 500 }}>
                     {round} / {maxRounds} {streak >= 3 && (
@@ -226,6 +244,7 @@ export const Question = ({ statisticsUpdater = defaultStatisticsUpdater }) => {
                     mb: 3,
                     gap: { xs: 1, sm: 2 }, // Smaller gap for mobile, larger for larger screens
                 }}>
+                    {/*
                     <Paper
                         elevation={3}
                         sx={{
@@ -239,7 +258,7 @@ export const Question = ({ statisticsUpdater = defaultStatisticsUpdater }) => {
                         }}
                     >
                         <QuestionTypeSelector />
-                    </Paper>
+                    </Paper>*/}
                     <Paper
                         elevation={3}
                         sx={{
