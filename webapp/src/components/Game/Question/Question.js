@@ -366,12 +366,6 @@ export const Question = ({ statisticsUpdater = defaultStatisticsUpdater, type='r
                         )}
                     </Grid>
                 </Box>
-                <Button
-                    onClick={() => requestQuestion(false)} // Not the first question when manually requesting
-                    sx={{ display: "block", mx: "auto", mt: 3 }}
-                >
-                    Request new question
-                </Button>
             </Container>
         </ThemeProvider>
     )
