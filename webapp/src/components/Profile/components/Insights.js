@@ -55,7 +55,6 @@ export const Insights = ({statistics, registrationDate, title}) => {
                 successRate={getSuccessRate(statistics)}
                 membershipDuration={getMembershipDuration()}
             />
-            <Divider sx={{ my: 3 }} />
         </>
     )
 }
