@@ -128,7 +128,7 @@ export const Question = ({ statisticsUpdater = defaultStatisticsUpdater }) => {
                 setStreak(streak + 1); // Increment streak on correct answer
                 setScore(basePoints - (((totalTime - timeLeft) * 600) / totalTime) - AIAttempts*100 + getStreakBonus()); // Calculate score based on time left
                 try {
-                    await statisticsUpdater.recordCorrectAnswer(1000); // Assuming 1000 is the score for a correct answer
+                    await statisticsUpdater.recordCorrectAnswer(score); // Assuming 1000 is the score for a correct answer
                 } catch (error) {
                     console.error("Error recording correct answer:", error.message);
                 }
