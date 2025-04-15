@@ -228,6 +228,13 @@ app.get('/statistics', async (req, res) => {
       maxScore: Math.max(targetUser.games.filter(game => game.gameType === 'custom').map(game => game.score)) || 0,
       gamesPlayed: targetUser.games.filter(game => game.gameType === 'custom').length,
     },
+    qodStatistics: {
+      questionsAnswered: targetUser.games.filter(game => game.gameType === 'qod').reduce((acc, game) => acc + game.questionsAnswered, 0),
+      correctAnswers: targetUser.games.filter(game => game.gameType === 'qod').reduce((acc, game) => acc + game.correctAnswers, 0),
+      incorrectAnswers: targetUser.games.filter(game => game.gameType === 'qod').reduce((acc, game) => acc + game.incorrectAnswers, 0),
+      maxScore: Math.max(targetUser.games.filter(game => game.gameType === 'qod').map(game => game.score)) || 0,
+      gamesPlayed: targetUser.games.filter(game => game.gameType === 'qod').length,
+    }
   }
 
   // Only add sensitive data for the profile owner

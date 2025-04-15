@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import {
-    Typography, Box, Container, Paper, Button
+    Typography, Box, Container, Paper, Button, Tabs, Tab
 } from "@mui/material";
 import { ThemeProvider } from "@mui/material/styles";
 import Cookies from "js-cookie";
@@ -173,12 +173,47 @@ export const Profile = () => {
                             />
                         )}
 
-                        <Insights statistics={statistics.globalStatistics} registrationDate={registrationDate} />
-                        <Insights statistics={statistics.classicalStatistics} registrationDate={registrationDate} />
-                        <Insights statistics={statistics.suddenDeathStatistics} registrationDate={registrationDate} />
-                        <Insights statistics={statistics.timeTrialStatistics} registrationDate={registrationDate} />
-                        <Insights statistics={statistics.customStatistics} registrationDate={registrationDate} />
+                        <Paper elevation={3} sx={{ mt: 3, p: 3 }}>
+                            <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+                                <Tabs
+                                    value={statistics.selectedTab}
+                                    onChange={(event, newValue) => setStatistics({ ...statistics, selectedTab: newValue })}
+                                    aria-label="Profile statistics tabs"
+                                >
+                                    <Tab label="Global 🌍" />
+                                    <Tab label="Classical 🎲" />
+                                    <Tab label="Sudden Death ☠️" />
+                                    <Tab label="Time Trial ⏱️" />
+                                    <Tab label="Custom 🎨" />
+                                    <Tab label="QOD 📅" />
+                                </Tabs>
+                            </Box>
+                            <Box sx={{ mt: 2 }}>
+                                {statistics.selectedTab === 0 && (
+                                    <Insights statistics={statistics.globalStatistics} registrationDate={registrationDate} title="Global Statistics 🌍" />
+                                )}
+                                {statistics.selectedTab === 1 && (
+                                    <Insights statistics={statistics.classicalStatistics} registrationDate={registrationDate} title="Classical Game Statistics 🎲" />
+                                )}
+                                {statistics.selectedTab === 2 && (
+                                    <Insights statistics={statistics.suddenDeathStatistics} registrationDate={registrationDate} title="Sudden Death Statistics ☠️" />
+                                )}
+                                {statistics.selectedTab === 3 && (
+                                    <Insights statistics={statistics.timeTrialStatistics} registrationDate={registrationDate} title="Time Trial Statistics ⏱️" />
+                                )}
+                                {statistics.selectedTab === 4 && (
+                                    <Insights statistics={statistics.customStatistics} registrationDate={registrationDate} title="Custom Game Statistics 🎨" />
+                                )}
+                                {statistics.selectedTab === 5 && (
+                                    <Insights statistics={statistics.qodStatistics} registrationDate={registrationDate} title="Question of the Day Statistics 📅" />
+                                )}
+                            </Box>
+                        </Paper>
+                        {/* Add spacing between the two papers */}
+                        <Box sx={{ mt: 3 }} />
 
+                        {/* Ensure Global statistics is selected by default */}
+                        {statistics.selectedTab === undefined && setStatistics({ ...statistics, selectedTab: 0 })}
                         {/* Only show visitors section if this is own profile */}
                         {isProfileOwner && recentVisitors.length > 0 && (
                             <VisitorsSection

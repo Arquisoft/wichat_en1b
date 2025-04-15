@@ -20,10 +20,10 @@ const theme = createTheme({
 // Create a default statistics updater instance
 const defaultStatisticsUpdater = new StatisticsUpdater('classical');
 
-export const Question = ({ statisticsUpdater = defaultStatisticsUpdater, type='random' }) => {
-    const maxRounds = 10;
+export const Question = ({ statisticsUpdater = defaultStatisticsUpdater, type = 'random' }) => {
+    let maxRounds = 10;
     const basePoints = 1000; // Base points for a correct answer
-    const totalTime = 60;
+    let totalTime = 60;
 
     const [selectedAnswer, setSelectedAnswer] = useState(null)
     const [timeLeft, setTimeLeft] = useState(totalTime)
@@ -36,8 +36,9 @@ export const Question = ({ statisticsUpdater = defaultStatisticsUpdater, type='r
     const [isGameEnded, setIsGameEnded] = useState(false); // Track if the game has ended
     const [streak, setStreak] = useState(0); // Track the streak of correct answers
     const [score, setScore] = useState(0); // Track the score
+    const [currentScore, setCurrentScore] = useState(0); // Track the current score
 
-    const { question, setQuestion, setGameEnded, questionType, setQuestionType, AIAttempts, setAIAttempts, maxAIAttempts } = useGame();
+    const { question, setQuestion, setGameEnded, questionType, setQuestionType, AIAttempts, setAIAttempts, maxAIAttempts, setMaxAIAttempts } = useGame();
     const gatewayEndpoint = process.env.REACT_APP_API_ENDPOINT || 'http://localhost:8000';
 
     const topic = localStorage.getItem("topic") || "random"; // Default to "random" if not set
@@ -45,11 +46,18 @@ export const Question = ({ statisticsUpdater = defaultStatisticsUpdater, type='r
 
 
     const [customSettings, setCustomSettings] = useState(localStorage.getItem('customSettings') ? JSON.parse(localStorage.getItem('customSettings')) : {
-            rounds: 5,
-            timePerQuestion: 30,
-            aiAttempts: 3,
-        });
+        rounds: 5,
+        timePerQuestion: 30,
+        aiAttempts: 3,
+    });
 
+    if (type === 'custom') {
+        maxRounds = customSettings.rounds;
+        totalTime = customSettings.timePerQuestion;
+        setMaxAIAttempts(customSettings.aiAttempts);
+    } else {
+        setMaxAIAttempts(3); // Reset AI attempts for non-custom modes
+    }
 
     useEffect(() => {
         const fetchInitialQuesiton = async () => {
@@ -136,8 +144,9 @@ export const Question = ({ statisticsUpdater = defaultStatisticsUpdater, type='r
 
             if (response.data.correct) {
                 // Update statistics for correct answer
-                setStreak(streak + 1); // Increment streak on correct answer
-                setScore(basePoints - (((totalTime - timeLeft) * 600) / totalTime) - AIAttempts*100 + getStreakBonus()); // Calculate score based on time left
+                setStreak((prevStreak) => prevStreak + 1);// Increment streak on correct answer
+                const newScore = basePoints - (((totalTime - timeLeft) * 600) / totalTime) - AIAttempts * 100 + getStreakBonus();
+                setScore(newScore); // Use functional update to ensure the latest score is used
                 try {
                     statisticsUpdater.recordCorrectAnswer(score); // Assuming 1000 is the score for a correct answer
                 } catch (error) {
@@ -145,11 +154,7 @@ export const Question = ({ statisticsUpdater = defaultStatisticsUpdater, type='r
                 }
 
                 setIsCorrect(true);
-                
-                setTimeout(() => {
-                    setIsCorrect(false);
-                    requestQuestion(false); // Not the first question
-                }, 2000);
+                setCurrentScore((prevScore) => prevScore + newScore); // Update current score
             } else {
                 // Update statistics for incorrect answer
                 try {
@@ -160,10 +165,6 @@ export const Question = ({ statisticsUpdater = defaultStatisticsUpdater, type='r
                 }
 
                 setIsIncorrect(true);
-                setTimeout(() => {
-                    setIsIncorrect(false);
-                    requestQuestion(false); // Not the first question
-                }, 2000);
             }
             setAIAttempts(0); // Reset AI attempts on each question
             if (round == maxRounds) {
@@ -177,15 +178,21 @@ export const Question = ({ statisticsUpdater = defaultStatisticsUpdater, type='r
                 }
                 endGameAndSaveResults();
                 setTimeout(() => {
+                    statisticsUpdater.newGame(); // Reset statistics for a new game
+                    setGameEnded(false); // Reset game ended state
+                    setRound(1); // Reset round count
+                    setStreak(0); // Reset streak count
+                    setCurrentScore(0); // Reset current score
+                }, 2000); // Show message for 2 seconds before resetting
 
-                }, 10000); // Show message for 2 seconds before resetting
-                statisticsUpdater.newGame(); // Reset statistics for a new game
-                setGameEnded(false); // Reset game ended state
-                setRound(1); // Reset round count
-                setStreak(0); // Reset streak count
             } else {
                 setRound(round + 1); // Increment round count
             }
+            setTimeout(() => {
+                setIsCorrect(false);
+                setIsIncorrect(false);
+                requestQuestion(false); // Not the first question
+            }, 2000);
         } catch (error) {
             console.error("Error checking answer: ", error);
         }
@@ -210,29 +217,30 @@ export const Question = ({ statisticsUpdater = defaultStatisticsUpdater, type='r
     }
 
     const getStreakBonus = () => {
-        if(streak < 3) return 0; // No bonus for streaks less than 3
+        if (streak < 3) return 0; // No bonus for streaks less than 3
         let base = 50;
-        return base + 15*(streak - 3); // 50 points for 3 streak, 15 points for each additional streak
+        return base + 15 * (streak - 3); // 50 points for 3 streak, 15 points for each additional streak
     }
 
 
     return (
         <ThemeProvider theme={theme}>
             <Container maxWidth="md" sx={{ py: 4 }}>
-                <p>{type}</p>
-                <p>Custom settings:</p>
-                <ul>
-                    <li>Rounds: {customSettings.rounds}</li>
-                    <li>Time per question: {customSettings.timePerQuestion} seconds</li>
-                    <li>AI attempts: {customSettings.aiAttempts}</li>
-                </ul>
+                {/* Game title */}
+                <Typography variant="h4" component="h1" align="center" sx={{ mb: 3, fontWeight: 500 }}>
+                    {type === 'custom' ? "Custom Game 🎨" :
+                        type === 'suddenDeath' ? "Sudden Death ☠️" :
+                            type === 'classical' ? "Classical Game 🎲" :
+                                type === 'timeTrial' ? "Time Trial ⏱️" :
+                                    "Question of the Day 📅"}
+                </Typography>
                 {/* Round counter */}
                 <Typography variant="p" component="p" align="center" sx={{ my: 3, fontWeight: 500 }}>
                     {round} / {maxRounds} {streak >= 3 && (
                         <Typography variant="span" component="span" align="center" sx={{ my: 3, fontWeight: 500, color: "red" }}>
                             {streak} 🔥
                         </Typography>
-                    ) 
+                    )
                     }
                 </Typography>
                 {/* Large Timer at the top */}
@@ -244,21 +252,7 @@ export const Question = ({ statisticsUpdater = defaultStatisticsUpdater, type='r
                     mb: 3,
                     gap: { xs: 1, sm: 2 }, // Smaller gap for mobile, larger for larger screens
                 }}>
-                    {/*
-                    <Paper
-                        elevation={3}
-                        sx={{
-                            display: "flex",
-                            alignItems: "center",
-                            padding: "12px 24px",
-                            borderRadius: "24px",
-                            backgroundColor: "white",
-                            border: "2px solid #1976d2",
-                            width: { xs: "80%", sm: "30%" }, // Full width on mobile, smaller on larger screens
-                        }}
-                    >
-                        <QuestionTypeSelector />
-                    </Paper>*/}
+                    {/* Timer with circular progress bar */}
                     <Paper
                         elevation={3}
                         sx={{
@@ -303,6 +297,31 @@ export const Question = ({ statisticsUpdater = defaultStatisticsUpdater, type='r
                             }}
                         >
                             {formatTime(timeLeft)}
+                        </Typography>
+                    </Paper>
+                    <Paper
+                        elevation={3}
+                        sx={{
+                            display: "flex",
+                            alignItems: "center",
+                            padding: "12px 24px",
+                            borderRadius: "24px",
+                            backgroundColor: "white",
+                            border: "1px solid #e0e0e0",
+                            width: { xs: "80%", sm: "30%" }
+                        }}
+                    >
+                        <Typography
+                            variant="h4"
+                            component="div"
+                            sx={{
+                                fontWeight: "bold",
+                                color: "text.primary",
+                                textAlign: "center",
+                                width: "100%",
+                            }}
+                        >
+                            Score: {currentScore}
                         </Typography>
                     </Paper>
                 </Box>

@@ -1,9 +1,9 @@
 import StatisticsSummary from "./StatisticsSummary";
 import AnswerDistribution from "./AnswerDistribution";
 import AdditionalInsights from "./AdditionalInsights";
-import { Grid } from "@mui/material";
+import { Divider, Grid, Typography } from "@mui/material";
 
-export const Insights = ({statistics, registrationDate}) => {
+export const Insights = ({statistics, registrationDate, title}) => {
 
     const getSuccessRate = () => {
         if (!statistics) return 0;
@@ -34,6 +34,9 @@ export const Insights = ({statistics, registrationDate}) => {
     };
     return (
         <>
+            <Typography variant="h4" component="h1" align="center" sx={{ mb: 3, fontWeight: 500 }}>
+                {title}
+            </Typography>
             <Grid container spacing={3} sx={{ mb: 3 }}>
                 <Grid item xs={12} md={6}>
                     <StatisticsSummary
@@ -52,6 +55,7 @@ export const Insights = ({statistics, registrationDate}) => {
                 successRate={getSuccessRate(statistics)}
                 membershipDuration={getMembershipDuration()}
             />
+            <Divider sx={{ my: 3 }} />
         </>
     )
 }

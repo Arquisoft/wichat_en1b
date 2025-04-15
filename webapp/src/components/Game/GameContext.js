@@ -7,11 +7,11 @@ export const GameProvider = ({ children }) => {
     const [gameEnded, setGameEnded] = useState(null);
     const [questionType, setQuestionType] = useState("random");
     const [AIAttempts, setAIAttempts] = useState(0); // Track AI attempts
-    const maxAIAttempts = 3; // Maximum AI attempts before showing the correct answer
+    const [maxAIAttempts, setMaxAIAttempts] = useState(0); // Track max AI attempts
     
 
     return (
-        <GameContext.Provider value={{ question, setQuestion, gameEnded, setGameEnded, questionType, setQuestionType, AIAttempts, setAIAttempts, maxAIAttempts }}>
+        <GameContext.Provider value={{ question, setQuestion, gameEnded, setGameEnded, questionType, setQuestionType, AIAttempts, setAIAttempts, maxAIAttempts, setMaxAIAttempts }}>
             {children}
         </GameContext.Provider>
     )

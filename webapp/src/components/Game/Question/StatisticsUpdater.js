@@ -39,6 +39,10 @@ class StatisticsUpdater {
         this.statsData.questionsAnswered += 1;
     }
 
+    getCurrentScore() {
+        return this.statsData.score;
+    }
+    
     async endGame() {
         this.statsData.endDate = Date.now();
         try {
