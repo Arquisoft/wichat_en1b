@@ -38,6 +38,7 @@ export const Question = ({ statisticsUpdater = defaultStatisticsUpdater, type = 
     const [currentScore, setCurrentScore] = useState(0); // Track the current score
 
     const { question, setQuestion, setGameEnded, questionType, setQuestionType, AIAttempts, setAIAttempts, maxAIAttempts, setMaxAIAttempts } = useGame();
+    console.log(setMaxAIAttempts)
     const gatewayEndpoint = process.env.REACT_APP_API_ENDPOINT || 'http://localhost:8000';
 
     const topic = localStorage.getItem("topic") || "random"; // Default to "random" if not set
@@ -50,19 +51,20 @@ export const Question = ({ statisticsUpdater = defaultStatisticsUpdater, type = 
         aiAttempts: 3,
     });
 
-    if (type === 'custom') {
-        maxRounds = customSettings.rounds;
-        totalTime = customSettings.timePerQuestion;
-        setMaxAIAttempts(customSettings.aiAttempts);
-    } else {
-        setMaxAIAttempts(3); // Reset AI attempts for non-custom modes
-    }
+    
 
     useEffect(() => {
         const fetchInitialQuesiton = async () => {
             await requestQuestion(true); // Pass true to indicate it's the initial load
         }
         fetchInitialQuesiton();
+        if (type === 'custom') {
+            maxRounds = customSettings.rounds;
+            totalTime = customSettings.timePerQuestion;
+            setMaxAIAttempts(customSettings.aiAttempts);
+        } else {
+            setMaxAIAttempts(3); // Reset AI attempts for non-custom modes
+        }
     }, [questionType])
 
     const progressPercentage = (timeLeft / totalTime) * 100
