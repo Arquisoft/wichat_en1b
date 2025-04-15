@@ -1,7 +1,7 @@
 import StatisticsSummary from "./StatisticsSummary";
 import AnswerDistribution from "./AnswerDistribution";
 import AdditionalInsights from "./AdditionalInsights";
-import { Divider, Grid, Typography } from "@mui/material";
+import { Grid, Typography } from "@mui/material";
 
 export const Insights = ({statistics, registrationDate, title}) => {
 

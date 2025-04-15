@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Box, Typography, Paper, MenuItem, Select, TextField, Button } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-import Cookies from 'js-cookie';
 
 const QUESTION_TYPES = ["random", "flags", "animals", "monuments", "foods"]
 

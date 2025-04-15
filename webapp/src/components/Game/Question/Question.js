@@ -5,8 +5,7 @@ import AccessTimeIcon from "@mui/icons-material/AccessTime"
 import axios from 'axios';
 import { useGame } from "../GameContext";
 import StatisticsUpdater from "./StatisticsUpdater";
-import { QuestionTypeSelector } from "./QuestionTypeSelector";
-import { DoNotDisturbOnTotalSilence } from "@mui/icons-material";
+
 
 // Create a theme with the blue color from the login screen
 const theme = createTheme({
