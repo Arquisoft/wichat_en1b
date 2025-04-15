@@ -53,7 +53,7 @@ export const Insights = ({statistics, registrationDate, title}) => {
             <AdditionalInsights
                 avgQuestionsPerGame={getAverageQuestionsPerGame(statistics)}
                 successRate={getSuccessRate(statistics)}
-                membershipDuration={getMembershipDuration()}
+                maxScore={statistics.maxScore || 0}
             />
         </>
     )
