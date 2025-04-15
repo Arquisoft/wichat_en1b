@@ -40,9 +40,7 @@ const ProfileHeader = ({
           width: 120, 
           height: 120, 
           mb: { xs: 2, sm: 0 }, 
-          mr: { sm: 4 },
-          border: '4px solid', 
-          borderColor: 'primary.main' 
+          mr: { sm: 4 }
         }}
       />
       
