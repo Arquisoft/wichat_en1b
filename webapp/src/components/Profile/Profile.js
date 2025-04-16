@@ -159,8 +159,6 @@ export const Profile = () => {
                             onOpenSettings={isProfileOwner ? handleOpenSettings : null} // Only show settings button for own profile
                             isProfileOwner={isProfileOwner}
                         />
-
-                        {/* Account settings dialog only for own profile */}
                         {isProfileOwner && (
                             <AccountSettingsDialog
                                 open={settingsOpen}
@@ -222,8 +220,6 @@ export const Profile = () => {
                             getImageUrl={userProfileSettings.getStaticProfileImageUrl.bind(userProfileSettings)}
                         />
                         )}
-
-                        {/* Actions */}
                         <Box sx={{ mt: 3, display: "flex", justifyContent: "center" }}>
                             <Button
                                 variant="contained"
