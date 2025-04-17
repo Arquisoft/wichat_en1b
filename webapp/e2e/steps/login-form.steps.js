@@ -55,8 +55,8 @@ defineFeature(feature, (test) => {
   });
 
   afterEach(async () => {
-    await page.waitForSelector('button[data-testid="login-nav"]');
-    await page.click('button[data-testid="login-nav"]');
+    await page.waitForSelector('button[data-testid="login-button"]');
+    await page.click('button[data-testid="login-button"]');
   });
 
   test("Login with valid credentials", ({ given, when, then }) => {
