@@ -6,14 +6,16 @@ const feature = loadFeature("./features/login-form.feature");
 let page;
 let browser;
 
+const loginAlert="Invalid credentials"
 const expectAlertToBe = async (text) => {
-  await page.waitForSelector('div[role="alert"]');
-  const alertMessage = await page.$eval('div[role="alert"]', 
-    (x) => x.textContent);
+  await page.waitForSelector('p[style="color: red;"]');
+  const alertMessage = await page.$eval('p[style="color: red;"]', 
+    (el) => el.textContent);
   expect(alertMessage).toContain(text);
 };
 
 defineFeature(feature, (test) => {
+
   beforeAll(async () => {
     browser = process.env.GITHUB_ACTIONS
       ? await puppeteer.launch({
@@ -24,18 +26,20 @@ defineFeature(feature, (test) => {
 
     page = await browser.newPage();
     setDefaultOptions({ timeout: 10000 });
+    process.env.JWT_SECRET='testSecret'
 
     await page.goto("http://localhost:3000", {
       waitUntil: "networkidle0",
     });
 
     // Go to Register page to create user
-    await page.waitForSelector('button[data-testid="register-nav"]');
-    await page.click('button[data-testid="register-nav"]');
+    await page.waitForSelector('button[data-testid="login-button"]');
+    await page.click('button[data-testid="login-button"]');
 
     // Register a new user for login
-    const usernameInput = await page.$('[data-testid="reg-username"] input');
-    const passwordInput = await page.$('[data-testid="reg-password"] input');
+    const usernameInput = await page.$('[data-testid="log-username"] input');
+    const passwordInput = await page.$('[data-testid="log-password"] input');
+
     await usernameInput.type("testlogin");
     await passwordInput.type("StrongPass123!");
     await expect(page).toClick('button[type="submit"]');
@@ -51,9 +55,6 @@ defineFeature(feature, (test) => {
   });
 
   afterEach(async () => {
-    await page.waitForSelector('button[data-testid="home-nav"]');
-    await page.click('button[data-testid="home-nav"]');
-
     await page.waitForSelector('button[data-testid="login-nav"]');
     await page.click('button[data-testid="login-nav"]');
   });

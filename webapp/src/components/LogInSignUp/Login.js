@@ -42,6 +42,7 @@ export const Login = () => {
               margin="normal"
               fullWidth
               label="Username"
+              data-testid="log-username"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
             />
@@ -52,6 +53,7 @@ export const Login = () => {
               fullWidth
               label="Password"
               type="password"
+              data-testid="log-password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
             />

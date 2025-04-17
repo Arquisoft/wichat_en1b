@@ -44,6 +44,7 @@ export const SignUp = () => {
               margin="normal"
               fullWidth
               label="Username"
+              data-testid="reg-username"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
             />
@@ -56,6 +57,7 @@ export const SignUp = () => {
               fullWidth
               label="Password"
               type="password"
+              data-testid="reg-password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
             />
@@ -68,13 +70,15 @@ export const SignUp = () => {
               fullWidth
               label="Confirm password"
               type="password"
+              data-testid="reg-confirmpassword"
               value={confirmpassword}
               onChange={(e) => setConfirmationPassword(e.target.value)}
             />
           </FormControl>
           <Button 
-            variant="contained" 
+            variant="contained"
             color="primary" 
+            data-testid="signup"
             onClick={signUp}>
             Sign Up
           </Button>

@@ -39,3 +39,8 @@ Feature: Register a new user
     Given User with a weak password
     When Trying to register
     Then Should be shown an error message
+
+  Scenario: Register with invalid data - passwords dont match
+    Given User with different passwords
+    When Trying to register
+    Then Should be shown an error message

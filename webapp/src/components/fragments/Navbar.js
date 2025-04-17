@@ -101,6 +101,12 @@ export const Navbar = () => {
                                     border: item.title !== "Sign up" ? "1px solid #1565c0" : "none",
                                 },
                             }}
+                            data-testid= {item.title === "Sign up"
+                            ? "signup-button"
+                            : item.title === "Login"
+                            ? "login-button"
+                            : undefined
+                        }
                         >
                             {item.title}
                         </Button>
@@ -137,6 +143,7 @@ export const Navbar = () => {
                                     color: "#1976d2",
                                 },
                             }}
+                            data-testid="home-button"
                         >
                             wichat_en1b
                         </Button>
@@ -179,6 +186,12 @@ export const Navbar = () => {
                                             border: item.title !== "Sign up" ? "1px solid #1565c0" : "none",
                                         },
                                     }}
+                                    data-testid={item.title === "Sign up"
+                                        ? "signup-button"
+                                        : item.title === "Login"
+                                        ? "login-button"
+                                        : undefined
+                                    }
                                 >
                                     {item.title}
                                 </Button>

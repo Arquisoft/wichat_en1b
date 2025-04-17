@@ -6,10 +6,12 @@ const feature = loadFeature('./features/register-form.feature');
 let page;
 let browser;
 
+const passwordAlert="Invalid password. It must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, one number, and one special character."
+const usernameAlert="Invalid username. It must be 3-20 characters long and contain only letters, numbers and underscores."
 const expectAlertToBe = async (text) => {
-  await page.waitForSelector('div[role="alert"]');
-  const alertMessage = await page.$eval('div[role="alert"]', 
-    (x) => x.textContent);
+  await page.waitForSelector('p[style="color: red;"]');
+  const alertMessage = await page.$eval('p[style="color: red;"]', 
+    (el) => el.textContent);
   expect(alertMessage).toContain(text);
 };
 
@@ -22,6 +24,7 @@ defineFeature(feature, test => {
     page = await browser.newPage();
     //Way of setting up the timeout
     setDefaultOptions({ timeout: 10000 })
+    process.env.JWT_SECRET='testSecret'
 
     await page
       .goto("http://localhost:3000", {
@@ -30,8 +33,8 @@ defineFeature(feature, test => {
       .catch(() => {});
 
     // Wait for the navbar and click the "Register" button
-    await page.waitForSelector('button[data-testid="register-nav"]');
-    await page.click('button[data-testid="register-nav"]');
+    await page.waitForSelector('button[data-testid="register-button"]');
+    await page.click('button[data-testid="register-button"]');
 
   });
 
@@ -40,12 +43,9 @@ defineFeature(feature, test => {
   });
 
   afterEach(async () => {
-    // Navigate to home to clear register inputs
-    await page.waitForSelector('button[data-testid="home-nav"]');
-    await page.click('button[data-testid="home-nav"]');
-    // Navigate back to the register page after each test
-    await page.waitForSelector('button[data-testid="register-nav"]');
-    await page.click('button[data-testid="register-nav"]');
+    // Navigate back to the register page to refresh the boxes
+    await page.waitForSelector('button[data-testid="register-button"]');
+    await page.click('button[data-testid="register-button"]');
   });
   
   test("Register user with valid credentials", ({ given, when, then }) => {
@@ -60,10 +60,13 @@ defineFeature(feature, test => {
     when("Filling in the register form and submit", async () => {
       const usernameInput = await page.$('[data-testid="reg-username"] input');
       const passwordInput = await page.$('[data-testid="reg-password"] input');
+      const confirmpasswordInput = await page.$('[data-testid="reg-confirmpassword"] input');
 
       await usernameInput.type(username1);
-      await passwordInput.type(password1);
-      await expect(page).toClick('button[type="submit"]');
+      await passwordInput.type(password1);     
+      await confirmpasswordInput.type(password1);
+
+      await expect(page).toClick('button[data-testid="signup"]');
     });
 
     then("Should be shown a success message", async () => {
@@ -83,14 +86,18 @@ defineFeature(feature, test => {
     when("Trying to register with existing username", async () => {
       const usernameInput = await page.$('[data-testid="reg-username"] input');
       const passwordInput = await page.$('[data-testid="reg-password"] input');
+      const confirmpasswordInput = await page.$('[data-testid="reg-confirmpassword"] input');
 
       await usernameInput.type(existingUsername);
-      await passwordInput.type(password2);
-      await expect(page).toClick('button[type="submit"]');
+      await passwordInput.type(password2);     
+      await confirmpasswordInput.type(password2);
+
+      await expect(page).toClick('button[data-testid="signup"]');
+
     });
 
     then("Should be shown an user already existing error message", async () => {
-      expectAlertToBe("Unauthorized");
+      expectAlertToBe("The username provided is already in use. Please choose a different one.");
     });
   });
 
@@ -100,20 +107,24 @@ defineFeature(feature, test => {
 
     given("User with a long invalid username", async () => {
       longUsername = "UserTestVeryLongName1"; // 21 characters
-      password3 = "StrongPass124!";
+      password3 = "StrongPass102!";
     });
 
     when("Trying to register", async () => {
       const usernameInput = await page.$('[data-testid="reg-username"] input');
       const passwordInput = await page.$('[data-testid="reg-password"] input');
+      const confirmpasswordInput = await page.$('[data-testid="reg-confirmpassword"] input');
 
       await usernameInput.type(longUsername);
-      await passwordInput.type(password3);
-      await expect(page).toClick('button[type="submit"]');
+      await passwordInput.type(password3);     
+      await confirmpasswordInput.type(password3);
+
+      await expect(page).toClick('button[data-testid="signup"]');
+
     });
 
     then("Should be shown an error message", async () => {
-      expectAlertToBe("Bad Request");
+      expectAlertToBe(usernameAlert);
     });
   });
 
@@ -123,20 +134,24 @@ defineFeature(feature, test => {
 
     given("User with a short invalid username", async () => {
       shortUsername = "mi"; // 4 characters
-      password4 = "StrongPass102!";
+      password4 = "StrongPass103!";
     });
 
     when("Trying to register", async () => {
       const usernameInput = await page.$('[data-testid="reg-username"] input');
       const passwordInput = await page.$('[data-testid="reg-password"] input');
+      const confirmpasswordInput = await page.$('[data-testid="reg-confirmpassword"] input');
 
       await usernameInput.type(shortUsername);
-      await passwordInput.type(password4);
-      await expect(page).toClick('button[type="submit"]');
+      await passwordInput.type(password4);     
+      await confirmpasswordInput.type(password4);
+
+      await expect(page).toClick('button[data-testid="signup"]');
+
     });
 
     then("Should be shown an error message", async () => {
-      expectAlertToBe("Bad Request");
+      expectAlertToBe(usernameAlert);
     });
   });
 
@@ -152,14 +167,18 @@ defineFeature(feature, test => {
     when("Trying to register", async () => {
       const usernameInput = await page.$('[data-testid="reg-username"] input');
       const passwordInput = await page.$('[data-testid="reg-password"] input');
+      const confirmpasswordInput = await page.$('[data-testid="reg-confirmpassword"] input');
 
       await usernameInput.type(emptyUsername);
-      await passwordInput.type(password5);
-      await expect(page).toClick('button[type="submit"]');
+      await passwordInput.type(password5);     
+      await confirmpasswordInput.type(password5);
+
+      await expect(page).toClick('button[data-testid="signup"]');
+
     });
 
     then("Should be shown an error message", async () => {
-      expectAlertToBe("Bad Request");
+      expectAlertToBe(usernameAlert);
     });
   });
 
@@ -169,20 +188,24 @@ defineFeature(feature, test => {
 
     given("User with special characters in the username", async () => {
       invalidUsername = "UserTest2@!";
-      password6 = "StrongPass103!";
+      password6 = "StrongPass105!";
     });
 
     when("Trying to register", async () => {
       const usernameInput = await page.$('[data-testid="reg-username"] input');
       const passwordInput = await page.$('[data-testid="reg-password"] input');
+      const confirmpasswordInput = await page.$('[data-testid="reg-confirmpassword"] input');
 
       await usernameInput.type(invalidUsername);
-      await passwordInput.type(password6);
-      await expect(page).toClick('button[type="submit"]');
+      await passwordInput.type(password6);     
+      await confirmpasswordInput.type(password6);
+
+      await expect(page).toClick('button[data-testid="signup"]');
+
     });
 
     then("Should be shown an error message", async () => {
-      expectAlertToBe("Bad Request");
+      expectAlertToBe(usernameAlert);
     });
   });
 
@@ -191,21 +214,24 @@ defineFeature(feature, test => {
     let weakPassword;
 
     given("User with a weak password", async () => {
-      username2 = "UserTest4";
+      username2 = "UserTest3";
       weakPassword = "weak";
     });
 
     when("Trying to register", async () => {
       const usernameInput = await page.$('[data-testid="reg-username"] input');
       const passwordInput = await page.$('[data-testid="reg-password"] input');
+      const confirmpasswordInput = await page.$('[data-testid="reg-confirmpassword"] input');
 
       await usernameInput.type(username2);
       await passwordInput.type(weakPassword);
-      await expect(page).toClick('button[type="submit"]');
+      await confirmpasswordInput.type(weakPassword);
+      await expect(page).toClick('button[data-testid="signup"]');
+
     });
 
     then("Should be shown an error message", async () => {
-      expectAlertToBe("Bad Request");
+      expectAlertToBe(passwordAlert);
     });
   });
 
@@ -213,22 +239,54 @@ defineFeature(feature, test => {
     let username3;
     let emptyPassword;
 
+
     given("User with an empty password", async () => {
-      username3 = "UserTest3";
+      username3 = "UserTest4";
       emptyPassword = "";
     });
 
     when("Trying to register", async () => {
       const usernameInput = await page.$('[data-testid="reg-username"] input');
       const passwordInput = await page.$('[data-testid="reg-password"] input');
+      const confirmpasswordInput = await page.$('[data-testid="reg-confirmpassword"] input');
 
       await usernameInput.type(username3);
       await passwordInput.type(emptyPassword);
-      await expect(page).toClick('button[type="submit"]');
+      await confirmpasswordInput.type(emptyPassword);
+      await expect(page).toClick('button[data-testid="signup"]');
+
     });
 
     then("Should be shown an error message", async () => {
-      expectAlertToBe("Bad Request");
+      expectAlertToBe(passwordAlert);
+    });
+  });
+
+  test("Register with invalid data - passwords dont match", ({ given, when, then }) => {
+    let username3;
+    let password7;
+    let notsamepassword
+
+    given("User with different passwords", async () => {
+      username3 = "UserTest5";
+      password7 = "StrongPass123@";
+      notsamepassword = "StrongPass123!";
+    });
+
+    when("Trying to register", async () => {
+      const usernameInput = await page.$('[data-testid="reg-username"] input');
+      const passwordInput = await page.$('[data-testid="reg-password"] input');
+      const confirmpasswordInput = await page.$('[data-testid="reg-confirmpassword"] input');
+
+      await usernameInput.type(username3);
+      await passwordInput.type(password7);
+      await confirmpasswordInput.type(notsamepassword);
+      await expect(page).toClick('button[data-testid="signup"]');
+
+    });
+
+    then("Should be shown an error message", async () => {
+      expectAlertToBe("The password and the confirmation do not match, please try again.");
     });
   });
 });
