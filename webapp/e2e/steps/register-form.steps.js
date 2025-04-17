@@ -33,8 +33,8 @@ defineFeature(feature, test => {
       .catch(() => {});
 
     // Wait for the navbar and click the "Register" button
-    await page.waitForSelector('button[data-testid="register-button"]');
-    await page.click('button[data-testid="register-button"]');
+    await page.waitForSelector('button[data-testid="signup-button"]');
+    await page.click('button[data-testid="signup-button"]');
 
   });
 
@@ -44,8 +44,8 @@ defineFeature(feature, test => {
 
   afterEach(async () => {
     // Navigate back to the register page to refresh the boxes
-    await page.waitForSelector('button[data-testid="register-button"]');
-    await page.click('button[data-testid="register-button"]');
+    await page.waitForSelector('button[data-testid="signup-button"]');
+    await page.click('button[data-testid="signup-button"]');
   });
   
   test("Register user with valid credentials", ({ given, when, then }) => {

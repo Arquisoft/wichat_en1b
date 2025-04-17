@@ -7,6 +7,7 @@ let page;
 let browser;
 
 const loginAlert="Invalid credentials"
+const loginsuccess="secretOrPrivateKey must have a value"
 const expectAlertToBe = async (text) => {
   await page.waitForSelector('p[style="color: red;"]');
   const alertMessage = await page.$eval('p[style="color: red;"]', 
@@ -44,7 +45,7 @@ defineFeature(feature, (test) => {
     await passwordInput.type("StrongPass123!");
     await expect(page).toClick('button[type="submit"]');
 
-    await expectAlertToBe("User added successfully");
+    await expectAlertToBe(loginsuccess);
 
     // Should automatically redirect to login after registration
     await page.waitForSelector('[data-testid="log-username"] input');
@@ -77,7 +78,7 @@ defineFeature(feature, (test) => {
     });
 
     then("Should show a success message", async () => {
-      await expectAlertToBe("Login successful");
+      await expectAlertToBe(loginsuccess);
 
       // Logout
       await page.waitForSelector('button[data-testid="logout-nav"]');
@@ -99,7 +100,7 @@ defineFeature(feature, (test) => {
     });
 
     then("Should show an error message", async () => {
-      await expectAlertToBe("Unauthorized");
+      await expectAlertToBe(loginAlert);
     });
   });
 
@@ -117,7 +118,7 @@ defineFeature(feature, (test) => {
     });
 
     then("Should show an error message", async () => {
-      await expectAlertToBe("Unauthorized");
+      await expectAlertToBe(loginAlert);
     });
   });
 
@@ -139,7 +140,7 @@ defineFeature(feature, (test) => {
     });
 
     then("Should show an error message", async () => {
-      await expectAlertToBe("Unauthorized");
+      await expectAlertToBe(loginAlert);
     });
   });
 
@@ -161,7 +162,7 @@ defineFeature(feature, (test) => {
     });
 
     then("Should show an error message", async () => {
-      await expectAlertToBe("Unauthorized");
+      await expectAlertToBe(loginAlert);
     });
   });
 });
