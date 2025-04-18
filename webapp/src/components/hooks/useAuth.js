@@ -25,13 +25,20 @@ export const useAuth = () => {
             navigate('/home');
             window.location.reload();
         } catch (error) {
-            const message =
-            error?.response?.data?.error ??
-            error?.message ??
-            'An unknown error occurred';
+            let message = 'An unknown error occurred';
+        
+            if (error?.response?.data?.errors?.length > 0) {
+                message = error.response.data.errors[0].msg;
+            } else if (error?.response?.data?.error) {
+                message = error.response.data.error;
+            } else if (error?.message) {
+                message = error.message;
+            }
+        
             setError(String(message));
             console.error(message);
         }
+        
     }
 
     return { authenticateUser, error };
