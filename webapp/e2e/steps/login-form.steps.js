@@ -46,7 +46,8 @@ defineFeature(feature, (test) => {
     await expect(page).toClick('button[type="submit"]');
 
     await expectAlertToBe(loginsuccess);
-
+    await page.waitForSelector('button[data-testid="login-button"]');
+    await page.click('button[data-testid="login-button"]');
   });
 
   afterAll(async () => {
