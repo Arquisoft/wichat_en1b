@@ -97,7 +97,7 @@ app.get('/users/:username/image', async (req, res) => {
   try {
     let userResponse = await axios.get(`${userServiceUrl}/users/${req.params.username}/image`);
     let userImageResponse = await axios.get(`${userServiceUrl}${userResponse.data.image}`, { responseType: 'arraybuffer' });
-    
+
     res.setHeader('Content-Type', 'image/png');
     return res.send(userImageResponse.data);
   } catch (error) {
@@ -145,13 +145,13 @@ app.post('/users/:username/custom-image', authMiddleware, upload.single('image')
 app.get('/profile/:username', authMiddleware, async (req, res) => {
   try {
     const targetUsername = req.params.username;
-    
+
     // Input validation for username parameter
     const usernameRegex = /^[a-zA-Z0-9_-]{3,30}$/;
     if (!usernameRegex.test(targetUsername)) {
       return res.status(400).json({ error: 'Invalid username format' });
     }
-    
+
     // Forward the request to the statistics service
     const statisticsResponse = await axios.get(`${statisticsServiceUrl}/statistics`, {
       headers: {
@@ -159,7 +159,7 @@ app.get('/profile/:username', authMiddleware, async (req, res) => {
         'targetusername': targetUsername
       }
     });
-    
+
     res.json(statisticsResponse.data);
   } catch (error) {
     manageError(res, error);
@@ -195,6 +195,16 @@ app.get('/question/:questionType', async (req, res) => {
     manageError(res, error);
   }
 });
+
+app.get('/question-of-the-day', async (req, res) => {
+  try {
+    const questionResponse = await axios.get(`${questionServiceUrl}/question-of-the-day`);
+    res.json(questionResponse.data);
+  } catch (error) {
+    manageError(res, error);
+  }
+});
+
 
 app.post('/answer', async (req, res) => {
   try {
