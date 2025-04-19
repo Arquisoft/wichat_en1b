@@ -65,7 +65,7 @@ describe('Gateway Service', () => {
                                      }
                             });
 
-    } else if (url.endsWith('/question') || url.endsWith('/question/flags')) {
+    } else if (url.endsWith('/question') || url.endsWith('/question/flags') || url.endsWith('/question-of-the-day')) {
       return Promise.resolve({ data: { id: "mpzulblyui9du98pmodg5o", 
                                        question: "Which of the following flags belongs to Nepal?",
                                        images: [
@@ -163,6 +163,10 @@ describe('Gateway Service', () => {
 
   it('should retrieve a question from the question service by specific question type', async () => {
     await verifyMockQuestion('/question/flags');;
+  });
+
+  it('should retrieve a question from the question of the day', async () => {
+    await verifyMockQuestion('/question-of-the-day');
   });
 
   // Test /answer endpoint
@@ -339,6 +343,20 @@ describe('Error handling', () => {
 
     const response = await request(app)
       .get('/question');
+
+    expect(response.statusCode).toBe(500);
+    expect(response.body.error).toBe('Question service error');
+  });
+
+  it('should handle errors from question of the day endpoint from question service', async () => {
+    axios.get.mockImplementationOnce((url) => {
+      if (url.endsWith('/question-of-the-day')) {
+        return getRejectedPromise(500, 'Question service error');
+      }
+    });
+
+    const response = await request(app)
+      .get('/question-of-the-day');
 
     expect(response.statusCode).toBe(500);
     expect(response.body.error).toBe('Question service error');

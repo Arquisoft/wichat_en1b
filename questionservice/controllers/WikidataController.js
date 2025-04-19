@@ -7,16 +7,22 @@ const questionTypes = require('./questionTypes');
 
 const WikidataItemRepository = require('../repositories/WikidataItemRepository');
 const QuestionRepository = require('../repositories/QuestionRepository');
+const QuestionOfTheDayRepository = require('../repositories/QuestionOfTheDayRepository');
 
 const ANSWERS_PER_QUESTION = 4
 const INCORRECT_NAME_REGEX = /[QL]\d+/;
-
 class WikidataController {
 
     constructor() {
         this.wikidataItemRepository = new WikidataItemRepository();
         this.questionRepository = new QuestionRepository();
+        this.questionOfTheDayRepository = new QuestionOfTheDayRepository();
         this.getTestQuestions = true;
+    }
+
+    async initialRun() {
+        await this.preSaveWikidataItems();
+        await this.checkInitialQuestionOfTheDay();
     }
 
     setTestQuestions(value) {
@@ -107,6 +113,18 @@ class WikidataController {
         };
     }
 
+    async getQuestionOfTheDay() {
+        const questionOfTheDay = await this.questionOfTheDayRepository.getQuestionOfTheDay();
+        const rawQuestion = questionOfTheDay.question;
+        const question = {
+            id: questionOfTheDay._id,
+            question: rawQuestion.question,
+            images: rawQuestion.images,
+            correctOption: rawQuestion.correctOption
+        }
+        return question;
+    }
+
     async isQuestionCorrect(questionId, answer) {
         return await this.questionRepository.isAnswerCorrect(questionId, answer);
     }
@@ -137,6 +155,23 @@ class WikidataController {
             }
         }
         return resultReport;
+    }
+
+    /**
+     * Sets the question of the day to the question
+     * Question of the day is updated every day at 02:00 AM
+     */
+    async setQuestionOfTheDay(defaultQuestionType = "random") {
+        const question = await this.getQuestionAndImages(defaultQuestionType);
+        return await this.questionOfTheDayRepository.createQuestionOfTheDay(question.id);
+    }
+
+    async checkInitialQuestionOfTheDay(defaultQuestionType = null) {
+        const questionOfTheDay = await this.questionOfTheDayRepository.getQuestionOfTheDay();
+        if (!questionOfTheDay) {
+            return await this.setQuestionOfTheDay(defaultQuestionType);
+        }
+        return questionOfTheDay;
     }
 
 }

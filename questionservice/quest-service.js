@@ -73,6 +73,16 @@ app.post("/answer", [
     }
 )
 
+app.get("/question-of-the-day", async (_req, res) => {
+    try {
+        const question = await wikidataController.getQuestionOfTheDay();
+        res.json(question)
+    } catch (error) {
+        console.error("Error fetching question of the day:", error)
+        res.status(500).json({ error: "Failed to fetch question of the day" })
+    }
+})
+
 const server = app.listen(port, () => {
     console.log(`Question Service listening at http://localhost:${port}`)
 });
@@ -91,7 +101,17 @@ if (require.main === module) {
         'Europe/Madrid' // timeZone
     );
 
-    wikidataController.preSaveWikidataItems(); // initial run to save
+    new CronJob(
+        '0 2 * * *', // every day at 02:00 AM
+        async () => {
+            await wikidataController.setQuestionOfTheDay();
+        }, // onTick
+        null, // onComplete
+        true, // start
+        'Europe/Madrid' // timeZone
+    );
+
+    wikidataController.initialRun(); // initial run to save items and set question of the day
 }
 
 module.exports = server;

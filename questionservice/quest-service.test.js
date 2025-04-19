@@ -62,6 +62,14 @@ afterAll(async () => {
 })
 
 describe('Question Service', () => {
+    const verifyQuestionResponse = (response) => {
+        expect(response.status).toBe(200);
+        expect(response.body).toHaveProperty('id');
+        expect(response.body).toHaveProperty('question');
+        expect(response.body).toHaveProperty('images');
+        expect(response.body.images).toHaveLength(4);
+    }
+
     it('Should give a status 200 when a GET request is sent to /', async () => {
         let response = await request(app).get('/');
         expect(response.status).toBe(200);
@@ -69,12 +77,7 @@ describe('Question Service', () => {
 
     it('Should retrieve questions through the /question endpoint', async () => {
         let response = await request(app).get('/question/flags');
-
-        expect(response.status).toBe(200);
-        expect(response.body).toHaveProperty('id');
-        expect(response.body).toHaveProperty('question');
-        expect(response.body).toHaveProperty('images');
-        expect(response.body.images).toHaveLength(4);
+        verifyQuestionResponse(response);
     });
 
     it('Should validate correctly an answer', async () => {
@@ -100,5 +103,15 @@ describe('Question Service', () => {
         const result = await wikidataController.preSaveWikidataItems(["flags"]);
 
         expect(result.fetchedItems).toBeGreaterThan(0);
+    })
+
+    it('Should return the question of the day / store a new one if none exists', async () => {
+        const question = await wikidataController.checkInitialQuestionOfTheDay("flags");
+        expect(question).toHaveProperty('_id');
+    })
+
+    it('Should return the question of the day', async () => {
+        let response = await request(app).get('/question-of-the-day');
+        verifyQuestionResponse(response);
     })
 })
