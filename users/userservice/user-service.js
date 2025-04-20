@@ -154,7 +154,7 @@ app.post('/users/:username/default-image', async (req, res) => {
 app.post('/adduser', async (req, res) => {
   try {
     // Check if required fields are present in the request body
-    validateRequiredFields(req, ['reg-username', 'reg-password', 'reg-confirmpassword']);
+    validateRequiredFields(req, ['username', 'password', 'confirmpassword']);
 
     // Check if a user with the same username already exists
     const validatedUsername = validateUsername(req.body.username);  // Validate to prevent NoSQL injection

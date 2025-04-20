@@ -19,7 +19,7 @@ mongoose.connect(mongoUri);
 
 // Route for user login
 app.post('/login',  [
-  check('username').notEmpty().withMessage('The username required'),
+  check('username').notEmpty().withMessage('The username is required'),
   check('password').notEmpty().withMessage('The password is required')
 ],async (req, res) => {
   try {

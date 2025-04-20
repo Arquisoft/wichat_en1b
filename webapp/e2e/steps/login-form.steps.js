@@ -34,20 +34,22 @@ defineFeature(feature, (test) => {
     });
 
     // Go to Register page to create user
-    await page.waitForSelector('button[data-testid="login-button"]');
-    await page.click('button[data-testid="login-button"]');
+    await page.waitForSelector('button[data-testid="signup-button"]');
+    await page.click('button[data-testid="signup-button"]');
 
     // Register a new user for login
-    const usernameInput = await page.$('[data-testid="log-username"] input');
-    const passwordInput = await page.$('[data-testid="log-password"] input');
+    const usernameInput = await page.$('[data-testid="reg-username"] input');
+    const passwordInput = await page.$('[data-testid="reg-password"] input');
+    const confirmpasswordInput = await page.$('[data-testid="reg-confirmpassword"] input');
 
     await usernameInput.type("loginuser");
     await passwordInput.type("StrongPass123!");
-    await expect(page).toClick('button[type="submit"]');
+    await confirmpasswordInput.type("StrongPass123!");
+    await expect(page).toClick('[data-testid="signup"]');
 
     await expectAlertToBe(loginsuccess);
-    await page.waitForSelector('button[data-testid="login-button"]');
-    await page.click('button[data-testid="login-button"]');
+    await page.waitForSelector('[data-testid="login-button"]');
+    await page.click('[data-testid="login-button"]');
   });
 
   afterAll(async () => {
@@ -98,7 +100,7 @@ defineFeature(feature, (test) => {
     });
 
     then("Should show an error message", async () => {
-      await expectAlertToBe("The username required");
+      await expectAlertToBe("The username is required");
     });
   });
 
