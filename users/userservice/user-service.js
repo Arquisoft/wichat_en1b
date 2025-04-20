@@ -43,7 +43,7 @@ function validateUsername(username) {
   
   // Allow only letters, numbers, and underscores, and ensure length between 3 and 20 characters
   const usernameRegex = /^[a-zA-Z0-9_]{3,20}$/;
-  if (username==="" || !usernameRegex.test(usernameStr)) {
+  if (!usernameRegex.test(usernameStr)) {
     throw new Error('Invalid username. It must be 3-20 characters long and contain only letters, numbers and underscores.');
   }
   // Return the sanitized string
@@ -56,7 +56,7 @@ function validatePassword(password) {
 
   const strongPasswordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/;
 
-  if (password==="" || !strongPasswordRegex.test(passwordStr)) {
+  if (!strongPasswordRegex.test(passwordStr)) {
     throw new Error(
       'Invalid password. It must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, one number, and one special character.'
     );
