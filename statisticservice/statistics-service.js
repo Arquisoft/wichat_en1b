@@ -19,6 +19,148 @@ if (mongoose.connection.readyState === 0) {
     .catch(err => console.error('MongoDB connection error:', err));
 }
 
+function isValidDateString(dateStr) {
+  // Ensure it matches YYYY-MM-DD
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) return false;
+
+  const date = new Date(dateStr);
+  if (isNaN(date.getTime())) return false;
+
+  const [year, month, day] = dateStr.split('-').map(Number);
+  return date.getUTCFullYear() === year &&
+    date.getUTCMonth() + 1 === month &&
+    date.getUTCDate() === day;
+}
+
+// Get statistics for all users (ordered)
+app.get('/statistics', async (req, res) => {
+
+  // Extract query parameters for filtering and sorting
+  const {
+    sort = 'gamesPlayed',
+    order = 'desc',
+    limit = 50,
+    offset = 0,
+    gameType,
+    minGames,
+    minScore,
+    registeredBefore,
+    registeredAfter
+  } = req.query;
+
+  // Validate sort field
+  const validSortFields = ['username', 'gamesPlayed', 'totalVisits', 'registrationDate', 'maxScore'];
+  if (!validSortFields.includes(sort)) {
+    return res.status(400).json({ error: 'Invalid sort field' });
+  }
+
+  // Validate sort order
+  if (order !== 'asc' && order !== 'desc') {
+    return res.status(400).json({ error: 'Invalid sort order, must be "asc" or "desc"' });
+  }
+
+  // Build query filter
+  const filter = {};
+
+  // Add game type filter if provided
+  if (gameType) {
+    const validGameTypes = ['classical', 'suddenDeath', 'timeTrial', 'custom', 'qod'];
+    if (!validGameTypes.includes(gameType)) {
+      return res.status(400).json({ error: 'Invalid game type' });
+    }
+    filter['games.gameType'] = gameType;
+  }
+
+  // Add minimum games filter if provided
+  if (minGames) {
+    const gamesCount = parseInt(minGames);
+    if (isNaN(gamesCount) || gamesCount < 0) {
+      return res.status(400).json({ error: 'Invalid minimum games value' });
+    }
+    filter.gamesPlayed = { $gte: gamesCount };
+  }
+
+  // Add minimum score filter if provided
+  if (minScore) {
+    const score = parseInt(minScore);
+    if (isNaN(score) || score < 0) {
+      return res.status(400).json({ error: 'Invalid minimum score value' });
+    }
+    filter['games.score'] = { $gte: score };
+  }
+
+  // Add registration date filters if provided
+  if (registeredBefore) {
+    if (!isValidDateString(registeredBefore)) {
+      return res.status(400).json({ error: 'Invalid registeredBefore date format' });
+    } else {
+      filter.registrationDate = filter.registrationDate || {};
+      filter.registrationDate.$lte = new Date(registeredBefore);
+    }
+  }
+  
+  if (registeredAfter) {
+    if (!isValidDateString(registeredAfter)) {
+      return res.status(400).json({ error: 'Invalid registeredAfter date format' });
+    } else {
+      filter.registrationDate = filter.registrationDate || {};
+      filter.registrationDate.$gte = new Date(registeredAfter);
+    }
+  }
+
+  // Create sort object for MongoDB
+  const sortObj = {};
+  sortObj[sort] = order === 'asc' ? 1 : -1;
+
+  const limitNum = parseInt(limit);
+  const offsetNum = parseInt(offset);
+
+  if (isNaN(limitNum) || limitNum < 1 || limitNum > 100) {
+    return res.status(400).json({ error: 'Invalid limit value, must be between 1 and 100' });
+  }
+
+  if (isNaN(offsetNum) || offsetNum < 0) {
+    return res.status(400).json({ error: 'Invalid offset value, must be non-negative' });
+  }
+
+  // Get users with pagination and filtering
+  const users = await User.find(filter)
+    .sort(sortObj)
+    .skip(offsetNum)
+    .limit(limitNum);
+
+  // Get total count for pagination info
+  const totalCount = await User.countDocuments(filter);
+
+  // Process users and create response
+  const usersData = users.map(user => {
+    return {
+      username: user.username,
+      gamesPlayed: user.gamesPlayed,
+      registrationDate: user.registrationDate,
+      totalVisits: user.totalVisits,
+      globalStatistics: {
+        questionsAnswered: user.games.reduce((acc, game) => acc + game.questionsAnswered, 0),
+        correctAnswers: user.games.reduce((acc, game) => acc + game.correctAnswers, 0),
+        incorrectAnswers: user.games.reduce((acc, game) => acc + game.incorrectAnswers, 0),
+        maxScore: Math.max(...user.games.map(game => game.score)) || 0,
+        gamesPlayed: user.games.length,
+      }
+    };
+  });
+
+  // Return response with pagination metadata
+  res.json({
+    users: usersData,
+    pagination: {
+      total: totalCount,
+      limit: limitNum,
+      offset: offsetNum,
+      hasMore: offsetNum + usersData.length < totalCount
+    }
+  });
+});
+
 // Update statistics for a user (in the headers)
 app.post('/statistics', async (req, res) => {
   const username = req.headers['username'];
@@ -62,8 +204,9 @@ app.post('/recordGame', async (req, res) => {
   const gameStats = req.body;
 
   const user = await User.findOne({ username: username });
-  if (!user) return res.status(404).json({ error: 'User not found' });
-  else {
+  if (!user) {
+    return res.status(404).json({ error: 'User not found' });
+  } else {
     // Find the user and update the statistics
     await User.findOneAndUpdate(
       { username: username },
@@ -74,6 +217,8 @@ app.post('/recordGame', async (req, res) => {
         $inc: { gamesPlayed: 1 }
       }
     );
+
+    return res.status(200).json({ message: 'Game recorded successfully' });
   }
 });
 
@@ -195,10 +340,6 @@ app.get('/statistics/:username', async (req, res) => {
   res.json(responseData);
 });
 
-// Get statistics for all users (ordered)
-app.get('/statistics', async (req, res) => {
-
-});
 
 // Start the Express.js server
 const server = app.listen(port, () => {

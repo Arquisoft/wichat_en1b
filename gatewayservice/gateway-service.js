@@ -208,13 +208,39 @@ app.post('/answer', async (req, res) => {
 
 app.get('/statistics', authMiddleware, async (req, res) => {
   try {
-    // Forward the user information to the statistics service
-    const statisticsResponse = await axios.get(`${statisticsServiceUrl}/statistics`, {
-      headers: {
-        'username': req.user
-      }
-    });
+    // Extract query parameters for filtering and sorting
+    const {
+      sort,
+      order,
+      limit,
+      offset,
+      gameType,
+      minGames,
+      minScore,
+      registeredBefore,
+      registeredAfter
+    } = req.query;
 
+    // Build query parameters for the statistics service request
+    const queryParams = new URLSearchParams();
+    
+    // Add parameters to the query string if they exist
+    if (sort) queryParams.append('sort', sort);
+    if (order) queryParams.append('order', order);
+    if (limit) queryParams.append('limit', limit);
+    if (offset) queryParams.append('offset', offset);
+    if (gameType) queryParams.append('gameType', gameType);
+    if (minGames) queryParams.append('minGames', minGames);
+    if (minScore) queryParams.append('minScore', minScore);
+    if (registeredBefore) queryParams.append('registeredBefore', registeredBefore);
+    if (registeredAfter) queryParams.append('registeredAfter', registeredAfter);
+
+    // Construct the URL with query parameters
+    const url = `${statisticsServiceUrl}/statistics${queryParams.toString() ? '?' + queryParams.toString() : ''}`;
+    
+    // Forward the request to the statistics service
+    const statisticsResponse = await axios.get(url);
+    
     res.json(statisticsResponse.data);
   } catch (error) {
     manageError(res, error);
