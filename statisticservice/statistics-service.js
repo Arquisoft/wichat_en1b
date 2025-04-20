@@ -49,7 +49,7 @@ app.get('/statistics', async (req, res) => {
   } = req.query;
 
   // Validate sort field
-  const validSortFields = ['username', 'gamesPlayed', 'totalVisits', 'registrationDate', 'maxScore'];
+  const validSortFields = ['username', 'gamesPlayed', 'totalScore', 'totalVisits', 'registrationDate', 'maxScore'];
   if (!validSortFields.includes(sort)) {
     return res.status(400).json({ error: 'Invalid sort field' });
   }
