@@ -27,29 +27,35 @@ class RecordRetriever {
             if (!token) throw new Error("Cannot parse authentication token.");
 
             // Build query parameters
-            const queryParams = new URLSearchParams();
-            const validFilters = ['sort', 'order', 'limit', 'offset', 'gameType',
-                'minGames', 'minScore', 'registeredBefore', 'registeredAfter'];;
-
-            validFilters.forEach(filter => {
-                if (filters[filter]) queryParams.append(filter, filters[filter]);
-            });
-
-            // Build URL with query parameters
-            const url = `${this.apiUrl}/statistics${queryParams.toString() ? '?' + queryParams.toString() : ''}`;
-
-            // Make a GET request to the gateway with the authorization token
-            const response = await axios.get(url, {
-                headers: {
-                    'Authorization': `Bearer ${token}`
+            const params = new URLSearchParams();
+            const allowed = ['sort', 'order', 'limit', 'offset', 'gameType', 'minGames', 'minScore', 'registeredBefore', 'registeredAfter'];
+            allowed.forEach(key => {
+                if (filters[key] !== '' && filters[key] !== undefined && filters[key] !== null) {
+                    params.append(key, filters[key]);
                 }
             });
 
-            // Return the response data (user statistics) and the username
-            return {
-                statsData: response.data,
-                username: parsedUserCookie.username,
-            };
+            const url = `${this.apiUrl}/statistics${params.toString() ? '?' + params.toString() : ''}`;
+            const response = await axios.get(url, { headers: { Authorization: `Bearer ${token}` } });
+
+            // reshape data
+            const { users, pagination } = response.data;
+            // map to frontend fields
+            const mapped = users.map((u, idx) => ({
+                id: idx + pagination.offset + 1,
+                username: u.username,
+                totalGames: u.globalStatistics.gamesPlayed,
+                totalScore: u.globalStatistics.questionsAnswered,
+                averageScore: u.globalStatistics.gamesPlayed > 0
+                    ? u.globalStatistics.questionsAnswered / u.globalStatistics.gamesPlayed
+                    : null,
+                highScore: u.globalStatistics.maxScore,
+                preferredGameType: 'Mixed',
+                registrationDate: u.registrationDate
+            }));
+
+            return { users: mapped, pagination, username: parsedUserCookie.username };
+
         } catch (error) {
             console.error("Error fetching statistics:", error);
             if (error.response?.status === 401 || error.response?.status === 403) {
@@ -57,6 +63,10 @@ class RecordRetriever {
             }
             throw new Error(error.response?.data?.error || "Failed to retrieve statistics");
         }
+    }
+
+    getStaticProfileImageUrl(username) {
+        return `${this.apiUrl}/users/${username}/image`;
     }
 }
 
