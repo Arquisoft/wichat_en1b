@@ -19,6 +19,7 @@ if (mongoose.connection.readyState === 0) {
     .catch(err => console.error('MongoDB connection error:', err));
 }
 
+// Update statistics for a user (in the headers)
 app.post('/statistics', async (req, res) => {
   const username = req.headers['username'];
   if (!username) return res.status(400).json({ error: 'Username missing in request' });
@@ -76,11 +77,12 @@ app.post('/recordGame', async (req, res) => {
   }
 });
 
-app.get('/statistics', async (req, res) => {
+// Get statistics for a user by username (in the URL)
+app.get('/statistics/:username', async (req, res) => {
   const currentUsername = req.headers['currentuser'];
   if (!currentUsername) return res.status(400).json({ error: 'Current user missing in request' });
 
-  const targetUsername = req.headers['targetusername'];
+  const targetUsername = req.params.username;
   if (!targetUsername) return res.status(400).json({ error: 'Target user missing in request' });
 
   const usernameRegex = /^[a-zA-Z0-9_-]{3,30}$/;
@@ -191,6 +193,11 @@ app.get('/statistics', async (req, res) => {
   }
 
   res.json(responseData);
+});
+
+// Get statistics for all users (ordered)
+app.get('/statistics', async (req, res) => {
+
 });
 
 // Start the Express.js server

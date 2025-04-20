@@ -153,10 +153,10 @@ app.get('/profile/:username', authMiddleware, async (req, res) => {
     }
     
     // Forward the request to the statistics service
-    const statisticsResponse = await axios.get(`${statisticsServiceUrl}/statistics`, {
-      headers: {
-        'currentuser': req.user,
-        'targetusername': targetUsername
+    const statisticsResponse = await axios.get(`${statisticsServiceUrl}/statistics/${targetUsername}`, 
+      {      
+        headers: {
+          'currentuser': req.user
       }
     });
     
