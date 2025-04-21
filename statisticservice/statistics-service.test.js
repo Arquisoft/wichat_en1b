@@ -1,227 +1,212 @@
 const request = require('supertest');
 const { MongoMemoryServer } = require('mongodb-memory-server');
-const User = require('./statistics-model');
 const mongoose = require('mongoose');
-
+const User = require('./statistics-model');
 let mongoServer;
-let app;
-
-const testUser = {
-  username: 'testuser',
-  passwordHash: 'hashedpassword',
-};
+let server;
 
 beforeAll(async () => {
-  // Set up MongoMemoryServer
   mongoServer = await MongoMemoryServer.create();
-  const mongoUri = mongoServer.getUri();
-  process.env.MONGODB_URI = mongoUri;
-
-  // Import statistics service after setting MongoDB URI
-  app = require('./statistics-service');
-
-  // Set up test user
-  await User.deleteMany({});
-  const user = new User({
-    username: testUser.username,
-    passwordHash: testUser.passwordHash,
-    gamesPlayed: 0,
-    questionsAnswered: 0,
-    correctAnswers: 0,
-    incorrectAnswers: 0,
-  });
-  await user.save();
-});
-
-afterAll(async () => {
-  if (app && app.listening) {
-    await new Promise((resolve) => app.close(resolve));
-  }
-  await mongoose.connection.close(); // Close Mongoose connection
-  if (mongoServer) {
-    await mongoServer.stop(); // Stop MongoMemoryServer
-  }
+  process.env.MONGODB_URI = mongoServer.getUri();
+  // Import after setting env var
+  server = require('./statistics-service');
 });
 
 beforeEach(async () => {
-  // Reset user statistics before each test
-  await User.updateOne(
-    { username: testUser.username },
-    {
-      $set: {
-        gamesPlayed: 0,
-        questionsAnswered: 0,
-        correctAnswers: 0,
-        incorrectAnswers: 0,
-      },
-    }
-  );
+  // Clean database before each test
+  await User.deleteMany({});
 });
 
-describe('Statistics Service', () => {
-  it ('pending tests', () => {
-    expect(true).toBe(true);
-  });
-  /*
-  it('Should retrieve statistics for a valid user', async () => {
-    const response = await request(app)
-      .get('/statistics')
-      .set('username', testUser.username);
-    
-    expect(response.status).toBe(200);
-    expect(response.body).toEqual({
-      gamesPlayed: 0,
-      questionsAnswered: 0,
-      correctAnswers: 0,
-      incorrectAnswers: 0,
-      registrationDate: expect.any(String)
-    });
+afterAll(async () => {
+  // Close server & connections
+  await mongoose.disconnect();
+  server.close();
+  await mongoServer.stop();
+});
+
+describe('GET /statistics', () => {
+  it('should return users sorted by gamesPlayed desc with pagination info', async () => {
+    const users = [
+      { username: 'alice', gamesPlayed: 1, registrationDate: new Date(), totalVisits: 0, games: [] },
+      { username: 'bob',   gamesPlayed: 3, registrationDate: new Date(), totalVisits: 0, games: [] }
+    ];
+    await User.insertMany(users);
+
+    const res = await request(server).get('/statistics');
+    expect(res.status).toBe(200);
+    expect(res.body).toHaveProperty('users');
+    expect(res.body.users).toHaveLength(2);
+    expect(res.body.users[0].username).toBe('bob');
+    expect(res.body.pagination).toMatchObject({ total: 2, limit: 50, offset: 0, hasMore: false });
   });
 
-  it('Should update statistics by adding to existing values', async () => {
-    const updateData1 = {
-      gamesPlayed: 1,
-      questionsAnswered: 5,
-      correctAnswers: 3,
-      incorrectAnswers: 2,
-    };
+  it('should reject invalid sort field', async () => {
+    const res = await request(server).get('/statistics?sort=invalid');
+    expect(res.status).toBe(400);
+    expect(res.body.error).toBe('Invalid sort field');
+  });
 
-    const response1 = await request(app)
+  it('should reject invalid order value', async () => {
+    const res = await request(server).get('/statistics?order=up');
+    expect(res.status).toBe(400);
+    expect(res.body.error).toContain('Invalid sort order');
+  });
+
+  it('should reject invalid gameType filter', async () => {
+    const res = await request(server).get('/statistics?gameType=foo');
+    expect(res.status).toBe(400);
+    expect(res.body.error).toBe('Invalid game type');
+  });
+
+  it('should reject non-numeric minGames', async () => {
+    const res = await request(server).get('/statistics?minGames=abc');
+    expect(res.status).toBe(400);
+    expect(res.body.error).toBe('Invalid minimum games value');
+  });
+
+  it('should reject non-numeric minScore', async () => {
+    const res = await request(server).get('/statistics?minScore=xyz');
+    expect(res.status).toBe(400);
+    expect(res.body.error).toBe('Invalid minimum score value');
+  });
+
+  it('should reject invalid registration date formats', async () => {
+    const res1 = await request(server).get('/statistics?registeredBefore=not-a-date');
+    expect(res1.status).toBe(400);
+    expect(res1.body.error).toBe('Invalid registeredBefore date format');
+
+    const res2 = await request(server).get('/statistics?registeredAfter=2025-02-30');
+    expect(res2.status).toBe(400);
+    expect(res2.body.error).toBe('Invalid registeredAfter date format');
+  });
+
+  it('should reject invalid limit and offset values', async () => {
+    const badLimit = await request(server).get('/statistics?limit=0');
+    expect(badLimit.status).toBe(400);
+    expect(badLimit.body.error).toContain('Invalid limit');
+
+    const badOffset = await request(server).get('/statistics?offset=-1');
+    expect(badOffset.status).toBe(400);
+    expect(badOffset.body.error).toContain('Invalid offset');
+  });
+});
+
+describe('POST /statistics', () => {
+  it('should require username header', async () => {
+    const res = await request(server).post('/statistics').send({ gamesPlayed: 1 });
+    expect(res.status).toBe(400);
+    expect(res.body.error).toBe('Username missing in request');
+  });
+
+  it('should reject non-numeric body fields', async () => {
+    const user = await User.create({ username: 'tester', gamesPlayed: 0, questionsAnswered: 0, correctAnswers: 0, incorrectAnswers: 0 });
+    const res = await request(server)
       .post('/statistics')
-      .set('username', testUser.username)
-      .send(updateData1);
+      .set('username', 'tester')
+      .send({ gamesPlayed: 'NaN' });
+    expect(res.status).toBe(400);
+    expect(res.body.error).toContain('Invalid input');
+  });
 
-    expect(response1.status).toBe(200);
-    expect(response1.body).toEqual({
-      gamesPlayed: 1,
-      questionsAnswered: 5,
-      correctAnswers: 3,
-      incorrectAnswers: 2,
-    });
-
-    const updateData2 = {
-      gamesPlayed: 2,
-      questionsAnswered: 10,
-      correctAnswers: 7,
-      incorrectAnswers: 3,
-    };
-
-    const response2 = await request(app)
+  it('should return 404 for unknown user', async () => {
+    const res = await request(server)
       .post('/statistics')
-      .set('username', testUser.username)
-      .send(updateData2);
-
-    expect(response2.status).toBe(200);
-    expect(response2.body).toEqual({
-      gamesPlayed: 3,
-      questionsAnswered: 15,
-      correctAnswers: 10,
-      incorrectAnswers: 5,
-    });
-
-    const getResponse = await request(app)
-      .get('/statistics')
-      .set('username', testUser.username);
-
-    expect(getResponse.status).toBe(200);
-    expect(getResponse.body).toEqual({
-      gamesPlayed: 3,
-      questionsAnswered: 15,
-      correctAnswers: 10,
-      incorrectAnswers: 5,
-      registrationDate: expect.any(String)
-    });
+      .set('username', 'unknown')
+      .send({ gamesPlayed: 5 });
+    expect(res.status).toBe(404);
+    expect(res.body.error).toBe('User not found');
   });
 
-  it('Should handle partial updates by only incrementing specified fields', async () => {
-    await User.updateOne(
-      { username: testUser.username },
-      {
-        $set: {
-          gamesPlayed: 5,
-          questionsAnswered: 20,
-          correctAnswers: 15,
-          incorrectAnswers: 5,
-        },
-      }
-    );
-    
-    const updateData = { gamesPlayed: 2 };
-
-    const response = await request(app)
+  it('should update user statistics correctly', async () => {
+    const user = await User.create({ username: 'updateuser', gamesPlayed: 2, questionsAnswered: 4, correctAnswers: 3, incorrectAnswers: 1 });
+    const res = await request(server)
       .post('/statistics')
-      .set('username', testUser.username)
-      .send(updateData);
+      .set('username', 'updateuser')
+      .send({ gamesPlayed: 3, questionsAnswered: 2, correctAnswers: 1, incorrectAnswers: 1 });
 
-    expect(response.status).toBe(200);
-    expect(response.body).toEqual({
-      gamesPlayed: 7,
-      questionsAnswered: 20,
-      correctAnswers: 15,
-      incorrectAnswers: 5,
-    });
+    expect(res.status).toBe(200);
+    expect(res.body).toMatchObject({ gamesPlayed: 5, questionsAnswered: 6, correctAnswers: 4, incorrectAnswers: 2 });
+
+    const updated = await User.findOne({ username: 'updateuser' });
+    expect(updated.gamesPlayed).toBe(5);
+    expect(updated.questionsAnswered).toBe(6);
+  });
+});
+
+describe('POST /recordGame', () => {
+  it('should require username header', async () => {
+    const res = await request(server).post('/recordGame').send({ gameType: 'classical', score: 10 });
+    expect(res.status).toBe(400);
+    expect(res.body.error).toBe('Username missing in request');
   });
 
-  it('Should return a 400 error for invalid input', async () => {
-    const updateData = { gamesPlayed: "invalid" };
-  
-    const response = await request(app)
-      .post('/statistics')
-      .set('username', testUser.username)
-      .send(updateData);
-  
-    expect(response.status).toBe(400);
-    expect(response.body.error).toBe('Invalid input: All statistics must be numbers.');
+  it('should return 404 for unknown user', async () => {
+    const res = await request(server)
+      .post('/recordGame')
+      .set('username', 'nouser')
+      .send({ gameType: 'classical', score: 10 });
+    expect(res.status).toBe(404);
+    expect(res.body.error).toBe('User not found');
   });
+
+  it('should push new game and increment gamesPlayed', async () => {
+    const user = await User.create({ username: 'gamer', gamesPlayed: 0, games: [] });
+    const game = { gameType: 'timeTrial', score: 15, questionsAnswered: 5, correctAnswers: 4, incorrectAnswers: 1 };
   
-  it('Should return a 400 error for a request without a username', async () => {
-    const response = await request(app).get('/statistics');
-    
-    expect(response.status).toBe(400);
-    expect(response.body.error).toBe('Username missing in request');
-  });
+    const res = await request(server)
+      .post('/recordGame')
+      .set('username', 'gamer')
+      .send(game);
   
-  it('Should return a 404 error when retrieving statistics for a non-existent user', async () => {
-    const response = await request(app)
-      .get('/statistics')
-      .set('username', 'nonexistent');
-
-    expect(response.status).toBe(404);
-    expect(response.body.error).toBe('User not found');
+    expect(res.status).toBe(200);
+    const updated = await User.findOne({ username: 'gamer' });
+    expect(updated.gamesPlayed).toBe(1);
+    expect(updated.games[0].score).toBe(15);
   });
-  
-  it('Should return a 404 error when updating statistics for a non-existent user', async () => {
-    const updateData = {
-      gamesPlayed: 1,
-    };
+});
 
-    const response = await request(app)
-      .post('/statistics')
-      .set('username', 'nonexistent')
-      .send(updateData);
-
-    expect(response.status).toBe(404);
-    expect(response.body.error).toBe('User not found');
+describe('GET /statistics/:username', () => {
+  it('should require currentuser header', async () => {
+    const res = await request(server).get('/statistics/alice');
+    expect(res.status).toBe(400);
+    expect(res.body.error).toBe('Current user missing in request');
   });
-  
-  it('Should convert string numbers to integers when updating', async () => {
-    const updateData = {
-      gamesPlayed: "3",
-      questionsAnswered: "10"
-    };
 
-    const response = await request(app)
-      .post('/statistics')
-      .set('username', testUser.username)
-      .send(updateData);
-
-    expect(response.status).toBe(200);
-    expect(response.body).toEqual({
-      gamesPlayed: 3,
-      questionsAnswered: 10,
-      correctAnswers: 0,
-      incorrectAnswers: 0,
-    });
+  it('should reject invalid username format', async () => {
+    const res = await request(server)
+      .get('/statistics/!nv@lid')
+      .set('currentuser', 'tester');
+    expect(res.status).toBe(400);
+    expect(res.body.error).toBe('Invalid username format');
   });
-  */
+
+  it('should return 404 if target user not found', async () => {
+    const res = await request(server)
+      .get('/statistics/nonexistent')
+      .set('currentuser', 'tester');
+    expect(res.status).toBe(404);
+    expect(res.body.error).toBe('User not found');
+  });
+
+  it('should return public statistics for visitor', async () => {
+    const user = await User.create({ username: 'publicuser', gamesPlayed: 2, registrationDate: new Date(), totalVisits: 0, games: [] });
+    const res = await request(server)
+      .get('/statistics/publicuser')
+      .set('currentuser', 'visitor');
+
+    expect(res.status).toBe(200);
+    expect(res.body.isProfileOwner).toBe(false);
+    expect(res.body).not.toHaveProperty('recentVisitors');
+  });
+
+  it('should return private statistics for owner', async () => {
+    const user = await User.create({ username: 'self', gamesPlayed: 1, registrationDate: new Date(), totalVisits: 0, games: [], profileVisits: [ { visitorUsername: 'a', visitDate: new Date() } ] });
+    const res = await request(server)
+      .get('/statistics/self')
+      .set('currentuser', 'self');
+
+    expect(res.status).toBe(200);
+    expect(res.body.isProfileOwner).toBe(true);
+    expect(Array.isArray(res.body.recentVisitors)).toBe(true);
+  });
 });
