@@ -44,8 +44,11 @@ In order to perform some operations on this project, such as comunicating with t
 
 We need to create an `.env` file in the root folder of the project. It should contain the following fields so the project can work locally:
 ```ini
-# Your LLM API key
+# Your Empathy LLM API key
 LLM_API_KEY=YOUR-API-KEY
+
+# Your Gemini API key
+GEMINI_API_KEY=YOUR-API-KEY
 
 # JWT secret to sign tokens, locally it can be random
 JWT_SECRET=YOUR-JWT-SECRET
