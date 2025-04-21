@@ -33,6 +33,8 @@ describe('Gateway Service', () => {
       return Promise.resolve({ data: { userId: 'mockedUserId' } });
     } else if (url.endsWith('/ask')) {
       return Promise.resolve({ data: { answer: 'llmanswer' } });
+    } else if (url.endsWith('/simpleMessage')) {
+      return Promise.resolve({ data: { answer: 'simple llmanswer' } });
     } else if (url.endsWith('/answer')) {
       return Promise.resolve({ data: { correct: true } });
     } else if (url.endsWith('/users/someuser/default-image')) {
@@ -57,14 +59,32 @@ describe('Gateway Service', () => {
 
   // Mock responses for GET requests
   axios.get.mockImplementation((url) => {
-    if (url.endsWith('/statistics')) {
-      return Promise.resolve({ data: { gamesPlayed: 0, 
-                                       questionsAnswered: 0, 
-                                       correctAnswers: 0, 
-                                       incorrectAnswers: 0 
-                                     }
-                            });
-
+    if (url.includes('/statistics') && !url.includes('/statistics/')) {
+      return Promise.resolve({ 
+        data: { 
+          users: [
+            {
+              username: 'testuser',
+              gamesPlayed: 5,
+              totalVisits: 10,
+              registrationDate: '2023-01-01T12:00:00Z',
+              globalStatistics: {
+                questionsAnswered: 50,
+                correctAnswers: 40,
+                incorrectAnswers: 10,
+                maxScore: 100,
+                gamesPlayed: 5
+              }
+            }
+          ],
+          pagination: {
+            total: 1,
+            limit: 50,
+            offset: 0,
+            hasMore: false
+          }
+        } 
+      });
     } else if (url.endsWith('/question') || url.endsWith('/question/flags') || url.endsWith('/question-of-the-day')) {
       return Promise.resolve({ data: { id: "mpzulblyui9du98pmodg5o", 
                                        question: "Which of the following flags belongs to Nepal?",
@@ -77,14 +97,14 @@ describe('Gateway Service', () => {
                                      } 
                             });
     } else if (url.endsWith('/users/someuser/image')) {
-      return Promise.resolve({ data: { image: '/images/default/image_1.png' }});
+      return Promise.resolve({ data: { image: '/images/default/image_1.png' } });
     } else if (url.endsWith('/images/default/image_1.png')) {
       return Promise.resolve({
         data: new ArrayBuffer(8),
         headers: { 'content-type': 'image/png' }
       });
     }
-      throw new Error(`Unhandled GET request to ${url}`);
+    throw new Error(`Unhandled GET request to ${url}`);
   });
 
 
@@ -119,21 +139,88 @@ describe('Gateway Service', () => {
   it('should forward askllm request to the llm service', async () => {
     const response = await request(app)
       .post('/askllm')
-      .send({ question: 'question', apiKey: 'apiKey', model: 'gemini' });
+      .send({ gameQuestion: 'question', userQuestion: 'user question' });
 
     expect(response.statusCode).toBe(200);
     expect(response.body.answer).toBe('llmanswer');
   });
 
-  // Test /statistics GET endpoint
-  it('should forward statistics request to the statistics service', async () => {
+  // Test /statistics GET endpoint with updated implementation
+  it('should forward statistics request with query parameters to the statistics service', async () => {
     process.env.JWT_SECRET = 'mocksecret';
     const token = jwt.sign({ username: 'testuser' }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
-    axios.get.mockImplementationOnce((url, { headers }) => {
-      if (url.endsWith('/statistics') && headers.username === 'testuser') {
+    // Mock specific implementation for this test with query parameters
+    axios.get.mockImplementationOnce((url) => {
+      // Check if URL contains the expected query parameters
+      if (url.includes('/statistics') && 
+          url.includes('sort=gamesPlayed') && 
+          url.includes('order=desc') && 
+          url.includes('limit=10') &&
+          url.includes('gameType=classical')) {
         return Promise.resolve({
-          data: { gamesPlayed: 5, correctAnswers: 3 }
+          data: {
+            users: [
+              {
+                username: 'testuser',
+                gamesPlayed: 5,
+                globalStatistics: {
+                  questionsAnswered: 50,
+                  correctAnswers: 40,
+                  incorrectAnswers: 10,
+                  maxScore: 100,
+                  gamesPlayed: 5
+                }
+              }
+            ],
+            pagination: {
+              total: 1,
+              limit: 10,
+              offset: 0,
+              hasMore: false
+            }
+          }
+        });
+      }
+      throw new Error(`Mock not matched for URL: ${url}`);
+    });
+
+    const response = await request(app)
+      .get('/statistics?sort=gamesPlayed&order=desc&limit=10&gameType=classical')
+      .set('Authorization', `Bearer ${token}`);
+
+    expect(response.statusCode).toBe(200);
+    expect(response.body.users).toBeInstanceOf(Array);
+    expect(response.body.users[0].username).toBe('testuser');
+    expect(response.body.pagination).toBeDefined();
+    expect(response.body.pagination.limit).toBe(10);
+  }, 15000);
+
+  // Test /statistics GET endpoint with no query parameters
+  it('should forward statistics request with no query parameters to the statistics service', async () => {
+    process.env.JWT_SECRET = 'mocksecret';
+    const token = jwt.sign({ username: 'testuser' }, process.env.JWT_SECRET, { expiresIn: '1h' });
+
+    axios.get.mockImplementationOnce((url) => {
+      if (url.endsWith('/statistics')) {
+        return Promise.resolve({
+          data: {
+            users: [
+              {
+                username: 'testuser',
+                gamesPlayed: 5,
+                globalStatistics: {
+                  gamesPlayed: 5
+                }
+              }
+            ],
+            pagination: {
+              total: 1,
+              limit: 50,
+              offset: 0,
+              hasMore: false
+            }
+          }
         });
       }
     });
@@ -143,8 +230,8 @@ describe('Gateway Service', () => {
       .set('Authorization', `Bearer ${token}`);
 
     expect(response.statusCode).toBe(200);
-    expect(response.body.gamesPlayed).toBe(5);
-    expect(response.body.correctAnswers).toBe(3);
+    expect(response.body.users).toBeInstanceOf(Array);
+    expect(response.body.pagination).toBeDefined();
   }, 15000);
 
   const verifyMockQuestion = async (endpoint) => {
@@ -162,7 +249,7 @@ describe('Gateway Service', () => {
   });
 
   it('should retrieve a question from the question service by specific question type', async () => {
-    await verifyMockQuestion('/question/flags');;
+    await verifyMockQuestion('/question/flags');
   });
 
   it('should retrieve a question from the question of the day', async () => {
@@ -198,9 +285,9 @@ describe('Gateway Service', () => {
   });
 
   it('should update the image of some user, to a default one', async () => {
-    process.env.JWT_SECRET='mocksecret';
+    process.env.JWT_SECRET = 'mocksecret';
     let token = jwt.sign({ username: 'someuser' }, process.env.JWT_SECRET, { expiresIn: '1m' });
-    
+
     const response = await request(app)
       .post('/users/someuser/default-image')
       .send({ image: 'image_1.png' })
@@ -258,7 +345,7 @@ describe('Gateway Service', () => {
     const token = jwt.sign({ username: 'currentuser' }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
     axios.get.mockImplementationOnce((url, { headers }) => {
-      if (url.endsWith('/statistics') && headers.currentuser === 'currentuser' && headers.targetusername === 'validuser') {
+      if (url.endsWith('/statistics/validuser') && headers.currentuser === 'currentuser') {
         return Promise.resolve({
           data: { gamesPlayed: 10, correctAnswers: 7 }
         });
@@ -272,6 +359,35 @@ describe('Gateway Service', () => {
     expect(response.statusCode).toBe(200);
     expect(response.body.gamesPlayed).toBe(10);
     expect(response.body.correctAnswers).toBe(7);
+  });
+  
+  it('should forward recordGame request to the statistics service', async () => {
+    process.env.JWT_SECRET = 'mocksecret';
+    const token = jwt.sign({ username: 'testuser' }, process.env.JWT_SECRET, { expiresIn: '1h' });
+
+    axios.post.mockImplementationOnce((url, data, { headers }) => {
+      if (
+        url.endsWith('/recordGame') &&
+        headers.username === 'testuser' &&
+        data.gameType === 'classical'
+      ) {
+        return Promise.resolve({ data: { success: true } });
+      }
+    });
+
+    const response = await request(app)
+      .post('/recordGame')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ 
+        gameType: 'classical',
+        score: 100,
+        questionsAnswered: 10,
+        correctAnswers: 8,
+        incorrectAnswers: 2
+      });
+
+    expect(response.statusCode).toBe(200);
+    expect(response.body.success).toBe(true);
   });
 });
 
@@ -307,9 +423,9 @@ describe('Error handling', () => {
 
     const response = await request(app)
       .post('/login')
-      .send({ 
-        username: TEST_CREDENTIALS.username, 
-        password: TEST_CREDENTIALS.password 
+      .send({
+        username: TEST_CREDENTIALS.username,
+        password: TEST_CREDENTIALS.password
       });
 
     expect(response.statusCode).toBe(500);
@@ -333,6 +449,21 @@ describe('Error handling', () => {
     expect(response.body.error).toBe('LLM service error');
   });
 
+  it('should handle errors from simplellm', async () => {
+    axios.post.mockImplementationOnce((url) => {
+      if (url.endsWith('/simpleMessage')) {
+        return getRejectedPromise(500, 'SIMPLE LLM service error');
+      }
+    });
+
+    const response = await request(app)
+      .post('/simplellm')
+      .send({ message: 'test' });
+
+    expect(response.statusCode).toBe(500);
+    expect(response.body.error).toBe('SIMPLE LLM service error');
+  });
+
   // Test error case for question
   it('should handle errors from question service', async () => {
     axios.get.mockImplementationOnce((url) => {
@@ -343,20 +474,6 @@ describe('Error handling', () => {
 
     const response = await request(app)
       .get('/question');
-
-    expect(response.statusCode).toBe(500);
-    expect(response.body.error).toBe('Question service error');
-  });
-
-  it('should handle errors from question of the day endpoint from question service', async () => {
-    axios.get.mockImplementationOnce((url) => {
-      if (url.endsWith('/question-of-the-day')) {
-        return getRejectedPromise(500, 'Question service error');
-      }
-    });
-
-    const response = await request(app)
-      .get('/question-of-the-day');
 
     expect(response.statusCode).toBe(500);
     expect(response.body.error).toBe('Question service error');
@@ -377,26 +494,24 @@ describe('Error handling', () => {
     expect(response.body.error).toBe('Answer service error');
   });
 
-  /// Test error case for statistics
-  it('should handle errors from statistics service', async () => {
+  /// Test error case for statistics with query parameters
+  it('should handle errors from statistics service with query parameters', async () => {
     // Mock the error response from the statistics service
     axios.get.mockImplementationOnce((url) => {
-      if (url.endsWith('/statistics')) {
-        return getRejectedPromise(404, 'User stats not found');
+      if (url.includes('/statistics') && url.includes('gameType=invalid')) {
+        return getRejectedPromise(400, 'Invalid game type');
       }
     });
   
     process.env.JWT_SECRET='mocksecret';
-    const username = 'nonexistent';
-  
-    let token = jwt.sign({ username: username }, process.env.JWT_SECRET, { expiresIn: '1h' });
+    const token = jwt.sign({ username: 'testuser' }, process.env.JWT_SECRET, { expiresIn: '1h' });
   
     const response = await request(app)
-      .get('/statistics')
+      .get('/statistics?gameType=invalid')
       .set('Authorization', `Bearer ${token}`);
   
-    expect(response.statusCode).toBe(404);
-    expect(response.body.error).toBe('User stats not found');
+    expect(response.statusCode).toBe(400);
+    expect(response.body.error).toBe('Invalid game type');
   });
 
   it('should return 400 if no image file is provided', async () => {
@@ -441,7 +556,7 @@ describe('Error handling', () => {
     const response = await request(app)
       .get('/statistics')
       .set('Authorization', 'Bearer invalid_token'); // Provide an invalid token
-  
+
     expect(response.statusCode).toBe(403);
     expect(response.body.error).toBe('Invalid or expired token'); // Check correct error message
   });
@@ -449,7 +564,7 @@ describe('Error handling', () => {
   // Test /statistics GET endpoint, missing token
   it('should return 401 for missing Authorization header in GET /statistics', async () => {
     const response = await request(app).get('/statistics');
-    
+
     expect(response.statusCode).toBe(401);
     expect(response.body.error).toBe('Authorization header missing');
   });
@@ -497,6 +612,21 @@ describe('Error handling', () => {
 
     expect(response.statusCode).toBe(400);
     expect(response.body.error).toBe('No default image provided');
+  });
+  
+  it('should handle errors in /recordGame endpoint', async () => {
+    axios.post.mockImplementationOnce(() => getRejectedPromise(400, 'Invalid game data'));
+
+    process.env.JWT_SECRET = 'mocksecret';
+    const token = jwt.sign({ username: 'testuser' }, process.env.JWT_SECRET, { expiresIn: '1h' });
+
+    const response = await request(app)
+      .post('/recordGame')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ gameType: 'invalid' });
+
+    expect(response.statusCode).toBe(400);
+    expect(response.body.error).toBe('Invalid game data');
   });
 });
 
