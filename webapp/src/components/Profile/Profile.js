@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import {
-    Typography, Box, Container, Paper, Button, Grid
+    Typography, Box, Container, Paper, Button, Tabs, Tab
 } from "@mui/material";
 import { ThemeProvider } from "@mui/material/styles";
 import Cookies from "js-cookie";
@@ -9,13 +9,11 @@ import RecordRetrieverProfile from "./RecordRetrieverProfile";
 import UserProfileSettings from "./UserProfileSettings";
 import { theme } from "./theme";
 import ProfileHeader from "./components/ProfileHeader";
-import StatisticsSummary from "./components/StatisticsSummary";
-import AnswerDistribution from "./components/AnswerDistribution";
-import AdditionalInsights from "./components/AdditionalInsights";
 import AccountSettingsDialog from "./components/AccountSettingsDialog";
 import VisitorsSection from "./components/VisitorsSection";
 import LoadingState from "./components/LoadingState";
 import ErrorState from "./components/ErrorState";
+import { Insights } from "./components/Insights";
 
 const retriever = new RecordRetrieverProfile();
 const userProfileSettings = new UserProfileSettings();
@@ -99,6 +97,7 @@ export const Profile = () => {
                     const { statsData, username: fetchedUsername } = await retriever.getRecords(profileUsernameParam);
 
                     setStatistics(statsData);
+                    console.log("Statistics data:", statsData);
                     
                     // Determine which profile to load
                     setIsProfileOwner(statsData.isProfileOwner);
@@ -130,17 +129,6 @@ export const Profile = () => {
         setDefaultImages(userProfileSettings.getDefaultImages());
     }, []);
 
-    // Calculate derived statistics
-    const getSuccessRate = () => {
-        if (!statistics) return 0;
-        const total = statistics.correctAnswers + statistics.incorrectAnswers;
-        return total > 0 ? (statistics.correctAnswers / total) * 100 : 0;
-    };
-
-    const getAverageQuestionsPerGame = () => {
-        if (!statistics || statistics.gamesPlayed === 0) return 0;
-        return statistics.questionsAnswered / statistics.gamesPlayed;
-    };
 
     const getMembershipDuration = () => {
         if (!registrationDate) return "N/A";
@@ -148,15 +136,6 @@ export const Profile = () => {
         const diffTime = Math.abs(now - registrationDate);
         const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
         return diffDays;
-    };
-
-    // Prepare chart data
-    const getPieChartData = () => {
-        if (!statistics) return [];
-        return [
-            { name: 'Correct', value: statistics.correctAnswers },
-            { name: 'Incorrect', value: statistics.incorrectAnswers }
-        ];
     };
 
     return (
@@ -194,32 +173,54 @@ export const Profile = () => {
                             />
                         )}
 
-                        <Grid container spacing={3} sx={{ mb: 3 }}>
-                            <Grid item xs={12} md={6}>
-                                <StatisticsSummary
-                                    statistics={statistics}
-                                    successRate={getSuccessRate()}
-                                />
-                            </Grid>
+                        <Paper elevation={3} sx={{ mt: 3, p: 3 }}>
+                            <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+                                <Tabs
+                                    value={statistics.selectedTab}
+                                    onChange={(event, newValue) => setStatistics({ ...statistics, selectedTab: newValue })}
+                                    aria-label="Profile statistics tabs"
+                                >
+                                    <Tab label="Global 🌍" />
+                                    <Tab label="Classical 🎲" />
+                                    <Tab label="Sudden Death ☠️" />
+                                    <Tab label="Time Trial ⏱️" />
+                                    <Tab label="Custom 🎨" />
+                                    <Tab label="QOD 📅" />
+                                </Tabs>
+                            </Box>
+                            <Box sx={{ mt: 2 }}>
+                                {statistics.selectedTab === 0 && (
+                                    <Insights statistics={statistics.globalStatistics} registrationDate={registrationDate} title="Global Statistics 🌍" />
+                                )}
+                                {statistics.selectedTab === 1 && (
+                                    <Insights statistics={statistics.classicalStatistics} registrationDate={registrationDate} title="Classical Game Statistics 🎲" />
+                                )}
+                                {statistics.selectedTab === 2 && (
+                                    <Insights statistics={statistics.suddenDeathStatistics} registrationDate={registrationDate} title="Sudden Death Statistics ☠️" />
+                                )}
+                                {statistics.selectedTab === 3 && (
+                                    <Insights statistics={statistics.timeTrialStatistics} registrationDate={registrationDate} title="Time Trial Statistics ⏱️" />
+                                )}
+                                {statistics.selectedTab === 4 && (
+                                    <Insights statistics={statistics.customStatistics} registrationDate={registrationDate} title="Custom Game Statistics 🎨" />
+                                )}
+                                {statistics.selectedTab === 5 && (
+                                    <Insights statistics={statistics.qodStatistics} registrationDate={registrationDate} title="Question of the Day Statistics 📅" />
+                                )}
+                            </Box>
+                        </Paper>
+                        {/* Add spacing between the two papers */}
+                        <Box sx={{ mt: 3 }} />
 
-                            <Grid item xs={12} md={6}>
-                                <AnswerDistribution chartData={getPieChartData()} />
-                            </Grid>
-                        </Grid>
-
-                        <AdditionalInsights
-                            avgQuestionsPerGame={getAverageQuestionsPerGame()}
-                            successRate={getSuccessRate()}
-                            membershipDuration={getMembershipDuration()}
-                        />
-
+                        {/* Ensure Global statistics is selected by default */}
+                        {statistics.selectedTab === undefined && setStatistics({ ...statistics, selectedTab: 0 })}
                         {/* Only show visitors section if this is own profile */}
                         {isProfileOwner && recentVisitors.length > 0 && (
                             <VisitorsSection
                             visitors={recentVisitors}
                             totalVisits={statistics.totalVisits}
                             getImageUrl={userProfileSettings.getStaticProfileImageUrl.bind(userProfileSettings)}
-                          />
+                        />
                         )}
 
                         {/* Actions */}

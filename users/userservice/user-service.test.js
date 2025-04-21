@@ -4,7 +4,6 @@ const User = require('./user-model');
 const jwt = require('jsonwebtoken');
 const path = require('path');
 const fs = require('fs');
-const multer = require('multer');
 
 let mongoServer;
 let app;
@@ -29,7 +28,8 @@ afterAll(async () => {
 describe('User Service Validation', () => {
   it('should reject requests with missing username', async () => {
     const incompleteUser = {
-      password: 'testpassword'
+      password: 'Testpassword1!',
+      confirmpassword: 'Testpassword1!'
     };
     
     const response = await request(app).post('/adduser').send(incompleteUser);
@@ -40,7 +40,8 @@ describe('User Service Validation', () => {
   
   it('should reject requests with missing password', async () => {
     const incompleteUser = {
-      username: 'testuser2'
+      username: 'testuser2',
+      confirmpassword: 'Testpassword1!'
     };
     
     const response = await request(app).post('/adduser').send(incompleteUser);
@@ -48,11 +49,24 @@ describe('User Service Validation', () => {
     expect(response.status).toBe(400);
     expect(response.body.error).toContain('Missing required field: password');
   });
-  
+
+  it('should reject requests with missing confirmation password', async () => {
+    const incompleteUser = {
+      username: 'testUser3',
+      password: 'Testpassword1!'
+    };
+    
+    const response = await request(app).post('/adduser').send(incompleteUser);
+    
+    expect(response.status).toBe(400);
+    expect(response.body.error).toContain('Missing required field: confirmpassword');
+  });
+
   it('should reject usernames that are too short', async () => {
     const invalidUser = {
       username: 'ab',
-      password: 'testpassword'
+      password: 'Testpassword1!',
+      confirmpassword: 'Testpassword1!'
     };
     
     const response = await request(app).post('/adduser').send(invalidUser);
@@ -64,7 +78,8 @@ describe('User Service Validation', () => {
   it('should reject usernames with invalid characters', async () => {
     const invalidUser = {
       username: 'test-user!',
-      password: 'testpassword'
+      password: 'Testpassword1!',
+      confirmpassword: 'Testpassword1!'
     };
     
     const response = await request(app).post('/adduser').send(invalidUser);
@@ -77,13 +92,15 @@ describe('User Service Validation', () => {
     // Create a user
     await request(app).post('/adduser').send({
       username: 'duplicateuser',
-      password: 'testpassword'
+      password: 'Testpassword1!',
+      confirmpassword: 'Testpassword1!'
     });
     
     // Try to create the same user again
     const response = await request(app).post('/adduser').send({
       username: 'duplicateuser',
-      password: 'anotherpassword'
+      password: 'Anotherpassword1!',
+      confirmpassword:'Anotherpassword1!'
     });
     
     expect(response.status).toBe(400);
@@ -93,7 +110,8 @@ describe('User Service Validation', () => {
   it('should validate and sanitize username for NoSQL injection attempts', async () => {
     const suspiciousUser = {
       username: { $ne: null }, // NoSQL injection attempt
-      password: 'testpassword'
+      password: 'Testpassword1!',
+      confirmpassword: 'Testpassword1!'
     };
     
     const response = await request(app).post('/adduser').send(suspiciousUser);
@@ -106,7 +124,8 @@ describe('User Service Validation', () => {
 
     const newUser = {
       username: 'tokenuser',
-      password: 'testpassword'
+      password: 'Testpassword1!',
+      confirmpassword: 'Testpassword1!'
     };
     
     const response = await request(app).post('/adduser').send(newUser);
@@ -125,7 +144,8 @@ describe('User Service Validation', () => {
 
     const newUser = {
       username: 'dateuser',
-      password: 'testpassword'
+      password: 'Testpassword1!',
+      confirmpassword: 'Testpassword1!'
     };
     
     const response = await request(app).post('/adduser').send(newUser);
@@ -344,4 +364,77 @@ describe('User Service Default Image Update', () => {
     expect(response.status).toBe(500);
     expect(response.body).toHaveProperty('error', 'Invalid username. It must be 3-20 characters long and contain only letters, numbers and underscores.');
   });
+});
+
+const checkInvalidPasswordResponse = async (invalidUser) => {
+  const response = await request(app).post('/adduser').send(invalidUser);
+  expect(response.status).toBe(400);
+  expect(response.body.error).toContain('Invalid password. It must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, one number, and one special character.');
+};
+
+describe('Password Validation Tests', () => {
+
+  it('should reject passwords without a length lower than eight', async () => {
+    const shortUser = {
+      username: 'user1',
+      password: 'Sh0rt!',
+      confirmpassword: 'Sh0rt!'
+    };
+
+    await checkInvalidPasswordResponse(shortUser);
+  });
+
+  it('should reject passwords without a lowercase letter', async () => {
+    const noLowerUser = {
+      username: 'user1',
+      password: 'NOLOWERCASE1@',
+      confirmpassword: 'NOLOWERCASE1@'
+    };
+
+    await checkInvalidPasswordResponse(noLowerUser);
+  });
+
+  it('should reject passwords without an uppercase letter', async () => {
+    const noUpperUser = {
+      username: 'user2',
+      password: 'nouppercase1@',
+      confirmpassword: 'nouppercase1@'
+    };
+
+    await checkInvalidPasswordResponse(noUpperUser);
+  });
+
+  it('should reject passwords without a number', async () => {
+    const noNumberUser = {
+      username: 'user3',
+      password: 'NoNumber@!',
+      confirmpassword: 'NoNumber@!'
+    };
+
+    await checkInvalidPasswordResponse(noNumberUser);
+  });
+
+  it('should reject passwords without a special character', async () => {
+    const noSpecialUser = {
+      username: 'user4',
+      password: 'NoSpecial123',
+      confirmpassword: 'NoSpecial123'
+    };
+
+    await checkInvalidPasswordResponse(noSpecialUser);
+  });
+});
+
+describe('Password Confirmation Tests', () => {
+  it('should reject passwords that do not match with the confirmation', async () => {
+    const noSamePass = {
+      username: 'NoSame',
+      password: 'NoSame1!',
+      confirmpassword: 'NoSame2@'
+    };
+
+    const response = await request(app).post('/adduser').send(noSamePass);
+    expect(response.status).toBe(400);
+    expect(response.body.error).toContain('The password and the confirmation do not match, please try again.');
+    });
 });

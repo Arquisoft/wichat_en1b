@@ -15,8 +15,9 @@ export function Chat() {
     const [input, setInput] = useState("")
     const [isLoading, setIsLoading] = useState(false)
     const messagesEndRef = useRef(null)
+    const [isDisabled, setIsDisabled] = useState(false)
 
-    const { question, gameEnded, setGameEnded } = useGame();
+    const { question, gameEnded, setGameEnded, AIAttempts, setAIAttempts, maxAIAttempts } = useGame();
     // Adjust in function of the height of the navbar
     const navbarHeight = 64
     const gatewayEndpoint = process.env.REACT_APP_API_ENDPOINT || "http://localhost:8000"
@@ -31,7 +32,9 @@ export function Chat() {
     useEffect(() => {
         if (gameEnded) {
             setMessages([]);
+            setIsDisabled(false);
             setGameEnded(false);
+            setAIAttempts(0);
         }
     }, [gameEnded]);
 
@@ -45,6 +48,7 @@ export function Chat() {
 
 
     const handleSubmit = async (e) => {
+        setAIAttempts(AIAttempts + 1)
         e.preventDefault()
 
         if (!input.trim() || isLoading) return
@@ -62,6 +66,7 @@ export function Chat() {
         setMessages((prevMessages) => [...prevMessages, userMessage])
         setInput("") // Clear input field
         setIsLoading(true)
+        setIsDisabled(true)
 
         try {
             // Make the API call to your backend
@@ -91,6 +96,9 @@ export function Chat() {
             setMessages((prevMessages) => [...prevMessages, errorMessage])
         } finally {
             setIsLoading(false)
+            if (AIAttempts < maxAIAttempts-1) {
+                setIsDisabled(false)
+            }
         }
     }
 
@@ -259,7 +267,12 @@ export function Chat() {
 
                     <div ref={messagesEndRef} />
                 </Box>
-
+                <Divider />
+                    <Typography variant="caption" sx={{ padding: 1, textAlign: "center", color: "text.secondary" }}>
+                        {AIAttempts} / {maxAIAttempts} attempts used {AIAttempts>0 && (<Typography variant="caption" sx={{ padding: 1, textAlign: "center", color: "text.secondary" }}>
+                            (-{100*AIAttempts} points)
+                            </Typography>)}
+                    </Typography>
                 <Divider />
 
                 {/* Input */}
@@ -278,7 +291,7 @@ export function Chat() {
                         placeholder="Type your message..."
                         value={input}
                         onChange={handleInputChange}
-                        disabled={!isOpen || isLoading}
+                        disabled={!isOpen || isDisabled}
                         sx={{ flexGrow: 1 }}
                     />
                     <Button
@@ -287,7 +300,7 @@ export function Chat() {
                         color="primary"
                         name="send"
                         aria-label="Send message"
-                        disabled={isLoading || !input.trim()}
+                        disabled={isDisabled || !input.trim()}
                         sx={{ minWidth: "unset", width: 40, height: 40, padding: 0 }}
                     >
                         {isLoading ? <CircularProgress size={24} color="inherit" /> : <SendIcon fontSize="small" />}

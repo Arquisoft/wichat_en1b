@@ -50,6 +50,21 @@ function validateUsername(username) {
   return usernameStr;
 }
 
+function validatePassword(password) {
+  //convert to string
+  const passwordStr = String(password);
+
+  const strongPasswordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/;
+
+  if (!strongPasswordRegex.test(passwordStr)) {
+    throw new Error(
+      'Invalid password. It must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, one number, and one special character.'
+    );
+  }
+
+  return passwordStr;
+}
+
 // Helper function to delete an image file if it exists
 function deleteImageFile(imagePath) {
   if (fs.existsSync(imagePath)) {
@@ -139,7 +154,7 @@ app.post('/users/:username/default-image', async (req, res) => {
 app.post('/adduser', async (req, res) => {
   try {
     // Check if required fields are present in the request body
-    validateRequiredFields(req, ['username', 'password']);
+    validateRequiredFields(req, ['username', 'password', 'confirmpassword']);
 
     // Check if a user with the same username already exists
     const validatedUsername = validateUsername(req.body.username);  // Validate to prevent NoSQL injection
@@ -148,8 +163,13 @@ app.post('/adduser', async (req, res) => {
       throw new Error('The username provided is already in use. Please choose a different one.');
     }
 
+    if(req.body.password!==req.body.confirmpassword){
+      throw new Error('The password and the confirmation do not match, please try again.');
+    }
+    const password = validatePassword(req.body.password);
+    
     // Encrypt the password before saving it
-    const hashedPassword = await bcrypt.hash(req.body.password, 10);
+    const hashedPassword = await bcrypt.hash(password, 10);
 
     // Assign a random image from the default images
     let image = `/images/default/image_${Math.floor(Math.random() * 16) + 1}.png`;

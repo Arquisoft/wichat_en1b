@@ -9,11 +9,12 @@ import { useAuth } from '../hooks/useAuth';
 export const SignUp = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmpassword, setConfirmationPassword] = useState('');
   const { authenticateUser, error } = useAuth();
 
   const signUp = (e) => {
     e.preventDefault();
-    authenticateUser('addUser', username, password)
+    authenticateUser('addUser', username, password, confirmpassword)
   } 
 
   return (
@@ -38,6 +39,7 @@ export const SignUp = () => {
         >
           <FormControl>
             <TextField
+              id="username"
               name="username"
               margin="normal"
               fullWidth
@@ -48,6 +50,7 @@ export const SignUp = () => {
           </FormControl>
           <FormControl>
             <TextField
+              id="password"
               name="password"
               margin="normal"
               fullWidth
@@ -55,6 +58,18 @@ export const SignUp = () => {
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+            />
+          </FormControl>
+          <FormControl>
+            <TextField
+              id="confirmpassword"
+              name="confirmpassword"
+              margin="normal"
+              fullWidth
+              label="Confirm password"
+              type="password"
+              value={confirmpassword}
+              onChange={(e) => setConfirmationPassword(e.target.value)}
             />
           </FormControl>
           <Button 

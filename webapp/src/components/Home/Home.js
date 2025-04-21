@@ -4,7 +4,7 @@ import axios from 'axios';
 import { Typewriter } from "react-simple-typewriter";
 import { Container, Grid, Card, CardContent, Typography, Box } from "@mui/material";
 import { Link } from "react-router-dom";
-import { User, BarChart, Gamepad2, Layers } from "lucide-react";
+import { User, BarChart, Gamepad2, Layers, Puzzle, Library, BookOpenText } from "lucide-react";
 import { keyframes } from "@mui/system";
 import "@fontsource/inter";
 
@@ -63,11 +63,31 @@ export const Home = () => {
     }
 
     const menuItems = [
-        { id: 1, title: "Your Profile", icon: <User size={50} />, link: `/profile/${username}`, color: "#A7E3FF" },
-        { id: 2, title: "New Game", icon: <Gamepad2 size={50} />, link: "/game", color: "#D0C3FF" },
-        { id: 3, title: "Statistics", icon: <BarChart size={50} />, link: "/statistics", color: "#FFCF9D" },
-        { id: 4, title: "Game Modes", icon: <Layers size={50} />, link: "/game-modes", color: "#C3CADF" },
-    ];
+        {
+            id: 1,
+            title: "Your Profile",
+            icon: <User size={45} color="#1976D2" />,
+            link: `/profile/${username}`,
+        },
+        {
+            id: 2,
+            title: "Classical Game",
+            icon: <BookOpenText size={45} color="#1976D2" />,
+            link: "/game",
+        },
+        {
+            id: 3,
+            title: "Statistics",
+            icon: <BarChart size={45} color="#1976D2" />,
+            link: "/statistics",
+        },
+        {
+            id: 4,
+            title: "Game Modes",
+            icon: <Layers size={45} color="#1976D2" />,
+            link: "/game-modes",
+        },
+    ]
 
     const getGreetingMessage = async () => {
 
@@ -118,14 +138,37 @@ export const Home = () => {
                                         sx={{
                                             textAlign: "center",
                                             padding: "20px",
-                                            backgroundColor: item.color,
-                                            borderRadius: "10px",
-                                            '&:hover': { boxShadow: 6 }
+                                            backgroundColor: "#ffffff",
+                                            borderRadius: "12px",
+                                            border: "3px solid #1976D2", // More prominent blue border
+                                            transition: "all 0.3s ease",
+                                            boxShadow: "0 4px 6px rgba(0,0,0,0.05)",
+                                            "&:hover": {
+                                                boxShadow: "0 8px 15px rgba(25, 118, 210, 0.3)",
+                                                transform: "translateY(-5px)",
+                                                borderColor: "#1565C0",
+                                                borderWidth: "3px",
+                                            },
                                         }}
                                     >
                                         <CardContent>
-                                            {item.icon}
-                                            <Typography variant="h6" mt={2}>
+                                            <Box
+                                                sx={{
+                                                    display: "flex",
+                                                    justifyContent: "center",
+                                                    alignItems: "center",
+                                                    mb: 2,
+                                                    borderRadius: "50%",
+                                                    width: "80px",
+                                                    height: "80px",
+                                                    margin: "0 auto 12px",
+                                                    backgroundColor: "rgba(25, 118, 210, 0.08)",
+                                                    border: "2px solid #1976D2", // Added border to the icon container
+                                                }}
+                                            >
+                                                {item.icon}
+                                            </Box>
+                                            <Typography variant="h6" color="#333333" fontWeight="500">
                                                 {item.title}
                                             </Typography>
                                         </CardContent>
