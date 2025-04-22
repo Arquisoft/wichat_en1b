@@ -103,7 +103,6 @@ app.get('/users/:username/image', async (req, res) => {
 });
 
 app.patch('/users/:username', async (req, res) => {
-  console.log(req.body);
   try {
     if (req.body.newPassword && req.body.newPassword !== req.body.newPasswordRepeat) {
       return res.status(400).json({ error: 'The password and the confirmation do not match, please try again.' });

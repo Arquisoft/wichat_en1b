@@ -107,6 +107,10 @@ app.get('/users/:username/image', async (req, res) => {
 
 app.patch('/users/:username', authMiddleware,  async (req, res) => {
   try {
+    if (req.params.username !== req.user) {
+      return res.status(403).json({ error: 'You can only update your own account' });
+    }
+    
     let userResponse = await axios.patch(`${userServiceUrl}/users/${req.params.username}`, { currentUser: req.user, newUser: req.body.username, newPassword: req.body.password, newPasswordRepeat: req.body.passwordRepeat });
     return res.json(userResponse.data);
   } catch (error) {
