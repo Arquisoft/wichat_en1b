@@ -102,18 +102,25 @@ app.get('/users/:username/image', async (req, res) => {
   }
 });
 
-app.post('/users/:username/update', async (req, res) => {
+app.patch('/users/:username', async (req, res) => {
+  console.log(req.body);
   try {
-    const currentUsername = req.params.username;
-    const user = await User.findOne({ username: { $eq: validateUsername(currentUsername) } });
+    if (req.body.newPassword && req.body.newPassword !== req.body.newPasswordRepeat) {
+      return res.status(400).json({ error: 'The password and the confirmation do not match, please try again.' });
+    }
+
+    let currentUsername = req.params.username;
     let userUpdated = false;
+    let token = null;
+    
+    const user = await User.findOne({ username: { $eq: validateUsername(currentUsername) } });
     
     if (!user) {
       return res.status(404).json({ error: 'User not found' });
     }
 
     if (req.body.newUser) {
-      const newUsername = req.body.newUser;
+      const newUsername = validateUsername(req.body.newUser);
 
       const existingUser = await User.findOne({ username: { $eq: validateUsername(newUsername) } });
       if (existingUser) {
@@ -134,17 +141,28 @@ app.post('/users/:username/update', async (req, res) => {
 
       user.username = newUsername;
       await user.save();
+
+      token = jwt.sign(
+        {
+          userId: user._id,
+          username: newUsername
+        },
+        process.env.JWT_SECRET,
+        { expiresIn: '1h' }
+      );
+
+      currentUsername = newUsername;
       userUpdated = true;
     }
 
     if (req.body.newPassword) {
-      user.passwordHash = await bcrypt.hash(req.body.newPassword, 10);
+      user.passwordHash = await bcrypt.hash(validatePassword(req.body.newPassword), 10);
       await user.save();
       userUpdated = true;
     }
 
     if (userUpdated) {
-      return res.json({ success: true, message: 'User updated successfully' });
+      return res.json({ success: true, newUsername: currentUsername, token: token, message: 'User updated successfully' });
     }
 
     return res.json({ success: false, message: 'No updates applied to the user' });

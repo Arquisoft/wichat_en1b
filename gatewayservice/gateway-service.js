@@ -105,9 +105,9 @@ app.get('/users/:username/image', async (req, res) => {
   }
 });
 
-app.post('/users/:username/update', authMiddleware,  async (req, res) => {
+app.patch('/users/:username', authMiddleware,  async (req, res) => {
   try {
-    let userResponse = await axios.post(`${userServiceUrl}/users/${req.params.username}/update`, { currentUser: req.user, newUser: req.body.username, newPassword: req.body.password });
+    let userResponse = await axios.patch(`${userServiceUrl}/users/${req.params.username}`, { currentUser: req.user, newUser: req.body.username, newPassword: req.body.password, newPasswordRepeat: req.body.passwordRepeat });
     return res.json(userResponse.data);
   } catch (error) {
     manageError(res, error);

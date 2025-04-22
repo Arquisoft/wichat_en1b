@@ -9,25 +9,30 @@ import { useState } from "react";
     open, 
     onClose, 
     defaultImages, 
+    onChangeUsernameAndPassword,
     onCustomImageChange, 
     onDefaultImageChange,
     uploadError,
+    updateError,
     defaultImageError
   }) => {
     const [isUsernameChecked, setIsUsernameChecked] = useState(false);
     const [isPasswordChecked, setIsPasswordChecked] = useState(false);
+    const [username, setUsername] = useState("");
+    const [password, setPassword] = useState("");
+    const [repeatPassword, setRepeatPassword] = useState("");
 
     return (
       <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
         <DialogTitle sx={{ backgroundColor: "#f5f5f5", textAlign: "center", py: 1 }}>
-          <Typography variant="h6" fontWeight="bold" fontSize="1rem">Update Your Profile</Typography>
+          <Typography fontWeight="bold" fontSize="1rem">Update Your Profile</Typography>
           <Typography variant="body2" color="textSecondary" fontSize="0.875rem">
             Manage your account and profile picture below.
           </Typography>
         </DialogTitle>
         <DialogContent sx={{ px: 2, py: 1.5 }}>
           <Box sx={{ mb: 2 }}>
-            <Typography variant="h6" sx={{ mb: 1, fontWeight: "bold", fontSize: "1rem" }}>Account Information</Typography>
+            <Typography sx={{ mb: 1, fontWeight: "bold", fontSize: "1rem" }}>Account Information</Typography>
             <Typography variant="body2" color="textSecondary" sx={{ mb: 1, fontSize: "0.875rem" }}>
               Select what you want to update and provide the new values below.
             </Typography>
@@ -47,6 +52,8 @@ import { useState } from "react";
                 fullWidth 
                 size="small" 
                 disabled={!isUsernameChecked} 
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
               />
             </Box>
             <Box sx={{ display: "flex", alignItems: "center", mb: 1.5 }}>
@@ -66,6 +73,29 @@ import { useState } from "react";
                 fullWidth 
                 size="small" 
                 disabled={!isPasswordChecked} 
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+            </Box>
+            <Box sx={{ display: "flex", alignItems: "center", mb: 1.5 }}>
+              <FormControlLabel
+                control={
+                  <Checkbox 
+                    checked={isPasswordChecked} 
+                    disabled
+                  />
+                }
+                sx={{ mr: 2 }}
+              />
+              <TextField 
+                label="Repeat password" 
+                type="password" 
+                variant="outlined" 
+                fullWidth 
+                size="small" 
+                disabled={!isPasswordChecked} 
+                value={repeatPassword}
+                onChange={(e) => setRepeatPassword(e.target.value)}
               />
             </Box>
             <Button 
@@ -73,13 +103,19 @@ import { useState } from "react";
               color="primary" 
               fullWidth 
               sx={{ py: 0.75, fontSize: "0.875rem" }} 
-              disabled={!isUsernameChecked && !isPasswordChecked} // Disable if both are unchecked
+              disabled={!isUsernameChecked && !isPasswordChecked}
+              onClick={() => onChangeUsernameAndPassword(username, password, repeatPassword)}
             >
               Save Changes
             </Button>
+            {updateError && (
+              <Typography variant="body2" color="error" sx={{ mt: 1, textAlign: "center", fontSize: "0.75rem" }}>
+                {updateError}
+              </Typography>
+            )}
           </Box>
           <Box>
-            <Typography variant="h6" sx={{ mb: 1, fontWeight: "bold", fontSize: "1rem" }}>Profile Picture</Typography>
+            <Typography sx={{ mb: 1, fontWeight: "bold", fontSize: "1rem" }}>Profile Picture</Typography>
             <Typography variant="body2" color="textSecondary" sx={{ mb: 1, fontSize: "0.875rem" }}>
               Upload an image or select a default option.
             </Typography>
@@ -95,7 +131,7 @@ import { useState } from "react";
             <Box
               sx={{
                 display: "grid",
-                gridTemplateColumns: "repeat(8, 1fr)", // Ensure 8 columns
+                gridTemplateColumns: "repeat(8, 1fr)",
                 gap: 1,
                 mt: 1.5
               }}
@@ -106,7 +142,7 @@ import { useState } from "react";
                   src={image}
                   alt={`Default avatar ${index + 1}`}
                   sx={{
-                    width: 48, // Increased avatar size
+                    width: 48,
                     height: 48,
                     cursor: "pointer",
                     border: "2px solid transparent",

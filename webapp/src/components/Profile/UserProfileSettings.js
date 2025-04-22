@@ -4,17 +4,19 @@ export default class UserProfileSettings {
   
   API_GATEWAY = process.env.REACT_APP_API_ENDPOINT || 'http://localhost:8000';
 
-  async changeUsernameAndPassword(cookie, username, password) {
+  async changeUsernameAndPassword(cookie, username, password, passwordRepeat) {
     try {
-      await axios.post(this.API_GATEWAY + `/users/${username}/update`, { username: username, password: password },
+      const response = await axios.patch(this.API_GATEWAY + `/users/${JSON.parse(cookie).username}`, { username: username, password: password, passwordRepeat: passwordRepeat },
         {
           headers: {
             "Authorization": `Bearer ${JSON.parse(cookie).token}`,
           }
         }
       );
+
+      return { username: response.data.newUsername, token: response.data.token };
     } catch (error) {
-      throw new Error("Failed changing username and password: " + error.response?.data?.error || error.message);
+      throw new Error("Failed changing username and password: " + error.response?.data?.error ||  "Unknown error.");
     }
   }
 
