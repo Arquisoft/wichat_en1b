@@ -27,7 +27,7 @@ defineFeature(feature, (test) => {
 
     page = await browser.newPage();
     setDefaultOptions({ timeout: 10000 });
-    process.env.JWT_SECRET='testSecret'
+    process.env.JWT_SECRET='test-secret'
 
     await page.goto("http://localhost:3000", {
       waitUntil: "networkidle0",
@@ -62,6 +62,7 @@ defineFeature(feature, (test) => {
   });
 
   test("Login with valid credentials", ({ given, when, then }) => {
+    process.env.JWT_SECRET='test-secret'
     let validUsername;
     let validPassword;
 
@@ -75,7 +76,8 @@ defineFeature(feature, (test) => {
       const passwordInput = await page.$('[data-testid="log-password"] input');
       await usernameInput.type(validUsername);
       await passwordInput.type(validPassword);
-      await expect(page).toClick('button[type="submit"]');    });
+      await expect(page).toClick('button[type="submit"]');    
+    });
 
     then("Should show a success message", async () => {
       await expectAlertToBe(loginsuccess);
