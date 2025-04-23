@@ -7,6 +7,7 @@ import { Link } from "react-router-dom";
 import { User, BarChart, Gamepad2, Layers, Puzzle, Library, BookOpenText } from "lucide-react";
 import { keyframes } from "@mui/system";
 import "@fontsource/inter";
+import { useTranslation } from 'react-i18next';
 
 
 const floatAnimation = keyframes`
@@ -47,6 +48,7 @@ const Logo = () => {
 export const Home = () => {
     const [message, setMessage] = useState('');
     const [error, setError] = useState('');
+    const { t } = useTranslation();
 
     const userCookie = Cookies.get('user');
     const isUserLogged = !!userCookie;
@@ -65,25 +67,25 @@ export const Home = () => {
     const menuItems = [
         {
             id: 1,
-            title: "Your Profile",
+            title: t("home.yourProfile"),
             icon: <User size={45} color="#1976D2" />,
             link: `/profile/${username}`,
         },
         {
             id: 2,
-            title: "Classical Game",
+            title: t("home.classicalGame"),
             icon: <BookOpenText size={45} color="#1976D2" />,
             link: "/game",
         },
         {
             id: 3,
-            title: "Statistics",
+            title: t("home.statistics"),
             icon: <BarChart size={45} color="#1976D2" />,
             link: "/statistics",
         },
         {
             id: 4,
-            title: "Game Modes",
+            title:  t("home.gameModes"),
             icon: <Layers size={45} color="#1976D2" />,
             link: "/game-modes",
         },
@@ -124,7 +126,7 @@ export const Home = () => {
                         typeSpeed={50} // Typing speed in ms
                     />) : (
                     <Typography align="center" sx={{ marginTop: 2 }}>
-                        Loading message...
+                        {t("home.loadingMessage")}
                     </Typography>
                 )}
             </div>

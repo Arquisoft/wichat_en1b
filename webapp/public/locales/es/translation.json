@@ -9,5 +9,51 @@
         "logIn": "Iniciar sesión",
         "signUp": "Registrarse",
         "signOut": "Cerrar sesión"
+    },
+    "home": {
+        "loadingMessage": "Cargando mensaje...",
+        "yourProfile": "Perfil",
+        "classicalGame": "Juego clásico",
+        "statistics": "Estadísticas",
+        "gameModes": "Modos de juego"
+    },
+    "statistics": {
+        "globalStatistics": "Estadísticas globales",
+        "welcome": "¡Bienvenido {{username}}!",
+        "avatar": "Avatar",
+        "username": "Nombre de usuario",
+        "gamesPlayed": "Partidas jugadas",
+        "totalScore": "Puntuación total",
+        "avgScore": "Puntuación media",
+        "highestScore": "Puntuación más alta",
+        "gameType": "Tipo de juego",
+        "memberSince": "Miembro desde",
+        "noStatsFound": "No se encontraron estadísticas",
+        "you": "Tú",
+        "pagination": {
+            "first": "Primera",
+            "previous": "Anterior",
+            "next": "Siguiente",
+            "last": "Última",
+            "page": "Página {{page}} de {{total}}",
+            "perPage": "{{amount}} por página"
+        }
+    },
+    "logIn": {
+        "username": "Nombre de usuario",
+        "password": "Contraseña",
+        "logIn": "Iniciar sesión",
+        "or": "o",
+        "dontHaveAccount": "¿No tienes una cuenta?",
+        "signUpHere": "Regístrate aquí"  
+    },
+    "signUp": {
+        "username": "Nombre de usuario",
+        "password": "Contraseña",
+        "confirmPassword": "Confirmar contraseña",
+        "signUp": "Registrarse",
+        "or": "o",
+        "alreadyHaveAccount": "¿Ya tienes una cuenta?",
+        "logInHere": "Inicia sesión aquí"
     }
 }

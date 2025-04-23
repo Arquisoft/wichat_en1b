@@ -3,6 +3,7 @@ import RecordRetriever from './RecordRetriever';
 import StatisticsTable from './components/StatisticsTable';
 import ErrorMessage from './components/ErrorMessage';
 import LoadingSpinner from './components/LoadingSpinner';
+import { useTranslation } from 'react-i18next';
 import './theme.css';
 
 export const Statistics = () => {
@@ -22,6 +23,7 @@ export const Statistics = () => {
     registeredAfter: ''
   });
   const [username, setUsername] = useState('');
+  const { t } = useTranslation();
 
   const recordRetriever = new RecordRetriever();
 
@@ -60,8 +62,8 @@ export const Statistics = () => {
   return (
     <div className="statistics-container">
       <div className="statistics-header">
-        <h1>Global Statistics</h1>
-        <p>Welcome, {username}!</p>
+        <h1>{t("statistics.globalStatistics")}</h1>
+        <p>{t("statistics.welcome", { username: username })}</p>
       </div>
 
       {error && <ErrorMessage message={error} />}

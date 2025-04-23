@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { format } from 'date-fns';
 import { Avatar } from '@mui/material';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 const StatisticsTable = ({
   statistics,
@@ -41,28 +42,30 @@ const StatisticsTable = ({
   const totalPages = Math.ceil(totalCount / limit) || 1;
   const currentPage = Math.floor(currentOffset / limit) + 1;
 
+  const { t } = useTranslation();
+
   return (
     <div className="statistics-table-container">
       <table className="statistics-table">
         <thead>
           <tr>
-            <th>Avatar</th>
+            <th>{t("statistics.avatar")}</th>
             <th onClick={() => handleHeaderClick('username')} className="sortable-header">
-              Username {getSortIcon('username')}
+              {t("statistics.username")} {getSortIcon('username')}
             </th>
             <th onClick={() => handleHeaderClick('totalGames')} className="sortable-header">
-              Games Played {getSortIcon('totalGames')}
+              {t("statistics.gamesPlayed")} {getSortIcon('totalGames')}
             </th>
             <th onClick={() => handleHeaderClick('totalScore')} className="sortable-header">
-              Total Score {getSortIcon('totalScore')}
+              {t("statistics.totalScore")} {getSortIcon('totalScore')}
             </th>
-            <th className="non-sortable-header">Avg. Score</th>
+            <th className="non-sortable-header">{t("statistics.avgScore")}</th>
             <th onClick={() => handleHeaderClick('highScore')} className="sortable-header">
-              High Score {getSortIcon('highScore')}
+              {t("statistics.highestScore")} {getSortIcon('highScore')}
             </th>
-            <th className="non-sortable-header">Game Type</th>
+            <th className="non-sortable-header">{t("statistics.gameType")}</th>
             <th onClick={() => handleHeaderClick('registrationDate')} className="sortable-header">
-              Member Since {getSortIcon('registrationDate')}
+              {t("statistics.memberSince")} {getSortIcon('registrationDate')}
             </th>
           </tr>
         </thead>
@@ -83,7 +86,7 @@ const StatisticsTable = ({
                     className="username-link"
                     style={{ color: '#1976d2', textDecoration: 'none' }}
                   >
-                    {user.username} {isCurrentUser(user.username) && '(You)'}
+                    {user.username} {isCurrentUser(user.username) && '(' + t("statistics.you") + ')'}
                   </Link>
                 </td>
                 <td>{user.totalGames}</td>
@@ -95,19 +98,19 @@ const StatisticsTable = ({
               </tr>
             ))
           ) : (
-            <tr><td colSpan="9" className="no-results">No statistics found.</td></tr>
+            <tr><td colSpan="9" className="no-results">{t("statistics.noStatsFound")}.</td></tr>
           )}
         </tbody>
       </table>
 
       <div className="pagination">
-        <button disabled={currentPage === 1} onClick={() => onPageChange(0)}>First</button>
-        <button disabled={currentPage === 1} onClick={() => onPageChange(currentOffset - limit)}>Previous</button>
-        <span>Page {currentPage} of {totalPages}</span>
-        <button disabled={currentPage === totalPages} onClick={() => onPageChange(currentOffset + limit)}>Next</button>
-        <button disabled={currentPage === totalPages} onClick={() => onPageChange((totalPages - 1) * limit)}>Last</button>
+        <button disabled={currentPage === 1} onClick={() => onPageChange(0)}>{t("statistics.pagination.first")}</button>
+        <button disabled={currentPage === 1} onClick={() => onPageChange(currentOffset - limit)}>{t("statistics.pagination.previous")}</button>
+        <span>{t("statistics.pagination.page", { page: currentPage, total: totalPages })}</span>
+        <button disabled={currentPage === totalPages} onClick={() => onPageChange(currentOffset + limit)}>{t("statistics.pagination.next")}</button>
+        <button disabled={currentPage === totalPages} onClick={() => onPageChange((totalPages - 1) * limit)}>{t("statistics.pagination.last")}</button>
         <select value={limit} onChange={e => onFilterChange({ limit: Number(e.target.value) })}>
-          {[5, 10, 20, 30].map(n => <option key={n} value={n}>{n} per page</option>)}
+          {[5, 10, 20, 30].map(n => <option key={n} value={n}>{t("statistics.pagination.perPage", { amount: n })}</option>)}
         </select>
       </div>
     </div>

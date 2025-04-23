@@ -5,12 +5,14 @@ import { SitemarkIcon } from '../CustomIcons';
 import { Card, LogInContainer } from '../CustomComponents';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
+import { useTranslation } from 'react-i18next';
 
 export const SignUp = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [confirmpassword, setConfirmationPassword] = useState('');
   const { authenticateUser, error } = useAuth();
+  const { t } = useTranslation();
 
   const signUp = (e) => {
     e.preventDefault();
@@ -25,7 +27,7 @@ export const SignUp = () => {
           component="h1"
           variant="h4"
           sx={{ width: '100%', fontSize: 'clamp(2rem, 10vw, 2.15rem)' }}
-        >        Sign Up
+        >        {t("signUp.signUp")}
         </Typography>
         <Box
           component="form"
@@ -43,7 +45,7 @@ export const SignUp = () => {
               name="username"
               margin="normal"
               fullWidth
-              label="Username"
+              label={t("signUp.username")}
               value={username}
               onChange={(e) => setUsername(e.target.value)}
             />
@@ -54,7 +56,7 @@ export const SignUp = () => {
               name="password"
               margin="normal"
               fullWidth
-              label="Password"
+              label={t("signUp.password")}
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
@@ -66,7 +68,7 @@ export const SignUp = () => {
               name="confirmpassword"
               margin="normal"
               fullWidth
-              label="Confirm password"
+              label={t("signUp.confirmPassword")}
               type="password"
               value={confirmpassword}
               onChange={(e) => setConfirmationPassword(e.target.value)}
@@ -76,17 +78,17 @@ export const SignUp = () => {
             variant="contained" 
             color="primary" 
             onClick={signUp}>
-            Sign Up
+            {t("signUp.signUp")}
           </Button>
           {error && <p style={{ color: 'red' }}>{error}</p>}
 
         </Box>
-        <Divider>or</Divider>
+        <Divider>{t("signUp.or")}</Divider>
         <Typography component="div" align="center" sx={{ marginTop: 2 }}>
           <Typography sx={{ textAlign: 'center' }}>
-            Already have an account? {' '}
+            {t("signUp.alreadyHaveAccount") + ' '}
             <Link to="/login" name="gotoregister" component="button" variant="body2" >
-              Login here
+              {t("signUp.logInHere")}
             </Link>
           </Typography>
         </Typography>
