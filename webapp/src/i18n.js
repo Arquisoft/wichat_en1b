@@ -8,9 +8,8 @@ i18next
     .use(LanguageDetector)
     .use(Backend)
     .init({
-        debug: true,
         fallbackLng: 'en',
         backend: {
-            loadPath: 'locales/{{lng}}/translation.json'
+            loadPath: '/locales/{{lng}}.json'
         }
     });

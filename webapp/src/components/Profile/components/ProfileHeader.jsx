@@ -1,5 +1,6 @@
 import { Typography, Box, Avatar, Button, Chip } from "@mui/material";
 import SettingsIcon from '@mui/icons-material/Settings';
+import { useTranslation } from 'react-i18next';
 
 const ProfileHeader = ({ 
   username, 
@@ -10,9 +11,11 @@ const ProfileHeader = ({
   isOwnProfile
 }) => {
 
+  const { t, i18n } = useTranslation();
+  
   const formatDate = (date) => {
     if (!date) return "N/A";
-    return date.toLocaleDateString('en-US', {
+    return date.toLocaleDateString(i18n.language, {
       year: 'numeric',
       month: 'long',
       day: 'numeric'
@@ -63,12 +66,12 @@ const ProfileHeader = ({
         
         {registrationDate && (
           <Typography variant="body1" color="text.secondary" sx={{ mb: 1 }}>
-            Member since {formatDate(registrationDate, 'MMMM d, yyyy')}
+            {t("profile.header.since", { date: formatDate(registrationDate, 'MMMM d, yyyy') })}
           </Typography>
         )}
         
         <Typography variant="body2" color="text.secondary">
-          {getMembershipDuration()} days of membership
+          {t("profile.header.membershipDays", { count: getMembershipDuration() })}
         </Typography>
       </Box>
       
@@ -85,7 +88,7 @@ const ProfileHeader = ({
             mt: { xs: 2, sm: 0 }
           }}
         >
-          Account Settings
+          {t("profile.header.settings")}
         </Button>
       )}
     </Box>

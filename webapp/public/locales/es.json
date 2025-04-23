@@ -1,0 +1,118 @@
+{
+    "navBar": {
+        "home": "Inicio",
+        "profile": "Perfil",
+        "classicalGame": "Juego clásico",
+        "statistics": "Estadísticas",
+        "gameModes": "Modos de juego",
+
+        "logIn": "Iniciar sesión",
+        "signUp": "Registrarse",
+        "signOut": "Cerrar sesión"
+    },
+    "home": {
+        "loadingMessage": "Cargando mensaje...",
+        "yourProfile": "Perfil",
+        "classicalGame": "Juego clásico",
+        "statistics": "Estadísticas",
+        "gameModes": "Modos de juego"
+    },
+    "profile": {
+    "header": {
+        "since": "Miembro desde el {{date}}",
+        "membershipDays_one": "{{count}} día de membresía",
+        "membershipDays_other": "{{count}} días de membresía",
+        "settings": "Configuración de la cuenta"
+    },
+    "statisticTypes": {
+        "labels": {
+            "global": "Global 🌍",
+            "classical": "Clásico 🎲",
+            "suddenDeath": "Muerte Súbita ☠️",
+            "timeTrial": "Contrarreloj ⏱️",
+            "custom": "Personalizado 🎨",
+            "QOD": "Pregunta del Día 📅"
+        },
+        "insights": {
+            "global": "Estadísticas Globales 🌍",
+            "classical": "Estadísticas de Juego Clásico 🎲",
+            "suddenDeath": "Estadísticas de Muerte Súbita ☠️",
+            "timeTrial": "Estadísticas de Contrarreloj ⏱️",
+            "custom": "Estadísticas de Juego Personalizado 🎨",
+            "QOD": "Estadísticas de la Pregunta del Día 📅"
+        }
+    },
+    "summary": {
+        "performance": "Resumen de Rendimiento",
+        "successRate": "Porcentaje de Éxito",
+        "gamesPlayed": "Juegos Jugados",
+        "questionsAnswered": "Preguntas Respondidas",
+        "correctAnswers": "Respuestas Correctas",
+        "incorrectAnswers": "Respuestas Incorrectas"
+    },
+    "additionalInsights": {
+        "additionalInsights": "Información Adicional",
+        "avgQuestions": "Media de Preguntas por Juego",
+        "correctAnswerRate": "Porcentaje de Respuestas Correctas",
+        "maxScore": "Puntaje Máximo",
+        "maxScorePoints_one": "{{count}} punto",
+        "maxScorePoints_other": "{{count}} puntos"
+    },
+    "answerDistribution": {
+        "answerDistribution": "Distribución de Respuestas",
+        "correct": "Correctas",
+        "incorrect": "Incorrectas"
+    },
+    "visitors": {
+        "profileVisitors": "Visitantes del perfil",
+        "totalVisits": "Visitas totales: {{count}}",
+        "visitedOn": "Visitado el {{date}}",
+        "showMore": "Mostrar más",
+        "showAll": "Mostrar todo ({{count}})",
+        "noVisitors": "Aún no hay visitantes"
+    },
+    "loadingStatistics": "Cargando estadísticas del perfil...",
+    "globalStatistics": "Estadísticas globales",
+    "noStatistics": "No hay estadísticas disponibles",
+    "backToMenu": "Volver al menú"
+},
+    "statistics": {
+        "globalStatistics": "Estadísticas globales",
+        "welcome": "¡Bienvenido {{username}}!",
+        "avatar": "Avatar",
+        "username": "Nombre de usuario",
+        "gamesPlayed": "Partidas jugadas",
+        "totalScore": "Puntuación total",
+        "avgScore": "Puntuación media",
+        "highestScore": "Puntuación más alta",
+        "gameType": "Tipo de juego",
+        "memberSince": "Miembro desde el",
+        "noStatsFound": "No se encontraron estadísticas",
+        "you": "Tú",
+        "pagination": {
+            "first": "Primera",
+            "previous": "Anterior",
+            "next": "Siguiente",
+            "last": "Última",
+            "page": "Página {{page}} de {{total}}",
+            "perPage": "{{amount}} por página"
+        }
+    },
+    "logIn": {
+        "username": "Nombre de usuario",
+        "password": "Contraseña",
+        "logIn": "Iniciar sesión",
+        "or": "o",
+        "dontHaveAccount": "¿No tienes una cuenta?",
+        "signUpHere": "Regístrate aquí"  
+    },
+    "signUp": {
+        "username": "Nombre de usuario",
+        "password": "Contraseña",
+        "confirmPassword": "Confirmar contraseña",
+        "signUp": "Registrarse",
+        "or": "o",
+        "alreadyHaveAccount": "¿Ya tienes una cuenta?",
+        "logInHere": "Inicia sesión aquí"
+    }
+}

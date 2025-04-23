@@ -1,0 +1,118 @@
+{
+    "navBar": {
+        "home": "Home",
+        "profile": "Profile",
+        "classicalGame": "Classical game",
+        "statistics": "Statistics",
+        "gameModes": "Game modes",
+
+        "logIn": "Log in",
+        "signUp": "Sign up",
+        "signOut": "Sign out"
+    },
+    "home": {
+        "loadingMessage": "Loading message...",
+        "yourProfile": "Profile",
+        "classicalGame": "Classical game",
+        "statistics": "Statistics",
+        "gameModes": "Game modes"
+    },
+    "profile": {
+        "header": {
+            "since": "Member since {{date}}",
+            "membershipDays_one": "{{count}} day of membership",
+            "membershipDays_other": "{{count}} days of membership",
+            "settings": "Account Settings"
+        },
+        "statisticTypes": {
+            "labels": {
+                "global": "Global 🌍",
+                "classical": "Classical 🎲",
+                "suddenDeath": "Sudden Death ☠️",
+                "timeTrial": "Time Trial ⏱️",
+                "custom": "Custom 🎨",
+                "QOD": "QOD 📅"
+            },
+            "insights": {
+                "global": "Global Statistics 🌍",
+                "classical": "Classical Game Statistics 🎲",
+                "suddenDeath": "Sudden Death Statistics ☠️",
+                "timeTrial": "Time Trial Statistics ⏱️",
+                "custom": "Custom game Statistics 🎨",
+                "QOD": "Question of the Day Statistics 📅"
+            }
+        },
+        "summary": {
+            "performance": "Performance Summary",
+            "successRate": "Success Rate",
+            "gamesPlayed": "Games Played",
+            "questionsAnswered": "Questions Answered",
+            "correctAnswers": "Correct Answers",
+            "incorrectAnswers": "Incorrect Answers"
+        },
+        "additionalInsights": {
+            "additionalInsights": "Additional Insights",
+            "avgQuestions": "Avg. Questions per Game",
+            "correctAnswerRate": "Correct Answer Rate",
+            "maxScore": "Max Score",
+            "maxScorePoints_one": "{{count}} point",
+            "maxScorePoints_other": "{{count}} points" 
+        },
+        "answerDistribution": {
+            "answerDistribution": "Answer Distribution",
+            "correct": "Correct",
+            "incorrect": "Incorrect"
+        },
+        "visitors": {
+            "profileVisitors": "Profile visitors",
+            "totalVisits": "Total visits: {{count}}",
+            "visitedOn": "Visited on {{date}}",
+            "showMore": "Show More",
+            "showAll": "Show All ({{count}})",
+            "noVisitors": "No visitors yet"
+        },
+        "loadingStatistics": "Loading profile statistics...",
+        "globalStatistics": "Global statistics",
+        "noStatistics": "No statistics available",
+        "backToMenu": "Back to menu"
+    },
+    "statistics": {
+        "globalStatistics": "Global statistics",
+        "welcome": "Welcome {{username}}!",
+        "avatar": "Avatar",
+        "username": "Username",
+        "gamesPlayed": "Games played",
+        "totalScore": "Total score",
+        "avgScore": "Avg. score",
+        "highestScore": "Highest score",
+        "gameType": "Game type",
+        "memberSince": "Member since",
+        "noStatsFound": "No statistics found",
+        "you": "You",
+        "pagination": {
+            "first": "First",
+            "previous": "Previous",
+            "next": "Next",
+            "last": "Last",
+            "page": "Page {{page}} of {{total}}",
+            "perPage": "{{amount}} per page"
+        }
+    },
+    "logIn": {
+        "username": "Username",
+        "password": "Password",
+        "logIn": "Log in",
+        "or": "or",
+        "dontHaveAccount": "Don't have an account?",
+        "signUpHere": "Sign up here"
+    },
+    "signUp": {
+        "username": "Username",
+        "password": "Password",
+        "confirmPassword": "Confirm password",
+        "signUp": "Sign up",
+        "or": "or",
+        "alreadyHaveAccount": "Already have an account?",
+        "logInHere": "Log in here"
+    }
+}
