@@ -8,7 +8,9 @@ const GameModes = () => {
     const { t } = useTranslation();
 
     const QUESTION_TYPES = [t("gameModes.categories.random"), t("gameModes.categories.flags"), t("gameModes.categories.animals"), t("gameModes.categories.monuments"), t("gameModes.categories.foods")];
-    const NAVIGATION_MAP = { /* TODO */ }
+    const NAVIGATION_MAP = { classical: "random", flags: "flags", animals: "time-trial", QOD: "question-of-the-day" };
+     }
+
     const [topic, setTopic] = useState(localStorage.getItem('topic') || QUESTION_TYPES[0]);
     const [customSettings, setCustomSettings] = useState(localStorage.getItem('customSettings') ? JSON.parse(localStorage.getItem('customSettings')) : {
         rounds: 5,
@@ -42,7 +44,7 @@ const GameModes = () => {
     }
 
     const gameModes = [
-        { name: t("gameModes.classical.title"), description: t("gameModes.classical.description") },
+        { name: t("gameModes.classical.title"), description: t("gameModes.classical.description"), route: NAVIGATION_MAP.classical },
         { name: t("gameModes.suddenDeath.title"), description: t("gameModes.suddenDeath.description") },
         { name: t("gameModes.timeTrial.title"), description: t("gameModes.timeTrial.description") },
         { name: t("gameModes.QOD.title"), description: t("gameModes.QOD.description") },
