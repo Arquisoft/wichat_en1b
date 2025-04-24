@@ -71,6 +71,10 @@
         "showAll": "Mostrar todo ({{count}})",
         "noVisitors": "Aún no hay visitantes"
     },
+    "errorStates": {
+            "retry": "Reintentar",
+            "goBackToMenu": "Volver al menú"
+    },
     "loadingStatistics": "Cargando estadísticas del perfil...",
     "globalStatistics": "Estadísticas globales",
     "noStatistics": "No hay estadísticas disponibles",

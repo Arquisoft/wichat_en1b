@@ -71,6 +71,14 @@
             "showAll": "Show All ({{count}})",
             "noVisitors": "No visitors yet"
         },
+        "errorStates": {
+            "retry": "Retry",
+            "goBackToMenu": "Go back to menu"
+        },
+        "settings": {
+            "accountSettings": "Account Settings",
+            "manageSettings": "Manage your account settings"
+        },
         "loadingStatistics": "Loading profile statistics...",
         "globalStatistics": "Global statistics",
         "noStatistics": "No statistics available",
