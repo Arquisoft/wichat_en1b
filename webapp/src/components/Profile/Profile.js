@@ -21,12 +21,11 @@ const userProfileSettings = new UserProfileSettings();
 export const Profile = () => {
 
     const navigate = useNavigate();
-    const { username: profileUsernameParam } = useParams(); // Get username from URL params
+    const { username: profileUsernameParam } = useParams();
     const [hasValidUsername, setHasValidUsername] = useState(true);
 
     useEffect(() => {
         if (!profileUsernameParam) {
-            console.log("No username available");
             setHasValidUsername(false);
             navigate('/home');
         }
@@ -44,11 +43,28 @@ export const Profile = () => {
     const [DEFAULT_IMAGES, setDefaultImages] = useState([]);
     const [uploadError, setUploadError] = useState(null);
     const [defaultImageError, setDefaultImageError] = useState(null);
+    const [updateError, setUpdateError] = useState(null); // New state for update error
 
     const handleLogout = () => {
         Cookies.remove('user', { path: '/' });
         navigate('/login');
-    };
+    }
+
+    const handleModifyAccoutInformation = async (newUsername, newPassword, newPasswordRepeat) => {
+        try {
+            setUpdateError(null);
+            const response = await userProfileSettings.changeUsernameAndPassword(Cookies.get('user'), newUsername, newPassword, newPasswordRepeat);
+            if (response.token) {
+                Cookies.set('user', JSON.stringify({ username: response.username, token: response.token }), { expires: new Date().getTime() + (1 * 60 * 60 * 1000) });
+            }
+
+            setCurrentUsername(response.username);
+            navigate(`/profile/${response.username}`);
+            handleCloseSettings();
+        } catch (error) {
+            setUpdateError(error.message);
+        }
+    }
 
     const handleCustomProfileImageChange = async (event) => {
         if (!isProfileOwner) return;
@@ -62,7 +78,7 @@ export const Profile = () => {
         } catch (error) {
             setUploadError(error.message);
         }
-    };
+    }
     
     const handleDefaultProfileImageChange = async (image) => {
         if (!isProfileOwner) return;
@@ -76,7 +92,7 @@ export const Profile = () => {
         } catch (error) {
             setDefaultImageError(error.message);
         }
-    };
+    }
 
     const handleOpenSettings = () => {
         if (!isProfileOwner) return; // Additional safety check
@@ -97,7 +113,6 @@ export const Profile = () => {
                     const { statsData, username: fetchedUsername } = await retriever.getRecords(profileUsernameParam);
 
                     setStatistics(statsData);
-                    console.log("Statistics data:", statsData);
                     
                     // Determine which profile to load
                     setIsProfileOwner(statsData.isProfileOwner);
@@ -159,16 +174,16 @@ export const Profile = () => {
                             onOpenSettings={isProfileOwner ? handleOpenSettings : null} // Only show settings button for own profile
                             isProfileOwner={isProfileOwner}
                         />
-
-                        {/* Account settings dialog only for own profile */}
                         {isProfileOwner && (
                             <AccountSettingsDialog
                                 open={settingsOpen}
                                 onClose={handleCloseSettings}
                                 defaultImages={DEFAULT_IMAGES}
+                                onChangeUsernameAndPassword={handleModifyAccoutInformation}
                                 onCustomImageChange={handleCustomProfileImageChange}
                                 onDefaultImageChange={handleDefaultProfileImageChange}
                                 uploadError={uploadError}
+                                updateError={updateError}
                                 defaultImageError={defaultImageError}
                             />
                         )}
@@ -222,8 +237,6 @@ export const Profile = () => {
                             getImageUrl={userProfileSettings.getStaticProfileImageUrl.bind(userProfileSettings)}
                         />
                         )}
-
-                        {/* Actions */}
                         <Box sx={{ mt: 3, display: "flex", justifyContent: "center" }}>
                             <Button
                                 variant="contained"

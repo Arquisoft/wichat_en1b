@@ -102,6 +102,74 @@ app.get('/users/:username/image', async (req, res) => {
   }
 });
 
+app.patch('/users/:username', async (req, res) => {
+  try {
+    if (req.body.newPassword && req.body.newPassword !== req.body.newPasswordRepeat) {
+      return res.status(400).json({ error: 'The password and the confirmation do not match, please try again.' });
+    }
+
+    let currentUsername = req.params.username;
+    let userUpdated = false;
+    let token = null;
+    
+    const user = await User.findOne({ username: { $eq: validateUsername(currentUsername) } });
+    
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    if (req.body.newUser) {
+      const newUsername = validateUsername(req.body.newUser);
+
+      const existingUser = await User.findOne({ username: { $eq: validateUsername(newUsername) } });
+      if (existingUser) {
+        return res.status(400).json({ error: 'The new username is already in use. Please choose a different one.' });
+      }
+
+      if (user.image && user.image.startsWith('/images/custom/')) {
+        const oldImagePath = path.join(__dirname, 'public', user.image);
+        const newImageFilename = `${newUsername}-${Date.now()}.png`;
+        const newImagePath = path.join(__dirname, 'public', 'images', 'custom', newImageFilename);
+
+        if (fs.existsSync(oldImagePath)) {
+          fs.renameSync(oldImagePath, newImagePath);
+        }
+
+        user.image = `/images/custom/${newImageFilename}`;
+      }
+
+      user.username = newUsername;
+      await user.save();
+
+      token = jwt.sign(
+        {
+          userId: user._id,
+          username: newUsername
+        },
+        process.env.JWT_SECRET,
+        { expiresIn: '1h' }
+      );
+
+      currentUsername = newUsername;
+      userUpdated = true;
+    }
+
+    if (req.body.newPassword) {
+      user.passwordHash = await bcrypt.hash(validatePassword(req.body.newPassword), 10);
+      await user.save();
+      userUpdated = true;
+    }
+
+    if (userUpdated) {
+      return res.json({ success: true, newUsername: currentUsername, token: token, message: 'User updated successfully' });
+    }
+
+    return res.json({ success: false, message: 'No updates applied to the user' });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 app.post('/users/:username/custom-image', upload.single('image'), async (req, res) => {
   try {
     if (!req.file) {
