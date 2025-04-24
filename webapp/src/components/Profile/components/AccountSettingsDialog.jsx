@@ -4,6 +4,7 @@ import {
     TextField, FormControlLabel, Checkbox
   } from "@mui/material";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
   
   const AccountSettingsDialog = ({ 
     open, 
@@ -21,20 +22,21 @@ import { useState } from "react";
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [repeatPassword, setRepeatPassword] = useState("");
+    const { t } = useTranslation();
 
     return (
       <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
         <DialogTitle sx={{ backgroundColor: "#f5f5f5", textAlign: "center", py: 1 }}>
-          <Typography fontWeight="bold" fontSize="1rem">Update Your Profile</Typography>
+          <Typography fontWeight="bold" fontSize="1rem">{t("profile.settings.updateProfile")}</Typography>
           <Typography variant="body2" color="textSecondary" fontSize="0.875rem">
-            Manage your account and profile picture below.
+            {t("profile.settings.manageSettings")}.
           </Typography>
         </DialogTitle>
         <DialogContent sx={{ px: 2, py: 1.5 }}>
           <Box sx={{ mb: 2 }}>
-            <Typography sx={{ mb: 1, fontWeight: "bold", fontSize: "1rem" }}>Account Information</Typography>
+            <Typography sx={{ mb: 1, fontWeight: "bold", fontSize: "1rem" }}>{t("profile.settings.accountInfo")}</Typography>
             <Typography variant="body2" color="textSecondary" sx={{ mb: 1, fontSize: "0.875rem" }}>
-              Select what you want to update and provide the new values below.
+              {t("profile.settings.newValuesInfo")}.
             </Typography>
             <Box sx={{ display: "flex", alignItems: "center", mb: 1.5 }}>
               <FormControlLabel
@@ -47,7 +49,7 @@ import { useState } from "react";
                 sx={{ mr: 2 }}
               />
               <TextField 
-                label="New username" 
+                label={t("profile.settings.newUsername")} 
                 variant="outlined" 
                 fullWidth 
                 size="small" 
@@ -67,7 +69,7 @@ import { useState } from "react";
                 sx={{ mr: 2 }}
               />
               <TextField 
-                label="New password" 
+                label={t("profile.settings.newPassword")} 
                 type="password" 
                 variant="outlined" 
                 fullWidth 
@@ -88,7 +90,7 @@ import { useState } from "react";
                 sx={{ mr: 2 }}
               />
               <TextField 
-                label="Repeat password" 
+                label={t("profile.settings.repeatPassword")} 
                 type="password" 
                 variant="outlined" 
                 fullWidth 
@@ -106,7 +108,7 @@ import { useState } from "react";
               disabled={!isUsernameChecked && !isPasswordChecked}
               onClick={() => onChangeUsernameAndPassword(username, password, repeatPassword)}
             >
-              Save Changes
+              {t("profile.settings.saveChanges")}
             </Button>
             {updateError && (
               <Typography variant="body2" color="error" sx={{ mt: 1, textAlign: "center", fontSize: "0.75rem" }}>
@@ -115,12 +117,12 @@ import { useState } from "react";
             )}
           </Box>
           <Box>
-            <Typography sx={{ mb: 1, fontWeight: "bold", fontSize: "1rem" }}>Profile Picture</Typography>
+            <Typography sx={{ mb: 1, fontWeight: "bold", fontSize: "1rem" }}>{t("profile.settings.profilePicture")}</Typography>
             <Typography variant="body2" color="textSecondary" sx={{ mb: 1, fontSize: "0.875rem" }}>
-              Upload an image or select a default option.
+              {t("profile.settings.uploadPictureInfo")}.
             </Typography>
             <Button variant="outlined" component="label" fullWidth sx={{ mb: 1.5, py: 0.75, fontSize: "0.875rem" }}>
-              Upload Picture
+            {t("profile.settings.uploadPicture")}
               <input type="file" accept="image/*" hidden onChange={onCustomImageChange} />
             </Button>
             {uploadError && (
@@ -161,7 +163,7 @@ import { useState } from "react";
         </DialogContent>
         <DialogActions sx={{ justifyContent: "center", py: 1 }}>
           <Button onClick={onClose} color="primary" variant="outlined" sx={{ px: 2, fontSize: "0.875rem" }}>
-            Close
+            {t("profile.settings.close")}
           </Button>
         </DialogActions>
       </Dialog>

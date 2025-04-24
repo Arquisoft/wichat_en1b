@@ -76,8 +76,18 @@
             "goBackToMenu": "Go back to menu"
         },
         "settings": {
-            "accountSettings": "Account Settings",
-            "manageSettings": "Manage your account settings"
+            "updateProfile": "Update Your Profile",
+            "manageSettings": "Manage your account settings below",
+            "accountInfo": "Account Information",
+            "newValuesInfo": "Select what you want to update and provide the new values below",
+            "newUsername": "New username",
+            "newPassword": "New password",
+            "repeatPassword": "Repeat password",
+            "saveChanges": "Save changes",
+            "profilePicture": "Profile Picture",
+            "uploadPictureInfo": "Upload an image or select a default option",
+            "uploadPicture": "Upload picture",
+            "close": "Close"
         },
         "loadingStatistics": "Loading profile statistics...",
         "globalStatistics": "Global statistics",
@@ -105,6 +115,43 @@
             "page": "Page {{page}} of {{total}}",
             "perPage": "{{amount}} per page"
         }
+    },
+    "gameModes": {
+        "selectGameMode": "Select Game Mode",
+        "categories": {
+            "title": "Category:",
+            "random": "Random",
+            "flags": "Flags",
+            "animals": "Animals",
+            "monuments": "Monuments",
+            "foods": "Foods"
+        },
+        "classical": {
+            "title": "Classical",
+            "description": "The classic game mode with standard rules."
+        },
+        "suddenDeath": {
+            "title": "Sudden Death",
+            "description": "One wrong answer and it’s game over!"
+        },
+        "timeTrial": {
+            "title": "Time Trial",
+            "description": "Answer as many questions as possible within the time limit."
+        },
+        "QOD": {
+            "title": "QOD",
+            "description": "Question of the day mode for daily challenges."
+        },
+        "custom": {
+            "title": "Custom",
+            "description": "Customize your game with specific settings.",
+            "settings": {
+                "rounds": "Rounds",
+                "time": "Time per Question (s)",
+                "aiAttempts": "AI Attempts per Question"
+            }
+        },
+        "startGame": "Start Game"
     },
     "logIn": {
         "username": "Username",

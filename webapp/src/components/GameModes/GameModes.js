@@ -1,17 +1,20 @@
 import React, { useState } from 'react';
 import { Box, Typography, Paper, MenuItem, Select, TextField, Button } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-
-const QUESTION_TYPES = ["random", "flags", "animals", "monuments", "foods"]
+import { useTranslation } from 'react-i18next';
 
 const GameModes = () => {
+    const navigate = useNavigate();
+    const { t } = useTranslation();
+
+    const QUESTION_TYPES = [t("gameModes.categories.random"), t("gameModes.categories.flags"), t("gameModes.categories.animals"), t("gameModes.categories.monuments"), t("gameModes.categories.foods")];
+    const NAVIGATION_MAP = { /* TODO */ }
     const [topic, setTopic] = useState(localStorage.getItem('topic') || QUESTION_TYPES[0]);
     const [customSettings, setCustomSettings] = useState(localStorage.getItem('customSettings') ? JSON.parse(localStorage.getItem('customSettings')) : {
         rounds: 5,
         timePerQuestion: 30,
         aiAttempts: 3,
     });
-    const navigate = useNavigate();
 
     const handleCategoryChange = (event) => {
         localStorage.setItem('topic', event.target.value);
@@ -39,20 +42,20 @@ const GameModes = () => {
     }
 
     const gameModes = [
-        { name: 'Classical', description: 'The classic game mode with standard rules.' },
-        { name: 'SuddenDeath', description: 'One wrong answer and it’s game over!' },
-        { name: 'TimeTrial', description: 'Answer as many questions as possible within the time limit.' },
-        { name: 'QOD', description: 'Question of the day mode for daily challenges.' },
-        { name: 'Custom', description: 'Customize your game with specific settings.' },
+        { name: t("gameModes.classical.title"), description: t("gameModes.classical.description") },
+        { name: t("gameModes.suddenDeath.title"), description: t("gameModes.suddenDeath.description") },
+        { name: t("gameModes.timeTrial.title"), description: t("gameModes.timeTrial.description") },
+        { name: t("gameModes.QOD.title"), description: t("gameModes.QOD.description") },
+        { name: t("gameModes.custom.title"), description: t("gameModes.custom.description") },
     ];
 
     return (
         <Box sx={{ padding: 2 }}>
             <Typography variant="h4" gutterBottom>
-                Select Game Mode
+                {t("gameModes.selectGameMode")}
             </Typography>
             <Box sx={{ marginBottom: 2 }}>
-                <Typography variant="subtitle1">Category:</Typography>
+                <Typography variant="subtitle1">{t("gameModes.categories.title")}</Typography>
                 <Select value={topic} onChange={handleCategoryChange} fullWidth>
                     {QUESTION_TYPES.map((questionType) => (
                         <MenuItem key={questionType} value={questionType}>
@@ -85,10 +88,10 @@ const GameModes = () => {
                             <Typography variant="body2" sx={{ marginBottom: 1 }}>
                                 {mode.description}
                             </Typography>
-                            {mode.name === 'Custom' && (
+                            {mode.name === t("gameModes.custom.title") && (
                                 <Box>
                                     <TextField
-                                        label="Rounds"
+                                        label={t("gameModes.custom.settings.rounds")}
                                         type="number"
                                         name="rounds"
                                         value={customSettings.rounds}
@@ -102,7 +105,7 @@ const GameModes = () => {
                                         sx={{ marginBottom: 1 }}
                                     />
                                     <TextField
-                                        label="Time per Question (s)"
+                                        label={t("gameModes.custom.settings.time")}
                                         type="number"
                                         name="timePerQuestion"
                                         value={customSettings.timePerQuestion}
@@ -116,7 +119,7 @@ const GameModes = () => {
                                         sx={{ marginBottom: 1 }}
                                     />
                                     <TextField
-                                        label="AI Attempts per Question"
+                                        label={t("gameModes.custom.settings.aiAttempts")}
                                         type="number"
                                         name="aiAttempts"
                                         value={customSettings.aiAttempts}
@@ -138,7 +141,7 @@ const GameModes = () => {
                             onClick={() => handleGameModeClick(mode.name.toLowerCase())}
                             sx={{ marginTop: 'auto' }}
                         >
-                            Start Game
+                            {t("gameModes.startGame")}
                         </Button>
                     </Paper>
                 ))}

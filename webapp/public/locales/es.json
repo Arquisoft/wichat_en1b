@@ -18,68 +18,82 @@
         "gameModes": "Modos de juego"
     },
     "profile": {
-    "header": {
-        "since": "Miembro desde el {{date}}",
-        "membershipDays_one": "{{count}} día de membresía",
-        "membershipDays_other": "{{count}} días de membresía",
-        "settings": "Configuración de la cuenta"
-    },
-    "statisticTypes": {
-        "labels": {
-            "global": "Global 🌍",
-            "classical": "Clásico 🎲",
-            "suddenDeath": "Muerte Súbita ☠️",
-            "timeTrial": "Contrarreloj ⏱️",
-            "custom": "Personalizado 🎨",
-            "QOD": "Pregunta del Día 📅"
+        "header": {
+            "since": "Miembro desde el {{date}}",
+            "membershipDays_one": "{{count}} día de membresía",
+            "membershipDays_other": "{{count}} días de membresía",
+            "settings": "Configuración de la cuenta"
         },
-        "insights": {
-            "global": "Estadísticas Globales 🌍",
-            "classical": "Estadísticas de Juego Clásico 🎲",
-            "suddenDeath": "Estadísticas de Muerte Súbita ☠️",
-            "timeTrial": "Estadísticas de Contrarreloj ⏱️",
-            "custom": "Estadísticas de Juego Personalizado 🎨",
-            "QOD": "Estadísticas de la Pregunta del Día 📅"
-        }
+        "statisticTypes": {
+            "labels": {
+                "global": "Global 🌍",
+                "classical": "Clásico 🎲",
+                "suddenDeath": "Muerte Súbita ☠️",
+                "timeTrial": "Contrarreloj ⏱️",
+                "custom": "Personalizado 🎨",
+                "QOD": "Pregunta del Día 📅"
+            },
+            "insights": {
+                "global": "Estadísticas Globales 🌍",
+                "classical": "Estadísticas de Juego Clásico 🎲",
+                "suddenDeath": "Estadísticas de Muerte Súbita ☠️",
+                "timeTrial": "Estadísticas de Contrarreloj ⏱️",
+                "custom": "Estadísticas de Juego Personalizado 🎨",
+                "QOD": "Estadísticas de la Pregunta del Día 📅"
+            }
+        },
+        "summary": {
+            "performance": "Resumen de Rendimiento",
+            "successRate": "Porcentaje de Éxito",
+            "gamesPlayed": "Juegos Jugados",
+            "questionsAnswered": "Preguntas Respondidas",
+            "correctAnswers": "Respuestas Correctas",
+            "incorrectAnswers": "Respuestas Incorrectas"
+        },
+        "additionalInsights": {
+            "additionalInsights": "Información Adicional",
+            "avgQuestions": "Media de Preguntas por Juego",
+            "correctAnswerRate": "Porcentaje de Respuestas Correctas",
+            "maxScore": "Puntaje Máximo",
+            "maxScorePoints_one": "{{count}} punto",
+            "maxScorePoints_other": "{{count}} puntos"
+        },
+        "answerDistribution": {
+            "answerDistribution": "Distribución de Respuestas",
+            "correct": "Correctas",
+            "incorrect": "Incorrectas"
+        },
+        "visitors": {
+            "profileVisitors": "Visitantes del perfil",
+            "totalVisits": "Visitas totales: {{count}}",
+            "visitedOn": "Visitado el {{date}}",
+            "showMore": "Mostrar más",
+            "showAll": "Mostrar todo ({{count}})",
+            "noVisitors": "Aún no hay visitantes"
+        },
+        "errorStates": {
+                "retry": "Reintentar",
+                "goBackToMenu": "Volver al menú"
+        },
+        "settings": {
+            "updateProfile": "Actualizar tu perfil",
+            "manageSettings": "Administra la configuración de tu cuenta a continuación",
+            "accountInfo": "Información de la cuenta",
+            "newValuesInfo": "Selecciona lo que deseas actualizar y proporciona los nuevos valores a continuación",
+            "newUsername": "Nuevo nombre de usuario",
+            "newPassword": "Nueva contraseña",
+            "repeatPassword": "Repetir contraseña",
+            "saveChanges": "Guardar cambios",
+            "profilePicture": "Foto de perfil",
+            "uploadPictureInfo": "Sube una imagen o selecciona una opción predeterminada",
+            "uploadPicture": "Subir imagen",
+            "close": "Cerrar"
+        },
+        "loadingStatistics": "Cargando estadísticas del perfil...",
+        "globalStatistics": "Estadísticas globales",
+        "noStatistics": "No hay estadísticas disponibles",
+        "backToMenu": "Volver al menú"
     },
-    "summary": {
-        "performance": "Resumen de Rendimiento",
-        "successRate": "Porcentaje de Éxito",
-        "gamesPlayed": "Juegos Jugados",
-        "questionsAnswered": "Preguntas Respondidas",
-        "correctAnswers": "Respuestas Correctas",
-        "incorrectAnswers": "Respuestas Incorrectas"
-    },
-    "additionalInsights": {
-        "additionalInsights": "Información Adicional",
-        "avgQuestions": "Media de Preguntas por Juego",
-        "correctAnswerRate": "Porcentaje de Respuestas Correctas",
-        "maxScore": "Puntaje Máximo",
-        "maxScorePoints_one": "{{count}} punto",
-        "maxScorePoints_other": "{{count}} puntos"
-    },
-    "answerDistribution": {
-        "answerDistribution": "Distribución de Respuestas",
-        "correct": "Correctas",
-        "incorrect": "Incorrectas"
-    },
-    "visitors": {
-        "profileVisitors": "Visitantes del perfil",
-        "totalVisits": "Visitas totales: {{count}}",
-        "visitedOn": "Visitado el {{date}}",
-        "showMore": "Mostrar más",
-        "showAll": "Mostrar todo ({{count}})",
-        "noVisitors": "Aún no hay visitantes"
-    },
-    "errorStates": {
-            "retry": "Reintentar",
-            "goBackToMenu": "Volver al menú"
-    },
-    "loadingStatistics": "Cargando estadísticas del perfil...",
-    "globalStatistics": "Estadísticas globales",
-    "noStatistics": "No hay estadísticas disponibles",
-    "backToMenu": "Volver al menú"
-},
     "statistics": {
         "globalStatistics": "Estadísticas globales",
         "welcome": "¡Bienvenido {{username}}!",
@@ -101,6 +115,43 @@
             "page": "Página {{page}} de {{total}}",
             "perPage": "{{amount}} por página"
         }
+    },
+    "gameModes": {
+        "selectGameMode": "Seleccionar modo de juego",
+        "categories": {
+            "title": "Categoría:",
+            "random": "Aleatorio",
+            "flags": "Banderas",
+            "animals": "Animales",
+            "monuments": "Monumentos",
+            "foods": "Comidas"
+        },
+        "classical": {
+            "title": "Clásico",
+            "description": "El modo de juego clásico con reglas estándar."
+        },
+        "suddenDeath": {
+            "title": "Muerte súbita",
+            "description": "¡Una respuesta incorrecta y se acaba el juego!"
+        },
+        "timeTrial": {
+            "title": "Contrarreloj",
+            "description": "Responde tantas preguntas como puedas dentro del límite de tiempo."
+        },
+        "QOD": {
+            "title": "Pregunta del Día",
+            "description": "Modo de pregunta del día para desafíos diarios."
+        },
+        "custom": {
+            "title": "Personalizado",
+            "description": "Personaliza tu juego con configuraciones específicas.",
+            "settings": {
+                "rounds": "Rondas",
+                "time": "Tiempo por pregunta (s)",
+                "aiAttempts": "Intentos de IA por pregunta"
+            }
+        },
+        "startGame": "Comenzar juego"
     },
     "logIn": {
         "username": "Nombre de usuario",
