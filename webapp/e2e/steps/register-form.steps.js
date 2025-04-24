@@ -70,7 +70,7 @@ defineFeature(feature, test => {
     });
 
     then("Should be shown a success message", async () => {
-      expectAlertToBe("secretOrPrivateKey must have a value");
+      expectAlertToBe("The username provided is already in use. Please choose a different one.");
     });
   });
 

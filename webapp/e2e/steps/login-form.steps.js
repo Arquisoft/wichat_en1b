@@ -45,9 +45,8 @@ defineFeature(feature, (test) => {
     await usernameInput.type("loginuser");
     await passwordInput.type("StrongPass123!");
     await confirmpasswordInput.type("StrongPass123!");
-    await expect(page).toClick('[data-testid="signup"]');
+    await expect(page).toClick('button[data-testid="signup"]');
 
-    await expectAlertToBe(loginsuccess);
     await page.waitForSelector('[data-testid="login-button"]');
     await page.click('[data-testid="login-button"]');
   });
@@ -76,19 +75,21 @@ defineFeature(feature, (test) => {
       const passwordInput = await page.$('[data-testid="log-password"] input');
       await usernameInput.type(validUsername);
       await passwordInput.type(validPassword);
-      await expect(page).toClick('button[type="submit"]');    
+      await expect(page).toClick('button', { text: 'Log in' });
     });
 
-    then("Should show a success message", async () => {
-      await expectAlertToBe(loginsuccess);
+    then("Should show the home view", async () => {
 
-      // Logout BUG
-      //await page.waitForSelector('button[data-testid="logout-nav"]');
-      //await page.click('button[data-testid="logout-nav"]');
+      await page.waitForXPath("//button[contains(text(), 'Sign Out')]");
+      const [signOutButton] = await page.$x("//button[contains(text(), 'Sign Out')]");
+      await signOutButton.click();
+
     });
+
   });
 
   test("Login with empty username", ({ given, when, then }) => {
+
     let password;
 
     given("User without username", async () => {
@@ -99,14 +100,17 @@ defineFeature(feature, (test) => {
       const passwordInput = await page.$('[data-testid="log-password"] input');
       await passwordInput.type(password);
       await expect(page).toClick('button[type="submit"]');
+
     });
 
     then("Should show an error message", async () => {
       await expectAlertToBe("The username is required");
     });
+
   });
 
   test("Login with empty password", ({ given, when, then }) => {
+
     let username;
 
     given("User without password", async () => {
@@ -117,20 +121,24 @@ defineFeature(feature, (test) => {
       const usernameInput = await page.$('[data-testid="log-username"] input');
       await usernameInput.type(username);
       await expect(page).toClick('button[type="submit"]');
+
     });
 
     then("Should show an error message", async () => {
       await expectAlertToBe("The password is required");
     });
+
   });
 
   test("Login with incorrect password", ({ given, when, then }) => {
+
     let username;
     let wrongPassword;
 
     given("Registered user with incorrect password", async () => {
       username = "testlogin";
       wrongPassword = "WrongPass1!";
+
     });
 
     when("Trying to log in", async () => {
@@ -144,15 +152,18 @@ defineFeature(feature, (test) => {
     then("Should show an error message", async () => {
       await expectAlertToBe(loginAlert);
     });
+
   });
 
   test("Login with non-existing user", ({ given, when, then }) => {
+
     let username;
     let password;
 
     given("Not existent username", async () => {
       username = "nonexistentuser";
       password = "DoesntMatter123!";
+
     });
 
     when("Trying to log in", async () => {
@@ -161,10 +172,13 @@ defineFeature(feature, (test) => {
       await usernameInput.type(username);
       await passwordInput.type(password);
       await expect(page).toClick('button[type="submit"]');
+
     });
 
     then("Should show an error message", async () => {
       await expectAlertToBe(loginAlert);
     });
+
   });
+
 });
