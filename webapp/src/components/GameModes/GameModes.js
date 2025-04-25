@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Box, Typography, Paper, MenuItem, Select, TextField, Button } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -7,11 +7,9 @@ const GameModes = () => {
     const navigate = useNavigate();
     const { t } = useTranslation();
 
-    const QUESTION_TYPES = [t("gameModes.categories.random"), t("gameModes.categories.flags"), t("gameModes.categories.animals"), t("gameModes.categories.monuments"), t("gameModes.categories.foods")];
-    const NAVIGATION_MAP = { classical: "random", flags: "flags", animals: "time-trial", QOD: "question-of-the-day" };
-     }
+    const QUESTION_TYPES_KEYS = ["gameModes.categories.random", "gameModes.categories.flags", "gameModes.categories.animals", "gameModes.categories.monuments", "gameModes.categories.foods"];
 
-    const [topic, setTopic] = useState(localStorage.getItem('topic') || QUESTION_TYPES[0]);
+    const [topic, setTopic] = useState(localStorage.getItem('topic') || QUESTION_TYPES_KEYS[0]);
     const [customSettings, setCustomSettings] = useState(localStorage.getItem('customSettings') ? JSON.parse(localStorage.getItem('customSettings')) : {
         rounds: 5,
         timePerQuestion: 30,
@@ -19,6 +17,7 @@ const GameModes = () => {
     });
 
     const handleCategoryChange = (event) => {
+        console.log(event.target.value);
         localStorage.setItem('topic', event.target.value);
         setTopic(event.target.value);
     };
@@ -44,12 +43,19 @@ const GameModes = () => {
     }
 
     const gameModes = [
-        { name: t("gameModes.classical.title"), description: t("gameModes.classical.description"), route: NAVIGATION_MAP.classical },
-        { name: t("gameModes.suddenDeath.title"), description: t("gameModes.suddenDeath.description") },
-        { name: t("gameModes.timeTrial.title"), description: t("gameModes.timeTrial.description") },
-        { name: t("gameModes.QOD.title"), description: t("gameModes.QOD.description") },
-        { name: t("gameModes.custom.title"), description: t("gameModes.custom.description") },
+        { name: t("gameModes.classical.title"), description: t("gameModes.classical.description"), route: "classical" },
+        { name: t("gameModes.suddenDeath.title"), description: t("gameModes.suddenDeath.description"), route: "suddendeath" },
+        { name: t("gameModes.timeTrial.title"), description: t("gameModes.timeTrial.description"), route: "timetrial" },
+        { name: t("gameModes.QOD.title"), description: t("gameModes.QOD.description"), route: "qod" },
+        { name: t("gameModes.custom.title"), description: t("gameModes.custom.description"), route: "custom" }
     ];
+
+    useEffect(() => {
+        // Actualiza el topic si el valor actual no coincide con las claves disponibles
+        if (!QUESTION_TYPES_KEYS.includes(topic)) {
+            setTopic(QUESTION_TYPES_KEYS[0]);
+        }
+    }, [t]);
 
     return (
         <Box sx={{ padding: 2 }}>
@@ -59,9 +65,9 @@ const GameModes = () => {
             <Box sx={{ marginBottom: 2 }}>
                 <Typography variant="subtitle1">{t("gameModes.categories.title")}</Typography>
                 <Select value={topic} onChange={handleCategoryChange} fullWidth>
-                    {QUESTION_TYPES.map((questionType) => (
-                        <MenuItem key={questionType} value={questionType}>
-                            {capitalizaFirstLetter(questionType)}
+                    {QUESTION_TYPES_KEYS.map((key) => (
+                        <MenuItem key={key} value={key}>
+                            {capitalizaFirstLetter(t(key))}
                         </MenuItem>
                     ))}
                 </Select>
@@ -140,7 +146,7 @@ const GameModes = () => {
                         <Button
                             variant="contained"
                             color="primary"
-                            onClick={() => handleGameModeClick(mode.name.toLowerCase())}
+                            onClick={() => handleGameModeClick(mode.route)}
                             sx={{ marginTop: 'auto' }}
                         >
                             {t("gameModes.startGame")}

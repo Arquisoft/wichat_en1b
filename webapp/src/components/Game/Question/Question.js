@@ -38,7 +38,6 @@ export const Question = ({ statisticsUpdater = defaultStatisticsUpdater, type = 
     const [currentScore, setCurrentScore] = useState(0); // Track the current score
 
     const { question, setQuestion, setGameEnded, questionType, setQuestionType, AIAttempts, setAIAttempts, maxAIAttempts, setMaxAIAttempts } = useGame();
-    console.log(setMaxAIAttempts)
     const gatewayEndpoint = process.env.REACT_APP_API_ENDPOINT || 'http://localhost:8000';
 
     const topic = localStorage.getItem("topic") || "random"; // Default to "random" if not set
