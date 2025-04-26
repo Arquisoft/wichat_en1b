@@ -19,146 +19,172 @@ if (mongoose.connection.readyState === 0) {
     .catch(err => console.error('MongoDB connection error:', err));
 }
 
-function isValidDateString(dateStr) {
-  // Ensure it matches YYYY-MM-DD
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) return false;
+/**
+ * Helper: Build registration date filter for MongoDB $match
+ */
+function buildRegistrationDateFilter(before, after) {
+  const filter = {};
+  if (before || after) filter.registrationDate = {};
+  if (before) filter.registrationDate.$lte = new Date(before);
+  if (after) filter.registrationDate.$gte = new Date(after);
+  return filter;
+}
 
-  const date = new Date(dateStr);
-  if (isNaN(date.getTime())) return false;
+/**
+ * Helper: Build gameType filter for MongoDB $match
+ * Only matches users who have at least one game of the specified type
+ */
+function buildGameTypeFilter(gameType) {
+  if (!gameType) return {};
+  return { "games.gameType": gameType };
+}
 
-  const [year, month, day] = dateStr.split('-').map(Number);
-  return date.getUTCFullYear() === year &&
-    date.getUTCMonth() + 1 === month &&
-    date.getUTCDate() === day;
+/**
+ * Helper: Build minGames and minScore filters for MongoDB $match
+ * These are applied after statistics are calculated
+ */
+function buildMinFilters(minGames, minScore) {
+  const filter = {};
+  if (minGames) filter.gamesPlayed = { $gte: Number(minGames) };
+  if (minScore) filter.totalScore = { $gte: Number(minScore) };
+  return filter;
 }
 
 // Get statistics for all users (ordered)
 app.get('/statistics', async (req, res) => {
-
-  // Extract query parameters for filtering and sorting
-  const {
-    sort = 'gamesPlayed',
-    order = 'desc',
-    limit = 50,
-    offset = 0,
-    gameType,
-    minGames,
-    minScore,
-    registeredBefore,
-    registeredAfter
-  } = req.query;
-
-  // Validate sort field
-  const validSortFields = ['username', 'gamesPlayed', 'totalScore', 'totalVisits', 'registrationDate', 'maxScore'];
-  if (!validSortFields.includes(sort)) {
-    return res.status(400).json({ error: 'Invalid sort field' });
-  }
-
-  // Validate sort order
-  if (order !== 'asc' && order !== 'desc') {
-    return res.status(400).json({ error: 'Invalid sort order, must be "asc" or "desc"' });
-  }
-
-  // Build query filter
-  const filter = {};
-
-  // Add game type filter if provided
-  if (gameType) {
-    const validGameTypes = ['classical', 'suddenDeath', 'timeTrial', 'custom', 'qod'];
-    if (!validGameTypes.includes(gameType)) {
-      return res.status(400).json({ error: 'Invalid game type' });
-    }
-    filter['games.gameType'] = gameType;
-  }
-
-  // Add minimum games filter if provided
-  if (minGames) {
-    const gamesCount = parseInt(minGames);
-    if (isNaN(gamesCount) || gamesCount < 0) {
-      return res.status(400).json({ error: 'Invalid minimum games value' });
-    }
-    filter.gamesPlayed = { $gte: gamesCount };
-  }
-
-  // Add minimum score filter if provided
-  if (minScore) {
-    const score = parseInt(minScore);
-    if (isNaN(score) || score < 0) {
-      return res.status(400).json({ error: 'Invalid minimum score value' });
-    }
-    filter['games.score'] = { $gte: score };
-  }
-
-  // Add registration date filters if provided
-  if (registeredBefore) {
-    if (!isValidDateString(registeredBefore)) {
-      return res.status(400).json({ error: 'Invalid registeredBefore date format' });
-    } else {
-      filter.registrationDate = filter.registrationDate || {};
-      filter.registrationDate.$lte = new Date(registeredBefore);
-    }
-  }
   
-  if (registeredAfter) {
-    if (!isValidDateString(registeredAfter)) {
-      return res.status(400).json({ error: 'Invalid registeredAfter date format' });
-    } else {
-      filter.registrationDate = filter.registrationDate || {};
-      filter.registrationDate.$gte = new Date(registeredAfter);
-    }
-  }
+  const validSortFields = [
+    'username', 'gamesPlayed', 'questionsAnswered', 
+    'correctAnswers', 'incorrectAnswers', 'accuracy',
+    'totalScore', 'maxScore', 'registrationDate'
+  ];
 
-  // Create sort object for MongoDB
-  const sortObj = {};
-  sortObj[sort] = order === 'asc' ? 1 : -1;
+  try {
+    // Extract query parameters
+    const { 
+      sort = 'totalScore',
+      order = 'desc',
+      limit = 50,
+      offset = 0,
+      gameType,
+      minGames,
+      minScore,
+      registeredBefore,
+      registeredAfter
+    } = req.query;
 
-  const limitNum = parseInt(limit);
-  const offsetNum = parseInt(offset);
 
-  if (isNaN(limitNum) || limitNum < 1 || limitNum > 100) {
-    return res.status(400).json({ error: 'Invalid limit value, must be between 1 and 100' });
-  }
+    if (!validSortFields.includes(sort)) return res.status(400).json({ error: 'Invalid sort field' });
+    if (!['asc', 'desc'].includes(order)) return res.status(400).json({ error: 'Invalid sort order' });
 
-  if (isNaN(offsetNum) || offsetNum < 0) {
-    return res.status(400).json({ error: 'Invalid offset value, must be non-negative' });
-  }
-
-  // Get users with pagination and filtering
-  const users = await User.find(filter)
-    .sort(sortObj)
-    .skip(offsetNum)
-    .limit(limitNum);
-
-  // Get total count for pagination info
-  const totalCount = await User.countDocuments(filter);
-
-  // Process users and create response
-  const usersData = users.map(user => {
-    return {
-      username: user.username,
-      gamesPlayed: user.gamesPlayed,
-      registrationDate: user.registrationDate,
-      totalVisits: user.totalVisits,
-      globalStatistics: {
-        questionsAnswered: user.games.reduce((acc, game) => acc + game.questionsAnswered, 0),
-        correctAnswers: user.games.reduce((acc, game) => acc + game.correctAnswers, 0),
-        incorrectAnswers: user.games.reduce((acc, game) => acc + game.incorrectAnswers, 0),
-        maxScore: Math.max(...user.games.map(game => game.score)) || 0,
-        gamesPlayed: user.games.length,
+    // Build the aggregation pipeline for MongoDB
+    const pipeline = [
+      // 1. Filter users by registration date and gameType (if provided)
+      { 
+        $match: {
+          ...buildRegistrationDateFilter(registeredBefore, registeredAfter),
+          ...buildGameTypeFilter(gameType)
+        }
+      },
+       // 2. Project only the needed fields (for performance)
+      {
+        $project: {
+          username: 1,
+          registrationDate: 1,
+          games: 1,
+          // Denormalized (pre-computed) fields for global stats
+          denormGamesPlayed: "$gamesPlayed",
+          denormCorrect: "$correctAnswers",
+          denormQuestions: "$questionsAnswered"
+        }
+      },
+       // 3. If a gameType filter is set, create a filteredGames array with only those games
+      {
+        $addFields: {
+          filteredGames: gameType ? {
+            $filter: {
+              input: "$games",
+              as: "game",
+              cond: { $eq: ["$$game.gameType", gameType] }
+            }
+          } : "$games"
+        }
+      },
+      // 4. Calculate statistics for each user
+      {
+        $addFields: {
+           // If gameType is set, calculate stats from filteredGames; otherwise, use denormalized fields
+          gamesPlayed: gameType ? { $size: "$filteredGames" } : "$denormGamesPlayed",
+          correctAnswers: gameType ? { $sum: "$filteredGames.correctAnswers" } : "$denormCorrect",
+          questionsAnswered: gameType ? { $sum: "$filteredGames.questionsAnswered" } : "$denormQuestions",
+          totalScore: { $sum: "$filteredGames.score" },
+          maxScore: { $max: "$filteredGames.score" }
+        }
+      },
+       // 5. Calculate incorrectAnswers and accuracy
+      {
+        $addFields: {
+          incorrectAnswers: { $subtract: ["$questionsAnswered", "$correctAnswers"] },
+          accuracy: {
+            $cond: [
+              { $eq: ["$questionsAnswered", 0] },
+              0,
+              { $multiply: [{ $divide: ["$correctAnswers", "$questionsAnswered"] }, 100] }
+            ]
+          }
+        }
+      },
+      // 6. Filter out users who don't meet minGames or minScore requirements (if provided)
+      { 
+        $match: buildMinFilters(minGames, minScore) 
+      },
+      // 7. Facet for pagination and total count
+      {
+        $facet: {
+          metadata: [{ $count: "total" }],
+          data: [
+            { $sort: { [sort]: order === 'asc' ? 1 : -1 } },
+            { $skip: Number(offset) },
+            { $limit: Number(limit) },
+            {
+              $project: {
+                _id: 0,
+                username: 1,
+                registrationDate: 1,
+                gamesPlayed: 1,
+                questionsAnswered: 1,
+                correctAnswers: 1,
+                incorrectAnswers: 1,
+                accuracy: 1,
+                totalScore: 1,
+                maxScore: 1
+              }
+            }
+          ]
+        }
       }
-    };
-  });
+    ];
 
-  // Return response with pagination metadata
-  res.json({
-    users: usersData,
-    pagination: {
-      total: totalCount,
-      limit: limitNum,
-      offset: offsetNum,
-      hasMore: offsetNum + usersData.length < totalCount
-    }
-  });
+    // Run the aggregation pipeline
+    const [result] = await User.aggregate(pipeline);
+    
+    // Prepare the response
+    const total = result?.metadata[0]?.total || 0;
+    const users = result?.data || [];
+
+    res.json({
+      users,
+      pagination: {
+        total,
+        limit: Number(limit),
+        offset: Number(offset),
+        hasMore: (Number(offset) + users.length) < total
+      }
+    });
+
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
 });
 
 // Update statistics for a user (in the headers)
