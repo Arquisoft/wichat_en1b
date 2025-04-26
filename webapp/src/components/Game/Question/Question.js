@@ -5,7 +5,7 @@ import AccessTimeIcon from "@mui/icons-material/AccessTime"
 import axios from 'axios';
 import { useGame } from "../GameContext";
 import StatisticsUpdater from "./StatisticsUpdater";
-
+import { useTranslation } from "react-i18next"
 
 // Create a theme with the blue color from the login screen
 const theme = createTheme({
@@ -36,13 +36,17 @@ export const Question = ({ statisticsUpdater = defaultStatisticsUpdater, type = 
     const [streak, setStreak] = useState(0); // Track the streak of correct answers
     const [score, setScore] = useState(0); // Track the score
     const [currentScore, setCurrentScore] = useState(0); // Track the current score
+    const { t, i18n } = useTranslation();
 
     const { question, setQuestion, setGameEnded, questionType, setQuestionType, AIAttempts, setAIAttempts, maxAIAttempts, setMaxAIAttempts } = useGame();
     const gatewayEndpoint = process.env.REACT_APP_API_ENDPOINT || 'http://localhost:8000';
 
-    const topic = localStorage.getItem("topic") || "random"; // Default to "random" if not set
-    setQuestionType(topic); // Set the question type based on the topic
+    const topic = (() => {
+        const storedTopic = localStorage.getItem("topic");
+        return storedTopic ? storedTopic.substring(storedTopic.lastIndexOf('.') + 1) : "random";
+    })();
 
+    setQuestionType(topic);
 
     const [customSettings, setCustomSettings] = useState(localStorage.getItem('customSettings') ? JSON.parse(localStorage.getItem('customSettings')) : {
         rounds: 5,
@@ -50,14 +54,12 @@ export const Question = ({ statisticsUpdater = defaultStatisticsUpdater, type = 
         aiAttempts: 3,
     });
 
-    
-
     useEffect(() => {
         const fetchInitialQuesiton = async () => {
             await requestQuestion(true); // Pass true to indicate it's the initial load
         }
         fetchInitialQuesiton();
-        if (type === 'custom') {
+        if (topic === 'custom') {
             maxRounds = customSettings.rounds;
             totalTime = customSettings.timePerQuestion;
             setMaxAIAttempts(customSettings.aiAttempts);
@@ -95,7 +97,21 @@ export const Question = ({ statisticsUpdater = defaultStatisticsUpdater, type = 
         setGameEnded(true);
         try {
             let questionResponse = await axios.get(`${gatewayEndpoint}/question/${questionType}`);
-            setQuestion(questionResponse.data);
+            console.log("Question response: ", questionResponse.data);
+            const questionText = t("game.question", {
+                imageType: t(questionResponse.data.imageType),
+                relation: t(questionResponse.data.relation),
+                topic: questionResponse.data.topic,
+            });
+
+            setQuestion({
+                question: questionText,
+                images: questionResponse.data.images,
+                id: questionResponse.data.id,
+                imageType: questionResponse.data.imageType,
+                relation: questionResponse.data.relation,
+                topic: questionResponse.data.topic,
+            });
 
             // Update gamesPlayed only on the first load
             if (isInitialLoad) {
@@ -105,9 +121,8 @@ export const Question = ({ statisticsUpdater = defaultStatisticsUpdater, type = 
                     console.error("Error incrementing games played:", error.message);
                 }
             }
-
         } catch (error) {
-            console.error("Error fetching question: ", error)
+            console.error("Error fetching question: ", error);
         }
         setImagesLoaded(false);
     }
@@ -222,17 +237,28 @@ export const Question = ({ statisticsUpdater = defaultStatisticsUpdater, type = 
         return base + 15 * (streak - 3); // 50 points for 3 streak, 15 points for each additional streak
     }
 
+    useEffect(() => {
+        const updatedQuestionText = t("game.question", {
+            imageType: t(question.imageType),
+            relation: t(question.relation),
+            topic: question.topic,
+        });
+        setQuestion((prev) => ({
+            ...prev,
+            question: updatedQuestionText,
+        }));
+    }, [i18n.language]);
 
     return (
         <ThemeProvider theme={theme}>
             <Container maxWidth="md" sx={{ py: 4 }}>
                 {/* Game title */}
                 <Typography variant="h4" component="h1" align="center" sx={{ mb: 3, fontWeight: 500 }}>
-                    {type === 'custom' ? "Custom Game 🎨" :
-                        type === 'suddenDeath' ? "Sudden Death ☠️" :
-                            type === 'classical' ? "Classical Game 🎲" :
-                                type === 'timeTrial' ? "Time Trial ⏱️" :
-                                    "Question of the Day 📅"}
+                    {type === 'custom' ? t("game.modes.custom") :
+                        type === 'suddenDeath' ? t("game.modes.suddenDeath") :
+                            type === 'classical' ? t("game.modes.classical") :
+                                type === 'timeTrial' ? t("game.modes.timeTrial") :
+                                    t("game.modes.QOD") }
                 </Typography>
                 {/* Round counter */}
                 <Typography variant="p" component="p" align="center" sx={{ my: 3, fontWeight: 500 }}>
@@ -321,7 +347,7 @@ export const Question = ({ statisticsUpdater = defaultStatisticsUpdater, type = 
                                 width: "100%",
                             }}
                         >
-                            Score: {currentScore}
+                            {t("game.score", { score: currentScore })}
                         </Typography>
                     </Paper>
                 </Box>
@@ -332,19 +358,19 @@ export const Question = ({ statisticsUpdater = defaultStatisticsUpdater, type = 
 
                 {isCorrect && (
                     <Typography variant="h6" component="p" align="center" sx={{ my: 2, color: "green" }}>
-                        Correct! +{score} points
+                        {t("game.correctAnswer", { score: score })}
                     </Typography>
                 )}
 
                 {isIncorrect && (
                     <Typography variant="h6" component="p" align="center" sx={{ my: 2, color: "red" }}>
-                        Incorrect
+                        {t("game.incorrectAnswer")}
                     </Typography>
                 )}
 
                 {isTimeUp && (
                     <Typography variant="h6" component="p" align="center" sx={{ my: 2, color: "red" }}>
-                        You ran out of time!
+                        {t("game.timeUp")}
                     </Typography>
                 )}
                 <Box sx={{ width: "100%", maxWidth: 600, mx: "auto" }}>
@@ -380,7 +406,7 @@ export const Question = ({ statisticsUpdater = defaultStatisticsUpdater, type = 
                             ))
                         ) : (
                             <Typography variant="h6" component="p" align="center" sx={{ my: 2 }}>
-                                Loading images...
+                                {t("game.loadingImages")}
                             </Typography>
                         )}
                     </Grid>

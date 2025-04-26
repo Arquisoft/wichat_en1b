@@ -11,5 +11,8 @@ i18next
         fallbackLng: 'en',
         backend: {
             loadPath: '/locales/{{lng}}.json'
+        },
+        interpolation: {
+            escapeValue: false
         }
     });

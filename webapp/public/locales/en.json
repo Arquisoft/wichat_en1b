@@ -116,6 +116,30 @@
             "perPage": "{{amount}} per page"
         }
     },
+    "game": {
+        "score": "Score: {{score}}",
+        "loadingImages": "Loading images...",
+        "correctAnswer": "Correct! +{{score}} points",
+        "incorrectAnswer": "Incorrect",
+        "question": "Which of the following {{imageType}} {{relation}} {{topic}}?",
+        "modes": {
+            "custom": "Custom Game 🎨",
+            "suddenDeath": "Sudden Death ☠️",
+            "classical": "Classical Game 🎲",
+            "timeTrial": "Time Trial ⏱️",
+            "QOD": "Question of the Day 📅"
+        },
+        "imageTypes": {
+            "image": "images",
+            "flag": "flags"
+        },
+        "relations": {
+            "correspondsTo": "corresponds to",
+            "correspondsToThe": "corresponds to the",
+            "isA": "is a",
+            "belongsTo": "belongs to"
+        }
+    },
     "gameModes": {
         "selectGameMode": "Select Game Mode",
         "categories": {

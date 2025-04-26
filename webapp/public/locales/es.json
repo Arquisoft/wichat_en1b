@@ -31,7 +31,7 @@
                 "suddenDeath": "Muerte Súbita ☠️",
                 "timeTrial": "Contrarreloj ⏱️",
                 "custom": "Personalizado 🎨",
-                "QOD": "Pregunta del Día 📅"
+                "QOD": "PDD 📅"
             },
             "insights": {
                 "global": "Estadísticas Globales 🌍",
@@ -116,6 +116,30 @@
             "perPage": "{{amount}} por página"
         }
     },
+    "game": {
+    "score": "Puntuación: {{score}}",
+    "loadingImages": "Cargando imágenes...",
+    "correctAnswer": "¡Correcto! +{{score}} puntos",
+    "incorrectAnswer": "Incorrecto",
+    "question": "¿Cuál de las siguientes {{imageType}} {{relation}} {{topic}}?",
+    "modes": {
+        "custom": "Juego Personalizado 🎨",
+        "suddenDeath": "Muerte Súbita ☠️",
+        "classical": "Juego Clásico 🎲",
+        "timeTrial": "Contrarreloj ⏱️",
+        "QOD": "Pregunta del Día 📅"
+    },
+    "imageTypes": {
+        "image": "imágenes",
+        "flag": "banderas"
+    },
+    "relations": {
+        "correspondsTo": "corresponde a",
+        "correspondsToThe": "corresponde a el/la",
+        "isA": "es un(a)",
+        "belongsTo": "pertenece a"
+    }
+},
     "gameModes": {
         "selectGameMode": "Seleccionar modo de juego",
         "categories": {
