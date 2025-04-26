@@ -108,34 +108,32 @@ export const Statistics = () => {
           </Tabs>
         </Box>
 
-        <Box sx={{ mt: 2 }}>
-          <StatisticsFilters
-            filters={filters}
+        <StatisticsFilters
+          filters={filters}
+          onFilterChange={handleFilterChange}
+        />
+
+        <Typography variant="h5" component="div" sx={{ mb: 2 }}>
+          {getTabTitle()}
+        </Typography>
+
+        {error && <ErrorMessage message={error} />}
+
+        {loading ? (
+          <LoadingSpinner />
+        ) : (
+          <StatisticsTable
+            statistics={statistics}
+            totalCount={pagination.total}
+            currentUsername={username}
             onFilterChange={handleFilterChange}
+            filters={filters}
+            onPageChange={handlePageChange}
+            currentOffset={pagination.offset}
+            limit={pagination.limit}
+            getImageUrl={recordRetriever.getStaticProfileImageUrl.bind(recordRetriever)}
           />
-
-          <Typography variant="h5" component="div" sx={{ mb: 2 }}>
-            {getTabTitle()}
-          </Typography>
-
-          {error && <ErrorMessage message={error} />}
-
-          {loading ? (
-            <LoadingSpinner />
-          ) : (
-            <StatisticsTable
-              statistics={statistics}
-              totalCount={pagination.total}
-              currentUsername={username}
-              onFilterChange={handleFilterChange}
-              filters={filters}
-              onPageChange={handlePageChange}
-              currentOffset={pagination.offset}
-              limit={pagination.limit}
-              getImageUrl={recordRetriever.getStaticProfileImageUrl.bind(recordRetriever)}
-            />
-          )}
-        </Box>
+        )}
       </Paper>
     </div>
   );
