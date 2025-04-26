@@ -5,6 +5,17 @@ const StatisticsFilters = ({
     filters,
     onFilterChange
   }) => {
+
+    const handleResetFilters = () => {
+      onFilterChange({
+        minGames: undefined,
+        minScore: undefined,
+        registeredAfter: undefined,
+        registeredBefore: undefined,
+        offset: 0
+      });
+    };
+
     return (
       <div className="statistics-filters">
         <div className="filter-group">
@@ -52,6 +63,14 @@ const StatisticsFilters = ({
               onFilterChange({ registeredBefore: e.target.value || undefined })
             }
           />
+        </div>
+        <div className="filter-group">
+          <button 
+            className="reset-filters-button" 
+            onClick={handleResetFilters}
+          >
+            Reset Filters
+          </button>
         </div>
       </div>
     );

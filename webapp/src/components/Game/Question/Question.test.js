@@ -224,8 +224,6 @@ describe('Question Component', () => {
         });
     });
 
-    // TODO : Commented to check coverage
-    /*
     test('increments games played on initial load', async () => {
         render(<Question statisticsUpdater={mockStatisticsUpdater} />);
 
@@ -233,10 +231,7 @@ describe('Question Component', () => {
             expect(mockStatisticsUpdater.incrementGamesPlayed).toHaveBeenCalledTimes(1);
         });
     });
-    */
 
-    // TODO : Commented to check coverage
-    /*
     test('handles request new question button click', async () => {
         render(<Question statisticsUpdater={mockStatisticsUpdater} />);
 
@@ -250,10 +245,7 @@ describe('Question Component', () => {
         expect(axios.get).toHaveBeenCalledTimes(2);
         expect(mockGameContext.setGameEnded).toHaveBeenCalledWith(true);
     });
-    */
 
-    // TODO : Commented to check coverage
-    /*
     test('shows timer in red when time is running low', async () => {
         render(<Question statisticsUpdater={mockStatisticsUpdater} />);
 
@@ -270,7 +262,6 @@ describe('Question Component', () => {
         const circularProgress = document.querySelector('.MuiCircularProgress-colorError');
         expect(circularProgress).toBeInTheDocument();
     });
-    */
 
     test('handles error when fetching question', async () => {
         axios.get.mockRejectedValueOnce(new Error('Network error'));
