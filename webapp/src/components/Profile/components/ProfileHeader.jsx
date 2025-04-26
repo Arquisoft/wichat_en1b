@@ -1,4 +1,5 @@
 import { Typography, Box, Avatar, Button, Chip } from "@mui/material";
+import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import SettingsIcon from '@mui/icons-material/Settings';
 
 const ProfileHeader = ({ 
@@ -62,9 +63,10 @@ const ProfileHeader = ({
         </Box>
         
         {registrationDate && (
-          <Typography variant="body1" color="text.secondary" sx={{ mb: 1 }}>
-            Member since {formatDate(registrationDate, 'MMMM d, yyyy')}
-          </Typography>
+          <Typography variant="body1" color="text.secondary" sx={{ mb: 1, display: 'flex', alignItems: 'center' }}>
+          <CalendarTodayIcon sx={{ fontSize: 18, mr: 1 }} />
+          Member since {formatDate(registrationDate, 'MMMM d, yyyy')}
+        </Typography>
         )}
         
         <Typography variant="body2" color="text.secondary">

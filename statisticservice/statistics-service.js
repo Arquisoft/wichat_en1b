@@ -264,7 +264,6 @@ app.get('/statistics/:username', async (req, res) => {
 
   // Record the profile visit if the visitor is not the profile owner
   if (currentUsername !== targetUsername) {
-    console.log("currentUsername !== targetUsername")
     // Use findOneAndUpdate to atomically update the document
     await User.findOneAndUpdate(
       { username: targetUsername },
