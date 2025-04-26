@@ -24,9 +24,21 @@ if (mongoose.connection.readyState === 0) {
  */
 function buildRegistrationDateFilter(before, after) {
   const filter = {};
-  if (before || after) filter.registrationDate = {};
-  if (before) filter.registrationDate.$lte = new Date(before);
-  if (after) filter.registrationDate.$gte = new Date(after);
+
+  if (before) {
+    if (!isValidDateString(before)) {
+      throw new Error('Invalid registeredBefore date format');
+    }
+    filter.registrationDate = filter.registrationDate || {};
+    filter.registrationDate.$lte = new Date(before);
+  }
+  if (after) {
+    if (!isValidDateString(after)) {
+      throw new Error('Invalid registeredAfter date format');
+    }
+    filter.registrationDate = filter.registrationDate || {};
+    filter.registrationDate.$gte = new Date(after);
+  }
   return filter;
 }
 
@@ -50,18 +62,39 @@ function buildMinFilters(minGames, minScore) {
   return filter;
 }
 
+function isValidDateString(dateString) {
+  // Accepts only yyyy-mm-dd or yyyy-mm-ddTHH:MM:SS(.sss)Z
+  const isoDateRegex = /^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2}:\d{2}(\.\d{3})?Z)?$/;
+  if (!isoDateRegex.test(dateString)) return false;
+
+  const date = new Date(dateString);
+  if (isNaN(date.getTime())) return false;
+
+  // If only date part, check that the day/month/year match
+  if (dateString.length === 10) {
+    // yyyy-mm-dd
+    const [year, month, day] = dateString.split('-').map(Number);
+    return (
+      date.getUTCFullYear() === year &&
+      date.getUTCMonth() + 1 === month &&
+      date.getUTCDate() === day
+    );
+  }
+  return true;
+}
+
 // Get statistics for all users (ordered)
 app.get('/statistics', async (req, res) => {
-  
+
   const validSortFields = [
-    'username', 'gamesPlayed', 'questionsAnswered', 
+    'username', 'gamesPlayed', 'questionsAnswered',
     'correctAnswers', 'incorrectAnswers', 'accuracy',
     'totalScore', 'maxScore', 'registrationDate'
   ];
 
   try {
     // Extract query parameters
-    const { 
+    const {
       sort = 'totalScore',
       order = 'desc',
       limit = 50,
@@ -74,19 +107,46 @@ app.get('/statistics', async (req, res) => {
     } = req.query;
 
 
+    const validGameTypes = ['classical', 'suddenDeath', 'timeTrial', 'qod', 'custom'];
+
     if (!validSortFields.includes(sort)) return res.status(400).json({ error: 'Invalid sort field' });
     if (!['asc', 'desc'].includes(order)) return res.status(400).json({ error: 'Invalid sort order' });
+
+    if (gameType && !validGameTypes.includes(gameType)) {
+      return res.status(400).json({ error: 'Invalid game type' });
+    }
+
+    if (minGames !== undefined && (isNaN(Number(minGames)) || Number(minGames) < 0)) {
+      return res.status(400).json({ error: 'Invalid minimum games value' });
+    }
+    if (minScore !== undefined && (isNaN(Number(minScore)) || Number(minScore) < 0)) {
+      return res.status(400).json({ error: 'Invalid minimum score value' });
+    }
+
+    if (registeredBefore && !isValidDateString(registeredBefore)) {
+      return res.status(400).json({ error: 'Invalid registeredBefore date format' });
+    }
+    if (registeredAfter && !isValidDateString(registeredAfter)) {
+      return res.status(400).json({ error: 'Invalid registeredAfter date format' });
+    }
+
+    if (isNaN(Number(limit)) || Number(limit) < 1 || Number(limit) > 100) {
+      return res.status(400).json({ error: 'Invalid limit value, must be between 1 and 100' });
+    }
+    if (isNaN(Number(offset)) || Number(offset) < 0) {
+      return res.status(400).json({ error: 'Invalid offset value, must be non-negative' });
+    }
 
     // Build the aggregation pipeline for MongoDB
     const pipeline = [
       // 1. Filter users by registration date and gameType (if provided)
-      { 
+      {
         $match: {
           ...buildRegistrationDateFilter(registeredBefore, registeredAfter),
           ...buildGameTypeFilter(gameType)
         }
       },
-       // 2. Project only the needed fields (for performance)
+      // 2. Project only the needed fields (for performance)
       {
         $project: {
           username: 1,
@@ -98,7 +158,7 @@ app.get('/statistics', async (req, res) => {
           denormQuestions: "$questionsAnswered"
         }
       },
-       // 3. If a gameType filter is set, create a filteredGames array with only those games
+      // 3. If a gameType filter is set, create a filteredGames array with only those games
       {
         $addFields: {
           filteredGames: gameType ? {
@@ -113,7 +173,7 @@ app.get('/statistics', async (req, res) => {
       // 4. Calculate statistics for each user
       {
         $addFields: {
-           // If gameType is set, calculate stats from filteredGames; otherwise, use denormalized fields
+          // If gameType is set, calculate stats from filteredGames; otherwise, use denormalized fields
           gamesPlayed: gameType ? { $size: "$filteredGames" } : "$denormGamesPlayed",
           correctAnswers: gameType ? { $sum: "$filteredGames.correctAnswers" } : "$denormCorrect",
           questionsAnswered: gameType ? { $sum: "$filteredGames.questionsAnswered" } : "$denormQuestions",
@@ -121,7 +181,7 @@ app.get('/statistics', async (req, res) => {
           maxScore: { $max: "$filteredGames.score" }
         }
       },
-       // 5. Calculate incorrectAnswers and accuracy
+      // 5. Calculate incorrectAnswers and accuracy
       {
         $addFields: {
           incorrectAnswers: { $subtract: ["$questionsAnswered", "$correctAnswers"] },
@@ -135,8 +195,8 @@ app.get('/statistics', async (req, res) => {
         }
       },
       // 6. Filter out users who don't meet minGames or minScore requirements (if provided)
-      { 
-        $match: buildMinFilters(minGames, minScore) 
+      {
+        $match: buildMinFilters(minGames, minScore)
       },
       // 7. Facet for pagination and total count
       {
@@ -167,7 +227,7 @@ app.get('/statistics', async (req, res) => {
 
     // Run the aggregation pipeline
     const [result] = await User.aggregate(pipeline);
-    
+
     // Prepare the response
     const total = result?.metadata[0]?.total || 0;
     const users = result?.data || [];
