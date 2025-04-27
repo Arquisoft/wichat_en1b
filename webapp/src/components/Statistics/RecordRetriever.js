@@ -34,27 +34,15 @@ class RecordRetriever {
                     params.append(key, filters[key]);
                 }
             });
-
+            
             const url = `${this.apiUrl}/statistics${params.toString() ? '?' + params.toString() : ''}`;
             const response = await axios.get(url, { headers: { Authorization: `Bearer ${token}` } });
-
-            // reshape data
-            const { users, pagination } = response.data;
-            // map to frontend fields
-            const mapped = users.map((u, idx) => ({
-                id: idx + pagination.offset + 1,
-                username: u.username,
-                totalGames: u.globalStatistics.gamesPlayed,
-                totalScore: u.globalStatistics.questionsAnswered,
-                averageScore: u.globalStatistics.gamesPlayed > 0
-                    ? u.globalStatistics.questionsAnswered / u.globalStatistics.gamesPlayed
-                    : null,
-                highScore: u.globalStatistics.maxScore,
-                preferredGameType: 'Mixed',
-                registrationDate: u.registrationDate
-            }));
-
-            return { users: mapped, pagination, username: parsedUserCookie.username };
+            
+            return { 
+                users: response.data.users,
+                pagination: response.data.pagination,
+                username: parsedUserCookie.username,
+            };
 
         } catch (error) {
             console.error("Error fetching statistics:", error);
@@ -64,6 +52,7 @@ class RecordRetriever {
             throw new Error(error.response?.data?.error || "Failed to retrieve statistics");
         }
     }
+
 
     getStaticProfileImageUrl(username) {
         return `${this.apiUrl}/users/${username}/image`;
