@@ -273,6 +273,26 @@ describe('Gateway Service', () => {
     expect(response.headers['content-type']).toBe('image/png; charset=utf-8');
   });
 
+  it('should update the user account successfully', async () => {
+    process.env.JWT_SECRET = 'mocksecret';
+    const token = jwt.sign({ username: 'testuser' }, process.env.JWT_SECRET, { expiresIn: '1h' });
+
+    axios.patch.mockImplementationOnce((url, data) => {
+      if (url.endsWith('/users/testuser') && data.currentUser === 'testuser') {
+        return Promise.resolve({ data: { success: true, message: 'Account updated successfully' } });
+      }
+    });
+
+    const response = await request(app)
+      .patch('/users/testuser')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ username: 'newusername', password: 'newpassword', passwordRepeat: 'newpassword' });
+
+    expect(response.statusCode).toBe(200);
+    expect(response.body.success).toBe(true);
+    expect(response.body.message).toBe('Account updated successfully');
+  });
+
   it('should retrieve some default image', async () => {
     const response = await request(app)
       .get('/default-images/image_1.png');
@@ -510,6 +530,34 @@ describe('Error handling', () => {
   
     expect(response.statusCode).toBe(400);
     expect(response.body.error).toBe('Invalid game type');
+  });
+
+  it('should handle errors from the user service', async () => {
+    process.env.JWT_SECRET = 'mocksecret';
+    const token = jwt.sign({ username: 'testuser' }, process.env.JWT_SECRET, { expiresIn: '1h' });
+
+    axios.patch.mockImplementationOnce(() => getRejectedPromise(400, 'Invalid update data'));
+
+    const response = await request(app)
+      .patch('/users/testuser')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ username: 'newusername', password: 'newpassword', passwordRepeat: 'newpassword' });
+
+    expect(response.statusCode).toBe(400);
+    expect(response.body.error).toBe('Invalid update data');
+  });
+
+  it('should return 403 if trying to update another user\'s account', async () => {
+    process.env.JWT_SECRET = 'mocksecret';
+    const token = jwt.sign({ username: 'testuser' }, process.env.JWT_SECRET, { expiresIn: '1h' });
+
+    const response = await request(app)
+      .patch('/users/otheruser')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ username: 'newusername', password: 'newpassword', passwordRepeat: 'newpassword' });
+
+    expect(response.statusCode).toBe(403);
+    expect(response.body.error).toBe('You can only update your own account');
   });
 
   it('should return 400 if no image file is provided', async () => {
