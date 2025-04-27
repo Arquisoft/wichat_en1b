@@ -103,14 +103,32 @@
         "welcome": "Welcome {{username}}!",
         "avatar": "Avatar",
         "username": "Username",
+        "questions": "Questions",
+        "correct": "Correct",
+        "accuracy": "Accuracy %",
         "gamesPlayed": "Games played",
         "totalScore": "Total score",
         "avgScore": "Avg. score",
         "highestScore": "Highest score",
         "gameType": "Game type",
         "memberSince": "Member since",
-        "noStatsFound": "No statistics found",
+        "noStatsFound": "No statistics found.",
         "you": "You",
+        "statisticTypes": {
+            "global": "Global 🌍",
+            "classical": "Classical 🎲",
+            "suddenDeath": "Sudden Death ☠️",
+            "timeTrial": "Time Trial ⏱️",
+            "custom": "Custom 🎨",
+            "QOD": "QOD 📅"
+        },
+        "filters": {
+            "minGames": "Min Games",
+            "minScore": "Min Score",
+            "registeredAfter": "Registered After",
+            "registeredBefore": "Registered Before",
+            "reset": "Reset Filters"
+        },
         "pagination": {
             "first": "First",
             "previous": "Previous",
