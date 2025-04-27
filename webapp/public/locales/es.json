@@ -71,6 +71,10 @@
             "showAll": "Mostrar todo ({{count}})",
             "noVisitors": "Aún no hay visitantes"
         },
+        "errors": {
+            "failedToRetrieveStatistics": "Hubo un error al obtener las estadísticas.",
+            "invalidImage": "El archivo subido no es una imagen."
+        },
         "errorStates": {
                 "retry": "Reintentar",
                 "goBackToMenu": "Volver al menú"
@@ -114,32 +118,48 @@
             "last": "Última",
             "page": "Página {{page}} de {{total}}",
             "perPage": "{{amount}} por página"
+        },
+        "errors": {
+            "userNotFound": "Usuario no encontrado.",
+            "sessionExpired": "Tu sesión ha expirado. Por favor inicia sesión de nuevo.",
+            "failedToUpdate": "Hubo un error actualizando las estadísticas."
         }
     },
     "game": {
-    "score": "Puntuación: {{score}}",
-    "loadingImages": "Cargando imágenes...",
-    "correctAnswer": "¡Correcto! +{{score}} puntos",
-    "incorrectAnswer": "Incorrecto",
-    "question": "¿Cuál de las siguientes {{imageType}} {{relation}} {{topic}}?",
-    "modes": {
-        "custom": "Juego Personalizado 🎨",
-        "suddenDeath": "Muerte Súbita ☠️",
-        "classical": "Juego Clásico 🎲",
-        "timeTrial": "Contrarreloj ⏱️",
-        "QOD": "Pregunta del Día 📅"
+        "score": "Puntuación: {{score}}",
+        "loadingImages": "Cargando imágenes...",
+        "correctAnswer": "¡Correcto! +{{score}} puntos",
+        "incorrectAnswer": "Incorrecto",
+        "question": "¿Cuál de las siguientes {{imageType}} {{relation}} {{topic}}?",
+        "chat": {
+            "thinking": "Pensando...",
+            "you": "Tú",
+            "AI": "IA",
+            "chatAssistant": "Asistente de Chat",
+            "askMeAnything": "¡Pregúntame cualquier cosa sobre la pregunta!",
+            "typeMessage": "Escribe tu mensaje...",
+            "attemptsUsed": "{{used}} / {{total}} intentos usados",
+            "pointsConsumed": "-{{points}} puntos",
+            "cantProcessRequest": "Lo siento, no pude procesar tu solicitud."
+        },
+        "modes": {
+            "custom": "Juego Personalizado 🎨",
+            "suddenDeath": "Muerte Súbita ☠️",
+            "classical": "Juego Clásico 🎲",
+            "timeTrial": "Contrarreloj ⏱️",
+            "QOD": "Pregunta del Día 📅"
+        },
+        "imageTypes": {
+            "image": "imágenes",
+            "flag": "banderas"
+        },
+        "relations": {
+            "correspondsTo": "corresponde a",
+            "correspondsToThe": "corresponde al/la",
+            "isA": "es un(a)",
+            "belongsTo": "pertenece a"
+        }
     },
-    "imageTypes": {
-        "image": "imágenes",
-        "flag": "banderas"
-    },
-    "relations": {
-        "correspondsTo": "corresponde a",
-        "correspondsToThe": "corresponde a el/la",
-        "isA": "es un(a)",
-        "belongsTo": "pertenece a"
-    }
-},
     "gameModes": {
         "selectGameMode": "Seleccionar modo de juego",
         "categories": {
@@ -183,7 +203,11 @@
         "logIn": "Iniciar sesión",
         "or": "o",
         "dontHaveAccount": "¿No tienes una cuenta?",
-        "signUpHere": "Regístrate aquí"  
+        "signUpHere": "Regístrate aquí",
+        "errors": {
+            "missingFields": "Falta alguno de los campos.",
+            "invalidCredentials": "Usuario o contraseña inválidos."
+        }
     },
     "signUp": {
         "username": "Nombre de usuario",
@@ -192,6 +216,12 @@
         "signUp": "Registrarse",
         "or": "o",
         "alreadyHaveAccount": "¿Ya tienes una cuenta?",
-        "logInHere": "Inicia sesión aquí"
+        "logInHere": "Inicia sesión aquí",
+        "errors": {
+            "duplicateUsername": "El nombre de usuario proporcionado ya está en uso. Por favor, elige otro.",
+            "invalidUsername": "Nombre de usuario inválido. Debe tener entre 3 y 20 caracteres y contener solo letras, números y guiones bajos.",
+            "invalidPassword": "Contraseña inválida. Debe tener al menos 8 caracteres e incluir al menos una letra mayúscula, una letra minúscula, un número y un carácter especial.",
+            "passwordsDoNotMatch": "La contraseña y la confirmación no coinciden, por favor intentalo de nuevo."
+        }
     }
 }

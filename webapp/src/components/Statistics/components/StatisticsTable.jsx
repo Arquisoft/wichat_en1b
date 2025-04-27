@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { format } from 'date-fns';
+import { es, enUS } from 'date-fns/locale';
 import { Avatar } from '@mui/material';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -23,6 +24,8 @@ const StatisticsTable = ({
     registrationDate: 'registrationDate'
   };
 
+  const { t, i18n } = useTranslation();
+
   const getSortIcon = (col) => {
     const field = columnMap[col] || col;
     if (filters.sort !== field) return '⇅';
@@ -36,13 +39,14 @@ const StatisticsTable = ({
     onFilterChange({ sort: field, order: isSame && filters.order === 'asc' ? 'desc' : 'asc' });
   };
 
-  const formatDate = (dateString) => dateString ? format(new Date(dateString), 'MM/dd/yyyy') : 'N/A';
+  const formatDate = (dateString) => {
+    if (!dateString) return 'N/A';
+    return new Date(dateString).toLocaleDateString(i18n.language, { year: 'numeric', month: 'short', day: 'numeric' });
+  };
   const isCurrentUser = (u) => u === currentUsername;
 
   const totalPages = Math.ceil(totalCount / limit) || 1;
   const currentPage = Math.floor(currentOffset / limit) + 1;
-
-  const { t } = useTranslation();
 
   return (
     <div className="statistics-table-container">

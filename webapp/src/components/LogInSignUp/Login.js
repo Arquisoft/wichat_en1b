@@ -1,5 +1,5 @@
 // src/components/Login.js
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { SitemarkIcon } from '../CustomIcons';
 import { Box, Button, FormControl, TextField, Typography, Divider } from '@mui/material';
 import { LogInContainer, Card } from '../CustomComponents';
@@ -10,13 +10,18 @@ import { useTranslation } from 'react-i18next';
 export const Login = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [errorDisplayed, setErrorDisplayed] = useState('');
   const { authenticateUser, error } = useAuth();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
  
   const logIn = (e) => {
     e.preventDefault();
     authenticateUser('login', username, password)
   }
+
+  useEffect(() => {
+    setErrorDisplayed(t(error));
+  }, [error, i18n.language]);
 
   return (
     <LogInContainer direction="column" justifyContent="space-between">
@@ -64,9 +69,9 @@ export const Login = () => {
             variant="contained"
             onClick={logIn}
           >
-            {t("logIn.logIn")}
+            {t("logIn.logIn")}  
           </Button>
-          {error && <p style={{ color: 'red' }}>{error}</p>}
+          {error && <p style={{ color: 'red' }}>{errorDisplayed}</p>}
 
         </Box>
         <Divider>{t("logIn.or")}</Divider>

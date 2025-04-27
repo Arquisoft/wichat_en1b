@@ -134,7 +134,7 @@ export const Profile = () => {
                     setProfileImage(userProfileSettings.getProfileImageUrl(profileUsernameParam));
                     setLoading(false);
                 } catch (error) {
-                    setError(error.message || "Failed to retrieve statistics");
+                    setError(error.message || "profile.errors.failedToRetrieveStatistics");
                     setLoading(false);
                 }
             };
@@ -145,7 +145,6 @@ export const Profile = () => {
     useEffect(() => {
         setDefaultImages(userProfileSettings.getDefaultImages());
     }, []);
-
 
     const getMembershipDuration = () => {
         if (!registrationDate) return "N/A";
@@ -162,7 +161,7 @@ export const Profile = () => {
                     <LoadingState message={t("profile.loadingStatistics")} />
                 ) : error ? (
                     <ErrorState
-                        error={error}
+                        error={t(error)}
                         onRetry={handleRetry}
                         onLogout={handleLogout}
                     />

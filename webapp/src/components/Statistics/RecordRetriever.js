@@ -59,9 +59,9 @@ class RecordRetriever {
         } catch (error) {
             console.error("Error fetching statistics:", error);
             if (error.response?.status === 401 || error.response?.status === 403) {
-                throw new Error("Your session has expired. Please log in again.");
+                throw new Error("statistics.errors.sessionExpired");
             }
-            throw new Error(error.response?.data?.error || "Failed to retrieve statistics");
+            throw new Error(error.response?.data?.error || "profile.errors.failedToRetrieveStatistics");
         }
     }
 

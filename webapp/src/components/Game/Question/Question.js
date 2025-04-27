@@ -96,8 +96,7 @@ export const Question = ({ statisticsUpdater = defaultStatisticsUpdater, type = 
         setIsPaused(true);
         setGameEnded(true);
         try {
-            let questionResponse = await axios.get(`${gatewayEndpoint}/question/${questionType}`);
-            console.log("Question response: ", questionResponse.data);
+            const questionResponse = await axios.get(`${gatewayEndpoint}/question/${questionType}`);
             const questionText = t("game.question", {
                 imageType: t(questionResponse.data.imageType),
                 relation: t(questionResponse.data.relation),

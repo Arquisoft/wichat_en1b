@@ -3,7 +3,7 @@ import {
     Dialog, DialogTitle, DialogContent, DialogActions, 
     TextField, FormControlLabel, Checkbox
   } from "@mui/material";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
   
   const AccountSettingsDialog = ({ 
@@ -112,7 +112,7 @@ import { useTranslation } from "react-i18next";
             </Button>
             {updateError && (
               <Typography variant="body2" color="error" sx={{ mt: 1, textAlign: "center", fontSize: "0.75rem" }}>
-                {updateError}
+                {t(updateError)}
               </Typography>
             )}
           </Box>
@@ -127,7 +127,7 @@ import { useTranslation } from "react-i18next";
             </Button>
             {uploadError && (
               <Typography variant="body2" color="error" sx={{ textAlign: "center", fontSize: "0.75rem" }}>
-                {uploadError}
+                {t(uploadError)}
               </Typography>
             )}
             <Box
@@ -156,7 +156,7 @@ import { useTranslation } from "react-i18next";
             </Box>
             {defaultImageError && (
               <Typography variant="body2" color="error" sx={{ mt: 1, textAlign: "center", fontSize: "0.75rem" }}>
-                {defaultImageError}
+                {t(defaultImageError)}
               </Typography>
             )}
           </Box>

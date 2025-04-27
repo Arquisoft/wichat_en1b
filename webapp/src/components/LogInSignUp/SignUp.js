@@ -1,5 +1,5 @@
 // src/components/AddUser.js
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Typography, TextField, Button, Box, FormControl, Divider } from '@mui/material';
 import { SitemarkIcon } from '../CustomIcons';
 import { Card, LogInContainer } from '../CustomComponents';
@@ -12,12 +12,17 @@ export const SignUp = () => {
   const [password, setPassword] = useState('');
   const [confirmpassword, setConfirmationPassword] = useState('');
   const { authenticateUser, error } = useAuth();
-  const { t } = useTranslation();
+  const [errorDisplayed, setErrorDisplayed] = useState('');
+  const { t, i18n } = useTranslation();
 
   const signUp = (e) => {
     e.preventDefault();
     authenticateUser('addUser', username, password, confirmpassword)
-  } 
+  }
+
+  useEffect(() => {
+    setErrorDisplayed(t(error));
+  }, [error, i18n.language]);
 
   return (
     <LogInContainer direction="column" justifyContent="space-between">
@@ -80,7 +85,7 @@ export const SignUp = () => {
             onClick={signUp}>
             {t("signUp.signUp")}
           </Button>
-          {error && <p style={{ color: 'red' }}>{error}</p>}
+          {error && <p style={{ color: 'red' }}>{errorDisplayed}</p>}
 
         </Box>
         <Divider>{t("signUp.or")}</Divider>

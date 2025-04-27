@@ -71,6 +71,10 @@
             "showAll": "Show All ({{count}})",
             "noVisitors": "No visitors yet"
         },
+        "errors": {
+            "failedToRetrieveStatistics": "Failed to retrieve statistics",
+            "invalidImage": "Uploaded file is not an image."
+        },
         "errorStates": {
             "retry": "Retry",
             "goBackToMenu": "Go back to menu"
@@ -114,6 +118,11 @@
             "last": "Last",
             "page": "Page {{page}} of {{total}}",
             "perPage": "{{amount}} per page"
+        },
+        "errors": {
+            "userNotFound": "User not found.",
+            "sessionExpired": "Your session has expired. Please log in again.",
+            "failedToUpdate": "Failed to update statistics"
         }
     },
     "game": {
@@ -122,6 +131,17 @@
         "correctAnswer": "Correct! +{{score}} points",
         "incorrectAnswer": "Incorrect",
         "question": "Which of the following {{imageType}} {{relation}} {{topic}}?",
+        "chat": {
+            "thinking": "Thinking...",
+            "you": "You",
+            "AI": "AI",
+            "chatAssistant": "Chat Assistant",
+            "askMeAnything": "Ask me anything about the question!",
+            "typeMessage": "Type your message...",
+            "attemptsUsed": "{{used}} / {{total}} attempts used",
+            "pointsConsumed": "-{{points}} points",
+            "cantProcessRequest": "Sorry, I couldn't process your request."
+        },
         "modes": {
             "custom": "Custom Game 🎨",
             "suddenDeath": "Sudden Death ☠️",
@@ -183,7 +203,11 @@
         "logIn": "Log in",
         "or": "or",
         "dontHaveAccount": "Don't have an account?",
-        "signUpHere": "Sign up here"
+        "signUpHere": "Sign up here",
+        "errors": {
+            "missingFields": "Some of the fields are missing.",
+            "invalidCredentials": "Invalid username or password."
+        }
     },
     "signUp": {
         "username": "Username",
@@ -192,6 +216,12 @@
         "signUp": "Sign up",
         "or": "or",
         "alreadyHaveAccount": "Already have an account?",
-        "logInHere": "Log in here"
+        "logInHere": "Log in here",
+        "errors": {
+            "duplicateUsername": "The username provided is already in use. Please choose a different one.",
+            "invalidUsername": "Invalid username. It must be 3-20 characters long and contain only letters, numbers and underscores.",
+            "invalidPassword": "Invalid password. It must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, one number, and one special character.",
+            "passwordsDoNotMatch": "The password and the confirmation do not match, please try again."
+        }
     }
 }

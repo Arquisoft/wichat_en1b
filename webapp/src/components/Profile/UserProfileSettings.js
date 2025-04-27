@@ -16,7 +16,7 @@ export default class UserProfileSettings {
 
       return { username: response.data.newUsername, token: response.data.token };
     } catch (error) {
-      throw new Error("Failed changing username and password: " + error.response?.data?.error ||  "Unknown error.");
+      throw new Error(error.response?.data?.error ||  "Unknown error.");
     }
   }
 
@@ -32,7 +32,7 @@ export default class UserProfileSettings {
         );
       }
     } catch (error) {
-      throw new Error("Failed changing default profile image: " + error.response?.data?.error || error.message);
+      throw new Error(error.response?.data?.error || error.message);
     }
   }
 
@@ -52,7 +52,7 @@ export default class UserProfileSettings {
         );
       }
     } catch (error) {
-      throw new Error("Failed to upload the image: " + error.response?.data?.error || error.message);
+      throw new Error(error.response?.data?.error || error.message);
     }
   }
 
