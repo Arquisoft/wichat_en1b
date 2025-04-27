@@ -114,7 +114,7 @@ describe('POST /statistics', () => {
       .set('username', 'unknown')
       .send({ gamesPlayed: 5 });
     expect(res.status).toBe(404);
-    expect(res.body.error).toBe('User not found');
+    expect(res.body.error).toBe('statistics.errors.userNotFound');
   });
 
   it('should update user statistics correctly', async () => {
@@ -146,7 +146,7 @@ describe('POST /recordGame', () => {
       .set('username', 'nouser')
       .send({ gameType: 'classical', score: 10 });
     expect(res.status).toBe(404);
-    expect(res.body.error).toBe('User not found');
+    expect(res.body.error).toBe('statistics.errors.userNotFound');
   });
 
   it('should push new game and increment gamesPlayed', async () => {
@@ -185,7 +185,7 @@ describe('GET /statistics/:username', () => {
       .get('/statistics/nonexistent')
       .set('currentuser', 'tester');
     expect(res.status).toBe(404);
-    expect(res.body.error).toBe('User not found');
+    expect(res.body.error).toBe('statistics.errors.userNotFound');
   });
 
   it('should return public statistics for visitor', async () => {

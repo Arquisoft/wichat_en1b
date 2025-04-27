@@ -72,8 +72,9 @@ describe('Question Service', () => {
 
         expect(response.status).toBe(200);
         expect(response.body).toHaveProperty('id');
-        expect(response.body).toHaveProperty('question');
-        expect(response.body).toHaveProperty('images');
+        expect(response.body).toHaveProperty('imageType');
+        expect(response.body).toHaveProperty('relation');
+        expect(response.body).toHaveProperty('topic');
         expect(response.body.images).toHaveLength(4);
     });
 

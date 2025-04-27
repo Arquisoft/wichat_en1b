@@ -65,8 +65,7 @@ describe('Auth Service', () => {
     const response = await request(app).post('/login').send(missingFieldsUser);
     
     expect(response.status).toBe(400);
-    expect(response.body.errors).toHaveLength(1);
-    expect(response.body.errors[0]).toHaveProperty("msg", "The password is required");
+    expect(response.body).toHaveProperty("error", "logIn.errors.missingFields");
   });
 
   it('Should throw a 401 status code if password is incorrect', async () => { 
@@ -75,7 +74,7 @@ describe('Auth Service', () => {
     const response = await request(app).post('/login').send(invalidUser);
     
     expect(response.status).toBe(401);
-    expect(response.body).toHaveProperty('error', 'Invalid credentials');
+    expect(response.body).toHaveProperty('error', 'logIn.errors.invalidCredentials');
   });
 
   it('Should throw a 500 status code if some internal error occurs (f.i. missing JWT_SECRET)', async () => {     

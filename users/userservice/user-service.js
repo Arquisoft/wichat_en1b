@@ -121,7 +121,7 @@ app.patch('/users/:username', async (req, res) => {
 
       const existingUser = await User.findOne({ username: { $eq: validateUsername(newUsername) } });
       if (existingUser) {
-        return res.status(400).json({ error: 'The new username is already in use. Please choose a different one.' });
+        return res.status(400).json({ error: 'signUp.errors.duplicateUsername' });
       }
 
       if (user.image && user.image.startsWith('/images/custom/')) {
