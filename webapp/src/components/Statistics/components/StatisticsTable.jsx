@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { format } from 'date-fns';
 import { Avatar } from '@mui/material';
 import { Link } from 'react-router-dom';
@@ -14,11 +14,15 @@ const StatisticsTable = ({
   limit = 10,
   getImageUrl
 }) => {
+  // Map column names to their actual field names in the data
   const columnMap = {
     username: 'username',
-    totalGames: 'gamesPlayed',
-    totalScore: 'totalScore',
-    highScore: 'maxScore',
+    gamesPlayed: 'gamesPlayed',
+    questionsAnswered: 'questionsAnswered',
+    correctAnswers: 'correctAnswers',
+    incorrectAnswers: 'incorrectAnswers',
+    accuracy: 'accuracy',
+    totalScore: 'totalScore', // Sum of scores from games
     registrationDate: 'registrationDate'
   };
 
@@ -41,6 +45,12 @@ const StatisticsTable = ({
   const totalPages = Math.ceil(totalCount / limit) || 1;
   const currentPage = Math.floor(currentOffset / limit) + 1;
 
+  // Calculate accuracy as percentage
+  const calculateAccuracy = (correct, total) => {
+    if (!total) return 0;
+    return (correct / total * 100).toFixed(1);
+  };
+
   return (
     <div className="statistics-table-container">
       <table className="statistics-table">
@@ -50,17 +60,21 @@ const StatisticsTable = ({
             <th onClick={() => handleHeaderClick('username')} className="sortable-header">
               Username {getSortIcon('username')}
             </th>
-            <th onClick={() => handleHeaderClick('totalGames')} className="sortable-header">
-              Games Played {getSortIcon('totalGames')}
+            <th onClick={() => handleHeaderClick('gamesPlayed')} className="sortable-header">
+              Games Played {getSortIcon('gamesPlayed')}
+            </th>
+            <th onClick={() => handleHeaderClick('questionsAnswered')} className="sortable-header">
+              Questions {getSortIcon('questionsAnswered')}
+            </th>
+            <th onClick={() => handleHeaderClick('correctAnswers')} className="sortable-header">
+              Correct {getSortIcon('correctAnswers')}
+            </th>
+            <th onClick={() => handleHeaderClick('accuracy')} className="sortable-header">
+              Accuracy % {getSortIcon('accuracy')}
             </th>
             <th onClick={() => handleHeaderClick('totalScore')} className="sortable-header">
               Total Score {getSortIcon('totalScore')}
             </th>
-            <th className="non-sortable-header">Avg. Score</th>
-            <th onClick={() => handleHeaderClick('highScore')} className="sortable-header">
-              High Score {getSortIcon('highScore')}
-            </th>
-            <th className="non-sortable-header">Game Type</th>
             <th onClick={() => handleHeaderClick('registrationDate')} className="sortable-header">
               Member Since {getSortIcon('registrationDate')}
             </th>
@@ -68,8 +82,8 @@ const StatisticsTable = ({
         </thead>
         <tbody>
           {statistics.length > 0 ? (
-            statistics.map((user, i) => (
-              <tr key={user.id} className={isCurrentUser(user.username) ? 'current-user-row' : ''}>
+            statistics.map((user) => (
+              <tr key={user._id} className={isCurrentUser(user.username) ? 'current-user-row' : ''}>
                 <td>
                   <Avatar
                     src={getImageUrl(user.username)}
@@ -86,16 +100,18 @@ const StatisticsTable = ({
                     {user.username} {isCurrentUser(user.username) && '(You)'}
                   </Link>
                 </td>
-                <td>{user.totalGames}</td>
-                <td>{user.totalScore}</td>
-                <td>{user.averageScore != null ? user.averageScore.toFixed(1) : 'N/A'}</td>
-                <td>{user.highScore}</td>
-                <td>{user.preferredGameType || 'Mixed'}</td>
+                <td>{user.gamesPlayed}</td>
+                <td>{user.questionsAnswered}</td>
+                <td>{user.correctAnswers}</td>
+                <td>
+                  {calculateAccuracy(user.correctAnswers, user.questionsAnswered)}%
+                </td>
+                <td>{user.totalScore || user.games?.reduce((sum, game) => sum + game.score, 0) || 0}</td>
                 <td>{formatDate(user.registrationDate)}</td>
               </tr>
             ))
           ) : (
-            <tr><td colSpan="9" className="no-results">No statistics found.</td></tr>
+            <tr><td colSpan="8" className="no-results">No statistics found.</td></tr>
           )}
         </tbody>
       </table>
