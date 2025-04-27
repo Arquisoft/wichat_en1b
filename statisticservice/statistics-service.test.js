@@ -25,11 +25,35 @@ afterAll(async () => {
 });
 
 describe('GET /statistics', () => {
-  it('should return users sorted by gamesPlayed desc with pagination info', async () => {
-    const users = [
-      { username: 'alice', gamesPlayed: 1, registrationDate: new Date(), totalVisits: 0, games: [] },
-      { username: 'bob',   gamesPlayed: 3, registrationDate: new Date(), totalVisits: 0, games: [] }
-    ];
+
+  const users = [
+    {
+      username: 'alice',
+      gamesPlayed: 1,
+      correctAnswers: 1,
+      questionsAnswered: 1,
+      registrationDate: new Date(),
+      totalVisits: 0,
+      games: [
+        { username: 'alice', gameType: 'classical', score: 50, questionsAnswered: 1, correctAnswers: 1, incorrectAnswers: 0 },
+        { username: 'alice', gameType: 'timeTrial', score: 50, questionsAnswered: 1, correctAnswers: 1, incorrectAnswers: 0 }
+      ]
+    },
+    {
+      username: 'bob',
+      gamesPlayed: 3,
+      correctAnswers: 2,
+      questionsAnswered: 2,
+      registrationDate: new Date(),
+      totalVisits: 0,
+      games: [
+        { username: 'bob', gameType: 'classical', score: 60, questionsAnswered: 1, correctAnswers: 1, incorrectAnswers: 0 },
+        { username: 'bob', gameType: 'classical', score: 70, questionsAnswered: 1, correctAnswers: 1, incorrectAnswers: 0 }
+      ]
+    }
+  ];
+
+  it('should return users sorted by totalScore desc with pagination info', async () => {
     await User.insertMany(users);
 
     const res = await request(server).get('/statistics');
@@ -38,6 +62,147 @@ describe('GET /statistics', () => {
     expect(res.body.users).toHaveLength(2);
     expect(res.body.users[0].username).toBe('bob');
     expect(res.body.pagination).toMatchObject({ total: 2, limit: 50, offset: 0, hasMore: false });
+  });
+
+  it('should filter by gameType', async () => {
+    await User.insertMany(users);
+
+    const res = await request(server).get('/statistics?gameType=timeTrial');
+    expect(res.status).toBe(200);
+    expect(res.body.users).toHaveLength(1);
+    expect(res.body.users[0].username).toBe('alice');
+  });
+
+  it('should filter by minGames', async () => {
+    await User.insertMany(users);
+
+    const res = await request(server).get('/statistics?minGames=2');
+    expect(res.status).toBe(200);
+    expect(res.body.users).toHaveLength(1);
+    expect(res.body.users[0].username).toBe('bob');
+  });
+
+  it('should filter by minScore', async () => {
+    await User.insertMany(users);
+
+    const res = await request(server).get('/statistics?minScore=110');
+    expect(res.status).toBe(200);
+    expect(res.body.users).toHaveLength(1);
+    expect(res.body.users[0].username).toBe('bob');
+  });
+
+  it('should filter by registeredBefore', async () => {
+    await User.deleteMany({});
+    const now = new Date();
+    const future = new Date(now.getTime() + 24 * 60 * 60 * 1000); // 1 day in the future
+
+    const dateUsers = [
+      {
+        username: 'alice',
+        gamesPlayed: 1,
+        correctAnswers: 1,
+        questionsAnswered: 1,
+        registrationDate: now,
+        totalVisits: 0,
+        games: [
+          { username: 'alice', gameType: 'classical', score: 50, questionsAnswered: 1, correctAnswers: 1, incorrectAnswers: 0 }
+        ]
+      },
+      {
+        username: 'bob',
+        gamesPlayed: 3,
+        correctAnswers: 2,
+        questionsAnswered: 2,
+        registrationDate: new Date(future.getTime() + 24 * 60 * 60 * 1000), // Bob is after 'future'
+        totalVisits: 0,
+        games: [
+          { username: 'bob', gameType: 'classical', score: 60, questionsAnswered: 1, correctAnswers: 1, incorrectAnswers: 0 },
+          { username: 'bob', gameType: 'classical', score: 40, questionsAnswered: 1, correctAnswers: 1, incorrectAnswers: 0 }
+        ]
+      }
+    ];
+    await User.insertMany(dateUsers);
+
+    const res = await request(server).get(`/statistics?registeredBefore=${future.toISOString()}`);
+    expect(res.status).toBe(200);
+    expect(res.body.users).toHaveLength(1);
+    expect(res.body.users[0].username).toBe('alice');
+  });
+
+  it('should filter by registeredAfter', async () => {
+    await User.deleteMany({});
+    const now = new Date();
+    const yesterday = new Date(now.getTime() - 24 * 60 * 60 * 1000); // yesterday
+    const twoDaysAgo = new Date(now.getTime() - (24 * 60 * 60 * 1000)*2); // two days ago
+
+    const dateUsers = [
+      {
+        username: 'alice',
+        gamesPlayed: 1,
+        correctAnswers: 1,
+        questionsAnswered: 1,
+        registrationDate: twoDaysAgo,
+        totalVisits: 0,
+        games: [
+          { username: 'alice', gameType: 'classical', score: 50, questionsAnswered: 1, correctAnswers: 1, incorrectAnswers: 0 }
+        ]
+      },
+      {
+        username: 'bob',
+        gamesPlayed: 3,
+        correctAnswers: 2,
+        questionsAnswered: 2,
+        registrationDate: now,
+        totalVisits: 0,
+        games: [
+          { username: 'bob', gameType: 'classical', score: 60, questionsAnswered: 1, correctAnswers: 1, incorrectAnswers: 0 },
+          { username: 'bob', gameType: 'classical', score: 40, questionsAnswered: 1, correctAnswers: 1, incorrectAnswers: 0 }
+        ]
+      }
+    ];
+    await User.insertMany(dateUsers);
+
+    const res = await request(server).get(`/statistics?registeredAfter=${yesterday.toISOString()}`);
+    expect(res.status).toBe(200);
+    expect(res.body.users).toHaveLength(1);
+    expect(res.body.users[0].username).toBe('bob');
+  });
+
+  it('should combine multiple filters', async () => {
+    const now = new Date();
+    const yesterday = new Date(now.getTime() - 24 * 60 * 60 * 1000); // yesterday
+    const twoDaysAgo = new Date(now.getTime() - (24 * 60 * 60 * 1000)*2); // two days ago
+
+    const dateUsers = [
+      {
+        username: 'alice',
+        gamesPlayed: 1,
+        correctAnswers: 1,
+        questionsAnswered: 1,
+        registrationDate: twoDaysAgo,
+        totalVisits: 0,
+        games: [
+          { username: 'alice', gameType: 'classical', score: 50, questionsAnswered: 1, correctAnswers: 1, incorrectAnswers: 0 }
+        ]
+      },
+      {
+        username: 'bob',
+        gamesPlayed: 3,
+        correctAnswers: 2,
+        questionsAnswered: 2,
+        registrationDate: now,
+        totalVisits: 0,
+        games: [
+          { username: 'bob', gameType: 'classical', score: 100, questionsAnswered: 2, correctAnswers: 2, incorrectAnswers: 0 }
+        ]
+      }
+    ];
+    await User.insertMany(dateUsers);
+
+    const res = await request(server).get(`/statistics?gameType=classical&minGames=1&registeredAfter=${yesterday.toISOString()}`);
+    expect(res.status).toBe(200);
+    expect(res.body.users).toHaveLength(1);
+    expect(res.body.users[0].username).toBe('bob');
   });
 
   it('should reject invalid sort field', async () => {
@@ -152,12 +317,12 @@ describe('POST /recordGame', () => {
   it('should push new game and increment gamesPlayed', async () => {
     const user = await User.create({ username: 'gamer', gamesPlayed: 0, games: [] });
     const game = { gameType: 'timeTrial', score: 15, questionsAnswered: 5, correctAnswers: 4, incorrectAnswers: 1 };
-  
+
     const res = await request(server)
       .post('/recordGame')
       .set('username', 'gamer')
       .send(game);
-  
+
     expect(res.status).toBe(200);
     const updated = await User.findOne({ username: 'gamer' });
     expect(updated.gamesPlayed).toBe(1);
@@ -200,7 +365,7 @@ describe('GET /statistics/:username', () => {
   });
 
   it('should return private statistics for owner', async () => {
-    const user = await User.create({ username: 'self', gamesPlayed: 1, registrationDate: new Date(), totalVisits: 0, games: [], profileVisits: [ { visitorUsername: 'a', visitDate: new Date() } ] });
+    const user = await User.create({ username: 'self', gamesPlayed: 1, registrationDate: new Date(), totalVisits: 0, games: [], profileVisits: [{ visitorUsername: 'a', visitDate: new Date() }] });
     const res = await request(server)
       .get('/statistics/self')
       .set('currentuser', 'self');
