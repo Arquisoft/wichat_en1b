@@ -13,7 +13,10 @@ export const Navbar = () => {
 
     const langs = {
         en: { nativeName: "🇬🇧 English" },
-        es: { nativeName: "🇪🇸 Español" }
+        es: { nativeName: "🇪🇸 Español" },
+        fr: { nativeName: "🇫🇷 Français" },
+        de: { nativeName: "🇩🇪 Deutsch" },
+        ast: { nativeName: "Asturianu" }
     }
 
     useEffect(() => {
