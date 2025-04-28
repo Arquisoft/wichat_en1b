@@ -189,6 +189,16 @@ app.post('/askllm', async (req, res) => {
   }
 });
 
+app.post('/simplellm', async (req, res) => {
+  try {
+    // Forward the add user request to the user service
+    const llmResponse = await axios.post(llmServiceUrl + '/simpleMessage', req.body);
+    res.json(llmResponse.data);
+  } catch (error) {
+    manageError(res, error);
+  }
+});
+
 app.get('/question', async (_req, res) => {
   try {
     //Forward the asking for a question to the question service

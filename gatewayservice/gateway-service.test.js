@@ -60,8 +60,8 @@ describe('Gateway Service', () => {
   // Mock responses for GET requests
   axios.get.mockImplementation((url) => {
     if (url.includes('/statistics') && !url.includes('/statistics/')) {
-      return Promise.resolve({ 
-        data: { 
+      return Promise.resolve({
+        data: {
           users: [
             {
               username: 'testuser',
@@ -83,19 +83,21 @@ describe('Gateway Service', () => {
             offset: 0,
             hasMore: false
           }
-        } 
+        }
       });
     } else if (url.endsWith('/question') || url.endsWith('/question/flags') || url.endsWith('/question-of-the-day')) {
-      return Promise.resolve({ data: { id: "mpzulblyui9du98pmodg5o", 
-                                       question: "Which of the following flags belongs to Nepal?",
-                                       images: [
-                                         "http://commons.wikimedia.org/wiki/Special:FilePath/Flag%20of%20Nepal.svg",
-                                         "http://commons.wikimedia.org/wiki/Special:FilePath/Flag%20of%20Myanmar.svg",
-                                         "http://commons.wikimedia.org/wiki/Special:FilePath/Flag%20of%20Costa%20Rica.svg",
-                                         "http://commons.wikimedia.org/wiki/Special:FilePath/Flag%20of%20Yemen.svg"
-                                       ] 
-                                     } 
-                            });
+      return Promise.resolve({
+        data: {
+          id: "mpzulblyui9du98pmodg5o",
+          question: "Which of the following flags belongs to Nepal?",
+          images: [
+            "http://commons.wikimedia.org/wiki/Special:FilePath/Flag%20of%20Nepal.svg",
+            "http://commons.wikimedia.org/wiki/Special:FilePath/Flag%20of%20Myanmar.svg",
+            "http://commons.wikimedia.org/wiki/Special:FilePath/Flag%20of%20Costa%20Rica.svg",
+            "http://commons.wikimedia.org/wiki/Special:FilePath/Flag%20of%20Yemen.svg"
+          ]
+        }
+      });
     } else if (url.endsWith('/users/someuser/image')) {
       return Promise.resolve({ data: { image: '/images/default/image_1.png' } });
     } else if (url.endsWith('/images/default/image_1.png')) {
@@ -153,11 +155,11 @@ describe('Gateway Service', () => {
     // Mock specific implementation for this test with query parameters
     axios.get.mockImplementationOnce((url) => {
       // Check if URL contains the expected query parameters
-      if (url.includes('/statistics') && 
-          url.includes('sort=gamesPlayed') && 
-          url.includes('order=desc') && 
-          url.includes('limit=10') &&
-          url.includes('gameType=classical')) {
+      if (url.includes('/statistics') &&
+        url.includes('sort=gamesPlayed') &&
+        url.includes('order=desc') &&
+        url.includes('limit=10') &&
+        url.includes('gameType=classical')) {
         return Promise.resolve({
           data: {
             users: [
@@ -236,7 +238,7 @@ describe('Gateway Service', () => {
 
   const verifyMockQuestion = async (endpoint) => {
     const token = jwt.sign({ username: 'someuser' }, process.env.JWT_SECRET, { expiresIn: '1m' });
-   
+
     const response = await request(app)
       .get(endpoint)
       .set('Authorization', `Bearer ${token}`);
@@ -263,7 +265,7 @@ describe('Gateway Service', () => {
   // Test /answer endpoint
   it('should submit an answer and get a response', async () => {
     const token = jwt.sign({ username: 'someuser' }, process.env.JWT_SECRET, { expiresIn: '1m' });
-    
+
     const response = await request(app)
       .post('/answer')
       .set('Authorization', `Bearer ${token}`)
@@ -387,7 +389,7 @@ describe('Gateway Service', () => {
     expect(response.body.gamesPlayed).toBe(10);
     expect(response.body.correctAnswers).toBe(7);
   });
-  
+
   it('should forward recordGame request to the statistics service', async () => {
     process.env.JWT_SECRET = 'mocksecret';
     const token = jwt.sign({ username: 'testuser' }, process.env.JWT_SECRET, { expiresIn: '1h' });
@@ -405,7 +407,7 @@ describe('Gateway Service', () => {
     const response = await request(app)
       .post('/recordGame')
       .set('Authorization', `Bearer ${token}`)
-      .send({ 
+      .send({
         gameType: 'classical',
         score: 100,
         questionsAnswered: 10,
@@ -478,13 +480,13 @@ describe('Error handling', () => {
 
   it('should handle errors from simplellm', async () => {
     axios.post.mockImplementationOnce((url) => {
-      if (url.endsWith('/ask')) {
+      if (url.endsWith('/simpleMessage')) {
         return getRejectedPromise(500, 'SIMPLE LLM service error');
       }
     });
 
     const response = await request(app)
-      .post('/askllm')
+      .post('/simplellm')
       .send({ message: 'test' });
 
     expect(response.statusCode).toBe(500);
@@ -532,14 +534,14 @@ describe('Error handling', () => {
         return getRejectedPromise(400, 'Invalid game type');
       }
     });
-  
-    process.env.JWT_SECRET='mocksecret';
+
+    process.env.JWT_SECRET = 'mocksecret';
     const token = jwt.sign({ username: 'testuser' }, process.env.JWT_SECRET, { expiresIn: '1h' });
-  
+
     const response = await request(app)
       .get('/statistics?gameType=invalid')
       .set('Authorization', `Bearer ${token}`);
-  
+
     expect(response.statusCode).toBe(400);
     expect(response.body.error).toBe('Invalid game type');
   });
@@ -671,7 +673,7 @@ describe('Error handling', () => {
     expect(response.statusCode).toBe(400);
     expect(response.body.error).toBe('No default image provided');
   });
-  
+
   it('should handle errors in /recordGame endpoint', async () => {
     axios.post.mockImplementationOnce(() => getRejectedPromise(400, 'Invalid game data'));
 
