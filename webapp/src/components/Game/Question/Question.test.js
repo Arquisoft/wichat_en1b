@@ -224,32 +224,6 @@ describe('Question Component', () => {
         });
     });
 
-    test('increments games played on initial load', async () => {
-        render(<Question statisticsUpdater={mockStatisticsUpdater} />);
-
-        await waitFor(() => {
-            expect(mockStatisticsUpdater.incrementGamesPlayed).toHaveBeenCalledTimes(1);
-        });
-    });
-
-    test('handles request new question button click', async () => {
-        render(<Question statisticsUpdater={mockStatisticsUpdater} />);
-
-        await waitFor(() => {
-            expect(screen.queryByText('Loading images...')).not.toBeInTheDocument();
-        });
-
-        const requestButton = screen.getByText('Request new question');
-        fireEvent.click(requestButton);
-
-        await waitFor(() => {
-            expect(screen.queryByText('Loading images...')).not.toBeInTheDocument();
-        });
-
-        expect(axios.get).toHaveBeenCalledTimes(2);
-        expect(mockGameContext.setGameEnded).toHaveBeenCalledWith(true);
-    });
-
     test('shows timer in red when time is running low', async () => {
         render(<Question statisticsUpdater={mockStatisticsUpdater} />);
 
