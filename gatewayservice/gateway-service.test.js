@@ -599,7 +599,7 @@ describe('Error handling', () => {
       .attach('image', mockNonImageBuffer, mockNonImageName);
 
     expect(response.statusCode).toBe(400);
-    expect(response.body.error).toBe('Uploaded file is not an image');
+    expect(response.body.error).toBe('profile.errors.invalidImage');
   });
 
   it('should return 401 for missing Authorization header in POST /statistics', async () => {

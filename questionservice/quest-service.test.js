@@ -3,6 +3,9 @@ const WikidataItemRepository = require('./repositories/WikidataItemRepository');
 const mongoose = require('mongoose');
 const { MongoMemoryServer } = require('mongodb-memory-server');
 const WikidataController = require('./controllers/WikidataController');
+const axios = require('axios');
+
+jest.mock('axios');
 
 let app, mongoServer, wikidataController;
 
@@ -62,13 +65,44 @@ afterAll(async () => {
 })
 
 describe('Question Service', () => {
+
+    axios.get.mockImplementation((url) => {
+        if (url.includes('query.wikidata.org/sparql')) {
+            return Promise.resolve({
+                data: {
+                    results: {
+                        bindings: [
+                            {
+                                "item": {
+                                    "type": "uri",
+                                    "value": "http://www.wikidata.org/entity/Q16"
+                                },
+                                "image": {
+                                    "type": "uri",
+                                    "value": "http://commons.wikimedia.org/wiki/Special:FilePath/Flag%20of%20Canada%20%28Pantone%29.svg"
+                                },
+                                "itemLabel": {
+                                    "xml:lang": "en",
+                                    "type": "literal",
+                                    "value": "Canada"
+                                }
+                            }
+                        ]
+                    }
+                }
+            });
+        }
+    });
+
     const verifyQuestionResponse = (response) => {
         expect(response.status).toBe(200);
         expect(response.body).toHaveProperty('id');
-        expect(response.body).toHaveProperty('question');
-        expect(response.body).toHaveProperty('images');
-        expect(response.body).not.toHaveProperty('correctOption');
+        expect(response.body).toHaveProperty('imageType');
+        expect(response.body).toHaveProperty('relation');
+        expect(response.body).toHaveProperty('topic');
         expect(response.body.images).toHaveLength(4);
+
+        expect(response.body).not.toHaveProperty('correctOption');
     }
 
     it('Should give a status 200 when a GET request is sent to /', async () => {

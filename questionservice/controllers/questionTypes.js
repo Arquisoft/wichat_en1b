@@ -20,8 +20,8 @@ module.exports = {
         ORDER BY RAND()
         LIMIT 200
         `,
-        imgTypeName: "images",
-        relation: "corresponds to"
+        imgTypeName: "game.imageTypes.image",
+        relation: "game.relations.correspondsTo"
     },
     monuments: {
         query: `
@@ -34,8 +34,8 @@ module.exports = {
         ORDER BY RAND()  # Randomize results
         LIMIT 200
         `,
-        imgTypeName: "images",
-        relation: "corresponds to the"
+        imgTypeName: "game.imageTypes.image",
+        relation: "game.relations.correspondsToThe"
     },
     animals: {
         query: `
@@ -50,8 +50,8 @@ module.exports = {
         ORDER BY RAND()
         LIMIT 200
         `,
-        imgTypeName: "images",
-        relation: "is a"
+        imgTypeName: "game.imageTypes.image",
+        relation: "game.relations.isA"
     },
     flags: {
         query: `
@@ -61,8 +61,8 @@ module.exports = {
             wdt:P41 ?image. 
         } LIMIT 200
         `,
-        imgTypeName: "flags",
-        relation: "belongs to"
+        imgTypeName: "game.imageTypes.flag",
+        relation: "game.relations.belongsTo"
     }
 
 }

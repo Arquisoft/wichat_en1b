@@ -44,7 +44,7 @@ function validateUsername(username) {
   // Allow only letters, numbers, and underscores, and ensure length between 3 and 20 characters
   const usernameRegex = /^[a-zA-Z0-9_]{3,20}$/;
   if (!usernameRegex.test(usernameStr)) {
-    throw new Error('Invalid username. It must be 3-20 characters long and contain only letters, numbers and underscores.');
+    throw new Error('signUp.errors.invalidUsername');
   }
   // Return the sanitized string
   return usernameStr;
@@ -57,9 +57,7 @@ function validatePassword(password) {
   const strongPasswordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/;
 
   if (!strongPasswordRegex.test(passwordStr)) {
-    throw new Error(
-      'Invalid password. It must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, one number, and one special character.'
-    );
+    throw new Error('signUp.errors.invalidPassword');
   }
 
   return passwordStr;
@@ -105,7 +103,7 @@ app.get('/users/:username/image', async (req, res) => {
 app.patch('/users/:username', async (req, res) => {
   try {
     if (req.body.newPassword && req.body.newPassword !== req.body.newPasswordRepeat) {
-      return res.status(400).json({ error: 'The password and the confirmation do not match, please try again.' });
+      return res.status(400).json({ error: 'signUp.errors.passwordsDoNotMatch' });
     }
 
     let currentUsername = req.params.username;
@@ -123,7 +121,7 @@ app.patch('/users/:username', async (req, res) => {
 
       const existingUser = await User.findOne({ username: { $eq: validateUsername(newUsername) } });
       if (existingUser) {
-        return res.status(400).json({ error: 'The new username is already in use. Please choose a different one.' });
+        return res.status(400).json({ error: 'signUp.errors.duplicateUsername' });
       }
 
       if (user.image && user.image.startsWith('/images/custom/')) {
@@ -228,11 +226,11 @@ app.post('/adduser', async (req, res) => {
     const validatedUsername = validateUsername(req.body.username);  // Validate to prevent NoSQL injection
     const existingUser = await User.findOne({ username: { $eq: validatedUsername }});
     if (existingUser) {
-      throw new Error('The username provided is already in use. Please choose a different one.');
+      throw new Error('signUp.errors.duplicateUsername');
     }
 
     if(req.body.password!==req.body.confirmpassword){
-      throw new Error('The password and the confirmation do not match, please try again.');
+      throw new Error('signUp.errors.passwordsDoNotMatch');
     }
     const password = validatePassword(req.body.password);
     

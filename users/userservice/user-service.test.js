@@ -73,7 +73,7 @@ describe('User Service Validation', () => {
     const response = await request(app).post('/adduser').send(invalidUser);
     
     expect(response.status).toBe(400);
-    expect(response.body.error).toContain('Invalid username');
+    expect(response.body.error).toContain('signUp.errors.invalidUsername');
   });
   
   it('should reject usernames with invalid characters', async () => {
@@ -86,7 +86,7 @@ describe('User Service Validation', () => {
     const response = await request(app).post('/adduser').send(invalidUser);
     
     expect(response.status).toBe(400);
-    expect(response.body.error).toContain('Invalid username');
+    expect(response.body.error).toContain('signUp.errors.invalidUsername');
   });
   
   it('should reject duplicate usernames', async () => {
@@ -105,7 +105,7 @@ describe('User Service Validation', () => {
     });
     
     expect(response.status).toBe(400);
-    expect(response.body.error).toContain('already in use');
+    expect(response.body.error).toContain('signUp.errors.duplicateUsername');
   });
   
   it('should validate and sanitize username for NoSQL injection attempts', async () => {
@@ -283,7 +283,7 @@ describe('User Service Custom Image Upload', () => {
       .attach('image', mockImageBuffer, 'test-image.png');
 
     expect(response.status).toBe(500);
-    expect(response.body).toHaveProperty('error', 'Invalid username. It must be 3-20 characters long and contain only letters, numbers and underscores.');
+    expect(response.body).toHaveProperty('error', 'signUp.errors.invalidUsername');
   });
 });
 
@@ -363,14 +363,14 @@ describe('User Service Default Image Update', () => {
       .send({ image: 'image_5.png' });
 
     expect(response.status).toBe(500);
-    expect(response.body).toHaveProperty('error', 'Invalid username. It must be 3-20 characters long and contain only letters, numbers and underscores.');
+    expect(response.body).toHaveProperty('error', 'signUp.errors.invalidUsername');
   });
 });
 
 const checkInvalidPasswordResponse = async (invalidUser) => {
   const response = await request(app).post('/adduser').send(invalidUser);
   expect(response.status).toBe(400);
-  expect(response.body.error).toContain('Invalid password. It must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, one number, and one special character.');
+  expect(response.body.error).toContain('signUp.errors.invalidPassword');
 };
 
 describe('Password Validation Tests', () => {
@@ -436,7 +436,7 @@ describe('Password Confirmation Tests', () => {
 
     const response = await request(app).post('/adduser').send(noSamePass);
     expect(response.status).toBe(400);
-    expect(response.body.error).toContain('The password and the confirmation do not match, please try again.');
+    expect(response.body.error).toContain('signUp.errors.passwordsDoNotMatch');
     });
 });
 
@@ -474,7 +474,7 @@ describe('User Service Update Tests', () => {
       .send({ newUser: 'conflictinguser' });
 
     expect(response.status).toBe(400);
-    expect(response.body).toHaveProperty('error', 'The new username is already in use. Please choose a different one.');
+    expect(response.body).toHaveProperty('error', 'signUp.errors.duplicateUsername');
   });
 
   it('should update the password successfully', async () => {
@@ -509,7 +509,7 @@ describe('User Service Update Tests', () => {
       .send({ newPassword: 'NewPassword1!', newPasswordRepeat: 'DifferentPassword1!' });
 
     expect(response.status).toBe(400);
-    expect(response.body).toHaveProperty('error', 'The password and the confirmation do not match, please try again.');
+    expect(response.body).toHaveProperty('error', 'signUp.errors.passwordsDoNotMatch');
   });
 
   it('should return 404 if the user does not exist', async () => {
@@ -527,7 +527,7 @@ describe('User Service Update Tests', () => {
       .send({ newUser: 'newusername' });
 
     expect(response.status).toBe(500);
-    expect(response.body).toHaveProperty('error', 'Invalid username. It must be 3-20 characters long and contain only letters, numbers and underscores.');
+    expect(response.body).toHaveProperty('error', 'signUp.errors.invalidUsername');
   });
 
   it('should return a new token when the username is updated', async () => {

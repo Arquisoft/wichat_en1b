@@ -14,6 +14,7 @@ import VisitorsSection from "./components/VisitorsSection";
 import LoadingState from "./components/LoadingState";
 import ErrorState from "./components/ErrorState";
 import { Insights } from "./components/Insights";
+import { useTranslation } from 'react-i18next'; 
 
 const retriever = new RecordRetrieverProfile();
 const userProfileSettings = new UserProfileSettings();
@@ -44,6 +45,7 @@ export const Profile = () => {
     const [uploadError, setUploadError] = useState(null);
     const [defaultImageError, setDefaultImageError] = useState(null);
     const [updateError, setUpdateError] = useState(null); // New state for update error
+    const { t } = useTranslation();
 
     const handleLogout = () => {
         Cookies.remove('user', { path: '/' });
@@ -132,7 +134,7 @@ export const Profile = () => {
                     setProfileImage(userProfileSettings.getProfileImageUrl(profileUsernameParam));
                     setLoading(false);
                 } catch (error) {
-                    setError(error.message || "Failed to retrieve statistics");
+                    setError(error.message || "profile.errors.failedToRetrieveStatistics");
                     setLoading(false);
                 }
             };
@@ -143,7 +145,6 @@ export const Profile = () => {
     useEffect(() => {
         setDefaultImages(userProfileSettings.getDefaultImages());
     }, []);
-
 
     const getMembershipDuration = () => {
         if (!registrationDate) return "N/A";
@@ -157,10 +158,10 @@ export const Profile = () => {
         <ThemeProvider theme={theme}>
             <Container maxWidth="lg" sx={{ py: 4 }}>
                 {loading ? (
-                    <LoadingState message="Loading profile statistics..." />
+                    <LoadingState message={t("profile.loadingStatistics")} />
                 ) : error ? (
                     <ErrorState
-                        error={error}
+                        error={t(error)}
                         onRetry={handleRetry}
                         onLogout={handleLogout}
                     />
@@ -195,32 +196,32 @@ export const Profile = () => {
                                     onChange={(event, newValue) => setStatistics({ ...statistics, selectedTab: newValue })}
                                     aria-label="Profile statistics tabs"
                                 >
-                                    <Tab label="Global 🌍" />
-                                    <Tab label="Classical 🎲" />
-                                    <Tab label="Sudden Death ☠️" />
-                                    <Tab label="Time Trial ⏱️" />
-                                    <Tab label="Custom 🎨" />
-                                    <Tab label="QOD 📅" />
+                                    <Tab label={t("profile.statisticTypes.labels.global")} />
+                                    <Tab label={t("profile.statisticTypes.labels.classical")} />
+                                    <Tab label={t("profile.statisticTypes.labels.suddenDeath")} />
+                                    <Tab label={t("profile.statisticTypes.labels.timeTrial")} />
+                                    <Tab label={t("profile.statisticTypes.labels.custom")} />
+                                    <Tab label={t("profile.statisticTypes.labels.QOD")} />
                                 </Tabs>
                             </Box>
                             <Box sx={{ mt: 2 }}>
                                 {statistics.selectedTab === 0 && (
-                                    <Insights statistics={statistics.globalStatistics} registrationDate={registrationDate} title="Global Statistics 🌍" />
+                                    <Insights statistics={statistics.globalStatistics} registrationDate={registrationDate} title={t("profile.statisticTypes.insights.global")} />
                                 )}
                                 {statistics.selectedTab === 1 && (
-                                    <Insights statistics={statistics.classicalStatistics} registrationDate={registrationDate} title="Classical Game Statistics 🎲" />
+                                    <Insights statistics={statistics.classicalStatistics} registrationDate={registrationDate} title={t("profile.statisticTypes.insights.classical")} />
                                 )}
                                 {statistics.selectedTab === 2 && (
-                                    <Insights statistics={statistics.suddenDeathStatistics} registrationDate={registrationDate} title="Sudden Death Statistics ☠️" />
+                                    <Insights statistics={statistics.suddenDeathStatistics} registrationDate={registrationDate} title={t("profile.statisticTypes.insights.suddenDeath")} />
                                 )}
                                 {statistics.selectedTab === 3 && (
-                                    <Insights statistics={statistics.timeTrialStatistics} registrationDate={registrationDate} title="Time Trial Statistics ⏱️" />
+                                    <Insights statistics={statistics.timeTrialStatistics} registrationDate={registrationDate} title={t("profile.statisticTypes.insights.timeTrial")} />
                                 )}
                                 {statistics.selectedTab === 4 && (
-                                    <Insights statistics={statistics.customStatistics} registrationDate={registrationDate} title="Custom Game Statistics 🎨" />
+                                    <Insights statistics={statistics.customStatistics} registrationDate={registrationDate} title={t("profile.statisticTypes.insights.custom")} />
                                 )}
                                 {statistics.selectedTab === 5 && (
-                                    <Insights statistics={statistics.qodStatistics} registrationDate={registrationDate} title="Question of the Day Statistics 📅" />
+                                    <Insights statistics={statistics.qodStatistics} registrationDate={registrationDate} title={t("profile.statisticTypes.insights.QOD")} />
                                 )}
                             </Box>
                         </Paper>
@@ -245,20 +246,20 @@ export const Profile = () => {
                                 onClick={() => navigate('/')}
                                 sx={{ mr: 2 }}
                             >
-                                Back to menu
+                                {t("profile.backToMenu")}
                             </Button>
                         </Box>
                     </>
                 ) : (
                     <Paper elevation={3} sx={{ p: 4, textAlign: "center" }}>
-                        <Typography variant="h6">No statistics available.</Typography>
+                        <Typography variant="h6">{t("profile.noStatistics")}.</Typography>
                         <Button
                             variant="contained"
                             color="primary"
                             sx={{ mt: 2 }}
                             onClick={() => navigate('/')}
                         >
-                            Back to menu
+                            {t("profile.backToMenu")}
                         </Button>
                     </Paper>
                 )}

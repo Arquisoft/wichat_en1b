@@ -1,15 +1,25 @@
-import * as React from "react"
-import { AppBar, Toolbar, Button, IconButton, Box, Drawer, List, ListItem } from "@mui/material"
+import { useEffect, useState } from "react"
+import { AppBar, Toolbar, Button, IconButton, Box, Drawer, List, ListItem, Select, MenuItem } from "@mui/material"
 import { Menu as MenuIcon } from "@mui/icons-material"
 import Cookies from "js-cookie"
+import { useTranslation } from "react-i18next"
 
 export const Navbar = () => {
-    const [drawerOpen, setDrawerOpen] = React.useState(false)
-    const [isMobile, setIsMobile] = React.useState(false)
-    const [isLoggedIn, setIsLoggedIn] = React.useState(false)
-    const [scrolled, setScrolled] = React.useState(false)
+    const [drawerOpen, setDrawerOpen] = useState(false)
+    const [isMobile, setIsMobile] = useState(false)
+    const [isLoggedIn, setIsLoggedIn] = useState(false)
+    const [scrolled, setScrolled] = useState(false)
+    const { t, i18n } = useTranslation()
 
-    React.useEffect(() => {
+    const langs = {
+        en: { nativeName: "🇬🇧 English" },
+        es: { nativeName: "🇪🇸 Español" },
+        fr: { nativeName: "🇫🇷 Français" },
+        de: { nativeName: "🇩🇪 Deutsch" },
+        ast: { nativeName: "Asturianu" }
+    }
+
+    useEffect(() => {
         const checkLoginStatus = () => {
             const userCookie = Cookies.get("user")
             setIsLoggedIn(!!userCookie)
@@ -20,7 +30,7 @@ export const Navbar = () => {
         return () => clearInterval(intervalId)
     }, [])
 
-    React.useEffect(() => {
+    useEffect(() => {
         setIsMobile(window.innerWidth < 600)
 
         const handleResize = () => {
@@ -32,7 +42,7 @@ export const Navbar = () => {
     }, [])
 
     // Add scroll event listener to detect when page is scrolled
-    React.useEffect(() => {
+    useEffect(() => {
         const handleScroll = () => {
             const isScrolled = window.scrollY > 10
             if (isScrolled !== scrolled) {
@@ -57,6 +67,11 @@ export const Navbar = () => {
     const handleNavigation = (path) => {
         window.location.href = path
     }
+
+    const handleLanguageChange = (event) => {
+        i18n.changeLanguage(event.target.value)
+    }
+
     const userCookie = Cookies.get('user');
     let username = '';
     if (userCookie) {
@@ -69,15 +84,15 @@ export const Navbar = () => {
     }
 
     const navLinks = isLoggedIn
-        ? [ { title: "Home", path: "/home" },
-            { title: "Profile", path: `/profile/${username}` },
-            { title: "Classical game", path: "/game" },
-            { title: "Statistics", path: "/statistics" },
-            { title: "Game modes", path: "/game-modes" },
-            { title: "Sign Out", action: handleSignOut }]
+        ? [ { title: t("navBar.home"), path: "/home" },
+            { title: t("navBar.profile"), path: `/profile/${username}` },
+            { title: t("navBar.classicalGame"), path: "/game" },
+            { title: t("navBar.statistics"), path: "/statistics" },
+            { title: t("navBar.gameModes"), path: "/game-modes" },
+            { title: t("navBar.signOut"), action: handleSignOut }]
         : [
-            { title: "Login", path: "/login" },
-            { title: "Sign up", path: "/signup" },
+            { title: t("navBar.logIn"), path: "/login" },
+            { title: t("navBar.signUp"), path: "/signup" },
         ]
 
     const mobileDrawer = (
@@ -99,16 +114,16 @@ export const Navbar = () => {
                             onClick={item.action || (() => handleNavigation(item.path))}
                             fullWidth
                             sx={{
-                                color: item.title === "Sign up" ? "#fff" : "#1976d2",
-                                backgroundColor: item.title === "Sign up" ? "#1976d2" : "transparent",
+                                color: item.title === t("navBar.signUp") ? "#fff" : "#1976d2",
+                                backgroundColor: item.title === t("navBar.signUp") ? "#1976d2" : "transparent",
                                 textTransform: "none",
                                 fontSize: "1rem",
                                 px: 3,
                                 py: 0.8,
-                                border: item.title !== "Sign up" ? "1px solid #1976d2" : "none",
+                                border: item.title !== t("navBar.signUp") ? "1px solid #1976d2" : "none",
                                 "&:hover": {
-                                    backgroundColor: item.title === "Sign up" ? "#1565c0" : "rgba(25, 118, 210, 0.04)",
-                                    border: item.title !== "Sign up" ? "1px solid #1565c0" : "none",
+                                    backgroundColor: item.title === t("navBar.signUp") ? "#1565c0" : "rgba(25, 118, 210, 0.04)",
+                                    border: item.title !== t("navBar.signUp") ? "1px solid #1565c0" : "none",
                                 },
                             }}
                         >
@@ -171,22 +186,39 @@ export const Navbar = () => {
                             </Drawer>
                         </>
                     ) : (
-                        <Box sx={{ display: "flex", gap: 2 }}>
+                        <Box sx={{ display: "flex", gap: 2, alignItems: "center" }}>
+                            <Select
+                                value={i18n.resolvedLanguage}
+                                onChange={handleLanguageChange}
+                                sx={{
+                                    fontSize: "1rem",
+                                    color: "#1976d2",
+                                    "& .MuiSelect-select": {
+                                        padding: "0.5rem 1rem",
+                                    },
+                                }}
+                            >
+                                { Object.keys(langs).map(lang => (
+                                    <MenuItem key={lang} value={lang}>
+                                        {langs[lang].nativeName}
+                                    </MenuItem>
+                                ))}
+                            </Select>
                             {navLinks.map((item) => (
                                 <Button
                                     key={item.title}
                                     onClick={item.action || (() => handleNavigation(item.path))}
                                     sx={{
-                                        color: item.title === "Sign up" ? "#fff" : "#1976d2",
-                                        backgroundColor: item.title === "Sign up" ? "#1976d2" : "transparent",
+                                        color: item.title === t("navBar.signUp") ? "#fff" : "#1976d2",
+                                        backgroundColor: item.title === t("navBar.signUp") ? "#1976d2" : "transparent",
                                         textTransform: "none",
                                         fontSize: "1rem",
                                         px: 3,
                                         py: 0.8,
-                                        border: item.title !== "Sign up" ? "1px solid #1976d2" : "none",
+                                        border: item.title !== t("navBar.signUp") ? "1px solid #1976d2" : "none",
                                         "&:hover": {
-                                            backgroundColor: item.title === "Sign up" ? "#1565c0" : "rgba(25, 118, 210, 0.04)",
-                                            border: item.title !== "Sign up" ? "1px solid #1565c0" : "none",
+                                            backgroundColor: item.title === t("navBar.signUp") ? "#1565c0" : "rgba(25, 118, 210, 0.04)",
+                                            border: item.title !== t("navBar.signUp") ? "1px solid #1565c0" : "none",
                                         },
                                     }}
                                 >
