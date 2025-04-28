@@ -235,8 +235,12 @@ describe('Gateway Service', () => {
   }, 15000);
 
   const verifyMockQuestion = async (endpoint) => {
+    const token = jwt.sign({ username: 'someuser' }, process.env.JWT_SECRET, { expiresIn: '1m' });
+   
     const response = await request(app)
-      .get(endpoint);
+      .get(endpoint)
+      .set('Authorization', `Bearer ${token}`);
+
     expect(response.statusCode).toBe(200);
     expect(response.body.id).toBe('mpzulblyui9du98pmodg5o');
     expect(response.body.question).toBe('Which of the following flags belongs to Nepal?');
@@ -253,13 +257,16 @@ describe('Gateway Service', () => {
   });
 
   it('should retrieve a question from the question of the day', async () => {
-    await verifyMockQuestion('/question-of-the-day');
+    await verifyMockQuestion('/question-of-the-day')
   });
 
   // Test /answer endpoint
   it('should submit an answer and get a response', async () => {
+    const token = jwt.sign({ username: 'someuser' }, process.env.JWT_SECRET, { expiresIn: '1m' });
+    
     const response = await request(app)
       .post('/answer')
+      .set('Authorization', `Bearer ${token}`)
       .send({ questionId: '1', answer: 'mockAnswer' });
 
     expect(response.statusCode).toBe(200);
@@ -500,6 +507,8 @@ describe('Error handling', () => {
   });
 
   it('should handle errors from answer endpoint from question service', async () => {
+    const token = jwt.sign({ username: 'someuser' }, process.env.JWT_SECRET, { expiresIn: '1m' });
+
     axios.post.mockImplementationOnce((url) => {
       if (url.endsWith('/answer')) {
         return getRejectedPromise(500, 'Answer service error');
@@ -508,6 +517,7 @@ describe('Error handling', () => {
 
     const response = await request(app)
       .post('/answer')
+      .set('Authorization', `Bearer ${token}`)
       .send({ questionId: '1', answer: 'mockAnswer' });
 
     expect(response.statusCode).toBe(500);
@@ -796,10 +806,13 @@ describe('Error handling for endpoints', () => {
   });
 
   it('should handle errors in /answer endpoint', async () => {
+    const token = jwt.sign({ username: 'someuser' }, process.env.JWT_SECRET, { expiresIn: '1m' });
+
     axios.post.mockImplementationOnce(() => getRejectedPromise(500, 'Answer validation failed'));
 
     const response = await request(app)
       .post('/answer')
+      .set('Authorization', `Bearer ${token}`)
       .send({ questionId: '1', answer: 'wrongAnswer' });
 
     expect(response.statusCode).toBe(500);
