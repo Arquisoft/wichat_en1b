@@ -94,16 +94,15 @@ export const Home = () => {
     const getGreetingMessage = async () => {
 
         try {
-            const model = "empathy";
-            let question = "";
+            let message = "Please, generate a generic greeting message for a user visiting the 'WiChat' webapp. Two to three sentences max. Take into account that the WiChat website is a question game webapp.\n\n";
             if (isUserLogged) {
                 const userData = JSON.parse(userCookie);
-                question = "Please, generate a  greeting message for a student called " + userData.username + " that is a student of the Software Architecture course in the University of Oviedo. Be nice and polite. Two to three sentences max.";
+                message += "The user is called: " + userData.username;
             } else {
-                question = "Please, generate a generic greeting message for an unregistered user visiting the WiChat webapp. Take into account that the WiChat website is a question game webapp. Encourage him to log in or create a new user, while beign nice and polite. Two to three sentences max";
+                message += "Encourage him to log in or create a new user, while beign nice and polite.";
             }
-            let answerLLM = await axios.post(`${apiEndpoint}/askllm`, { question, model })
-            setMessage(answerLLM.data.answer);
+            let answerLLM = await axios.post(`${apiEndpoint}/simplellm`, { message })
+            setMessage(answerLLM.data.response);
         } catch (error) {
             setError(error.response.data.error);
         }

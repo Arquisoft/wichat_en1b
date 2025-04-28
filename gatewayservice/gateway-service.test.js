@@ -33,6 +33,8 @@ describe('Gateway Service', () => {
       return Promise.resolve({ data: { userId: 'mockedUserId' } });
     } else if (url.endsWith('/ask')) {
       return Promise.resolve({ data: { answer: 'llmanswer' } });
+    } else if (url.endsWith('/simpleMessage')) {
+      return Promise.resolve({ data: { answer: 'simple llmanswer' } });
     } else if (url.endsWith('/answer')) {
       return Promise.resolve({ data: { correct: true } });
     } else if (url.endsWith('/users/someuser/default-image')) {
@@ -84,18 +86,20 @@ describe('Gateway Service', () => {
         } 
       });
     } else if (url.endsWith('/question') || url.endsWith('/question/flags')) {
-      return Promise.resolve({ data: { id: "mpzulblyui9du98pmodg5o", 
-                                       question: "Which of the following flags belongs to Nepal?",
-                                       images: [
-                                         "http://commons.wikimedia.org/wiki/Special:FilePath/Flag%20of%20Nepal.svg",
-                                         "http://commons.wikimedia.org/wiki/Special:FilePath/Flag%20of%20Myanmar.svg",
-                                         "http://commons.wikimedia.org/wiki/Special:FilePath/Flag%20of%20Costa%20Rica.svg",
-                                         "http://commons.wikimedia.org/wiki/Special:FilePath/Flag%20of%20Yemen.svg"
-                                       ] 
-                                     } 
-                            });
+      return Promise.resolve({
+        data: {
+          id: "mpzulblyui9du98pmodg5o",
+          question: "Which of the following flags belongs to Nepal?",
+          images: [
+            "http://commons.wikimedia.org/wiki/Special:FilePath/Flag%20of%20Nepal.svg",
+            "http://commons.wikimedia.org/wiki/Special:FilePath/Flag%20of%20Myanmar.svg",
+            "http://commons.wikimedia.org/wiki/Special:FilePath/Flag%20of%20Costa%20Rica.svg",
+            "http://commons.wikimedia.org/wiki/Special:FilePath/Flag%20of%20Yemen.svg"
+          ]
+        }
+      });
     } else if (url.endsWith('/users/someuser/image')) {
-      return Promise.resolve({ data: { image: '/images/default/image_1.png' }});
+      return Promise.resolve({ data: { image: '/images/default/image_1.png' } });
     } else if (url.endsWith('/images/default/image_1.png')) {
       return Promise.resolve({
         data: new ArrayBuffer(8),
@@ -137,7 +141,7 @@ describe('Gateway Service', () => {
   it('should forward askllm request to the llm service', async () => {
     const response = await request(app)
       .post('/askllm')
-      .send({ question: 'question', apiKey: 'apiKey', model: 'gemini' });
+      .send({ gameQuestion: 'question', userQuestion: 'user question' });
 
     expect(response.statusCode).toBe(200);
     expect(response.body.answer).toBe('llmanswer');
@@ -299,9 +303,9 @@ describe('Gateway Service', () => {
   });
 
   it('should update the image of some user, to a default one', async () => {
-    process.env.JWT_SECRET='mocksecret';
+    process.env.JWT_SECRET = 'mocksecret';
     let token = jwt.sign({ username: 'someuser' }, process.env.JWT_SECRET, { expiresIn: '1m' });
-    
+
     const response = await request(app)
       .post('/users/someuser/default-image')
       .send({ image: 'image_1.png' })
@@ -437,9 +441,9 @@ describe('Error handling', () => {
 
     const response = await request(app)
       .post('/login')
-      .send({ 
-        username: TEST_CREDENTIALS.username, 
-        password: TEST_CREDENTIALS.password 
+      .send({
+        username: TEST_CREDENTIALS.username,
+        password: TEST_CREDENTIALS.password
       });
 
     expect(response.statusCode).toBe(500);
@@ -461,6 +465,21 @@ describe('Error handling', () => {
 
     expect(response.statusCode).toBe(500);
     expect(response.body.error).toBe('LLM service error');
+  });
+
+  it('should handle errors from simplellm', async () => {
+    axios.post.mockImplementationOnce((url) => {
+      if (url.endsWith('/simpleMessage')) {
+        return getRejectedPromise(500, 'SIMPLE LLM service error');
+      }
+    });
+
+    const response = await request(app)
+      .post('/simplellm')
+      .send({ message: 'test' });
+
+    expect(response.statusCode).toBe(500);
+    expect(response.body.error).toBe('SIMPLE LLM service error');
   });
 
   // Test error case for question
@@ -583,7 +602,7 @@ describe('Error handling', () => {
     const response = await request(app)
       .get('/statistics')
       .set('Authorization', 'Bearer invalid_token'); // Provide an invalid token
-  
+
     expect(response.statusCode).toBe(403);
     expect(response.body.error).toBe('Invalid or expired token'); // Check correct error message
   });
@@ -591,7 +610,7 @@ describe('Error handling', () => {
   // Test /statistics GET endpoint, missing token
   it('should return 401 for missing Authorization header in GET /statistics', async () => {
     const response = await request(app).get('/statistics');
-    
+
     expect(response.statusCode).toBe(401);
     expect(response.body.error).toBe('Authorization header missing');
   });
