@@ -7,6 +7,8 @@ import { useGame } from '../GameContext';
 
 jest.mock('axios');
 
+
+
 jest.mock('../GameContext', () => ({
     useGame: jest.fn()
 }));
@@ -15,10 +17,28 @@ const mockScrollIntoView = jest.fn();
 window.HTMLElement.prototype.scrollIntoView = mockScrollIntoView;
 
 describe('Chat Component', () => {
+    const mockQuestion = {
+        id: '123',
+        question: 'Which image shows a cat?',
+        images: [
+            'https://example.com/cat.jpg',
+            'https://example.com/dog.jpg',
+            'https://example.com/bird.jpg',
+            'https://example.com/fish.jpg'
+        ]
+    };
+
     const mockGameContext = {
-        question: { question: 'Test question?' },
+        question: mockQuestion,
+        setQuestion: jest.fn(),
         gameEnded: false,
-        setGameEnded: jest.fn()
+        setGameEnded: jest.fn(),
+        questionType: 'random',
+        setQuestionType: jest.fn(),
+        AIAttempts: 0,
+        setAIAttempts: jest.fn(),
+        maxAIAttempts: 3,
+        setMaxAIAttempts: jest.fn()
     };
 
     beforeEach(() => {
@@ -77,7 +97,7 @@ describe('Chat Component', () => {
         expect(screen.getByText('Hello, test message')).toBeInTheDocument();
 
         expect(axios.post).toHaveBeenCalledWith('http://test-api.com/askllm', {
-            gameQuestion: 'Test question?',
+            gameQuestion: mockQuestion.question,
             userQuestion: 'Hello, test message'
         });
 

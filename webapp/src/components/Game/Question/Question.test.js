@@ -242,6 +242,10 @@ describe('Question Component', () => {
         const requestButton = screen.getByText('Request new question');
         fireEvent.click(requestButton);
 
+        await waitFor(() => {
+            expect(screen.queryByText('Loading images...')).not.toBeInTheDocument();
+        });
+
         expect(axios.get).toHaveBeenCalledTimes(2);
         expect(mockGameContext.setGameEnded).toHaveBeenCalledWith(true);
     });
