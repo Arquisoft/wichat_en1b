@@ -55,39 +55,11 @@ paths:
               schema:
                 type: object
                 properties:
-                  errors:
-                    type: array
-                    description: List of validation errors.
-                    items:
-                      type: object
-                      properties:
-                        type:
-                          type: string
-                          description: Type of error.
-                          example: field
-                        msg:
-                          type: string
-                          description: Error message.
-                          example: Invalid value
-                        path:
-                          type: string
-                          description: Field that caused the error.
-                          example: username
-                        location:
-                          type: string
-                          description: Location of the error in the request.
-                          example: body
-              example:
-                errors:
-                  - type: field
-                    msg: Invalid value
-                    path: username
-                    location: body
-                  - type: field
-                    msg: Invalid value
-                    path: password
-                    location: body
-        "401":
+                  error:
+                    type: string
+                    description: An error for the localized template telling some field is missing.
+                    example: "logIn.errors.missingFields"
+        '401':
           description: Invalid credentials.
           content:
             application/json:
@@ -96,9 +68,9 @@ paths:
                 properties:
                   error:
                     type: string
-                    description: Shows the error info..
-                    example: Invalid credentials
-        "500":
+                    description: A messaage with the localization for the invalid credentials message.
+                    example: "logIn.errors.invalidCredentials"
+        '500':
           description: Some error ocurred in the server when processing the request.
           content:
             application/json:
@@ -698,10 +670,18 @@ paths:
                     type: string
                     description: Unique identifier for the question.
                     example: mpzulblyui9du98pmodg5o
-                  question:
+                  imageType:
                     type: string
-                    description: The text of the question.
-                    example: Which of the following flags belongs to Nepal?
+                    description: Type of image used in the question. Returns a string with the localization of the type.
+                    example: game.imagTypes.flag
+                  relation:
+                    type: string
+                    description: Relation of the question. Returns a string with the localization of the relation.
+                    example: game.relations.belongsTo
+                  topic:
+                    type: string
+                    description: Topic of the question.
+                    example: Catedral de la Almudena
                   images:
                     type: array
                     description: List of image URLs related to the question.

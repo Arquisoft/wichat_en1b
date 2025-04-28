@@ -279,7 +279,7 @@ app.post('/statistics', async (req, res) => {
       incorrectAnswers: user.incorrectAnswers,
     });
   } else {
-    res.status(404).json({ error: 'User not found' });
+    res.status(404).json({ error: 'statistics.errors.userNotFound' });
   }
 });
 
@@ -291,7 +291,7 @@ app.post('/recordGame', async (req, res) => {
 
   const user = await User.findOne({ username: username });
   if (!user) {
-    return res.status(404).json({ error: 'User not found' });
+    return res.status(404).json({ error: 'statistics.errors.userNotFound' });
   } else {
     // Find the user and update the statistics
     await User.findOneAndUpdate(
@@ -304,7 +304,7 @@ app.post('/recordGame', async (req, res) => {
       }
     );
 
-    return res.status(200).json({ message: 'Game recorded successfully' });
+    return res.json({ message: 'Game recorded successfully' });
   }
 });
 
@@ -320,7 +320,7 @@ app.get('/statistics/:username', async (req, res) => {
   if (!usernameRegex.test(targetUsername)) return res.status(400).json({ error: 'Invalid username format' });
 
   const targetUser = await User.findOne({ username: targetUsername });
-  if (!targetUser) return res.status(404).json({ error: 'User not found' });
+  if (!targetUser) return res.status(404).json({ error: 'statistics.errors.userNotFound' });
 
   // Record the profile visit if the visitor is not the profile owner
   if (currentUsername !== targetUsername) {

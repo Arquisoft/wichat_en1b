@@ -138,7 +138,7 @@ app.post('/users/:username/custom-image', authMiddleware, upload.single('image')
     }
 
     if (!req.file.mimetype.startsWith('image/')) {
-      return res.status(400).json({ error: 'Uploaded file is not an image' });
+      return res.status(400).json({ error: 'profile.errors.invalidImage' });
     }
 
     const formData = new FormData();

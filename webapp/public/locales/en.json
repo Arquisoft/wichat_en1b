@@ -1,0 +1,244 @@
+{
+    "navBar": {
+        "home": "Home",
+        "profile": "Profile",
+        "classicalGame": "Classical game",
+        "statistics": "Statistics",
+        "gameModes": "Game modes",
+        "logIn": "Log in",
+        "signUp": "Sign up",
+        "signOut": "Sign out"
+    },
+    "home": {
+        "loadingMessage": "Loading message...",
+        "yourProfile": "Profile",
+        "classicalGame": "Classical game",
+        "statistics": "Statistics",
+        "gameModes": "Game modes"
+    },
+    "profile": {
+        "header": {
+            "since": "Member since {{date}}",
+            "membershipDays_one": "{{count}} day of membership",
+            "membershipDays_other": "{{count}} days of membership",
+            "settings": "Account Settings"
+        },
+        "statisticTypes": {
+            "labels": {
+                "global": "Global 🌍",
+                "classical": "Classical 🎲",
+                "suddenDeath": "Sudden Death ☠️",
+                "timeTrial": "Time Trial ⏱️",
+                "custom": "Custom 🎨",
+                "QOD": "QOD 📅"
+            },
+            "insights": {
+                "global": "Global Statistics 🌍",
+                "classical": "Classical Game Statistics 🎲",
+                "suddenDeath": "Sudden Death Statistics ☠️",
+                "timeTrial": "Time Trial Statistics ⏱️",
+                "custom": "Custom game Statistics 🎨",
+                "QOD": "Question of the Day Statistics 📅"
+            }
+        },
+        "summary": {
+            "performance": "Performance Summary",
+            "successRate": "Success Rate",
+            "gamesPlayed": "Games Played",
+            "questionsAnswered": "Questions Answered",
+            "correctAnswers": "Correct Answers",
+            "incorrectAnswers": "Incorrect Answers"
+        },
+        "additionalInsights": {
+            "additionalInsights": "Additional Insights",
+            "avgQuestions": "Avg. Questions per Game",
+            "correctAnswerRate": "Correct Answer Rate",
+            "maxScore": "Max Score",
+            "maxScorePoints_one": "{{count}} point",
+            "maxScorePoints_other": "{{count}} points" 
+        },
+        "answerDistribution": {
+            "answerDistribution": "Answer Distribution",
+            "correct": "Correct",
+            "incorrect": "Incorrect"
+        },
+        "visitors": {
+            "profileVisitors": "Profile visitors",
+            "totalVisits": "Total visits: {{count}}",
+            "visitedOn": "Visited on {{date}}",
+            "showMore": "Show More",
+            "showAll": "Show All ({{count}})",
+            "noVisitors": "No visitors yet"
+        },
+        "errors": {
+            "failedToRetrieveStatistics": "Failed to retrieve statistics",
+            "invalidImage": "Uploaded file is not an image."
+        },
+        "errorStates": {
+            "retry": "Retry",
+            "goBackToMenu": "Go back to menu"
+        },
+        "settings": {
+            "updateProfile": "Update Your Profile",
+            "manageSettings": "Manage your account settings below",
+            "accountInfo": "Account Information",
+            "newValuesInfo": "Select what you want to update and provide the new values below",
+            "newUsername": "New username",
+            "newPassword": "New password",
+            "repeatPassword": "Repeat password",
+            "saveChanges": "Save changes",
+            "profilePicture": "Profile Picture",
+            "uploadPictureInfo": "Upload an image or select a default option",
+            "uploadPicture": "Upload picture",
+            "close": "Close"
+        },
+        "loadingStatistics": "Loading profile statistics...",
+        "globalStatistics": "Global statistics",
+        "noStatistics": "No statistics available",
+        "backToMenu": "Back to menu"
+    },
+    "statistics": {
+        "globalStatistics": "Global statistics",
+        "welcome": "Welcome {{username}}!",
+        "avatar": "Avatar",
+        "username": "Username",
+        "questions": "Questions",
+        "correct": "Correct",
+        "accuracy": "Accuracy %",
+        "gamesPlayed": "Games played",
+        "totalScore": "Total score",
+        "avgScore": "Avg. score",
+        "highestScore": "Highest score",
+        "gameType": "Game type",
+        "memberSince": "Member since",
+        "noStatsFound": "No statistics found.",
+        "you": "You",
+        "statisticTypes": {
+            "global": "Global 🌍",
+            "classical": "Classical 🎲",
+            "suddenDeath": "Sudden Death ☠️",
+            "timeTrial": "Time Trial ⏱️",
+            "custom": "Custom 🎨",
+            "QOD": "QOD 📅"
+        },
+        "filters": {
+            "minGames": "Min Games",
+            "minScore": "Min Score",
+            "registeredAfter": "Registered After",
+            "registeredBefore": "Registered Before",
+            "reset": "Reset Filters"
+        },
+        "pagination": {
+            "first": "First",
+            "previous": "Previous",
+            "next": "Next",
+            "last": "Last",
+            "page": "Page {{page}} of {{total}}",
+            "perPage": "{{amount}} per page"
+        },
+        "errors": {
+            "userNotFound": "User not found.",
+            "sessionExpired": "Your session has expired. Please log in again.",
+            "failedToUpdate": "Failed to update statistics"
+        }
+    },
+    "game": {
+        "score": "Score: {{score}}",
+        "loadingImages": "Loading images...",
+        "correctAnswer": "Correct! +{{score}} points",
+        "incorrectAnswer": "Incorrect",
+        "question": "Which of the following {{imageType}} {{relation}} {{topic}}?",
+        "chat": {
+            "thinking": "Thinking...",
+            "you": "You",
+            "AI": "AI",
+            "chatAssistant": "Chat Assistant",
+            "askMeAnything": "Ask me anything about the question!",
+            "typeMessage": "Type your message...",
+            "attemptsUsed": "{{used}} / {{total}} attempts used",
+            "pointsConsumed": "-{{points}} points",
+            "cantProcessRequest": "Sorry, I couldn't process your request."
+        },
+        "modes": {
+            "custom": "Custom Game 🎨",
+            "suddenDeath": "Sudden Death ☠️",
+            "classical": "Classical Game 🎲",
+            "timeTrial": "Time Trial ⏱️",
+            "QOD": "Question of the Day 📅"
+        },
+        "imageTypes": {
+            "image": "images",
+            "flag": "flags"
+        },
+        "relations": {
+            "correspondsTo": "corresponds to",
+            "correspondsToThe": "corresponds to the",
+            "isA": "is a",
+            "belongsTo": "belongs to"
+        }
+    },
+    "gameModes": {
+        "selectGameMode": "Select Game Mode",
+        "categories": {
+            "title": "Category:",
+            "random": "Random",
+            "flags": "Flags",
+            "animals": "Animals",
+            "monuments": "Monuments",
+            "foods": "Foods"
+        },
+        "classical": {
+            "title": "Classical",
+            "description": "The classic game mode with standard rules."
+        },
+        "suddenDeath": {
+            "title": "Sudden Death",
+            "description": "One wrong answer and it’s game over!"
+        },
+        "timeTrial": {
+            "title": "Time Trial",
+            "description": "Answer as many questions as possible within the time limit."
+        },
+        "QOD": {
+            "title": "QOD",
+            "description": "Question of the day mode for daily challenges."
+        },
+        "custom": {
+            "title": "Custom",
+            "description": "Customize your game with specific settings.",
+            "settings": {
+                "rounds": "Rounds",
+                "time": "Time per Question (s)",
+                "aiAttempts": "AI Attempts per Question"
+            }
+        },
+        "startGame": "Start Game"
+    },
+    "logIn": {
+        "username": "Username",
+        "password": "Password",
+        "logIn": "Log in",
+        "or": "or",
+        "dontHaveAccount": "Don't have an account?",
+        "signUpHere": "Sign up here",
+        "errors": {
+            "missingFields": "Some of the fields are missing.",
+            "invalidCredentials": "Invalid username or password."
+        }
+    },
+    "signUp": {
+        "username": "Username",
+        "password": "Password",
+        "confirmPassword": "Confirm password",
+        "signUp": "Sign up",
+        "or": "or",
+        "alreadyHaveAccount": "Already have an account?",
+        "logInHere": "Log in here",
+        "errors": {
+            "duplicateUsername": "The username provided is already in use. Please choose a different one.",
+            "invalidUsername": "Invalid username. It must be 3-20 characters long and contain only letters, numbers and underscores.",
+            "invalidPassword": "Invalid password. It must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, one number, and one special character.",
+            "passwordsDoNotMatch": "The password and the confirmation do not match, please try again."
+        }
+    }
+}

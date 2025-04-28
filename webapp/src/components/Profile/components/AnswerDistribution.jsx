@@ -4,12 +4,15 @@ import {
   Tooltip, Legend
 } from "recharts";
 import { CHART_COLORS } from "../theme";
+import { useTranslation } from "react-i18next";
 
 const AnswerDistribution = ({ chartData }) => {
+  const { t } = useTranslation();
+
   return (
     <Card elevation={2} sx={{ height: "100%" }}>
       <CardContent>
-        <Typography variant="h6" gutterBottom>Answer Distribution</Typography>
+        <Typography variant="h6" gutterBottom>{t("profile.answerDistribution.answerDistribution")}</Typography>
         <Divider sx={{ mb: 2 }} />
         <Box sx={{ height: 300 }}>
           <ResponsiveContainer width="100%" height="100%">

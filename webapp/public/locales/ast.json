@@ -1,0 +1,244 @@
+{
+    "navBar": {
+        "home": "Iniciu",
+        "profile": "Perfil",
+        "classicalGame": "Xuegu Clásicu",
+        "statistics": "Estadístiques",
+        "gameModes": "Modos de xuegu",
+        "logIn": "Iniciar sesión",
+        "signUp": "Crear cuenta",
+        "signOut": "Cerrar sesión"
+    },
+    "home": {
+        "loadingMessage": "Cargando mensaje...",
+        "yourProfile": "Perfil",
+        "classicalGame": "Xuegu Clásicu",
+        "statistics": "Estadístiques",
+        "gameModes": "Modos de xuegu"
+    },
+    "profile": {
+        "header": {
+            "since": "Miembro dende {{date}}",
+            "membershipDays_one": "{{count}} día de membrecía",
+            "membershipDays_other": "{{count}} díes de membrecía",
+            "settings": "Axustes de cuenta"
+        },
+        "statisticTypes": {
+            "labels": {
+                "global": "Global 🌍",
+                "classical": "Clásicu 🎲",
+                "suddenDeath": "Muerte súbita ☠️",
+                "timeTrial": "Proba de tiempu ⏱️",
+                "custom": "Personalizáu 🎨",
+                "QOD": "Pregunta del día 📅"
+            },
+            "insights": {
+                "global": "Estadístiques globales 🌍",
+                "classical": "Estadístiques del xuegu clásicu 🎲",
+                "suddenDeath": "Estadístiques de muerte súbita ☠️",
+                "timeTrial": "Estadístiques de proba de tiempu ⏱️",
+                "custom": "Estadístiques del xuegu personalizáu 🎨",
+                "QOD": "Estadístiques de pregunta del día 📅"
+            }
+        },
+        "summary": {
+            "performance": "Resumen de rendimientu",
+            "successRate": "Tasa de éxito",
+            "gamesPlayed": "Xuegues xugados",
+            "questionsAnswered": "Preguntes respondíes",
+            "correctAnswers": "Respuestes correctes",
+            "incorrectAnswers": "Respuestes incorrectes"
+        },
+        "additionalInsights": {
+            "additionalInsights": "Visións adicionales",
+            "avgQuestions": "Preguntes promedio por xuegu",
+            "correctAnswerRate": "Tasa de respuestes correctes",
+            "maxScore": "Puntuación máxima",
+            "maxScorePoints_one": "{{count}} punto",
+            "maxScorePoints_other": "{{count}} puntos"
+        },
+        "answerDistribution": {
+            "answerDistribution": "Distribución de respuestes",
+            "correct": "Correctu",
+            "incorrect": "Incorrectu"
+        },
+        "visitors": {
+            "profileVisitors": "Visitantes del perfil",
+            "totalVisits": "Visites total: {{count}}",
+            "visitedOn": "Visitó'l {{date}}",
+            "showMore": "Amosar más",
+            "showAll": "Amosar toos ({{count}})",
+            "noVisitors": "Aún no hai visitantes"
+        },
+        "errors": {
+            "failedToRetrieveStatistics": "Falló al obtener les estadístiques",
+            "invalidImage": "El archivo cargáu no ye una imaxe."
+        },
+        "errorStates": {
+            "retry": "Tentar de nuevu",
+            "goBackToMenu": "Volver al menú"
+        },
+        "settings": {
+            "updateProfile": "Actualiza'l to perfil",
+            "manageSettings": "Xestiona los axustes de la cuenta más abajo",
+            "accountInfo": "Información de la cuenta",
+            "newValuesInfo": "Selecciona lo que quies actualizar y da los nuevos valores más abajo",
+            "newUsername": "Nuevo nombre d'usuariu",
+            "newPassword": "Nueva contraseña",
+            "repeatPassword": "Repite la contraseña",
+            "saveChanges": "Guardar cambeos",
+            "profilePicture": "Foto de perfil",
+            "uploadPictureInfo": "Cargu una imaxe o selecciona una opción por defeutu",
+            "uploadPicture": "Cargar imaxe",
+            "close": "Cerrar"
+        },
+        "loadingStatistics": "Cargando les estadístiques del perfil...",
+        "globalStatistics": "Estadístiques globales",
+        "noStatistics": "Nun hai estadístiques disponibles",
+        "backToMenu": "Volver al menú"
+    },
+    "statistics": {
+        "globalStatistics": "Estadístiques globales",
+        "welcome": "Benvido {{username}}!",
+        "avatar": "Avatar",
+        "username": "Nombre d'usuariu",
+        "questions": "Preguntes",
+        "correct": "Correctu",
+        "accuracy": "Precisión %",
+        "gamesPlayed": "Xuegues xugados",
+        "totalScore": "Puntuación total",
+        "avgScore": "Puntuación promedio",
+        "highestScore": "Puntuación más alta",
+        "gameType": "Tipu de xuegu",
+        "memberSince": "Miembro dende",
+        "noStatsFound": "Nun s'alcanzaron estadístiques.",
+        "you": "Tú",
+        "statisticTypes": {
+            "global": "Global 🌍",
+            "classical": "Clásicu 🎲",
+            "suddenDeath": "Muerte súbita ☠️",
+            "timeTrial": "Proba de tiempu ⏱️",
+            "custom": "Personalizáu 🎨",
+            "QOD": "Pregunta del día 📅"
+        },
+        "filters": {
+            "minGames": "Mín. xuegues",
+            "minScore": "Mín. puntuación",
+            "registeredAfter": "Registráu después",
+            "registeredBefore": "Registráu antes",
+            "reset": "Restablecer filtros"
+        },
+        "pagination": {
+            "first": "Primera",
+            "previous": "Anterior",
+            "next": "Siguiente",
+            "last": "Última",
+            "page": "Páxina {{page}} de {{total}}",
+            "perPage": "{{amount}} por páxina"
+        },
+        "errors": {
+            "userNotFound": "Usuariu non encontráu.",
+            "sessionExpired": "La to sesión caducó. Por favor, inicia sesión de nuevu.",
+            "failedToUpdate": "Falló al actualizar les estadístiques"
+        }
+    },
+    "game": {
+        "score": "Puntuación: {{score}}",
+        "loadingImages": "Cargando imaxes...",
+        "correctAnswer": "Correctu! +{{score}} puntos",
+        "incorrectAnswer": "Incorrectu",
+        "question": "¿Cuál de les siguientes {{imageType}} {{relation}} {{topic}}?",
+        "chat": {
+            "thinking": "Pensando...",
+            "you": "Tú",
+            "AI": "IA",
+            "chatAssistant": "Asistente de xente",
+            "askMeAnything": "¡Pregúntame lo que quieras sobre la pregunta!",
+            "typeMessage": "Escribe la to mensaxe...",
+            "attemptsUsed": "{{used}} / {{total}} intentos usáus",
+            "pointsConsumed": "-{{points}} puntos",
+            "cantProcessRequest": "Lo siento, no pueo procesar la to solicitud."
+        },
+        "modes": {
+            "custom": "Xuegu Personalizáu 🎨",
+            "suddenDeath": "Muerte súbita ☠️",
+            "classical": "Xuegu Clásicu 🎲",
+            "timeTrial": "Proba de tiempu ⏱️",
+            "QOD": "Pregunta del día 📅"
+        },
+        "imageTypes": {
+            "image": "imaxes",
+            "flag": "banderes"
+        },
+        "relations": {
+            "correspondsTo": "corresponde a",
+            "correspondsToThe": "corresponde a la",
+            "isA": "ye un",
+            "belongsTo": "pertenece a"
+        }
+    },
+    "gameModes": {
+        "selectGameMode": "Selecciona un modo de xuegu",
+        "categories": {
+            "title": "Categoría:",
+            "random": "Aleatorio",
+            "flags": "Banderes",
+            "animals": "Animales",
+            "monuments": "Monumentos",
+            "foods": "Alimentos"
+        },
+        "classical": {
+            "title": "Clásicu",
+            "description": "El modo de xuegu clásicu con reglas estándar."
+        },
+        "suddenDeath": {
+            "title": "Muerte súbita",
+            "description": "¡Unha respuesta incorrecta y fin del xuegu!"
+        },
+        "timeTrial": {
+            "title": "Proba de tiempu",
+            "description": "Responde tantes preguntas como puedas dentro del límite de tiempu."
+        },
+        "QOD": {
+            "title": "Pregunta del día",
+            "description": "Modo pregunta del día para desafíos diarios."
+        },
+        "custom": {
+            "title": "Personalizáu",
+            "description": "Personaliza'l to xuegu con settings específicos.",
+            "settings": {
+                "rounds": "Rondes",
+                "time": "Tiempu por pregunta (s)",
+                "aiAttempts": "Intentos de la IA por pregunta"
+            }
+        },
+        "startGame": "Empezar el xuegu"
+    },
+    "logIn": {
+        "username": "Nombre d'usuariu",
+        "password": "Contraseña",
+        "logIn": "Iniciar sesión",
+        "or": "o",
+        "dontHaveAccount": "¿No tienes cuenta?",
+        "signUpHere": "Crear cuenta aquí",
+        "errors": {
+            "missingFields": "Algun de los campos falta.",
+            "invalidCredentials": "Nombre d'usuariu o contraseña incorrectos."
+        }
+    },
+    "signUp": {
+        "username": "Nombre d'usuariu",
+        "password": "Contraseña",
+        "confirmPassword": "Confirmar contraseña",
+        "signUp": "Crear cuenta",
+        "or": "o",
+        "alreadyHaveAccount": "¿Ya tienes cuenta?",
+        "logInHere": "Iniciar sesión aquí",
+        "errors": {
+            "duplicateUsername": "El nombre d'usuariu ya ta utilizáu. Escoge un de diferente.",
+            "invalidUsername": "Nombre d'usuariu incorrectu. Debe tener de 3 a 20 caracteres y contener nomás lletres, números y guiones bajos.",
+            "invalidPassword": "Contraseña incorrecta. Debe tener al menos 8 caracteres y contene al menos una lletra mayúscula, una minúscula, un número y un carácter especial.",
+            "passwordsDoNotMatch": "La contraseña y la confirmación nun coinciden, por favor inténtalo de nuevo."
+        }
+    }
+}
