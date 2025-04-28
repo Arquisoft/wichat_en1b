@@ -4,6 +4,7 @@ const wbk = WBK({
     sparqlEndpoint: 'https://query.wikidata.org/sparql' // Required to use `sparqlQuery` and `getReverseClaims` functions, optional otherwise
 })
 const questionTypes = require('./questionTypes');
+const axios = require('axios')
 
 const WikidataItemRepository = require('../repositories/WikidataItemRepository');
 const QuestionRepository = require('../repositories/QuestionRepository');
@@ -48,12 +49,12 @@ class WikidataController {
         //Constructing the url for the wikidata request
         let url = wbk.sparqlQuery(query);
 
-        const response = await fetch(url, {
+        const response = await axios.get(url, {
             headers: {
                 "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36"
             }
         });
-        const data = await response.json();
+        const data = response.data;
         return data.results.bindings;
     }
 
@@ -114,9 +115,10 @@ class WikidataController {
         const rawQuestion = questionOfTheDay.question;
         const question = {
             id: rawQuestion._id,
-            question: rawQuestion.question,
-            images: rawQuestion.images,
-            correctOption: rawQuestion.correctOption
+            imageType: rawQuestion.imageType,
+            relation: rawQuestion.relation,
+            topic: rawQuestion.topic,
+            images: rawQuestion.images
         }
         return question;
     }

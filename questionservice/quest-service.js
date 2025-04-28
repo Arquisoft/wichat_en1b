@@ -88,10 +88,9 @@ app.get("/question-of-the-day", async (req, res) => {
         const username = req.headers['username'];
         const question = await wikidataController.getQuestionOfTheDay();
         const recordedAnswer = await answerRepository.findAnswer(question._id, username);
+        delete question.correctOption;
         const questionOfTheDay = {
-            id: question.id,
-            question: question.question,
-            images: question.images,
+            ...question,
             recordedAnswer
         };
         res.json(questionOfTheDay);
