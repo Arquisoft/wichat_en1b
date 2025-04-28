@@ -478,13 +478,13 @@ describe('Error handling', () => {
 
   it('should handle errors from simplellm', async () => {
     axios.post.mockImplementationOnce((url) => {
-      if (url.endsWith('/simpleMessage')) {
+      if (url.endsWith('/ask')) {
         return getRejectedPromise(500, 'SIMPLE LLM service error');
       }
     });
 
     const response = await request(app)
-      .post('/simplellm')
+      .post('/askllm')
       .send({ message: 'test' });
 
     expect(response.statusCode).toBe(500);
