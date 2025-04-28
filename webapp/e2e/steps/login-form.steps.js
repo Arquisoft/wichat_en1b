@@ -23,7 +23,7 @@ defineFeature(feature, (test) => {
           headless: "new",
           args: ["--no-sandbox", "--disable-setuid-sandbox"],
         })
-      : await puppeteer.launch({ headless: false, slowMo: 30 });
+      : await puppeteer.launch({ headless: false, slowMo: 10 });
 
     page = await browser.newPage();
     setDefaultOptions({ timeout: 10000 });
@@ -46,6 +46,10 @@ defineFeature(feature, (test) => {
     await passwordInput.type("StrongPass123!");
     await confirmpasswordInput.type("StrongPass123!");
     await expect(page).toClick('button[data-testid="signup"]');
+
+    await page.waitForXPath("//button[contains(text(), 'Sign Out')]");
+    const [signOutButton] = await page.$x("//button[contains(text(), 'Sign Out')]");
+    await signOutButton.click();
 
     await page.waitForSelector('[data-testid="login-button"]');
     await page.click('[data-testid="login-button"]');
