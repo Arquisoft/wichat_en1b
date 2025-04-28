@@ -7,7 +7,7 @@ let page;
 let browser;
 
 const loginAlert="Invalid credentials"
-const loginsuccess="secretOrPrivateKey must have a value"
+
 const expectAlertToBe = async (text) => {
   await page.waitForSelector('p[style="color: red;"]');
   const alertMessage = await page.$eval('p[style="color: red;"]', 
@@ -85,7 +85,6 @@ defineFeature(feature, (test) => {
       await signOutButton.click();
 
     });
-
   });
 
   test("Login with empty username", ({ given, when, then }) => {

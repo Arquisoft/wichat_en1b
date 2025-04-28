@@ -3,7 +3,7 @@ Feature: Register a new user
   Scenario: Register user with valid credentials
     Given An unregistered user with valid credentials
     When Filling in the register form and submit
-    Then Should be shown a success message
+    Then Should enter into the aplication
 
   Scenario: Register an existing user
     Given User that already exists

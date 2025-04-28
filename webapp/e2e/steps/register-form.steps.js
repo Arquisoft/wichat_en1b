@@ -20,7 +20,7 @@ defineFeature(feature, test => {
   beforeAll(async () => {
     browser = process.env.GITHUB_ACTIONS
       ? await puppeteer.launch({headless: "new", args: ['--no-sandbox', '--disable-setuid-sandbox']})
-      : await puppeteer.launch({ headless: false, slowMo: 100 });
+      : await puppeteer.launch({ headless: false, slowMo: 10 });
     page = await browser.newPage();
     //Way of setting up the timeout
     setDefaultOptions({ timeout: 10000 })
@@ -69,9 +69,13 @@ defineFeature(feature, test => {
       await expect(page).toClick('button[data-testid="signup"]');
     });
 
-    then("Should be shown a success message", async () => {
-      expectAlertToBe("The username provided is already in use. Please choose a different one.");
+    then("Should enter into the aplication", async () => {
+
+      await page.waitForXPath("//button[contains(text(), 'Sign Out')]");
+      const [signOutButton] = await page.$x("//button[contains(text(), 'Sign Out')]");
+      await signOutButton.click();
     });
+    
   });
 
   test("Register an existing user", ({ given, when, then }) => {
