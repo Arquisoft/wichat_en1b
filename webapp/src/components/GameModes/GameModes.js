@@ -1,19 +1,23 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Box, Typography, Paper, MenuItem, Select, TextField, Button } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-
-const QUESTION_TYPES = ["random", "flags", "animals", "monuments", "foods"]
+import { useTranslation } from 'react-i18next';
 
 const GameModes = () => {
-    const [topic, setTopic] = useState(localStorage.getItem('topic') || QUESTION_TYPES[0]);
+    const navigate = useNavigate();
+    const { t } = useTranslation();
+
+    const QUESTION_TYPES_KEYS = ["gameModes.categories.random", "gameModes.categories.flags", "gameModes.categories.animals", "gameModes.categories.monuments", "gameModes.categories.foods"];
+
+    const [topic, setTopic] = useState(localStorage.getItem('topic') || QUESTION_TYPES_KEYS[0]);
     const [customSettings, setCustomSettings] = useState(localStorage.getItem('customSettings') ? JSON.parse(localStorage.getItem('customSettings')) : {
         rounds: 5,
         timePerQuestion: 30,
         aiAttempts: 3,
     });
-    const navigate = useNavigate();
 
     const handleCategoryChange = (event) => {
+        console.log(event.target.value);
         localStorage.setItem('topic', event.target.value);
         setTopic(event.target.value);
     };
@@ -39,24 +43,31 @@ const GameModes = () => {
     }
 
     const gameModes = [
-        { name: 'Classical', description: 'The classic game mode with standard rules.' },
-        { name: 'SuddenDeath', description: 'One wrong answer and it’s game over!' },
-        { name: 'TimeTrial', description: 'Answer as many questions as possible within the time limit.' },
-        { name: 'QOD', description: 'Question of the day mode for daily challenges.' },
-        { name: 'Custom', description: 'Customize your game with specific settings.' },
+        { name: t("gameModes.classical.title"), description: t("gameModes.classical.description"), route: "classical" },
+        { name: t("gameModes.suddenDeath.title"), description: t("gameModes.suddenDeath.description"), route: "suddendeath" },
+        { name: t("gameModes.timeTrial.title"), description: t("gameModes.timeTrial.description"), route: "timetrial" },
+        { name: t("gameModes.QOD.title"), description: t("gameModes.QOD.description"), route: "qod" },
+        { name: t("gameModes.custom.title"), description: t("gameModes.custom.description"), route: "custom" }
     ];
+
+    useEffect(() => {
+        // Actualiza el topic si el valor actual no coincide con las claves disponibles
+        if (!QUESTION_TYPES_KEYS.includes(topic)) {
+            setTopic(QUESTION_TYPES_KEYS[0]);
+        }
+    }, [t]);
 
     return (
         <Box sx={{ padding: 2 }}>
             <Typography variant="h4" gutterBottom>
-                Select Game Mode
+                {t("gameModes.selectGameMode")}
             </Typography>
             <Box sx={{ marginBottom: 2 }}>
-                <Typography variant="subtitle1">Category:</Typography>
+                <Typography variant="subtitle1">{t("gameModes.categories.title")}</Typography>
                 <Select value={topic} onChange={handleCategoryChange} fullWidth>
-                    {QUESTION_TYPES.map((questionType) => (
-                        <MenuItem key={questionType} value={questionType}>
-                            {capitalizaFirstLetter(questionType)}
+                    {QUESTION_TYPES_KEYS.map((key) => (
+                        <MenuItem key={key} value={key}>
+                            {capitalizaFirstLetter(t(key))}
                         </MenuItem>
                     ))}
                 </Select>
@@ -85,10 +96,10 @@ const GameModes = () => {
                             <Typography variant="body2" sx={{ marginBottom: 1 }}>
                                 {mode.description}
                             </Typography>
-                            {mode.name === 'Custom' && (
+                            {mode.name === t("gameModes.custom.title") && (
                                 <Box>
                                     <TextField
-                                        label="Rounds"
+                                        label={t("gameModes.custom.settings.rounds")}
                                         type="number"
                                         name="rounds"
                                         value={customSettings.rounds}
@@ -102,7 +113,7 @@ const GameModes = () => {
                                         sx={{ marginBottom: 1 }}
                                     />
                                     <TextField
-                                        label="Time per Question (s)"
+                                        label={t("gameModes.custom.settings.time")}
                                         type="number"
                                         name="timePerQuestion"
                                         value={customSettings.timePerQuestion}
@@ -116,7 +127,7 @@ const GameModes = () => {
                                         sx={{ marginBottom: 1 }}
                                     />
                                     <TextField
-                                        label="AI Attempts per Question"
+                                        label={t("gameModes.custom.settings.aiAttempts")}
                                         type="number"
                                         name="aiAttempts"
                                         value={customSettings.aiAttempts}
@@ -135,10 +146,10 @@ const GameModes = () => {
                         <Button
                             variant="contained"
                             color="primary"
-                            onClick={() => handleGameModeClick(mode.name.toLowerCase())}
+                            onClick={() => handleGameModeClick(mode.route)}
                             sx={{ marginTop: 'auto' }}
                         >
-                            Start Game
+                            {t("gameModes.startGame")}
                         </Button>
                     </Paper>
                 ))}

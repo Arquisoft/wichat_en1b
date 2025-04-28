@@ -7,6 +7,7 @@ import { Link } from "react-router-dom";
 import { User, BarChart, Gamepad2, Layers, Puzzle, Library, BookOpenText } from "lucide-react";
 import { keyframes } from "@mui/system";
 import "@fontsource/inter";
+import { useTranslation } from 'react-i18next';
 
 
 const floatAnimation = keyframes`
@@ -47,6 +48,7 @@ const Logo = () => {
 export const Home = () => {
     const [message, setMessage] = useState('');
     const [error, setError] = useState('');
+    const { t } = useTranslation();
 
     const userCookie = Cookies.get('user');
     const isUserLogged = !!userCookie;
@@ -65,25 +67,25 @@ export const Home = () => {
     const menuItems = [
         {
             id: 1,
-            title: "Your Profile",
+            title: t("home.yourProfile"),
             icon: <User size={45} color="#1976D2" />,
             link: `/profile/${username}`,
         },
         {
             id: 2,
-            title: "Classical Game",
+            title: t("home.classicalGame"),
             icon: <BookOpenText size={45} color="#1976D2" />,
             link: "/game",
         },
         {
             id: 3,
-            title: "Statistics",
+            title: t("home.statistics"),
             icon: <BarChart size={45} color="#1976D2" />,
             link: "/statistics",
         },
         {
             id: 4,
-            title: "Game Modes",
+            title:  t("home.gameModes"),
             icon: <Layers size={45} color="#1976D2" />,
             link: "/game-modes",
         },
@@ -92,16 +94,15 @@ export const Home = () => {
     const getGreetingMessage = async () => {
 
         try {
-            const model = "empathy";
-            let question = "";
+            let message = "Please, generate a generic greeting message for a user visiting the 'WiChat' webapp. Two to three sentences max. Take into account that the WiChat website is a question game webapp.\n\n";
             if (isUserLogged) {
                 const userData = JSON.parse(userCookie);
-                question = "Please, generate a  greeting message for a student called " + userData.username + " that is a student of the Software Architecture course in the University of Oviedo. Be nice and polite. Two to three sentences max.";
+                message += "The user is called: " + userData.username;
             } else {
-                question = "Please, generate a generic greeting message for an unregistered user visiting the WiChat webapp. Take into account that the WiChat website is a question game webapp. Encourage him to log in or create a new user, while beign nice and polite. Two to three sentences max";
+                message += "Encourage him to log in or create a new user, while beign nice and polite.";
             }
-            let answerLLM = await axios.post(`${apiEndpoint}/askllm`, { question, model })
-            setMessage(answerLLM.data.answer);
+            let answerLLM = await axios.post(`${apiEndpoint}/simplellm`, { message })
+            setMessage(answerLLM.data.response);
         } catch (error) {
             setError(error.response.data.error);
         }
@@ -124,7 +125,7 @@ export const Home = () => {
                         typeSpeed={50} // Typing speed in ms
                     />) : (
                     <Typography align="center" sx={{ marginTop: 2 }}>
-                        Loading message...
+                        {t("home.loadingMessage")}
                     </Typography>
                 )}
             </div>

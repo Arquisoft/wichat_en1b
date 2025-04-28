@@ -97,7 +97,7 @@ app.get('/users/:username/image', async (req, res) => {
   try {
     let userResponse = await axios.get(`${userServiceUrl}/users/${req.params.username}/image`);
     let userImageResponse = await axios.get(`${userServiceUrl}${userResponse.data.image}`, { responseType: 'arraybuffer' });
-    
+
     res.setHeader('Content-Type', 'image/png');
     return res.send(userImageResponse.data);
   } catch (error) {
@@ -138,7 +138,7 @@ app.post('/users/:username/custom-image', authMiddleware, upload.single('image')
     }
 
     if (!req.file.mimetype.startsWith('image/')) {
-      return res.status(400).json({ error: 'Uploaded file is not an image' });
+      return res.status(400).json({ error: 'profile.errors.invalidImage' });
     }
 
     const formData = new FormData();
@@ -158,13 +158,13 @@ app.post('/users/:username/custom-image', authMiddleware, upload.single('image')
 app.get('/profile/:username', authMiddleware, async (req, res) => {
   try {
     const targetUsername = req.params.username;
-    
+
     // Input validation for username parameter
     const usernameRegex = /^[a-zA-Z0-9_-]{3,30}$/;
     if (!usernameRegex.test(targetUsername)) {
       return res.status(400).json({ error: 'Invalid username format' });
     }
-    
+
     // Forward the request to the statistics service
     const statisticsResponse = await axios.get(`${statisticsServiceUrl}/statistics/${targetUsername}`, 
       {      
@@ -172,7 +172,7 @@ app.get('/profile/:username', authMiddleware, async (req, res) => {
           'currentuser': req.user
       }
     });
-    
+
     res.json(statisticsResponse.data);
   } catch (error) {
     manageError(res, error);
@@ -183,6 +183,16 @@ app.post('/askllm', async (req, res) => {
   try {
     // Forward the add user request to the user service
     const llmResponse = await axios.post(llmServiceUrl + '/ask', req.body);
+    res.json(llmResponse.data);
+  } catch (error) {
+    manageError(res, error);
+  }
+});
+
+app.post('/simplellm', async (req, res) => {
+  try {
+    // Forward the add user request to the user service
+    const llmResponse = await axios.post(llmServiceUrl + '/simpleMessage', req.body);
     res.json(llmResponse.data);
   } catch (error) {
     manageError(res, error);
