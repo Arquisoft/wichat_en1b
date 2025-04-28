@@ -77,7 +77,7 @@ class WikidataController {
      */
     async getQuestionAndImages(queryName) {
 
-        if (queryName == "random") {
+        if (queryName == "random" || !queryName) {
             queryName = this.getRandomQuestionType();
         }
 
@@ -117,7 +117,7 @@ class WikidataController {
         const questionOfTheDay = await this.questionOfTheDayRepository.getQuestionOfTheDay();
         const rawQuestion = questionOfTheDay.question;
         const question = {
-            id: questionOfTheDay._id,
+            id: rawQuestion._id,
             question: rawQuestion.question,
             images: rawQuestion.images,
             correctOption: rawQuestion.correctOption

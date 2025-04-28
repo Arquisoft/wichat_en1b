@@ -67,6 +67,7 @@ describe('Question Service', () => {
         expect(response.body).toHaveProperty('id');
         expect(response.body).toHaveProperty('question');
         expect(response.body).toHaveProperty('images');
+        expect(response.body).not.toHaveProperty('correctOption');
         expect(response.body.images).toHaveLength(4);
     }
 
@@ -83,6 +84,7 @@ describe('Question Service', () => {
     it('Should validate correctly an answer', async () => {
         let response = await request(app)
             .post('/answer')
+            .set('username', 'testuser')
             .send({
                 answer: 'http://commons.wikimedia.org/wiki/Special:FilePath/Flag%20of%20Lithuania.svg',
                 questionId: '67f14a3f3a6d351adaa0929f'
