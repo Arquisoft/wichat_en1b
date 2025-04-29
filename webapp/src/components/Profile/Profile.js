@@ -114,8 +114,13 @@ export const Profile = () => {
                 try {
                     const { statsData, username: fetchedUsername } = await retriever.getRecords(profileUsernameParam);
 
-                    setStatistics(statsData);
-                    
+                    setStatistics((prevStatistics) => {
+                        if (JSON.stringify(prevStatistics) !== JSON.stringify(statsData)) {
+                            return statsData;
+                        }
+                        return prevStatistics;
+                    });
+
                     // Determine which profile to load
                     setIsProfileOwner(statsData.isProfileOwner);
 
