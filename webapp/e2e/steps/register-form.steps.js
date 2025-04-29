@@ -40,6 +40,7 @@ defineFeature(feature, test => {
 
   afterAll(async () => {
     await browser.close();
+    
   });
 
   afterEach(async () => {
