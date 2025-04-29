@@ -1,0 +1,244 @@
+{
+    "navBar": {
+        "home": "Accueil",
+        "profile": "Profil",
+        "classicalGame": "Jeu classique",
+        "statistics": "Statistiques",
+        "gameModes": "Modes de jeu",
+        "logIn": "Se connecter",
+        "signUp": "S'inscrire",
+        "signOut": "Se déconnecter"
+    },
+    "home": {
+        "loadingMessage": "Chargement...",
+        "yourProfile": "Profil",
+        "classicalGame": "Jeu classique",
+        "statistics": "Statistiques",
+        "gameModes": "Modes de jeu"
+    },
+    "profile": {
+        "header": {
+            "since": "Membre depuis {{date}}",
+            "membershipDays_one": "{{count}} jour d'adhésion",
+            "membershipDays_other": "{{count}} jours d'adhésion",
+            "settings": "Paramètres du compte"
+        },
+        "statisticTypes": {
+            "labels": {
+                "global": "Global 🌍",
+                "classical": "Classique 🎲",
+                "suddenDeath": "Mort subite ☠️",
+                "timeTrial": "Épreuve chronométrée ⏱️",
+                "custom": "Personnalisé 🎨",
+                "QOD": "Question du jour 📅"
+            },
+            "insights": {
+                "global": "Statistiques globales 🌍",
+                "classical": "Statistiques du jeu classique 🎲",
+                "suddenDeath": "Statistiques de la mort subite ☠️",
+                "timeTrial": "Statistiques de l'épreuve chronométrée ⏱️",
+                "custom": "Statistiques du jeu personnalisé 🎨",
+                "QOD": "Statistiques de la question du jour 📅"
+            }
+        },
+        "summary": {
+            "performance": "Résumé de la performance",
+            "successRate": "Taux de réussite",
+            "gamesPlayed": "Jeux joués",
+            "questionsAnswered": "Questions répondues",
+            "correctAnswers": "Réponses correctes",
+            "incorrectAnswers": "Réponses incorrectes"
+        },
+        "additionalInsights": {
+            "additionalInsights": "Informations supplémentaires",
+            "avgQuestions": "Moyenne de questions par jeu",
+            "correctAnswerRate": "Taux de réponses correctes",
+            "maxScore": "Score maximal",
+            "maxScorePoints_one": "{{count}} point",
+            "maxScorePoints_other": "{{count}} points"
+        },
+        "answerDistribution": {
+            "answerDistribution": "Répartition des réponses",
+            "correct": "Correctes",
+            "incorrect": "Incorrectes"
+        },
+        "visitors": {
+            "profileVisitors": "Visiteurs du profil",
+            "totalVisits": "Visites totales : {{count}}",
+            "visitedOn": "Visité le {{date}}",
+            "showMore": "Voir plus",
+            "showAll": "Tout afficher ({{count}})",
+            "noVisitors": "Aucun visiteur pour l'instant"
+        },
+        "errors": {
+            "failedToRetrieveStatistics": "Échec de la récupération des statistiques",
+            "invalidImage": "Le fichier téléchargé n'est pas une image."
+        },
+        "errorStates": {
+            "retry": "Réessayer",
+            "goBackToMenu": "Retour au menu"
+        },
+        "settings": {
+            "updateProfile": "Mettre à jour votre profil",
+            "manageSettings": "Gérez vos paramètres de compte ci-dessous",
+            "accountInfo": "Informations sur le compte",
+            "newValuesInfo": "Sélectionnez ce que vous souhaitez mettre à jour et fournissez les nouvelles valeurs ci-dessous",
+            "newUsername": "Nouveau nom d'utilisateur",
+            "newPassword": "Nouveau mot de passe",
+            "repeatPassword": "Répétez le mot de passe",
+            "saveChanges": "Enregistrer les modifications",
+            "profilePicture": "Image de profil",
+            "uploadPictureInfo": "Téléchargez une image ou sélectionnez une option par défaut",
+            "uploadPicture": "Télécharger l'image",
+            "close": "Fermer"
+        },
+        "loadingStatistics": "Chargement des statistiques du profil...",
+        "globalStatistics": "Statistiques globales",
+        "noStatistics": "Aucune statistique disponible",
+        "backToMenu": "Retour au menu"
+    },
+    "statistics": {
+        "globalStatistics": "Statistiques globales",
+        "welcome": "Bienvenue {{username}} !",
+        "avatar": "Avatar",
+        "username": "Nom d'utilisateur",
+        "questions": "Questions",
+        "correct": "Correct",
+        "accuracy": "Précision (%)",
+        "gamesPlayed": "Jeux joués",
+        "totalScore": "Score total",
+        "avgScore": "Score moyen",
+        "highestScore": "Score le plus élevé",
+        "gameType": "Type de jeu",
+        "memberSince": "Membre depuis",
+        "noStatsFound": "Aucune statistique trouvée.",
+        "you": "Vous",
+        "statisticTypes": {
+            "global": "Global 🌍",
+            "classical": "Classique 🎲",
+            "suddenDeath": "Mort subite ☠️",
+            "timeTrial": "Épreuve chronométrée ⏱️",
+            "custom": "Personnalisé 🎨",
+            "QOD": "Question du jour 📅"
+        },
+        "filters": {
+            "minGames": "Jeux min.",
+            "minScore": "Score min.",
+            "registeredAfter": "Inscrit après",
+            "registeredBefore": "Inscrit avant",
+            "reset": "Réinitialiser les filtres"
+        },
+        "pagination": {
+            "first": "Premier",
+            "previous": "Précédent",
+            "next": "Suivant",
+            "last": "Dernier",
+            "page": "Page {{page}} sur {{total}}",
+            "perPage": "{{amount}} par page"
+        },
+        "errors": {
+            "userNotFound": "Utilisateur non trouvé.",
+            "sessionExpired": "Votre session a expiré. Veuillez vous reconnecter.",
+            "failedToUpdate": "Échec de la mise à jour des statistiques"
+        }
+    },
+    "game": {
+        "score": "Score : {{score}}",
+        "loadingImages": "Chargement des images...",
+        "correctAnswer": "Correct ! +{{score}} points",
+        "incorrectAnswer": "Incorrect",
+        "question": "Quel {{imageType}} {{relation}} {{topic}} ?",
+        "chat": {
+            "thinking": "Réflexion...",
+            "you": "Vous",
+            "AI": "IA",
+            "chatAssistant": "Assistant de discussion",
+            "askMeAnything": "Demandez-moi n'importe quoi à propos de la question !",
+            "typeMessage": "Tapez votre message...",
+            "attemptsUsed": "{{used}} / {{total}} tentatives utilisées",
+            "pointsConsumed": "-{{points}} points",
+            "cantProcessRequest": "Désolé, je n'ai pas pu traiter votre demande."
+        },
+        "modes": {
+            "custom": "Jeu personnalisé 🎨",
+            "suddenDeath": "Mort subite ☠️",
+            "classical": "Jeu classique 🎲",
+            "timeTrial": "Épreuve chronométrée ⏱️",
+            "QOD": "Question du jour 📅"
+        },
+        "imageTypes": {
+            "image": "images",
+            "flag": "drapeaux"
+        },
+        "relations": {
+            "correspondsTo": "correspond à",
+            "correspondsToThe": "correspond au",
+            "isA": "est un",
+            "belongsTo": "appartient à"
+        }
+    },
+    "gameModes": {
+        "selectGameMode": "Sélectionner un mode de jeu",
+        "categories": {
+            "title": "Catégorie :",
+            "random": "Aléatoire",
+            "flags": "Drapeaux",
+            "animals": "Animaux",
+            "monuments": "Monuments",
+            "foods": "Aliments"
+        },
+        "classical": {
+            "title": "Classique",
+            "description": "Le mode de jeu classique avec les règles standard."
+        },
+        "suddenDeath": {
+            "title": "Mort subite",
+            "description": "Une mauvaise réponse et c'est fini !"
+        },
+        "timeTrial": {
+            "title": "Épreuve chronométrée",
+            "description": "Répondez à autant de questions que possible dans le temps imparti."
+        },
+        "QOD": {
+            "title": "Question du jour",
+            "description": "Mode de défi quotidien avec la question du jour."
+        },
+        "custom": {
+            "title": "Personnalisé",
+            "description": "Personnalisez votre jeu avec des paramètres spécifiques.",
+            "settings": {
+                "rounds": "Tours",
+                "time": "Temps par question (s)",
+                "aiAttempts": "Tentatives IA par question"
+            }
+        },
+        "startGame": "Démarrer le jeu"
+    },
+    "logIn": {
+        "username": "Nom d'utilisateur",
+        "password": "Mot de passe",
+        "logIn": "Se connecter",
+        "or": "ou",
+        "dontHaveAccount": "Vous n'avez pas de compte ?",
+        "signUpHere": "Inscrivez-vous ici",
+        "errors": {
+            "missingFields": "Certains champs sont manquants.",
+            "invalidCredentials": "Nom d'utilisateur ou mot de passe invalide."
+        }
+    },
+    "signUp": {
+        "username": "Nom d'utilisateur",
+        "password": "Mot de passe",
+        "confirmPassword": "Confirmer le mot de passe",
+        "signUp": "S'inscrire",
+        "or": "ou",
+        "alreadyHaveAccount": "Vous avez déjà un compte ?",
+        "logInHere": "Connectez-vous ici",
+        "errors": {
+            "duplicateUsername": "Le nom d'utilisateur fourni est déjà utilisé. Veuillez choisir un autre.",
+            "invalidUsername": "Nom d'utilisateur invalide. Il doit comporter entre 3 et 20 caractères et ne contenir que des lettres, des chiffres et des underscores.",
+            "invalidPassword": "Mot de passe invalide. Il doit comporter au moins 8 caractères, une lettre majuscule, une lettre minuscule, un chiffre et un caractère spécial.",
+            "passwordsDoNotMatch": "Le mot de passe et la confirmation ne correspondent pas, veuillez réessayer."
+        }
+    }
+}

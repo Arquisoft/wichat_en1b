@@ -7,7 +7,7 @@ import ChevronLeftIcon from "@mui/icons-material/ChevronLeft"
 import ChevronRightIcon from "@mui/icons-material/ChevronRight"
 import axios from "axios"
 import { useGame } from "../GameContext"
-
+import { useTranslation } from "react-i18next"
 
 export function Chat() {
     const [isOpen, setIsOpen] = useState(false)
@@ -15,8 +15,11 @@ export function Chat() {
     const [input, setInput] = useState("")
     const [isLoading, setIsLoading] = useState(false)
     const messagesEndRef = useRef(null)
+    const [isDisabled, setIsDisabled] = useState(false)
 
-    const { question, gameEnded, setGameEnded } = useGame();
+    const { question, gameEnded, setGameEnded, AIAttempts, setAIAttempts, maxAIAttempts } = useGame();
+    const { t } = useTranslation();
+    
     // Adjust in function of the height of the navbar
     const navbarHeight = 64
     const gatewayEndpoint = process.env.REACT_APP_API_ENDPOINT || "http://localhost:8000"
@@ -31,7 +34,9 @@ export function Chat() {
     useEffect(() => {
         if (gameEnded) {
             setMessages([]);
+            setIsDisabled(false);
             setGameEnded(false);
+            setAIAttempts(0);
         }
     }, [gameEnded]);
 
@@ -45,6 +50,7 @@ export function Chat() {
 
 
     const handleSubmit = async (e) => {
+        setAIAttempts(AIAttempts + 1)
         e.preventDefault()
 
         if (!input.trim() || isLoading) return
@@ -62,6 +68,7 @@ export function Chat() {
         setMessages((prevMessages) => [...prevMessages, userMessage])
         setInput("") // Clear input field
         setIsLoading(true)
+        setIsDisabled(true)
 
         try {
             // Make the API call to your backend
@@ -74,7 +81,7 @@ export function Chat() {
             const assistantMessage = {
                 id: Date.now().toString(),
                 role: "assistant",
-                content: response.data.answer || "Sorry, I couldn't process your request.",
+                content: response.data.answer || t("game.chat.cantProcessRequest"),
             }
 
             setMessages((prevMessages) => [...prevMessages, assistantMessage])
@@ -91,6 +98,9 @@ export function Chat() {
             setMessages((prevMessages) => [...prevMessages, errorMessage])
         } finally {
             setIsLoading(false)
+            if (AIAttempts < maxAIAttempts-1) {
+                setIsDisabled(false)
+            }
         }
     }
 
@@ -158,7 +168,7 @@ export function Chat() {
                 >
                     <Typography variant="h6" sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                         <ChatIcon fontSize="small" />
-                        Chat Assistant
+                        {t("game.chat.chatAssistant")}
                     </Typography>
                     <IconButton onClick={toggleSidebar} size="small">
                         <CloseIcon />
@@ -189,7 +199,7 @@ export function Chat() {
                         >
                             <Box>
                                 <ChatIcon sx={{ fontSize: 48, color: "text.disabled", mb: 1 }} />
-                                <Typography>Ask me anything about the quiz!</Typography>
+                                <Typography>{t("game.chat.askMeAnything")}</Typography>
                             </Box>
                         </Box>
                     ) : (
@@ -204,7 +214,7 @@ export function Chat() {
                                 }}
                             >
                                 {message.role !== "user" && (
-                                    <Avatar sx={{ bgcolor: "#1976d2", width: 32, height: 32, fontSize: "0.875rem" }}>AI</Avatar>
+                                    <Avatar sx={{ bgcolor: "#1976d2", width: 32, height: 32, fontSize: "0.875rem" }}>{t("game.chat.AI")}</Avatar>
                                 )}
                                 <Paper
                                     elevation={0}
@@ -222,7 +232,7 @@ export function Chat() {
                                     <Avatar
                                         sx={{ bgcolor: "#e0e0e0", width: 32, height: 32, fontSize: "0.875rem", color: "text.primary" }}
                                     >
-                                        You
+                                        {t("game.chat.you")}
                                     </Avatar>
                                 )}
                             </Box>
@@ -252,14 +262,19 @@ export function Chat() {
                                 }}
                             >
                                 <CircularProgress size={16} />
-                                <Typography variant="body2">Thinking...</Typography>
+                                <Typography variant="body2">{t("game.chat.thinking")}</Typography>
                             </Paper>
                         </Box>
                     )}
 
                     <div ref={messagesEndRef} />
                 </Box>
-
+                <Divider />
+                    <Typography variant="caption" sx={{ padding: 1, textAlign: "center", color: "text.secondary" }}>
+                        {t("game.chat.attemptsUsed", { used: AIAttempts, total: maxAIAttempts })} {AIAttempts>0 && (<Typography variant="caption" sx={{ padding: 1, textAlign: "center", color: "text.secondary" }}>
+                            {t("game.chat.pointsConsumed", { points: 100*AIAttempts })}
+                            </Typography>)}
+                    </Typography>
                 <Divider />
 
                 {/* Input */}
@@ -275,10 +290,10 @@ export function Chat() {
                     <TextField
                         fullWidth
                         size="small"
-                        placeholder="Type your message..."
+                        placeholder={t("game.chat.typeMessage")}
                         value={input}
                         onChange={handleInputChange}
-                        disabled={!isOpen || isLoading}
+                        disabled={!isOpen || isDisabled}
                         sx={{ flexGrow: 1 }}
                     />
                     <Button
@@ -287,7 +302,7 @@ export function Chat() {
                         color="primary"
                         name="send"
                         aria-label="Send message"
-                        disabled={isLoading || !input.trim()}
+                        disabled={isDisabled || !input.trim()}
                         sx={{ minWidth: "unset", width: 40, height: 40, padding: 0 }}
                     >
                         {isLoading ? <CircularProgress size={24} color="inherit" /> : <SendIcon fontSize="small" />}

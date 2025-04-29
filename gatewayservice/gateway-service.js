@@ -97,9 +97,22 @@ app.get('/users/:username/image', async (req, res) => {
   try {
     let userResponse = await axios.get(`${userServiceUrl}/users/${req.params.username}/image`);
     let userImageResponse = await axios.get(`${userServiceUrl}${userResponse.data.image}`, { responseType: 'arraybuffer' });
-    
+
     res.setHeader('Content-Type', 'image/png');
     return res.send(userImageResponse.data);
+  } catch (error) {
+    manageError(res, error);
+  }
+});
+
+app.patch('/users/:username', authMiddleware,  async (req, res) => {
+  try {
+    if (req.params.username !== req.user) {
+      return res.status(403).json({ error: 'You can only update your own account' });
+    }
+    
+    let userResponse = await axios.patch(`${userServiceUrl}/users/${req.params.username}`, { currentUser: req.user, newUser: req.body.username, newPassword: req.body.password, newPasswordRepeat: req.body.passwordRepeat });
+    return res.json(userResponse.data);
   } catch (error) {
     manageError(res, error);
   }
@@ -125,7 +138,7 @@ app.post('/users/:username/custom-image', authMiddleware, upload.single('image')
     }
 
     if (!req.file.mimetype.startsWith('image/')) {
-      return res.status(400).json({ error: 'Uploaded file is not an image' });
+      return res.status(400).json({ error: 'profile.errors.invalidImage' });
     }
 
     const formData = new FormData();
@@ -145,21 +158,21 @@ app.post('/users/:username/custom-image', authMiddleware, upload.single('image')
 app.get('/profile/:username', authMiddleware, async (req, res) => {
   try {
     const targetUsername = req.params.username;
-    
+
     // Input validation for username parameter
     const usernameRegex = /^[a-zA-Z0-9_-]{3,30}$/;
     if (!usernameRegex.test(targetUsername)) {
       return res.status(400).json({ error: 'Invalid username format' });
     }
-    
+
     // Forward the request to the statistics service
-    const statisticsResponse = await axios.get(`${statisticsServiceUrl}/statistics`, {
-      headers: {
-        'currentuser': req.user,
-        'targetusername': targetUsername
+    const statisticsResponse = await axios.get(`${statisticsServiceUrl}/statistics/${targetUsername}`, 
+      {      
+        headers: {
+          'currentuser': req.user
       }
     });
-    
+
     res.json(statisticsResponse.data);
   } catch (error) {
     manageError(res, error);
@@ -170,6 +183,16 @@ app.post('/askllm', async (req, res) => {
   try {
     // Forward the add user request to the user service
     const llmResponse = await axios.post(llmServiceUrl + '/ask', req.body);
+    res.json(llmResponse.data);
+  } catch (error) {
+    manageError(res, error);
+  }
+});
+
+app.post('/simplellm', async (req, res) => {
+  try {
+    // Forward the add user request to the user service
+    const llmResponse = await axios.post(llmServiceUrl + '/simpleMessage', req.body);
     res.json(llmResponse.data);
   } catch (error) {
     manageError(res, error);
@@ -208,13 +231,39 @@ app.post('/answer', async (req, res) => {
 
 app.get('/statistics', authMiddleware, async (req, res) => {
   try {
-    // Forward the user information to the statistics service
-    const statisticsResponse = await axios.get(`${statisticsServiceUrl}/statistics`, {
-      headers: {
-        'username': req.user
-      }
-    });
+    // Extract query parameters for filtering and sorting
+    const {
+      sort,
+      order,
+      limit,
+      offset,
+      gameType,
+      minGames,
+      minScore,
+      registeredBefore,
+      registeredAfter
+    } = req.query;
 
+    // Build query parameters for the statistics service request
+    const queryParams = new URLSearchParams();
+    
+    // Add parameters to the query string if they exist
+    if (sort) queryParams.append('sort', sort);
+    if (order) queryParams.append('order', order);
+    if (limit) queryParams.append('limit', limit);
+    if (offset) queryParams.append('offset', offset);
+    if (gameType) queryParams.append('gameType', gameType);
+    if (minGames) queryParams.append('minGames', minGames);
+    if (minScore) queryParams.append('minScore', minScore);
+    if (registeredBefore) queryParams.append('registeredBefore', registeredBefore);
+    if (registeredAfter) queryParams.append('registeredAfter', registeredAfter);
+
+    // Construct the URL with query parameters
+    const url = `${statisticsServiceUrl}/statistics${queryParams.toString() ? '?' + queryParams.toString() : ''}`;
+    
+    // Forward the request to the statistics service
+    const statisticsResponse = await axios.get(url);
+    
     res.json(statisticsResponse.data);
   } catch (error) {
     manageError(res, error);
@@ -240,6 +289,22 @@ app.post('/statistics', authMiddleware, async (req, res) => {
     manageError(res, error);
   }
 });
+
+app.post('/recordGame', authMiddleware, async (req, res) => {
+  try {
+    // Forward the record game request to the statistics service
+    const gameData = req.body;
+    const statisticsResponse = await axios.post(`${statisticsServiceUrl}/recordGame`, gameData, {
+      headers: {
+        'username': req.user  // Send username in the headers
+      }
+    });
+    res.json(statisticsResponse.data);
+  } catch (error) {
+    manageError(res, error);
+  }
+}
+);
 
 // Read the OpenAPI YAML file synchronously
 openapiPath = __dirname + '/openapi.yaml'

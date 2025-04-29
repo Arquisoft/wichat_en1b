@@ -1,7 +1,15 @@
 const mongoose = require('mongoose');
 
 const questionSchema = new mongoose.Schema({
-    question: {
+    imageType: {
+        type: String,
+        required: true,
+    },
+    relation: {
+        type: String,
+        required: true,
+    },
+    topic: {
         type: String,
         required: true,
     },

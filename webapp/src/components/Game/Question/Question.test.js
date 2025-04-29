@@ -36,9 +36,14 @@ describe('Question Component', () => {
     const mockGameContext = {
         question: mockQuestion,
         setQuestion: jest.fn(),
+        gameEnded: false,
         setGameEnded: jest.fn(),
         questionType: 'random',
-        setQuestionType: jest.fn()
+        setQuestionType: jest.fn(),
+        AIAttempts: 0,
+        setAIAttempts: jest.fn(),
+        maxAIAttempts: 3,
+        setMaxAIAttempts: jest.fn()
     };
 
     const mockUserCookie = JSON.stringify({ token: 'fake-jwt-token' });

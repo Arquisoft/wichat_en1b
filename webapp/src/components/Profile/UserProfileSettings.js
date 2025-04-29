@@ -4,6 +4,22 @@ export default class UserProfileSettings {
   
   API_GATEWAY = process.env.REACT_APP_API_ENDPOINT || 'http://localhost:8000';
 
+  async changeUsernameAndPassword(cookie, username, password, passwordRepeat) {
+    try {
+      const response = await axios.patch(this.API_GATEWAY + `/users/${JSON.parse(cookie).username}`, { username: username, password: password, passwordRepeat: passwordRepeat },
+        {
+          headers: {
+            "Authorization": `Bearer ${JSON.parse(cookie).token}`,
+          }
+        }
+      );
+
+      return { username: response.data.newUsername, token: response.data.token };
+    } catch (error) {
+      throw new Error(error.response?.data?.error ||  "Unknown error.");
+    }
+  }
+
   async changeDefaultProfileImage(username, cookie, image) {
     try {
       if (image) {
@@ -16,7 +32,7 @@ export default class UserProfileSettings {
         );
       }
     } catch (error) {
-      throw new Error("Failed changing default profile image: " + error.response?.data?.error || error.message);
+      throw new Error(error.response?.data?.error || error.message);
     }
   }
 
@@ -36,7 +52,7 @@ export default class UserProfileSettings {
         );
       }
     } catch (error) {
-      throw new Error("Failed to upload the image: " + error.response?.data?.error || error.message);
+      throw new Error(error.response?.data?.error || error.message);
     }
   }
 

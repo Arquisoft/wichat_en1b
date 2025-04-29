@@ -19,18 +19,17 @@ mongoose.connect(mongoUri);
 
 // Route for user login
 app.post('/login',  [
-  check('username').notEmpty().withMessage('The username is required'),
-  check('password').notEmpty().withMessage('The password is required')
+  check('username').notEmpty(),
+  check('password').notEmpty()
 ],async (req, res) => {
   try {
     const errors = validationResult(req);
-    
     if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors['errors'] });
+      return res.status(400).json({ error: "logIn.errors.missingFields" });
     }
 
-    let username =req.body.username.toString();
-    let password =req.body.password.toString();
+    let username = req.body.username.toString();
+    let password = req.body.password.toString();
 
     // Find the user by username in the database
     const user = await User.findOne({ username });
@@ -51,7 +50,7 @@ app.post('/login',  [
       // Respond with the token and user information
       res.json({ token: token, username: username, createdAt: user.registrationDate });
     } else {
-      res.status(401).json({ error: 'Invalid credentials' });
+      res.status(401).json({ error: 'logIn.errors.invalidCredentials' });
     }
   } catch (error) {
     res.status(500).json({ error: error.message });

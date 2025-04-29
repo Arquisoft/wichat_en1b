@@ -1,67 +1,169 @@
 import { 
     Typography, Box, Button, Avatar, 
-    Dialog, DialogTitle, DialogContent, DialogActions 
+    Dialog, DialogTitle, DialogContent, DialogActions, 
+    TextField, FormControlLabel, Checkbox
   } from "@mui/material";
+import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
   
   const AccountSettingsDialog = ({ 
     open, 
     onClose, 
     defaultImages, 
+    onChangeUsernameAndPassword,
     onCustomImageChange, 
     onDefaultImageChange,
     uploadError,
+    updateError,
     defaultImageError
   }) => {
+    const [isUsernameChecked, setIsUsernameChecked] = useState(false);
+    const [isPasswordChecked, setIsPasswordChecked] = useState(false);
+    const [username, setUsername] = useState("");
+    const [password, setPassword] = useState("");
+    const [repeatPassword, setRepeatPassword] = useState("");
+    const { t } = useTranslation();
+
     return (
       <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
-        <DialogTitle>Account Settings</DialogTitle>
-        <DialogContent>
-          <Typography variant="body1" sx={{ mb: 2 }}>
-            Manage your account settings below:
+        <DialogTitle sx={{ backgroundColor: "#f5f5f5", textAlign: "center", py: 1 }}>
+          <Typography fontWeight="bold" fontSize="1rem">{t("profile.settings.updateProfile")}</Typography>
+          <Typography variant="body2" color="textSecondary" fontSize="0.875rem">
+            {t("profile.settings.manageSettings")}.
           </Typography>
-          <Button
-            variant="outlined"
-            component="label"
-            sx={{ mb: 2 }}
-          >
-            Upload Profile Picture
-            <input
-              type="file"
-              accept="image/*"
-              hidden
-              onChange={onCustomImageChange}
-            />
-          </Button>
-          {uploadError && (
-            <Typography variant="body2" color="error" sx={{ mt: 1 }}>
-              {uploadError}
+        </DialogTitle>
+        <DialogContent sx={{ px: 2, py: 1.5 }}>
+          <Box sx={{ mb: 2 }}>
+            <Typography sx={{ mb: 1, fontWeight: "bold", fontSize: "1rem" }}>{t("profile.settings.accountInfo")}</Typography>
+            <Typography variant="body2" color="textSecondary" sx={{ mb: 1, fontSize: "0.875rem" }}>
+              {t("profile.settings.newValuesInfo")}.
             </Typography>
-          )}
-          <Typography variant="body2" sx={{ mt: 2, mb: 1 }}>Or select a default image:</Typography>
-          <Box sx={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(48px, 1fr))", gap: 2 }}>
-            {defaultImages.map((image, index) => (
-              <Avatar
-                key={index}
-                src={image}
-                alt={`Default avatar ${index + 1}`}
-                sx={{
-                  width: "100%",
-                  height: "auto",
-                  cursor: "pointer",
-                }}
-                onClick={() => onDefaultImageChange(image)}
+            <Box sx={{ display: "flex", alignItems: "center", mb: 1.5 }}>
+              <FormControlLabel
+                control={
+                  <Checkbox 
+                    checked={isUsernameChecked} 
+                    onChange={(e) => setIsUsernameChecked(e.target.checked)} 
+                  />
+                }
+                sx={{ mr: 2 }}
               />
-            ))}
+              <TextField 
+                label={t("profile.settings.newUsername")} 
+                variant="outlined" 
+                fullWidth 
+                size="small" 
+                disabled={!isUsernameChecked} 
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+              />
+            </Box>
+            <Box sx={{ display: "flex", alignItems: "center", mb: 1.5 }}>
+              <FormControlLabel
+                control={
+                  <Checkbox 
+                    checked={isPasswordChecked} 
+                    onChange={(e) => setIsPasswordChecked(e.target.checked)} 
+                  />
+                }
+                sx={{ mr: 2 }}
+              />
+              <TextField 
+                label={t("profile.settings.newPassword")} 
+                type="password" 
+                variant="outlined" 
+                fullWidth 
+                size="small" 
+                disabled={!isPasswordChecked} 
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+            </Box>
+            <Box sx={{ display: "flex", alignItems: "center", mb: 1.5 }}>
+              <FormControlLabel
+                control={
+                  <Checkbox 
+                    checked={isPasswordChecked} 
+                    disabled
+                  />
+                }
+                sx={{ mr: 2 }}
+              />
+              <TextField 
+                label={t("profile.settings.repeatPassword")} 
+                type="password" 
+                variant="outlined" 
+                fullWidth 
+                size="small" 
+                disabled={!isPasswordChecked} 
+                value={repeatPassword}
+                onChange={(e) => setRepeatPassword(e.target.value)}
+              />
+            </Box>
+            <Button 
+              variant="contained" 
+              color="primary" 
+              fullWidth 
+              sx={{ py: 0.75, fontSize: "0.875rem" }} 
+              disabled={!isUsernameChecked && !isPasswordChecked}
+              onClick={() => onChangeUsernameAndPassword(username, password, repeatPassword)}
+            >
+              {t("profile.settings.saveChanges")}
+            </Button>
+            {updateError && (
+              <Typography variant="body2" color="error" sx={{ mt: 1, textAlign: "center", fontSize: "0.75rem" }}>
+                {t(updateError)}
+              </Typography>
+            )}
           </Box>
-          {defaultImageError && (
-            <Typography variant="body2" color="error" sx={{ mt: 1 }}>
-              {defaultImageError}
+          <Box>
+            <Typography sx={{ mb: 1, fontWeight: "bold", fontSize: "1rem" }}>{t("profile.settings.profilePicture")}</Typography>
+            <Typography variant="body2" color="textSecondary" sx={{ mb: 1, fontSize: "0.875rem" }}>
+              {t("profile.settings.uploadPictureInfo")}.
             </Typography>
-          )}
+            <Button variant="outlined" component="label" fullWidth sx={{ mb: 1.5, py: 0.75, fontSize: "0.875rem" }}>
+            {t("profile.settings.uploadPicture")}
+              <input type="file" accept="image/*" hidden onChange={onCustomImageChange} />
+            </Button>
+            {uploadError && (
+              <Typography variant="body2" color="error" sx={{ textAlign: "center", fontSize: "0.75rem" }}>
+                {t(uploadError)}
+              </Typography>
+            )}
+            <Box
+              sx={{
+                display: "grid",
+                gridTemplateColumns: "repeat(8, 1fr)",
+                gap: 1,
+                mt: 1.5
+              }}
+            >
+              {defaultImages.map((image, index) => (
+                <Avatar
+                  key={index}
+                  src={image}
+                  alt={`Default avatar ${index + 1}`}
+                  sx={{
+                    width: 48,
+                    height: 48,
+                    cursor: "pointer",
+                    border: "2px solid transparent",
+                    "&:hover": { borderColor: "#1976d2" }
+                  }}
+                  onClick={() => onDefaultImageChange(image)}
+                />
+              ))}
+            </Box>
+            {defaultImageError && (
+              <Typography variant="body2" color="error" sx={{ mt: 1, textAlign: "center", fontSize: "0.75rem" }}>
+                {t(defaultImageError)}
+              </Typography>
+            )}
+          </Box>
         </DialogContent>
-        <DialogActions>
-          <Button onClick={onClose} color="primary">
-            Close
+        <DialogActions sx={{ justifyContent: "center", py: 1 }}>
+          <Button onClick={onClose} color="primary" variant="outlined" sx={{ px: 2, fontSize: "0.875rem" }}>
+            {t("profile.settings.close")}
           </Button>
         </DialogActions>
       </Dialog>

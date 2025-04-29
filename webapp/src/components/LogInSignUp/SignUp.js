@@ -1,21 +1,28 @@
 // src/components/AddUser.js
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Typography, TextField, Button, Box, FormControl, Divider } from '@mui/material';
 import { SitemarkIcon } from '../CustomIcons';
 import { Card, LogInContainer } from '../CustomComponents';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
+import { useTranslation } from 'react-i18next';
 
 export const SignUp = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [confirmpassword, setConfirmationPassword] = useState('');
   const { authenticateUser, error } = useAuth();
+  const [errorDisplayed, setErrorDisplayed] = useState('');
+  const { t, i18n } = useTranslation();
 
   const signUp = (e) => {
     e.preventDefault();
     authenticateUser('addUser', username, password, confirmpassword)
-  } 
+  }
+
+  useEffect(() => {
+    setErrorDisplayed(t(error));
+  }, [error, i18n.language]);
 
   return (
     <LogInContainer direction="column" justifyContent="space-between">
@@ -25,7 +32,7 @@ export const SignUp = () => {
           component="h1"
           variant="h4"
           sx={{ width: '100%', fontSize: 'clamp(2rem, 10vw, 2.15rem)' }}
-        >        Sign Up
+        >        {t("signUp.signUp")}
         </Typography>
         <Box
           component="form"
@@ -43,8 +50,8 @@ export const SignUp = () => {
               name="username"
               margin="normal"
               fullWidth
-              label="Username"
               data-testid="reg-username"
+              label={t("signUp.username")}
               value={username}
               onChange={(e) => setUsername(e.target.value)}
             />
@@ -55,7 +62,7 @@ export const SignUp = () => {
               name="password"
               margin="normal"
               fullWidth
-              label="Password"
+              label={t("signUp.password")}
               type="password"
               data-testid="reg-password"
               value={password}
@@ -68,7 +75,7 @@ export const SignUp = () => {
               name="confirmpassword"
               margin="normal"
               fullWidth
-              label="Confirm password"
+              label={t("signUp.confirmPassword")}
               type="password"
               data-testid="reg-confirmpassword"
               value={confirmpassword}
@@ -80,17 +87,17 @@ export const SignUp = () => {
             color="primary" 
             data-testid="signup"
             onClick={signUp}>
-            Sign Up
+            {t("signUp.signUp")}
           </Button>
-          {error && <p style={{ color: 'red' }}>{error}</p>}
+          {error && <p style={{ color: 'red' }}>{errorDisplayed}</p>}
 
         </Box>
-        <Divider>or</Divider>
+        <Divider>{t("signUp.or")}</Divider>
         <Typography component="div" align="center" sx={{ marginTop: 2 }}>
           <Typography sx={{ textAlign: 'center' }}>
-            Already have an account? {' '}
+            {t("signUp.alreadyHaveAccount") + ' '}
             <Link to="/login" name="gotoregister" component="button" variant="body2" >
-              Login here
+              {t("signUp.logInHere")}
             </Link>
           </Typography>
         </Typography>

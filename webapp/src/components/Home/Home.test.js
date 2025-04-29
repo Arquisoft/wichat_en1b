@@ -40,7 +40,7 @@ describe('Home Component Render Tests', () => {
 
         // Check for personalized greeting message and username
         expect(screen.getByText(/Your Profile/i)).toBeInTheDocument();
-        expect(screen.getByText(/New Game/i)).toBeInTheDocument();
+        expect(screen.getByText(/Classical Game/i)).toBeInTheDocument();
         expect(screen.getByText(/Statistics/i)).toBeInTheDocument();
         expect(screen.getByText(/Game Modes/i)).toBeInTheDocument();
     });

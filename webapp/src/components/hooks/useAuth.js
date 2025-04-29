@@ -10,6 +10,8 @@ const apiEndpoint = process.env.REACT_APP_API_ENDPOINT || 'http://localhost:8000
 export const useAuth = () => {
     const [error, setError] = useState('');
     const navigate = useNavigate();    
+    localStorage.removeItem('topic'); // Clear the topic from local storage on every login/logout
+    localStorage.removeItem('customSettings'); // Clear the custom settings from local storage on every login/logout
     
     const authenticateUser = async (action, username, password, confirmpassword) => {
         try {
