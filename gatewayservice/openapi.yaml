@@ -55,39 +55,11 @@ paths:
               schema:
                 type: object
                 properties:
-                  errors:
-                    type: array
-                    description: List of validation errors.
-                    items:
-                      type: object
-                      properties:
-                        type:
-                          type: string
-                          description: Type of error.
-                          example: field
-                        msg:
-                          type: string
-                          description: Error message.
-                          example: Invalid value
-                        path:
-                          type: string
-                          description: Field that caused the error.
-                          example: username
-                        location:
-                          type: string
-                          description: Location of the error in the request.
-                          example: body
-              example:
-                errors:
-                  - type: field
-                    msg: Invalid value
-                    path: username
-                    location: body
-                  - type: field
-                    msg: Invalid value
-                    path: password
-                    location: body
-        "401":
+                  error:
+                    type: string
+                    description: An error for the localized template telling some field is missing.
+                    example: "logIn.errors.missingFields"
+        '401':
           description: Invalid credentials.
           content:
             application/json:
@@ -96,9 +68,9 @@ paths:
                 properties:
                   error:
                     type: string
-                    description: Shows the error info..
-                    example: Invalid credentials
-        "500":
+                    description: A messaage with the localization for the invalid credentials message.
+                    example: "logIn.errors.invalidCredentials"
+        '500':
           description: Some error ocurred in the server when processing the request.
           content:
             application/json:
@@ -350,6 +322,14 @@ paths:
     post:
       summary: Updates the image of some user to a default one.
       operationId: defaultUserImage
+      parameters:
+        - name: username
+          in: path
+          required: true
+          description: The username of the user to recover their image.
+          schema:
+            type: string
+            example: student
       security:
         - bearerAuth: []
       requestBody:
@@ -420,6 +400,14 @@ paths:
     post:
       summary: Updates the image of some user, uploading a new one.
       operationId: customUserImage
+      parameters:
+        - name: username
+          in: path
+          required: true
+          description: The username of the user to recover their image.
+          schema:
+            type: string
+            example: student
       security:
         - bearerAuth: []
       requestBody:
@@ -698,10 +686,18 @@ paths:
                     type: string
                     description: Unique identifier for the question.
                     example: mpzulblyui9du98pmodg5o
-                  question:
+                  imageType:
                     type: string
-                    description: The text of the question.
-                    example: Which of the following flags belongs to Nepal?
+                    description: Type of image used in the question. Returns a string with the localization of the type.
+                    example: game.imagTypes.flag
+                  relation:
+                    type: string
+                    description: Relation of the question. Returns a string with the localization of the relation.
+                    example: game.relations.belongsTo
+                  topic:
+                    type: string
+                    description: Topic of the question.
+                    example: Catedral de la Almudena
                   images:
                     type: array
                     description: List of image URLs related to the question.
@@ -785,6 +781,48 @@ paths:
                     type: string
                     description: Error message.
                     example: Internal Server Error
+  /question-of-the-day:
+    get:
+      summary: Retrieves the question of the day.
+      operationId: getQuestionOfTheDay
+      responses:
+        '200':
+          description: The question of the day was retrieved correctly.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    description: Unique identifier for the question.
+                    example: mpzulblyui9du98pmodg5o
+                  question:
+                    type: string
+                    description: The text of the question.
+                    example: Which of the following flags belongs to Nepal?
+                  images:
+                    type: array
+                    description: List of image URLs related to the question.
+                    items:
+                      type: string
+                      format: uri
+                    example:
+                      - 'http://commons.wikimedia.org/wiki/Special:FilePath/Flag%20of%20Nepal.svg'
+                      - 'http://commons.wikimedia.org/wiki/Special:FilePath/Flag%20of%20Myanmar.svg'
+                      - 'http://commons.wikimedia.org/wiki/Special:FilePath/Flag%20of%20Costa%20Rica.svg'
+                      - 'http://commons.wikimedia.org/wiki/Special:FilePath/Flag%20of%20Yemen.svg'
+        '500':
+          description: The question of the day could not be retrieved.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    description: The error message.
+                    example: Failed to fetch question of the day
   /statistics:
     get:
       summary: Retrieves the statistics for the user in session.

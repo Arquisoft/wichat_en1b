@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect } from "react";
+import { createContext, useContext, useState, useEffect, useMemo } from "react";
 import useTimer from "../hooks/useTimer";
 import { useRounds } from "../hooks/useRounds";
 import { GameModesConfig } from "../GameModes/gameModesConfiguration";
@@ -6,62 +6,82 @@ import StatisticsUpdater from "./components/StatisticsUpdater";
 
 const GameContext = createContext();
 
-export const GameProvider = ({ children, type }) => {
+export const GameProvider = ({ children, selectedModeId }) => {
+    console.log("GameProvider: selectedModeId", selectedModeId);
+    const [gameMode, setGameMode] = useState(selectedModeId || 'classical');
+    console.log("GameProvider: gameMode", gameMode);
     const [question, setQuestion] = useState({ question: "Pregunta", images: [] });
     const [gameEnded, setGameEnded] = useState(false);
     const [questionType, setQuestionType] = useState("random");
     const [AIAttempts, setAIAttempts] = useState(0);
     const [maxAIAttempts, setMaxAIAttempts] = useState(0);
+    const [statisticsUpdater, setStatisticsUpdater] = useState(new StatisticsUpdater(gameMode));
 
-    const [gameMode, setGameMode] = useState(type || 'classical');
-    const [statisticsUpdater, setStatisticsUpdater] = useState(null);
-
-    // Default fallback times (can be overwritten on gameMode change)
-    const { timeLeft, isRunning, start, pause, reset } = useTimer({ 
-        initialTime: 60, 
-        onTimeUp: () => handleTimeUp(),
-        autoStart: false 
+    const [customSettings] = useState(() => {
+        return JSON.parse(localStorage.getItem('customSettings')) || {
+            rounds: 5,
+            timePerQuestion: 30,
+            aiAttempts: 3,
+        };
     });
 
-    const { round, nextRound, isGameEnded, resetRounds } = useRounds(10); // Default maxRounds = 10, will update later
+    // 🧠 Strategy depends on selected game mode and custom settings
+    const strategy = useMemo(() => {
+        const mode = (gameMode || 'CLASSICAL').toUpperCase();
 
-    // Updates when gameMode changes
+        const config = GameModesConfig[mode] || GameModesConfig.CLASSICAL;
+        console.log("GameProvider: customSettings: ", customSettings);
+        const base = { ...config };
+
+        if (gameMode === 'custom') {
+            base.maxRounds = customSettings.rounds || 5;
+            base.timePerRound = customSettings.timePerQuestion || 30;
+            base.maxAIAttempts = customSettings.aiAttempts || 3;
+            base.timerMode = 'perQuestion';
+        }
+        console.log("Game mode strategy: ", base);
+        return base;
+    }, [gameMode, customSettings]);
+
     useEffect(() => {
-        if (!gameMode) return;
+        console.log('Strategy recomputed:', strategy);
+    }, [strategy]);
 
-        const config = GameModesConfig[gameMode];
-        if (!config) {
-            console.error("Unknown game mode:", gameMode);
-            return;
-        }
+    // Timer setup
+    const { timeLeft, isRunning, start, pause, reset, setInitialTime, initialTime } = useTimer({
+        initialTimeParam: strategy.timerMode === 'perQuestion' ? strategy.timePerQuestion : strategy.totalGameTime,
+        onTimeUp: () => handleTimeUp(),
+        autoStart: false
+    });
 
-        resetRounds(); // reset to round 1
-        reset(config.timerMode === 'perQuestion' ? config.timePerRound : config.timePerGame);
+    const { round, nextRound, isGameEnded, resetRounds } = useRounds(strategy.maxRounds ?? 10);
+
+    // 🎯 Handle gameMode changes
+    useEffect(() => {
+        setInitialTime(strategy.timerMode === 'perQuestion' ? strategy.timePerQuestion : strategy.totalGameTime);
+        console.log("GameProvider: setInitialTime", strategy.timerMode === 'perQuestion' ? strategy.timePerQuestion : strategy.totalGameTime);
+        resetRounds();
+        reset(strategy.timerMode === 'perQuestion' ? strategy.timePerQuestion : strategy.totalGameTime);
         setStatisticsUpdater(new StatisticsUpdater(gameMode));
-        setMaxAIAttempts(config.maxAIAttempts || 0);
+        setMaxAIAttempts(strategy.maxAIAttempts || 0);
 
-        if (config.timerMode === 'perGame') {
-            start(); // Start immediately if perGame
+        if (strategy.timerMode === 'perGame') {
+            start();
         }
+    }, [strategy]);
 
-    }, [gameMode]);
-
-    // Handle what happens when timer finishes
+    // ⏰ When time is up
     const handleTimeUp = () => {
-        const config = GameModesConfig[gameMode];
-        if (!config) return;
-
-        if (config.timerMode === 'perQuestion') {
+        if (strategy.timerMode === 'perQuestion') {
             if (isGameEnded()) {
                 setGameEnded(true);
                 pause();
             } else {
                 nextRound();
-                reset(config.timePerRound);
+                reset(strategy.timePerRound);
                 start();
             }
         } else {
-            // PerGame -> full game timer ran out
             setGameEnded(true);
             pause();
         }
@@ -82,11 +102,17 @@ export const GameProvider = ({ children, type }) => {
             startTimer: start,
             pauseTimer: pause,
             resetTimer: reset,
+            initialTime,
             gameMode,
             setGameMode,
             statisticsUpdater,
+            strategy,
         }}>
-            <p>GameMode: {gameMode}</p>
+            {strategy ? (
+                <p>Strategy: {strategy.id} {strategy.name}</p>
+            ) : (
+                <p>Strategy is loading...</p>
+            )}
             {children}
         </GameContext.Provider>
     );

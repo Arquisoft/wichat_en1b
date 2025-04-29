@@ -1,9 +1,11 @@
 const express = require("express");
 const cors = require("cors");
-const WikidataController = require("./controllers/WikidataController");
 const CronJob = require("cron").CronJob;
 const mongoose = require("mongoose");
 const { check, validationResult } = require('express-validator');
+
+const WikidataController = require("./controllers/WikidataController");
+const AnswerRepository = require("./repositories/AnswerRepository");
 
 const app = express();
 const port = 8004;
@@ -16,6 +18,7 @@ if (mongoose.connection.readyState === 0) {
 };
 
 const wikidataController = new WikidataController();
+const answerRepository = new AnswerRepository();
 
 app.use(express.json());
 app.use(cors());
@@ -63,8 +66,15 @@ app.post("/answer", [
                 return res.status(400).json({ errors: errors['errors'] });
             }
 
-            const { questionId, answer } = req.body
+            const username = req.headers['username'];
+
+            const { questionId, answer } = req.body;
+            const recordedAnswer = await answerRepository.findAnswer(questionId, username);
+            if (recordedAnswer) {
+                return res.json({ correct: recordedAnswer.isCorrect })
+            }
             const isCorrect = await wikidataController.isQuestionCorrect(questionId, answer)
+            await answerRepository.createAnswer(questionId, username, answer, isCorrect)
             res.json({ correct: isCorrect })
         } catch (error) {
             console.error(error)
@@ -72,6 +82,23 @@ app.post("/answer", [
         }
     }
 )
+
+app.get("/question-of-the-day", async (req, res) => {
+    try {
+        const username = req.headers['username'];
+        const question = await wikidataController.getQuestionOfTheDay();
+        const recordedAnswer = await answerRepository.findAnswer(question._id, username);
+        delete question.correctOption;
+        const questionOfTheDay = {
+            ...question,
+            recordedAnswer
+        };
+        res.json(questionOfTheDay);
+    } catch (error) {
+        console.error("Error fetching question of the day:", error)
+        res.status(500).json({ error: "Failed to fetch question of the day" })
+    }
+})
 
 const server = app.listen(port, () => {
     console.log(`Question Service listening at http://localhost:${port}`)
@@ -91,7 +118,17 @@ if (require.main === module) {
         'Europe/Madrid' // timeZone
     );
 
-    wikidataController.preSaveWikidataItems(); // initial run to save
+    new CronJob(
+        '0 2 * * *', // every day at 02:00 AM
+        async () => {
+            await wikidataController.setQuestionOfTheDay();
+        }, // onTick
+        null, // onComplete
+        true, // start
+        'Europe/Madrid' // timeZone
+    );
+
+    wikidataController.initialRun(); // initial run to save items and set question of the day
 }
 
 module.exports = server;

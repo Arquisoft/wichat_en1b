@@ -5,6 +5,7 @@ import StatisticsTable from './components/StatisticsTable';
 import StatisticsFilters from './components/StatisticsFilters';
 import ErrorMessage from './components/ErrorMessage';
 import LoadingSpinner from './components/LoadingSpinner';
+import { useTranslation } from 'react-i18next';
 import './theme.css';
 
 export const Statistics = () => {
@@ -23,6 +24,8 @@ export const Statistics = () => {
     minScore: undefined
   });
   const [username, setUsername] = useState('');
+  const { t } = useTranslation();
+
   const recordRetriever = new RecordRetriever();
 
   // Map tab index to game type for filtering
@@ -79,10 +82,10 @@ export const Statistics = () => {
   // Get tab title based on selected tab
   const getTabTitle = () => {
     switch (selectedTab) {
-      case 0: return "Global Statistics 🌍";
-      case 1: return "Classical Game Statistics 🎲";
-      case 2: return "Sudden Death Statistics ☠️";
-      case 3: return "Time Trial Statistics ⏱️";
+      case 0: return "statistics.statisticTypes.global";
+      case 1: return "statistics.statisticTypes.classical";
+      case 2: return "statistics.statisticTypes.suddenDeath";
+      case 3: return "statistics.statisticTypes.timeTrial";
       default: return "Statistics";
     }
   };
@@ -90,8 +93,8 @@ export const Statistics = () => {
   return (
     <div className="statistics-container">
       <div className="statistics-header">
-        <h1>Quiz Game Statistics</h1>
-        <p>Welcome, {username}!</p>
+        <h1>{t("statistics.globalStatistics")}</h1>
+        <p>{t("statistics.welcome", { username: username })}</p>
       </div>
 
       <Paper elevation={3} sx={{ mt: 3, p: 3 }}>
@@ -101,10 +104,10 @@ export const Statistics = () => {
             onChange={handleTabChange}
             aria-label="Statistics game mode tabs"
           >
-            <Tab label="Global 🌍" />
-            <Tab label="Classical 🎲" />
-            <Tab label="Sudden Death ☠️" />
-            <Tab label="Time Trial ⏱️" />
+            <Tab label={t("statistics.statisticTypes.global")} />
+            <Tab label={t("statistics.statisticTypes.classical")} />
+            <Tab label={t("statistics.statisticTypes.suddenDeath")} />
+            <Tab label={t("statistics.statisticTypes.timeTrial")} />
           </Tabs>
         </Box>
 
@@ -114,7 +117,7 @@ export const Statistics = () => {
         />
 
         <Typography variant="h5" component="div" sx={{ mb: 2 }}>
-          {getTabTitle()}
+          {t(getTabTitle())}
         </Typography>
 
         {error && <ErrorMessage message={error} />}

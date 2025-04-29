@@ -2,6 +2,7 @@ import StatisticsSummary from "./StatisticsSummary";
 import AnswerDistribution from "./AnswerDistribution";
 import AdditionalInsights from "./AdditionalInsights";
 import { Grid, Typography } from "@mui/material";
+import { useTranslation } from "react-i18next";
 
 export const Insights = ({statistics, registrationDate, title}) => {
 
@@ -28,10 +29,13 @@ export const Insights = ({statistics, registrationDate, title}) => {
     const getPieChartData = () => {
         if (!statistics) return [];
         return [
-            { name: 'Correct', value: statistics.correctAnswers },
-            { name: 'Incorrect', value: statistics.incorrectAnswers }
+            { name: t("profile.answerDistribution.correct"), value: statistics.correctAnswers },
+            { name: t("profile.answerDistribution.incorrect"), value: statistics.incorrectAnswers }
         ];
     };
+
+    const { t } = useTranslation();
+
     return (
         <>
             <Typography variant="h4" component="h1" align="center" sx={{ mb: 3, fontWeight: 500 }}>

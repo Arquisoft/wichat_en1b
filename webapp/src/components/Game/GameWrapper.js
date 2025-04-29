@@ -6,7 +6,7 @@ import StatisticsUpdater from "./components/StatisticsUpdater";
 export default function GameWrapper({type}) {
     const statsUpdater = new StatisticsUpdater(type);
     return (
-        <GameProvider type={type}>
+        <GameProvider selectedModeId={type}>
             <Question />
             <Chat />
         </GameProvider>

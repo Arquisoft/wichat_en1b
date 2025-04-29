@@ -1,8 +1,9 @@
 import { useState, useEffect, useRef } from 'react';
 
-function useTimer({ initialTime, onTimeUp, autoStart = true }) {
-    const [timeLeft, setTimeLeft] = useState(initialTime);
+function useTimer({ initialTimeParam, onTimeUp, autoStart = true }) {
+    const [timeLeft, setTimeLeft] = useState(60);
     const [isRunning, setIsRunning] = useState(autoStart);
+    const [initialTime, setInitialTime] = useState(initialTimeParam);
     const timerRef = useRef(null);
 
     useEffect(() => {
@@ -32,9 +33,11 @@ function useTimer({ initialTime, onTimeUp, autoStart = true }) {
     return {
         timeLeft,
         isRunning,
+        initialTime,
         start,
         pause,
-        reset
+        reset,
+        setInitialTime, // Allow setting a new initial time
     };
 }
 

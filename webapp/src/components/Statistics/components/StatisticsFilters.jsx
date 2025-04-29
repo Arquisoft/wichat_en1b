@@ -1,11 +1,14 @@
 import React from 'react';
 import '../theme.css';
+import { useTranslation } from 'react-i18next';
 
 const StatisticsFilters = ({
     filters,
     onFilterChange
   }) => {
 
+    const { t } = useTranslation();
+    
     const handleResetFilters = () => {
       onFilterChange({
         minGames: undefined,
@@ -19,7 +22,7 @@ const StatisticsFilters = ({
     return (
       <div className="statistics-filters">
         <div className="filter-group">
-          <label htmlFor="minGames">Min Games</label>
+          <label htmlFor="minGames">{t("statistics.filters.minGames")}</label>
           <input
             id="minGames"
             type="number"
@@ -31,7 +34,7 @@ const StatisticsFilters = ({
           />
         </div>
         <div className="filter-group">
-          <label htmlFor="minScore">Min Score</label>
+          <label htmlFor="minScore">{t("statistics.filters.minScore")}</label>
           <input
             id="minScore"
             type="number"
@@ -43,7 +46,7 @@ const StatisticsFilters = ({
           />
         </div>
         <div className="filter-group">
-          <label htmlFor="registeredAfter">Registered After</label>
+          <label htmlFor="registeredAfter">{t("statistics.filters.registeredAfter")}</label>
           <input
             id="registeredAfter"
             type="date"
@@ -54,7 +57,7 @@ const StatisticsFilters = ({
           />
         </div>
         <div className="filter-group">
-          <label htmlFor="registeredBefore">Registered Before</label>
+          <label htmlFor="registeredBefore">{t("statistics.filters.registeredBefore")}</label>
           <input
             id="registeredBefore"
             type="date"
@@ -69,7 +72,7 @@ const StatisticsFilters = ({
             className="reset-filters-button" 
             onClick={handleResetFilters}
           >
-            Reset Filters
+            {t("statistics.filters.reset")}
           </button>
         </div>
       </div>

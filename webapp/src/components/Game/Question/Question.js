@@ -4,9 +4,11 @@ import { createTheme, ThemeProvider } from "@mui/material/styles";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import axios from 'axios';
 import { useGame } from "../GameContext";
-import StatisticsUpdater from "../components/StatisticsUpdater";
+import { useTranslation } from "react-i18next"
+import { GameModesConfig } from "../../GameModes/gameModesConfiguration";
 
-// Create a theme
+
+// Create a theme with the blue color from the login screen
 const theme = createTheme({
     palette: {
         primary: {
@@ -15,26 +17,32 @@ const theme = createTheme({
     },
 });
 
-const defaultStatisticsUpdater = new StatisticsUpdater('classical');
 
 export const Question = () => {
-    const { question, setQuestion, setGameEnded, questionType, setQuestionType, AIAttempts, setAIAttempts, setMaxAIAttempts, statisticsUpdater, gameMode } = useGame();
+    const { question, setQuestion, setGameEnded, questionType, setQuestionType, 
+        AIAttempts, setAIAttempts, setMaxAIAttempts, 
+        statisticsUpdater, gameMode,  round, nextRound, resetRounds, isGameEnded,
+        timeLeft, isRunning, startTimer, pauseTimer, resetTimer, strategy, initialTime } = useGame();
+    console.log("Question: strategy: ", strategy)
     const gatewayEndpoint = process.env.REACT_APP_API_ENDPOINT || 'http://localhost:8000';
 
     const [selectedAnswer, setSelectedAnswer] = useState(null);
-    const [timeLeft, setTimeLeft] = useState(60);
-    const [totalTime, setTotalTime] = useState(60);
+    const [totalTime, setTotalTime] = useState(initialTime); // Set initial time based on the strategy
+    console.log("Question: totalTime", totalTime);
     const [maxRounds, setMaxRounds] = useState(10);
-    const [round, setRound] = useState(1);
     const [isCorrect, setIsCorrect] = useState(false);
     const [isIncorrect, setIsIncorrect] = useState(false);
     const [isTimeUp, setIsTimeUp] = useState(false);
-    const [isPaused, setIsPaused] = useState(false);
     const [imagesLoaded, setImagesLoaded] = useState(false);
-    const [isGameEnded, setIsGameEnded] = useState(false);
-    const [score, setScore] = useState(0);
-    const [currentScore, setCurrentScore] = useState(0);
-    const [streak, setStreak] = useState(0);
+    const [isPaused, setIsPaused] = useState(false);
+    const [streak, setStreak] = useState(0); // Track the streak of correct answers
+    const [score, setScore] = useState(0); // Track the score
+    const [currentScore, setCurrentScore] = useState(0); // Track the current score
+    const [t, i18n] = useTranslation(); // Initialize i18next for translations
+
+    const topic = localStorage.getItem("topic") || "random"; // Default to "random" if not set
+    setQuestionType(topic); // Set the question type based on the topic
+
 
     const [customSettings] = useState(() => {
         return JSON.parse(localStorage.getItem('customSettings')) || {
@@ -44,57 +52,38 @@ export const Question = () => {
         };
     });
 
-    useEffect(() => {
-        // Set topic on first load
-        const storedTopic = localStorage.getItem("topic") || "random";
-        setQuestionType(storedTopic);
-    }, [setQuestionType]);
+
 
     useEffect(() => {
+        const fetchInitialQuesiton = async () => {
+            await requestQuestion(true); // Pass true to indicate it's the initial load
+        }
+        fetchInitialQuesiton();
         if (gameMode === 'custom') {
             setMaxRounds(customSettings.rounds);
             setTotalTime(customSettings.timePerQuestion);
             setMaxAIAttempts(customSettings.aiAttempts);
         } else {
             setMaxRounds(10);
-            setTotalTime(60);
+            setTotalTime(initialTime);
             setMaxAIAttempts(3);
         }
     }, [gameMode, customSettings, setMaxAIAttempts]);
 
     const progressPercentage = (timeLeft / totalTime) * 100;
 
-    useEffect(() => {
-        if (timeLeft <= 0 && !isTimeUp) {
-            setIsTimeUp(true);
-            setTimeout(() => {
-                requestQuestion(false).finally(() => {
-                    setIsTimeUp(false);
-                });
-            }, 2000);
-            return;
-        }
-
-        if (isPaused || isTimeUp) return;
-
-        const timerId = setInterval(() => {
-            setTimeLeft(prev => prev - 1);
-        }, 1000);
-
-        return () => clearInterval(timerId);
-    }, [timeLeft, isPaused, isTimeUp]);
 
     const requestQuestion = async (isInitialLoad = false) => {
         setIsPaused(true);
         try {
-            const { data } = await axios.get(`${gatewayEndpoint}/question/${questionType}`);
-            setQuestion(data);
+            let questionResponse = await axios.get(`${gatewayEndpoint}/question/${questionType}`);
+            setQuestion(questionResponse.data);
 
             if (isInitialLoad) {
                 statisticsUpdater.newGame();
             }
         } catch (error) {
-            console.error("Error fetching question:", error);
+            console.error("Error fetching question: ", error)
         }
         setImagesLoaded(false);
     };
@@ -112,15 +101,30 @@ export const Question = () => {
                     img.onload = resolve;
                 });
             });
-
+    
             Promise.all(imagePromises).then(() => {
                 setImagesLoaded(true);
-                setTimeLeft(totalTime);
                 setSelectedAnswer(null);
-                setIsPaused(false);
+                startTimer(); // <-- Start context timer
             });
         }
-    }, [question.images, totalTime]);
+    }, [question.images]);
+
+    useEffect(() => {
+        if (timeLeft === 0) {
+            setIsTimeUp(true);
+            pauseTimer();
+            setTimeout(() => {
+                requestQuestion(false).finally(() => {
+                    setIsTimeUp(false);
+                    resetTimer();
+                    startTimer();
+                });
+            }, 2000);
+        }
+    }, [timeLeft]);
+    
+    
 
     const handleAnswerSelect = async (answer) => {
         if (selectedAnswer || isCorrect || isIncorrect || isTimeUp) return;
@@ -147,10 +151,8 @@ export const Question = () => {
 
             setAIAttempts(0);
 
-            if (round === maxRounds) {
+            if (isGameEnded()) {
                 setGameEnded(true);
-                setIsGameEnded(true);
-
                 try {
                     await statisticsUpdater.endGame();
                 } catch (error) {
@@ -162,7 +164,7 @@ export const Question = () => {
                     resetGame();
                 }, 2000);
             } else {
-                setRound(prev => prev + 1);
+                nextRound();
                 setTimeout(() => {
                     setIsCorrect(false);
                     setIsIncorrect(false);
@@ -175,13 +177,15 @@ export const Question = () => {
     };
 
     const resetGame = () => {
-        setRound(1);
+        resetRounds();             // From useGame context
+        resetTimer();              // Reset the timer to initial value
         setCurrentScore(0);
         setScore(0);
         setStreak(0);
-        setIsGameEnded(false);
         setSelectedAnswer(null);
+        setGameEnded(false);       // From useGame context
     };
+    
 
     const formatTime = (seconds) => {
         const mins = Math.floor(seconds / 60);
@@ -194,6 +198,17 @@ export const Question = () => {
         return 50 + 15 * (streak - 3);
     };
 
+    useEffect(() => {
+        const updatedQuestionText = t("game.question", {
+            imageType: t(question.imageType),
+            relation: t(question.relation),
+            topic: question.topic,
+        });
+        setQuestion((prev) => ({
+            ...prev,
+            question: updatedQuestionText,
+        }));
+    }, [i18n.language]);
 
     return (
         <ThemeProvider theme={theme}>
@@ -209,7 +224,8 @@ export const Question = () => {
                 </Typography>
                 {/* Round counter */}
                 <Typography variant="p" component="p" align="center" sx={{ my: 3, fontWeight: 500 }}>
-                    {round} / {maxRounds} {streak >= 3 && (
+                    {round} {strategy.maxRounds != Infinity ? `/ ${strategy.maxRounds}` : ""} 
+                    {streak >= 3 && (
                         <Typography variant="span" component="span" align="center" sx={{ my: 3, fontWeight: 500, color: "red" }}>
                             {streak} 🔥
                         </Typography>
@@ -294,7 +310,7 @@ export const Question = () => {
                                 width: "100%",
                             }}
                         >
-                            Score: {currentScore}
+                            {t("game.score", { score: currentScore })}
                         </Typography>
                     </Paper>
                 </Box>
@@ -305,19 +321,19 @@ export const Question = () => {
 
                 {isCorrect && (
                     <Typography variant="h6" component="p" align="center" sx={{ my: 2, color: "green" }}>
-                        Correct! +{score} points
+                        {t("game.correctAnswer", { score: score })}
                     </Typography>
                 )}
 
                 {isIncorrect && (
                     <Typography variant="h6" component="p" align="center" sx={{ my: 2, color: "red" }}>
-                        Incorrect
+                        {t("game.incorrectAnswer")}
                     </Typography>
                 )}
 
                 {isTimeUp && (
                     <Typography variant="h6" component="p" align="center" sx={{ my: 2, color: "red" }}>
-                        You ran out of time!
+                        {t("game.timeUp")}
                     </Typography>
                 )}
                 <Box sx={{ width: "100%", maxWidth: 600, mx: "auto" }}>
@@ -353,7 +369,7 @@ export const Question = () => {
                             ))
                         ) : (
                             <Typography variant="h6" component="p" align="center" sx={{ my: 2 }}>
-                                Loading images...
+                                {t("game.loadingImages")}
                             </Typography>
                         )}
                     </Grid>
