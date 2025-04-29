@@ -45,18 +45,18 @@ export const Insights = ({statistics, registrationDate, title}) => {
                 <Grid item xs={12} md={6}>
                     <StatisticsSummary
                         statistics={statistics}
-                        successRate={getSuccessRate(statistics)}
+                        successRate={getSuccessRate()}
                     />
                 </Grid>
 
                 <Grid item xs={12} md={6}>
-                    <AnswerDistribution chartData={getPieChartData(statistics)} />
+                    <AnswerDistribution chartData={getPieChartData()} />
                 </Grid>
             </Grid>
 
             <AdditionalInsights
-                avgQuestionsPerGame={getAverageQuestionsPerGame(statistics)}
-                successRate={getSuccessRate(statistics)}
+                avgQuestionsPerGame={getAverageQuestionsPerGame()}
+                successRate={getSuccessRate()}
                 maxScore={statistics.maxScore || 0}
             />
         </>

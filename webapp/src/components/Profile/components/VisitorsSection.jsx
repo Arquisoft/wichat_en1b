@@ -72,7 +72,7 @@ const VisitorsSection = ({ visitors, totalVisits, getImageUrl }) => {
                     }
                     secondary={
                       <Typography component="span" variant="body2" color="text.secondary">
-                        {t("profile.visitors.visitedOn", { date: formatDate(new Date(visitor.date), 'MMM d, yyyy h:mm a') })}
+                        {t("profile.visitors.visitedOn", { date: formatDate(new Date(visitor.date)) })}
                       </Typography>
                     }
                   />
