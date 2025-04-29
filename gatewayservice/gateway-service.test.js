@@ -60,8 +60,8 @@ describe('Gateway Service', () => {
   // Mock responses for GET requests
   axios.get.mockImplementation((url) => {
     if (url.includes('/statistics') && !url.includes('/statistics/')) {
-      return Promise.resolve({ 
-        data: { 
+      return Promise.resolve({
+        data: {
           users: [
             {
               username: 'testuser',
@@ -83,9 +83,9 @@ describe('Gateway Service', () => {
             offset: 0,
             hasMore: false
           }
-        } 
+        }
       });
-    } else if (url.endsWith('/question') || url.endsWith('/question/flags')) {
+    } else if (url.endsWith('/question') || url.endsWith('/question/flags') || url.endsWith('/question-of-the-day')) {
       return Promise.resolve({
         data: {
           id: "mpzulblyui9du98pmodg5o",
@@ -155,11 +155,11 @@ describe('Gateway Service', () => {
     // Mock specific implementation for this test with query parameters
     axios.get.mockImplementationOnce((url) => {
       // Check if URL contains the expected query parameters
-      if (url.includes('/statistics') && 
-          url.includes('sort=gamesPlayed') && 
-          url.includes('order=desc') && 
-          url.includes('limit=10') &&
-          url.includes('gameType=classical')) {
+      if (url.includes('/statistics') &&
+        url.includes('sort=gamesPlayed') &&
+        url.includes('order=desc') &&
+        url.includes('limit=10') &&
+        url.includes('gameType=classical')) {
         return Promise.resolve({
           data: {
             users: [
@@ -237,8 +237,12 @@ describe('Gateway Service', () => {
   }, 15000);
 
   const verifyMockQuestion = async (endpoint) => {
+    const token = jwt.sign({ username: 'someuser' }, process.env.JWT_SECRET, { expiresIn: '1m' });
+
     const response = await request(app)
-      .get(endpoint);
+      .get(endpoint)
+      .set('Authorization', `Bearer ${token}`);
+
     expect(response.statusCode).toBe(200);
     expect(response.body.id).toBe('mpzulblyui9du98pmodg5o');
     expect(response.body.question).toBe('Which of the following flags belongs to Nepal?');
@@ -254,10 +258,17 @@ describe('Gateway Service', () => {
     await verifyMockQuestion('/question/flags');
   });
 
+  it('should retrieve a question from the question of the day', async () => {
+    await verifyMockQuestion('/question-of-the-day')
+  });
+
   // Test /answer endpoint
   it('should submit an answer and get a response', async () => {
+    const token = jwt.sign({ username: 'someuser' }, process.env.JWT_SECRET, { expiresIn: '1m' });
+
     const response = await request(app)
       .post('/answer')
+      .set('Authorization', `Bearer ${token}`)
       .send({ questionId: '1', answer: 'mockAnswer' });
 
     expect(response.statusCode).toBe(200);
@@ -378,7 +389,7 @@ describe('Gateway Service', () => {
     expect(response.body.gamesPlayed).toBe(10);
     expect(response.body.correctAnswers).toBe(7);
   });
-  
+
   it('should forward recordGame request to the statistics service', async () => {
     process.env.JWT_SECRET = 'mocksecret';
     const token = jwt.sign({ username: 'testuser' }, process.env.JWT_SECRET, { expiresIn: '1h' });
@@ -396,7 +407,7 @@ describe('Gateway Service', () => {
     const response = await request(app)
       .post('/recordGame')
       .set('Authorization', `Bearer ${token}`)
-      .send({ 
+      .send({
         gameType: 'classical',
         score: 100,
         questionsAnswered: 10,
@@ -498,6 +509,8 @@ describe('Error handling', () => {
   });
 
   it('should handle errors from answer endpoint from question service', async () => {
+    const token = jwt.sign({ username: 'someuser' }, process.env.JWT_SECRET, { expiresIn: '1m' });
+
     axios.post.mockImplementationOnce((url) => {
       if (url.endsWith('/answer')) {
         return getRejectedPromise(500, 'Answer service error');
@@ -506,6 +519,7 @@ describe('Error handling', () => {
 
     const response = await request(app)
       .post('/answer')
+      .set('Authorization', `Bearer ${token}`)
       .send({ questionId: '1', answer: 'mockAnswer' });
 
     expect(response.statusCode).toBe(500);
@@ -520,14 +534,14 @@ describe('Error handling', () => {
         return getRejectedPromise(400, 'Invalid game type');
       }
     });
-  
-    process.env.JWT_SECRET='mocksecret';
+
+    process.env.JWT_SECRET = 'mocksecret';
     const token = jwt.sign({ username: 'testuser' }, process.env.JWT_SECRET, { expiresIn: '1h' });
-  
+
     const response = await request(app)
       .get('/statistics?gameType=invalid')
       .set('Authorization', `Bearer ${token}`);
-  
+
     expect(response.statusCode).toBe(400);
     expect(response.body.error).toBe('Invalid game type');
   });
@@ -659,7 +673,7 @@ describe('Error handling', () => {
     expect(response.statusCode).toBe(400);
     expect(response.body.error).toBe('No default image provided');
   });
-  
+
   it('should handle errors in /recordGame endpoint', async () => {
     axios.post.mockImplementationOnce(() => getRejectedPromise(400, 'Invalid game data'));
 
@@ -794,10 +808,13 @@ describe('Error handling for endpoints', () => {
   });
 
   it('should handle errors in /answer endpoint', async () => {
+    const token = jwt.sign({ username: 'someuser' }, process.env.JWT_SECRET, { expiresIn: '1m' });
+
     axios.post.mockImplementationOnce(() => getRejectedPromise(500, 'Answer validation failed'));
 
     const response = await request(app)
       .post('/answer')
+      .set('Authorization', `Bearer ${token}`)
       .send({ questionId: '1', answer: 'wrongAnswer' });
 
     expect(response.statusCode).toBe(500);

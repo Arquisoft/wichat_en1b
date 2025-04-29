@@ -322,6 +322,14 @@ paths:
     post:
       summary: Updates the image of some user to a default one.
       operationId: defaultUserImage
+      parameters:
+        - name: username
+          in: path
+          required: true
+          description: The username of the user to recover their image.
+          schema:
+            type: string
+            example: student
       security:
         - bearerAuth: []
       requestBody:
@@ -392,6 +400,14 @@ paths:
     post:
       summary: Updates the image of some user, uploading a new one.
       operationId: customUserImage
+      parameters:
+        - name: username
+          in: path
+          required: true
+          description: The username of the user to recover their image.
+          schema:
+            type: string
+            example: student
       security:
         - bearerAuth: []
       requestBody:
@@ -765,6 +781,48 @@ paths:
                     type: string
                     description: Error message.
                     example: Internal Server Error
+  /question-of-the-day:
+    get:
+      summary: Retrieves the question of the day.
+      operationId: getQuestionOfTheDay
+      responses:
+        '200':
+          description: The question of the day was retrieved correctly.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    description: Unique identifier for the question.
+                    example: mpzulblyui9du98pmodg5o
+                  question:
+                    type: string
+                    description: The text of the question.
+                    example: Which of the following flags belongs to Nepal?
+                  images:
+                    type: array
+                    description: List of image URLs related to the question.
+                    items:
+                      type: string
+                      format: uri
+                    example:
+                      - 'http://commons.wikimedia.org/wiki/Special:FilePath/Flag%20of%20Nepal.svg'
+                      - 'http://commons.wikimedia.org/wiki/Special:FilePath/Flag%20of%20Myanmar.svg'
+                      - 'http://commons.wikimedia.org/wiki/Special:FilePath/Flag%20of%20Costa%20Rica.svg'
+                      - 'http://commons.wikimedia.org/wiki/Special:FilePath/Flag%20of%20Yemen.svg'
+        '500':
+          description: The question of the day could not be retrieved.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    description: The error message.
+                    example: Failed to fetch question of the day
   /statistics:
     get:
       summary: Retrieves the statistics for the user in session.
