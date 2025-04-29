@@ -5,7 +5,6 @@ import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import axios from 'axios';
 import { useGame } from "../GameContext";
 import { useTranslation } from "react-i18next"
-import { GameModesConfig } from "../../GameModes/gameModesConfiguration";
 
 
 // Create a theme with the blue color from the login screen
@@ -29,12 +28,10 @@ export const Question = () => {
     const [selectedAnswer, setSelectedAnswer] = useState(null);
     const [totalTime, setTotalTime] = useState(initialTime); // Set initial time based on the strategy
     console.log("Question: totalTime", totalTime);
-    const [maxRounds, setMaxRounds] = useState(10);
     const [isCorrect, setIsCorrect] = useState(false);
     const [isIncorrect, setIsIncorrect] = useState(false);
     const [isTimeUp, setIsTimeUp] = useState(false);
     const [imagesLoaded, setImagesLoaded] = useState(false);
-    const [isPaused, setIsPaused] = useState(false);
     const [streak, setStreak] = useState(0); // Track the streak of correct answers
     const [score, setScore] = useState(0); // Track the score
     const [currentScore, setCurrentScore] = useState(0); // Track the current score
@@ -44,37 +41,21 @@ export const Question = () => {
     setQuestionType(topic); // Set the question type based on the topic
 
 
-    const [customSettings] = useState(() => {
-        return JSON.parse(localStorage.getItem('customSettings')) || {
-            rounds: 5,
-            timePerQuestion: 30,
-            aiAttempts: 3,
-        };
-    });
-
-
-
     useEffect(() => {
+        resetTimer();
+        pauseTimer();
         const fetchInitialQuesiton = async () => {
             await requestQuestion(true); // Pass true to indicate it's the initial load
+            startTimer(); // Start the timer after fetching the question
         }
         fetchInitialQuesiton();
-        if (gameMode === 'custom') {
-            setMaxRounds(customSettings.rounds);
-            setTotalTime(customSettings.timePerQuestion);
-            setMaxAIAttempts(customSettings.aiAttempts);
-        } else {
-            setMaxRounds(10);
-            setTotalTime(initialTime);
-            setMaxAIAttempts(3);
-        }
-    }, [gameMode, customSettings, setMaxAIAttempts]);
+    }, [gameMode, setMaxAIAttempts]);
 
     const progressPercentage = (timeLeft / totalTime) * 100;
 
 
     const requestQuestion = async (isInitialLoad = false) => {
-        setIsPaused(true);
+        pauseTimer(); // Stop the timer before fetching a new question
         try {
             let questionResponse = await axios.get(`${gatewayEndpoint}/question/${questionType}`);
             setQuestion(questionResponse.data);
@@ -130,12 +111,15 @@ export const Question = () => {
         if (selectedAnswer || isCorrect || isIncorrect || isTimeUp) return;
 
         setSelectedAnswer(answer);
-        setIsPaused(true);
+        pauseTimer(); // Pause the timer when an answer is selected
 
         try {
-            const { data } = await axios.post(`${gatewayEndpoint}/answer`, { questionId: question.id, answer });
+            console.log("Question: handleAnswerSelect: ", answer);
+            console.log("Question: handleAnswerSelect: question: ", question);
+            console.log("Question: handleAnswerSelect: question.id: ", question.id);
+            let response = await axios.post(`${gatewayEndpoint}/answer`, { questionId: question.id, answer: answer });
 
-            if (data.correct) {
+            if (response.data.correct) {
                 const newScore = Math.max(0, Math.floor(1000 - ((totalTime - timeLeft) * 600 / totalTime) - AIAttempts * 100 + getStreakBonus()));
                 setScore(newScore);
                 setCurrentScore(prev => prev + newScore);
@@ -213,7 +197,6 @@ export const Question = () => {
     return (
         <ThemeProvider theme={theme}>
             <Container maxWidth="md" sx={{ py: 4 }}>
-                <p>{gameMode}</p>
                 {/* Game title */}
                 <Typography variant="h4" component="h1" align="center" sx={{ mb: 3, fontWeight: 500 }}>
                     {gameMode === 'custom' ? t("game.modes.custom") :

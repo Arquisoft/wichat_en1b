@@ -66,7 +66,7 @@ export const GameProvider = ({ children, selectedModeId }) => {
         reset(strategy.timerMode === 'perQuestion' ? strategy.timePerQuestion : strategy.totalGameTime);
         setStatisticsUpdater(new StatisticsUpdater(gameMode));
         setMaxAIAttempts(strategy.maxAIAttempts || 0);
-
+        console.error("GameProvider: StatisticsUpdater: ", statisticsUpdater);
         if (strategy.timerMode === 'perGame') {
             start();
         }
@@ -112,11 +112,6 @@ export const GameProvider = ({ children, selectedModeId }) => {
             statisticsUpdater,
             strategy,
         }}>
-            {strategy ? (
-                <p>Strategy: {strategy.id} {strategy.name}</p>
-            ) : (
-                <p>Strategy is loading...</p>
-            )}
             {children}
         </GameContext.Provider>
     );
