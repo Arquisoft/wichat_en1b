@@ -175,7 +175,8 @@
             "correspondsToThe": "correspond au",
             "isA": "est un",
             "belongsTo": "appartient à"
-        }
+        },
+        "timeUp": "Temps écoulé !"
     },
     "gameModes": {
         "selectGameMode": "Sélectionner un mode de jeu",

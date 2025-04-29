@@ -216,11 +216,11 @@ export const Question = () => {
                 <p>{gameMode}</p>
                 {/* Game title */}
                 <Typography variant="h4" component="h1" align="center" sx={{ mb: 3, fontWeight: 500 }}>
-                    {gameMode === 'custom' ? "Custom Game 🎨" :
-                        gameMode === 'suddenDeath' ? "Sudden Death ☠️" :
-                            gameMode === 'classical' ? "Classical Game 🎲" :
-                                gameMode === 'timeTrial' ? "Time Trial ⏱️" :
-                                    "Question of the Day 📅"}
+                    {gameMode === 'custom' ? t("game.modes.custom") :
+                        gameMode === 'suddenDeath' ? t("game.modes.suddenDeath") :
+                            gameMode === 'classical' ? t("game.modes.classical") :
+                                gameMode === 'timeTrial' ? t("game.modes.timeTrial") :
+                                    t("game.modes.QOD")}
                 </Typography>
                 {/* Round counter */}
                 <Typography variant="p" component="p" align="center" sx={{ my: 3, fontWeight: 500 }}>

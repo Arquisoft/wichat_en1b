@@ -175,7 +175,8 @@
             "correspondsToThe": "corresponde al/la",
             "isA": "es un(a)",
             "belongsTo": "pertenece a"
-        }
+        },
+        "timeUp": "¡Tiempo agotado!"
     },
     "gameModes": {
         "selectGameMode": "Seleccionar modo de juego",
