@@ -6,7 +6,7 @@ const feature = loadFeature("./features/login-form.feature");
 let page;
 let browser;
 
-const loginAlert="Invalid credentials"
+const loginAlert="Invalid username or password."
 
 const expectAlertToBe = async (text) => {
   await page.waitForSelector('p[style="color: red;"]');
@@ -28,10 +28,17 @@ defineFeature(feature, (test) => {
     page = await browser.newPage();
     setDefaultOptions({ timeout: 10000 });
     process.env.JWT_SECRET='test-secret'
-
+    await page.setViewport({ width: 1580, height: 800 });
     await page.goto("http://localhost:3000", {
       waitUntil: "networkidle0",
     });
+
+    //Change the languaje to english
+    await page.waitForSelector('[data-testid="ArrowDropDownIcon"]');
+    await page.click('[data-testid="ArrowDropDownIcon"]');
+    
+    await page.waitForSelector('[data-value="en"]');
+    await page.click('[data-value="en"]');
 
     // Go to Register page to create user
     await page.waitForSelector('button[data-testid="signup-button"]');
@@ -47,8 +54,8 @@ defineFeature(feature, (test) => {
     await confirmpasswordInput.type("StrongPass123!");
     await expect(page).toClick('button[data-testid="signup"]');
 
-    await page.waitForXPath("//button[contains(text(), 'Sign Out')]");
-    const [signOutButton] = await page.$x("//button[contains(text(), 'Sign Out')]");
+    await page.waitForXPath("//button[contains(text(), 'Sign out')]");
+    const [signOutButton] = await page.$x("//button[contains(text(), 'Sign out')]");
     await signOutButton.click();
 
     await page.waitForSelector('[data-testid="login-button"]');
@@ -75,17 +82,19 @@ defineFeature(feature, (test) => {
     });
 
     when("Logging in using the correct credentials", async () => {
+      
       const usernameInput = await page.$('[data-testid="log-username"] input');
       const passwordInput = await page.$('[data-testid="log-password"] input');
       await usernameInput.type(validUsername);
       await passwordInput.type(validPassword);
-      await expect(page).toClick('button', { text: 'Log in' });
+      await expect(page).toClick('button[type="submit"]');    
+
     });
 
     then("Should show the home view", async () => {
 
-      await page.waitForXPath("//button[contains(text(), 'Sign Out')]");
-      const [signOutButton] = await page.$x("//button[contains(text(), 'Sign Out')]");
+      await page.waitForXPath("//button[contains(text(), 'Sign out')]");
+      const [signOutButton] = await page.$x("//button[contains(text(), 'Sign out')]");
       await signOutButton.click();
 
     });

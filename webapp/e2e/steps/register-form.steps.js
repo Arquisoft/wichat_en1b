@@ -26,11 +26,20 @@ defineFeature(feature, test => {
     setDefaultOptions({ timeout: 10000 })
     process.env.JWT_SECRET='testSecret'
 
+    await page.setViewport({ width: 1580, height: 800 });
+
     await page
       .goto("http://localhost:3000", {
         waitUntil: "networkidle0",
       })
       .catch(() => {});
+
+    //Change the languaje to english
+    await page.waitForSelector('[data-testid="ArrowDropDownIcon"]');
+    await page.click('[data-testid="ArrowDropDownIcon"]');
+    
+    await page.waitForSelector('[data-value="en"]');
+    await page.click('[data-value="en"]');
 
     // Wait for the navbar and click the "Register" button
     await page.waitForSelector('button[data-testid="signup-button"]');
@@ -72,8 +81,8 @@ defineFeature(feature, test => {
 
     then("Should enter into the aplication", async () => {
 
-      await page.waitForXPath("//button[contains(text(), 'Sign Out')]");
-      const [signOutButton] = await page.$x("//button[contains(text(), 'Sign Out')]");
+      await page.waitForXPath("//button[contains(text(), 'Sign out')]");
+      const [signOutButton] = await page.$x("//button[contains(text(), 'Sign out')]");
       await signOutButton.click();
     });
     

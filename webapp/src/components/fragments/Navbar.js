@@ -128,7 +128,7 @@ export const Navbar = () => {
                             }}
                             data-testid= {item.title === "Sign up"
                             ? "signup-button"
-                            : item.title === "Login"
+                            : item.title === "Log in"
                             ? "login-button"
                             : undefined
                         }
@@ -230,7 +230,7 @@ export const Navbar = () => {
                                     }}
                                     data-testid={item.title === "Sign up"
                                         ? "signup-button"
-                                        : item.title === "Login"
+                                        : item.title === "Log in"
                                         ? "login-button"
                                         : undefined
                                     }
