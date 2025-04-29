@@ -75,7 +75,7 @@ describe('Chat Component', () => {
 
         const toggleButton = screen.getByRole('button', { name: 'toggleSidebar' });
         fireEvent.click(toggleButton);
-        expect(screen.getByText('Ask me anything about the quiz!')).toBeInTheDocument();
+        expect(screen.getByText('Ask me anything about the question!')).toBeInTheDocument();
     });
 
     test('sends message and displays response', async () => {
@@ -150,7 +150,7 @@ describe('Chat Component', () => {
 
         rerender(<Chat />);
 
-        expect(screen.getByText('Ask me anything about the quiz!')).toBeInTheDocument();
+        expect(screen.getByText('Ask me anything about the question!')).toBeInTheDocument();
 
         expect(mockGameContext.setGameEnded).toHaveBeenCalledWith(false);
     });

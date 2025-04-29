@@ -148,6 +148,7 @@
         "correctAnswer": "Correct ! +{{score}} points",
         "incorrectAnswer": "Incorrect",
         "question": "Quel {{imageType}} {{relation}} {{topic}} ?",
+        "timeUp": "Le temps est écoulé !",
         "chat": {
             "thinking": "Réflexion...",
             "you": "Vous",

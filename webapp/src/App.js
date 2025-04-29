@@ -10,7 +10,6 @@ import { Profile } from './components/Profile/Profile';
 import Cookies from 'js-cookie';
 import GameWrapper from './components/Game/GameWrapper';
 import GameModes from './components/GameModes/GameModes';
-import { useTranslation } from 'react-i18next';
 
 function App() {
   useEffect(() => {

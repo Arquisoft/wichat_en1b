@@ -18,7 +18,7 @@ describe('RecordRetriever', () => {
   test('throws if no cookie', async () => {
     Cookies.get.mockReturnValue(null);
     const rr = new RecordRetriever();
-    await expect(rr.getRecords()).rejects.toThrow(/Failed to retrieve statistics/i);
+    await expect(rr.getRecords()).rejects.toThrow("profile.errors.failedToRetrieveStatistics");
   });
 
   test('fetches records with correct URL and headers', async () => {
