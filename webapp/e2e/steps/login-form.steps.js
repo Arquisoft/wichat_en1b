@@ -107,7 +107,7 @@ defineFeature(feature, (test) => {
     });
 
     then("Should show an error message", async () => {
-      await expectAlertToBe("The username is required");
+      await expectAlertToBe("Some of the fields are missing.");
     });
 
   });
@@ -128,7 +128,7 @@ defineFeature(feature, (test) => {
     });
 
     then("Should show an error message", async () => {
-      await expectAlertToBe("The password is required");
+      await expectAlertToBe("Some of the fields are missing.");
     });
 
   });
