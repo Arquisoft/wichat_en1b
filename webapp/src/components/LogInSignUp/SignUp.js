@@ -50,6 +50,7 @@ export const SignUp = () => {
               name="username"
               margin="normal"
               fullWidth
+              data-testid="reg-username"
               label={t("signUp.username")}
               value={username}
               onChange={(e) => setUsername(e.target.value)}
@@ -63,6 +64,7 @@ export const SignUp = () => {
               fullWidth
               label={t("signUp.password")}
               type="password"
+              data-testid="reg-password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
             />
@@ -75,13 +77,15 @@ export const SignUp = () => {
               fullWidth
               label={t("signUp.confirmPassword")}
               type="password"
+              data-testid="reg-confirmpassword"
               value={confirmpassword}
               onChange={(e) => setConfirmationPassword(e.target.value)}
             />
           </FormControl>
           <Button 
-            variant="contained" 
+            variant="contained"
             color="primary" 
+            data-testid="signup"
             onClick={signUp}>
             {t("signUp.signUp")}
           </Button>
