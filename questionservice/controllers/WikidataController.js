@@ -82,25 +82,21 @@ class WikidataController {
         console.log(`[WikidataController] Getting question for: ${queryName}`);
 
         const { imgTypeName, relation } = questionTypes[queryName];
-
         const chosenItems = await this.getRandomQuestionSelection(queryName);
         if (chosenItems.length !== ANSWERS_PER_QUESTION) {
             throw new Error("Not enough items found");
         }
-
         const chosenItem = chosenItems[this.getRandomInt(0, chosenItems.length - 1)];
-        const question = `Which of the following ${imgTypeName} ${relation} ${chosenItem.label}?`;
-
         const questionAndImages = {
-            question: question,
+            imageType: imgTypeName,
+            relation: relation,
+            topic: chosenItem.label,
             images: chosenItems.map(item => item.image)
         }
-
         const savedQuestion = await this.questionRepository.newQuestion({
             ...questionAndImages,
             correctOption: chosenItem.image
         });
-
         return {
             id: savedQuestion._id,
             ...questionAndImages

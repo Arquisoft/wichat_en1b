@@ -4,6 +4,7 @@ const User = require('./user-model');
 const jwt = require('jsonwebtoken');
 const path = require('path');
 const fs = require('fs');
+const bcrypt = require('bcrypt');
 
 let mongoServer;
 let app;
@@ -72,7 +73,7 @@ describe('User Service Validation', () => {
     const response = await request(app).post('/adduser').send(invalidUser);
     
     expect(response.status).toBe(400);
-    expect(response.body.error).toContain('Invalid username');
+    expect(response.body.error).toContain('signUp.errors.invalidUsername');
   });
   
   it('should reject usernames with invalid characters', async () => {
@@ -85,7 +86,7 @@ describe('User Service Validation', () => {
     const response = await request(app).post('/adduser').send(invalidUser);
     
     expect(response.status).toBe(400);
-    expect(response.body.error).toContain('Invalid username');
+    expect(response.body.error).toContain('signUp.errors.invalidUsername');
   });
   
   it('should reject duplicate usernames', async () => {
@@ -104,7 +105,7 @@ describe('User Service Validation', () => {
     });
     
     expect(response.status).toBe(400);
-    expect(response.body.error).toContain('already in use');
+    expect(response.body.error).toContain('signUp.errors.duplicateUsername');
   });
   
   it('should validate and sanitize username for NoSQL injection attempts', async () => {
@@ -282,7 +283,7 @@ describe('User Service Custom Image Upload', () => {
       .attach('image', mockImageBuffer, 'test-image.png');
 
     expect(response.status).toBe(500);
-    expect(response.body).toHaveProperty('error', 'Invalid username. It must be 3-20 characters long and contain only letters, numbers and underscores.');
+    expect(response.body).toHaveProperty('error', 'signUp.errors.invalidUsername');
   });
 });
 
@@ -362,14 +363,14 @@ describe('User Service Default Image Update', () => {
       .send({ image: 'image_5.png' });
 
     expect(response.status).toBe(500);
-    expect(response.body).toHaveProperty('error', 'Invalid username. It must be 3-20 characters long and contain only letters, numbers and underscores.');
+    expect(response.body).toHaveProperty('error', 'signUp.errors.invalidUsername');
   });
 });
 
 const checkInvalidPasswordResponse = async (invalidUser) => {
   const response = await request(app).post('/adduser').send(invalidUser);
   expect(response.status).toBe(400);
-  expect(response.body.error).toContain('Invalid password. It must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, one number, and one special character.');
+  expect(response.body.error).toContain('signUp.errors.invalidPassword');
 };
 
 describe('Password Validation Tests', () => {
@@ -435,6 +436,117 @@ describe('Password Confirmation Tests', () => {
 
     const response = await request(app).post('/adduser').send(noSamePass);
     expect(response.status).toBe(400);
-    expect(response.body.error).toContain('The password and the confirmation do not match, please try again.');
+    expect(response.body.error).toContain('signUp.errors.passwordsDoNotMatch');
     });
+});
+
+describe('User Service Update Tests', () => {
+  it('should update the username successfully', async () => {
+    process.env.JWT_SECRET = 'testsecret';
+
+    const user = {
+      username: 'oldusername',
+      passwordHash: 'hashedpassword'
+    };
+    await User.create(user);
+
+    const response = await request(app)
+      .patch('/users/oldusername')
+      .send({ newUser: 'newusername' });
+
+    expect(response.status).toBe(200);
+    expect(response.body).toHaveProperty('success', true);
+    expect(response.body).toHaveProperty('newUsername', 'newusername');
+    expect(response.body).toHaveProperty('message', 'User updated successfully');
+    expect(response.body).toHaveProperty('token');
+
+    const userInDb = await User.findOne({ username: 'newusername' });
+    expect(userInDb).not.toBeNull();
+    expect(userInDb.username).toBe('newusername');
+  });
+
+  it('should return 400 if the new username is already in use', async () => {
+    await User.create({ username: 'existinguser', passwordHash: 'hashedpassword' });
+    await User.create({ username: 'conflictinguser', passwordHash: 'hashedpassword' });
+
+    const response = await request(app)
+      .patch('/users/existinguser')
+      .send({ newUser: 'conflictinguser' });
+
+    expect(response.status).toBe(400);
+    expect(response.body).toHaveProperty('error', 'signUp.errors.duplicateUsername');
+  });
+
+  it('should update the password successfully', async () => {
+    const user = {
+      username: 'passworduser',
+      passwordHash: 'hashedpassword'
+    };
+    await User.create(user);
+
+    const response = await request(app)
+      .patch('/users/passworduser')
+      .send({ newPassword: 'NewPassword1!', newPasswordRepeat: 'NewPassword1!' });
+
+    expect(response.status).toBe(200);
+    expect(response.body).toHaveProperty('success', true);
+    expect(response.body).toHaveProperty('message', 'User updated successfully');
+
+    const userInDb = await User.findOne({ username: 'passworduser' });
+    const isPasswordValid = await bcrypt.compare('NewPassword1!', userInDb.passwordHash);
+    expect(isPasswordValid).toBe(true);
+  });
+
+  it('should return 400 if the password and confirmation do not match', async () => {
+    const user = {
+      username: 'mismatchuser',
+      passwordHash: 'hashedpassword'
+    };
+    await User.create(user);
+
+    const response = await request(app)
+      .patch('/users/mismatchuser')
+      .send({ newPassword: 'NewPassword1!', newPasswordRepeat: 'DifferentPassword1!' });
+
+    expect(response.status).toBe(400);
+    expect(response.body).toHaveProperty('error', 'signUp.errors.passwordsDoNotMatch');
+  });
+
+  it('should return 404 if the user does not exist', async () => {
+    const response = await request(app)
+      .patch('/users/nonexistentuser')
+      .send({ newUser: 'newusername' });
+
+    expect(response.status).toBe(404);
+    expect(response.body).toHaveProperty('error', 'User not found');
+  });
+
+  it('should return 500 if the username is invalid', async () => {
+    const response = await request(app)
+      .patch('/users/invalid-username!')
+      .send({ newUser: 'newusername' });
+
+    expect(response.status).toBe(500);
+    expect(response.body).toHaveProperty('error', 'signUp.errors.invalidUsername');
+  });
+
+  it('should return a new token when the username is updated', async () => {
+    process.env.JWT_SECRET = 'testsecret';
+    const user = {
+      username: 'tokenuser',
+      passwordHash: 'hashedpassword'
+    };
+    await User.create(user);
+
+    const response = await request(app)
+      .patch('/users/tokenuser')
+      .send({ newUser: 'newtokenuser' });
+
+    expect(response.status).toBe(200);
+    expect(response.body).toHaveProperty('token');
+
+    const decoded = jwt.verify(response.body.token, process.env.JWT_SECRET);
+    expect(decoded).toHaveProperty('username', 'newtokenuser');
+    expect(decoded).toHaveProperty('userId');
+  });
 });
