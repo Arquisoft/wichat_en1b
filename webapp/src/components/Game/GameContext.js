@@ -28,20 +28,22 @@ export const GameProvider = ({ children, selectedModeId }) => {
     // 🧠 Strategy depends on selected game mode and custom settings
     const strategy = useMemo(() => {
         const mode = (gameMode || 'CLASSICAL').toUpperCase();
-
         const config = GameModesConfig[mode] || GameModesConfig.CLASSICAL;
-        console.log("GameProvider: customSettings: ", customSettings);
         const base = { ...config };
-
+    
         if (gameMode === 'custom') {
             base.maxRounds = customSettings.rounds || 5;
-            base.timePerRound = customSettings.timePerQuestion || 30;
+            base.timePerQuestion = customSettings.timePerQuestion || 30;
             base.maxAIAttempts = customSettings.aiAttempts || 3;
             base.timerMode = 'perQuestion';
         }
-        console.log("Game mode strategy: ", base);
         return base;
-    }, [gameMode, customSettings]);
+    }, [
+        gameMode,
+        customSettings.rounds,
+        customSettings.timePerQuestion,
+        customSettings.aiAttempts
+    ]);
 
     useEffect(() => {
         console.log('Strategy recomputed:', strategy);
@@ -74,9 +76,11 @@ export const GameProvider = ({ children, selectedModeId }) => {
     const handleTimeUp = () => {
         if (strategy.timerMode === 'perQuestion') {
             if (isGameEnded()) {
+                console.log("Game ended, no more rounds left.");
                 setGameEnded(true);
                 pause();
             } else {
+                console.log("Time's up! Moving to the next round.");
                 nextRound();
                 reset(strategy.timePerRound);
                 start();
