@@ -92,48 +92,6 @@ export const GameModesConfig = {
             totalTimeLeft: current.totalTimeLeft, // managed externally
         }),
     },
-
-    //    SUDDENDEATH: {
-    //        id: "suddenDeath",
-    //        name: "Sudden Death",
-    //        description: "1 question, 30 seconds to answer",
-    //        timerMode: "perQuestion",
-    //        timePerQuestion: 30,
-    //        totalGameTime: null,
-    //        maxRounds: Infinity,
-    //        maxAIAttempts: 3,
-    //        statisticsUpdater: new StatisticsUpdater("suddenDeath"),
-    //        lastAnswer: true,
-//
-    //        calculateScore({ isCorrect, timeLeft, AIAttempts }) {
-    //            if (!isCorrect) return 0;
-    //            return Math.max(
-    //                0,
-    //                Math.floor(
-    //                    1000 - ((this.timePerQuestion - timeLeft) * 600 / this.timePerQuestion) - AIAttempts * 100
-    //                )
-    //            );
-    //        },
-//
-    //        shouldContinue({ round, totalTimeLeft, isCorrect }) {
-    //            this.lastAnswer = isCorrect;
-    //            return isCorrect;
-    //        },
-//
-    //        hasEnded() { return !this.lastAnswer },
-//
-    //        getInitialState: () => ({
-    //            round: 1,
-    //            timeLeft: 30,
-    //            score: 0,
-    //        }),
-//
-    //        getNextState: ({ current }) => ({
-    //            round: current.round + 1,
-    //            timeLeft: 30,
-    //        }),
-    //    },
-//
     QOD: {
         id: "qod",
         name: "Question of the Day",
@@ -157,32 +115,5 @@ export const GameModesConfig = {
 
         getNextState: () => null, // only one question
     },
-//
-    //CUSTOM: {
-    //    id: "custom",
-    //    name: "Custom",
-    //    description: "Custom game mode",
-    //    timerMode: "perQuestion",
-    //    timePerQuestion: 30,
-    //    totalGameTime: null,
-    //    maxRounds: 10,
-    //    maxAIAttempts: 3,
-    //    statisticsUpdater: new StatisticsUpdater("custom"),
-//
-    //    calculateScore: ({ isCorrect }) => isCorrect ? 75 : 0,
-//
-    //    shouldContinue: ({ round, timeLeft, isCorrect }) => !this.maxRounds || round < this.maxRounds,
-//
-    //    getInitialState: () => ({
-    //        round: 1,
-    //        timeLeft: this.timePerQuestion,
-    //        score: 0,
-    //    }),
-//
-    //    getNextState: ({ current }) => ({
-    //        round: current.round + 1,
-    //        timeLeft: 60,
-    //    }),
-    //}
 };
 

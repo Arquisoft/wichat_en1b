@@ -95,7 +95,13 @@ export const Question = () => {
 
     useEffect(() => {
         if (timeLeft === 0) {
-            if (strategy.timerMode === 'perGame') {
+            strategy.statisticsUpdater.recordIncorrectAnswer();
+            const continueGame = strategy.shouldContinue({
+                isCorrect: false,
+                round,
+                totalTimeLeft: timeLeft,
+            });
+            if (strategy.timerMode === 'perGame' || !continueGame) {
                 setGameEnded(true);
                 setIsTimeUp(true);
 
@@ -116,6 +122,7 @@ export const Question = () => {
 
                 handleEndGame();
             } else {
+
                 setIsTimeUp(true);
                 pauseTimer();
                 setTimeout(() => {
@@ -241,7 +248,7 @@ export const Question = () => {
             ...prev,
             question: updatedQuestionText,
         }));
-    }, [i18n.language]);
+    }, [i18n.language, question.id]);
 
     return (
         <ThemeProvider theme={theme}>
@@ -347,10 +354,10 @@ export const Question = () => {
                     </Paper>
                 </Box>
 
-
+                {imagesLoaded ? (
                     <Typography variant="h5" component="h2" align="center" sx={{ my: 3, fontWeight: 500 }}>
                         {question.question}
-                    </Typography>
+                    </Typography>) : (<></>)}
 
                 {isCorrect && (
                     <Typography variant="h6" component="p" align="center" sx={{ my: 2, color: "green" }}>
