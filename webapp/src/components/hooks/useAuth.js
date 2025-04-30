@@ -19,6 +19,8 @@ export const useAuth = () => {
             ? { username, password, confirmpassword }
             : { username, password };
 
+            console.log(apiEndpoint);
+            
             const response = await axios.post(`${apiEndpoint}/${action}`, payload);
 
             let oneHourAfter = new Date().getTime() + (1 * 60 * 60 * 1000)
