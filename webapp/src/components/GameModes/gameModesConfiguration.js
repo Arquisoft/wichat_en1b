@@ -17,7 +17,7 @@ export const GameModesConfig = {
         
             const BASE_SCORE = 1000;
             const MAX_TIME_PENALTY = 600;
-            const MAX_TIME = 30; // or strategy.timePerQuestion
+            const MAX_TIME = 60; // or strategy.timePerQuestion
             const AI_PENALTY_PER_USE = 100;
         
             const timePenalty = ((MAX_TIME - timeLeft) * MAX_TIME_PENALTY) / MAX_TIME;
@@ -49,7 +49,7 @@ export const GameModesConfig = {
         description: "2 minutes to answer as many as possible",
         timerMode: "perGame",
         timePerQuestion: null,
-        totalGameTime: 60,
+        totalGameTime: 120,
         maxRounds: Infinity,
         maxAIAttempts: 3,
         statisticsUpdater: new StatisticsUpdater("timeTrial"),
