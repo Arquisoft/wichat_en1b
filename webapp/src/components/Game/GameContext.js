@@ -3,50 +3,51 @@ import useTimer from "../hooks/useTimer";
 import { useRounds } from "../hooks/useRounds";
 import { GameModesConfig } from "../GameModes/gameModesConfiguration";
 import StatisticsUpdater from "./components/StatisticsUpdater";
+import { getGameStrategy } from "../GameModes/strategyFactory";
+import { useRef } from "react";
 
 const GameContext = createContext();
 
 export const GameProvider = ({ children, selectedModeId }) => {
-    console.log("GameProvider: selectedModeId", selectedModeId);
+    //console.log("GameProvider: selectedModeId", selectedModeId);
     const [gameMode, setGameMode] = useState(selectedModeId || 'classical');
-    console.log("GameProvider: gameMode", gameMode);
+    //console.log("GameProvider: gameMode", gameMode);
     const [question, setQuestion] = useState({ question: "Pregunta", images: [] });
     const [gameEnded, setGameEnded] = useState(false);
     const [questionType, setQuestionType] = useState("random");
     const [AIAttempts, setAIAttempts] = useState(0);
     const [maxAIAttempts, setMaxAIAttempts] = useState(0);
     const [statisticsUpdater, setStatisticsUpdater] = useState(new StatisticsUpdater(gameMode));
+    const lastAnswerRef = useRef(true); // used in suddenDeath if needed
 
-    const [customSettings] = useState(() => {
-        return JSON.parse(localStorage.getItem('customSettings')) || {
-            rounds: 5,
-            timePerQuestion: 30,
-            aiAttempts: 3,
-        };
+    const [customSettings, setCustomSettings] = useState(() => {
+        const savedSettings = localStorage.getItem('customSettings');
+        return savedSettings ? JSON.parse(savedSettings) : { rounds: 5, timePerQuestion: 30, aiAttempts: 3 };
     });
-
-    // 🧠 Strategy depends on selected game mode and custom settings
-    const strategy = useMemo(() => {
-        const mode = (gameMode || 'CLASSICAL').toUpperCase();
-        const config = GameModesConfig[mode] || GameModesConfig.CLASSICAL;
-        const base = { ...config };
     
-        if (gameMode === 'custom') {
-            base.maxRounds = customSettings.rounds || 5;
-            base.timePerQuestion = customSettings.timePerQuestion || 30;
-            base.maxAIAttempts = customSettings.aiAttempts || 3;
-            base.timerMode = 'perQuestion';
-        }
-        return base;
-    }, [
-        gameMode,
-        customSettings.rounds,
-        customSettings.timePerQuestion,
-        customSettings.aiAttempts
-    ]);
-
+    // Optionally, listen for changes in `localStorage`
     useEffect(() => {
-        console.log('Strategy recomputed:', strategy);
+        const handleStorageChange = () => {
+            const savedSettings = localStorage.getItem('customSettings');
+            if (savedSettings) {
+                setCustomSettings(JSON.parse(savedSettings));
+            }
+        };
+    
+        window.addEventListener('storage', handleStorageChange);
+        return () => window.removeEventListener('storage', handleStorageChange);
+    }, []);
+    //console.log("GameProvider: customSettings", customSettings);
+    const strategy = useMemo(() => {
+        return getGameStrategy({
+            gameMode,
+            customOptions: customSettings,
+            injectedRefs: { lastAnswerRef }
+        });
+    }, [gameMode, customSettings]);
+    
+    useEffect(() => {
+        //console.log('Strategy recomputed:', strategy);
     }, [strategy]);
 
     // Timer setup
@@ -56,24 +57,23 @@ export const GameProvider = ({ children, selectedModeId }) => {
         autoStart: false
     });
 
-    const { round, nextRound, isGameEnded, resetRounds } = useRounds(strategy.maxRounds ?? 10);
+    const { round, nextRound, isGameEnded, resetRounds } = useRounds({
+        maxRounds: strategy.maxRounds ?? 10, 
+        onRoundChange: () => handleRoundChange() });
 
     // 🎯 Handle gameMode changes
     useEffect(() => {
         setInitialTime(strategy.timerMode === 'perQuestion' ? strategy.timePerQuestion : strategy.totalGameTime);
-        console.log("GameProvider: setInitialTime", strategy.timerMode === 'perQuestion' ? strategy.timePerQuestion : strategy.totalGameTime);
+        //console.log("GameProvider: setInitialTime", strategy.timerMode === 'perQuestion' ? strategy.timePerQuestion : strategy.totalGameTime);
         resetRounds();
         reset(strategy.timerMode === 'perQuestion' ? strategy.timePerQuestion : strategy.totalGameTime);
         setStatisticsUpdater(new StatisticsUpdater(gameMode));
         setMaxAIAttempts(strategy.maxAIAttempts || 0);
-        console.error("GameProvider: StatisticsUpdater: ", statisticsUpdater);
-        if (strategy.timerMode === 'perGame') {
-            start();
-        }
     }, [strategy]);
 
     // ⏰ When time is up
     const handleTimeUp = () => {
+        
         if (strategy.timerMode === 'perQuestion') {
             if (isGameEnded()) {
                 console.log("Game ended, no more rounds left.");
@@ -83,13 +83,26 @@ export const GameProvider = ({ children, selectedModeId }) => {
                 console.log("Time's up! Moving to the next round.");
                 nextRound();
                 reset(strategy.timePerRound);
-                start();
             }
         } else {
             setGameEnded(true);
             pause();
         }
     };
+
+    const handleRoundChange = () => {
+        console.log("Round changed to:", round);
+        if (strategy.id === 'suddenDeath') {
+            console.log("Sudden Death mode: checking if game has ended.");
+            if (strategy.hasEnded()) {
+                console.log("Game ended, failed to answer the last question.");
+                setGameEnded(true);
+                pause();
+            } else {
+                console.log("Sudden Death mode: game continues.");
+            }
+        }
+    }
 
     return (
         <GameContext.Provider value={{
@@ -100,6 +113,7 @@ export const GameProvider = ({ children, selectedModeId }) => {
             maxAIAttempts, setMaxAIAttempts,
             round,
             nextRound,
+            resetRounds,
             isGameEnded,
             timeLeft,
             isRunning,

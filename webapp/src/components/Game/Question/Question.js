@@ -24,12 +24,13 @@ export const Question = () => {
         AIAttempts, setAIAttempts, setMaxAIAttempts,
         statisticsUpdater, gameMode, round, nextRound, resetRounds, isGameEnded,
         timeLeft, isRunning, startTimer, pauseTimer, resetTimer, strategy, initialTime } = useGame();
-    console.log("Question: strategy: ", strategy)
+    //console.log("Question: strategy: ", strategy)
+    //console.log("Question: questionType: ", questionType)
     const gatewayEndpoint = process.env.REACT_APP_API_ENDPOINT || 'http://localhost:8000';
 
     const [selectedAnswer, setSelectedAnswer] = useState(null);
     const [totalTime, setTotalTime] = useState(initialTime); // Set initial time based on the strategy
-    console.log("Question: totalTime", totalTime);
+    //console.log("Question: totalTime", totalTime);
     const [isCorrect, setIsCorrect] = useState(false);
     const [isIncorrect, setIsIncorrect] = useState(false);
     const [isTimeUp, setIsTimeUp] = useState(false);
@@ -48,7 +49,6 @@ export const Question = () => {
         pauseTimer();
         const fetchInitialQuesiton = async () => {
             await requestQuestion(true); // Pass true to indicate it's the initial load
-            startTimer(); // Start the timer after fetching the question
         }
         fetchInitialQuesiton();
     }, [gameMode, setMaxAIAttempts]);
@@ -63,7 +63,7 @@ export const Question = () => {
             setQuestion(questionResponse.data);
 
             if (isInitialLoad) {
-                statisticsUpdater.newGame();
+                strategy.statisticsUpdater.newGame();
             }
         } catch (error) {
             console.error("Error fetching question: ", error)
@@ -95,78 +95,110 @@ export const Question = () => {
 
     useEffect(() => {
         if (timeLeft === 0) {
-            setIsTimeUp(true);
-            pauseTimer();
-            setTimeout(() => {
-                requestQuestion(false).finally(() => {
-                    setIsTimeUp(false);
-                    resetTimer();
-                    startTimer();
-                });
-            }, 2000);
+            if (strategy.timerMode === 'perGame') {
+                setGameEnded(true);
+                setIsTimeUp(true);
+
+
+                const handleEndGame = async () => {
+                    try {
+                        await strategy.statisticsUpdater.endGame();
+                    } catch (error) {
+                        console.error("Error ending game:", error.message);
+                    }
+
+                    setTimeout(() => {
+                        strategy.statisticsUpdater.newGame();
+                        resetGame();
+                        setIsTimeUp(false);
+                    }, 2000);
+                };
+
+                handleEndGame();
+            } else {
+                setIsTimeUp(true);
+                pauseTimer();
+                setTimeout(() => {
+                    requestQuestion(false).finally(() => {
+                        setIsTimeUp(false);
+                        resetTimer();
+                        startTimer();
+                    });
+                }, 2000);
+            }
         }
     }, [timeLeft]);
-
 
 
     const handleAnswerSelect = async (answer) => {
         if (selectedAnswer || isCorrect || isIncorrect || isTimeUp) return;
 
         setSelectedAnswer(answer);
-        pauseTimer(); // Pause the timer when an answer is selected
+        if (strategy.timerMode === 'perQuestion') pauseTimer();
 
         try {
-            console.log("Question: handleAnswerSelect: ", answer);
-            console.log("Question: handleAnswerSelect: question: ", question);
-            console.log("Question: handleAnswerSelect: question.id: ", question.id);
             const userCookie = Cookies.get('user');
-            if (!userCookie) throw new Error("You are not logged in. Please log in to view statistics.");
-            const parsedUserCookie = JSON.parse(userCookie);
-            if (!parsedUserCookie) throw new Error("Cannot parse user cookie.");
+            if (!userCookie) throw new Error("You are not logged in.");
+            const { token } = JSON.parse(userCookie) || {};
+            if (!token) throw new Error("Cannot parse auth token.");
 
-            // Parse the token from the cookie
-            const token = parsedUserCookie.token;
-            if (!token) throw new Error("Cannot parse authentication token.");
-            let response = await axios.post(`${gatewayEndpoint}/answer`, { questionId: question.id, answer: answer }, {
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
+            const response = await axios.post(`${gatewayEndpoint}/answer`, {
+                questionId: question.id,
+                answer: answer,
+            }, {
+                headers: { 'Authorization': `Bearer ${token}` }
             });
 
-            if (response.data.correct) {
-                const newScore = Math.max(0, Math.floor(1000 - ((totalTime - timeLeft) * 600 / totalTime) - AIAttempts * 100 + getStreakBonus()));
-                setScore(newScore);
-                setCurrentScore(prev => prev + newScore);
-                setStreak(prev => prev + 1);
+            const isCorrectAnswer = response.data.correct === true;
+            const score = strategy.calculateScore({
+                isCorrect: isCorrectAnswer,
+                timeLeft,
+                AIAttempts,
+                streak,
+                round,
+            });
 
-                statisticsUpdater.recordCorrectAnswer(newScore);
+            setScore(score);
+            setCurrentScore(prev => prev + score);
+            setStreak(prev => isCorrectAnswer ? prev + 1 : 0);
+
+            if (isCorrectAnswer) {
+                strategy.statisticsUpdater.recordCorrectAnswer(score);
                 setIsCorrect(true);
             } else {
-                statisticsUpdater.recordIncorrectAnswer();
-                setStreak(0);
+                strategy.statisticsUpdater.recordIncorrectAnswer();
                 setIsIncorrect(true);
             }
 
-            setAIAttempts(0);
+            const continueGame = strategy.shouldContinue({
+                isCorrect: isCorrectAnswer,
+                round,
+                totalTimeLeft: timeLeft,
+            });
 
-            if (isGameEnded()) {
+            setAIAttempts(0); // Reset AI attempts for next question
+
+            if (!continueGame || isGameEnded()) {
                 setGameEnded(true);
                 try {
-                    await statisticsUpdater.endGame();
+                    await strategy.statisticsUpdater.endGame();
                 } catch (error) {
                     console.error("Error ending game:", error.message);
                 }
 
                 setTimeout(() => {
-                    statisticsUpdater.newGame();
+                    strategy.statisticsUpdater.newGame();
                     resetGame();
                 }, 2000);
             } else {
-                nextRound();
                 setTimeout(() => {
                     setIsCorrect(false);
                     setIsIncorrect(false);
                     requestQuestion(false);
+                    nextRound();
+                    if (strategy.timerMode === 'perQuestion') {
+                        resetTimer();
+                    }
                 }, 2000);
             }
         } catch (error) {
@@ -180,8 +212,11 @@ export const Question = () => {
         setCurrentScore(0);
         setScore(0);
         setStreak(0);
+        setIsCorrect(false);
+        setIsIncorrect(false);
+        requestQuestion(false);
         setSelectedAnswer(null);
-        setGameEnded(false);       // From useGame context
+        setGameEnded(false);   // From useGame context
     };
 
 
@@ -312,9 +347,10 @@ export const Question = () => {
                     </Paper>
                 </Box>
 
-                <Typography variant="h5" component="h2" align="center" sx={{ my: 3, fontWeight: 500 }}>
-                    {question.question}
-                </Typography>
+
+                    <Typography variant="h5" component="h2" align="center" sx={{ my: 3, fontWeight: 500 }}>
+                        {question.question}
+                    </Typography>
 
                 {isCorrect && (
                     <Typography variant="h6" component="p" align="center" sx={{ my: 2, color: "green" }}>
