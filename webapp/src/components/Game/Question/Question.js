@@ -6,7 +6,7 @@ import axios from 'axios';
 import { useGame } from "../GameContext";
 import Cookies from "js-cookie";
 import { t, useTranslation } from "react-i18next";
-
+import { retrieveUserToken } from "../../utils/utils";
 
 
 // Create a theme with the blue color from the login screen
@@ -144,10 +144,7 @@ export const Question = () => {
         if (strategy.timerMode === 'perQuestion') pauseTimer();
 
         try {
-            const userCookie = Cookies.get('user');
-            if (!userCookie) throw new Error("You are not logged in.");
-            const { token } = JSON.parse(userCookie) || {};
-            if (!token) throw new Error("Cannot parse auth token.");
+            const token = retrieveUserToken();
 
             const response = await axios.post(`${gatewayEndpoint}/answer`, {
                 questionId: question.id,
@@ -231,11 +228,6 @@ export const Question = () => {
         const mins = Math.floor(seconds / 60);
         const secs = seconds % 60;
         return `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
-    };
-
-    const getStreakBonus = () => {
-        if (streak < 3) return 0;
-        return 50 + 15 * (streak - 3);
     };
 
     useEffect(() => {
