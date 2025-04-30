@@ -1,5 +1,6 @@
 import axios from "axios";
 import Cookies from "js-cookie";
+import { retrieveUserToken } from "../../utils/utils";
 
 class StatisticsUpdater {
 
@@ -46,17 +47,7 @@ class StatisticsUpdater {
     async endGame() {
         this.statsData.endDate = Date.now();
         try {
-            // Retrieve the 'user' cookie
-            const userCookie = Cookies.get('user');        
-            if (!userCookie) throw new Error("You are not logged in. Please log in to update your statistics.");
-            
-            // Parse the cookie value
-            const parsedUserCookie = JSON.parse(userCookie);
-            if (!parsedUserCookie) throw new Error("Cannot parse user cookie.");
-            
-            // Parse the token from the cookie
-            const token = parsedUserCookie.token;    
-            if (!token) throw new Error("Cannot parse authentication token.");
+            const token = retrieveUserToken();
             
             // Make a POST request to the gateway with the authorization token
             console.log("Recording game with data:", this.statsData);
