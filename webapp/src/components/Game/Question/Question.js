@@ -20,7 +20,7 @@ const theme = createTheme({
 
 
 export const Question = () => {
-    const { question, setQuestion, setGameEnded, questionType, setQuestionType,
+    const { question, setQuestion, setGameEnded,
         AIAttempts, setAIAttempts, setMaxAIAttempts,
         statisticsUpdater, gameMode, round, nextRound, resetRounds, isGameEnded,
         timeLeft, isRunning, startTimer, pauseTimer, resetTimer, strategy, initialTime } = useGame();
@@ -39,19 +39,17 @@ export const Question = () => {
     const [score, setScore] = useState(0); // Track the score
     const [currentScore, setCurrentScore] = useState(0); // Track the current score
     const [t, i18n] = useTranslation(); // Initialize i18next for translations
-
-    const topic = localStorage.getItem("topic") || "random"; // Default to "random" if not set
-    setQuestionType(topic); // Set the question type based on the topic
+    const questionType = localStorage.getItem("topic") || "random"; // Default to "random" if not set
 
 
     useEffect(() => {
         resetTimer();
         pauseTimer();
         const fetchInitialQuesiton = async () => {
-            await requestQuestion(true); // Pass true to indicate it's the initial load
+            await requestQuestion(true);
         }
         fetchInitialQuesiton();
-    }, [gameMode, setMaxAIAttempts]);
+    }, []); // Empty deps array since this should only run on mount
 
     const progressPercentage = (timeLeft / totalTime) * 100;
 
@@ -70,10 +68,6 @@ export const Question = () => {
         }
         setImagesLoaded(false);
     };
-
-    useEffect(() => {
-        requestQuestion(true);
-    }, [questionType]);
 
     useEffect(() => {
         if (question.images?.length) {
