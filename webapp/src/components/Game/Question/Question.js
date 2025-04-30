@@ -4,7 +4,9 @@ import { createTheme, ThemeProvider } from "@mui/material/styles";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import axios from 'axios';
 import { useGame } from "../GameContext";
-import { useTranslation } from "react-i18next"
+import Cookies from "js-cookie";
+import { t, useTranslation } from "react-i18next";
+
 
 
 // Create a theme with the blue color from the login screen
@@ -18,9 +20,9 @@ const theme = createTheme({
 
 
 export const Question = () => {
-    const { question, setQuestion, setGameEnded, questionType, setQuestionType, 
-        AIAttempts, setAIAttempts, setMaxAIAttempts, 
-        statisticsUpdater, gameMode,  round, nextRound, resetRounds, isGameEnded,
+    const { question, setQuestion, setGameEnded, questionType, setQuestionType,
+        AIAttempts, setAIAttempts, setMaxAIAttempts,
+        statisticsUpdater, gameMode, round, nextRound, resetRounds, isGameEnded,
         timeLeft, isRunning, startTimer, pauseTimer, resetTimer, strategy, initialTime } = useGame();
     console.log("Question: strategy: ", strategy)
     const gatewayEndpoint = process.env.REACT_APP_API_ENDPOINT || 'http://localhost:8000';
@@ -82,7 +84,7 @@ export const Question = () => {
                     img.onload = resolve;
                 });
             });
-    
+
             Promise.all(imagePromises).then(() => {
                 setImagesLoaded(true);
                 setSelectedAnswer(null);
@@ -104,8 +106,8 @@ export const Question = () => {
             }, 2000);
         }
     }, [timeLeft]);
-    
-    
+
+
 
     const handleAnswerSelect = async (answer) => {
         if (selectedAnswer || isCorrect || isIncorrect || isTimeUp) return;
@@ -117,7 +119,19 @@ export const Question = () => {
             console.log("Question: handleAnswerSelect: ", answer);
             console.log("Question: handleAnswerSelect: question: ", question);
             console.log("Question: handleAnswerSelect: question.id: ", question.id);
-            let response = await axios.post(`${gatewayEndpoint}/answer`, { questionId: question.id, answer: answer });
+            const userCookie = Cookies.get('user');
+            if (!userCookie) throw new Error("You are not logged in. Please log in to view statistics.");
+            const parsedUserCookie = JSON.parse(userCookie);
+            if (!parsedUserCookie) throw new Error("Cannot parse user cookie.");
+
+            // Parse the token from the cookie
+            const token = parsedUserCookie.token;
+            if (!token) throw new Error("Cannot parse authentication token.");
+            let response = await axios.post(`${gatewayEndpoint}/answer`, { questionId: question.id, answer: answer }, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
 
             if (response.data.correct) {
                 const newScore = Math.max(0, Math.floor(1000 - ((totalTime - timeLeft) * 600 / totalTime) - AIAttempts * 100 + getStreakBonus()));
@@ -169,7 +183,7 @@ export const Question = () => {
         setSelectedAnswer(null);
         setGameEnded(false);       // From useGame context
     };
-    
+
 
     const formatTime = (seconds) => {
         const mins = Math.floor(seconds / 60);
@@ -207,7 +221,7 @@ export const Question = () => {
                 </Typography>
                 {/* Round counter */}
                 <Typography variant="p" component="p" align="center" sx={{ my: 3, fontWeight: 500 }}>
-                    {round} {strategy.maxRounds != Infinity ? `/ ${strategy.maxRounds}` : ""} 
+                    {round} {strategy.maxRounds != Infinity ? `/ ${strategy.maxRounds}` : ""}
                     {streak >= 3 && (
                         <Typography variant="span" component="span" align="center" sx={{ my: 3, fontWeight: 500, color: "red" }}>
                             {streak} 🔥
