@@ -41,6 +41,8 @@ describe('Question Component', () => {
         ]
     };
 
+    let timeLeft = 60;
+
     const mockGameContext = {
         question: mockQuestion,
         setQuestion: jest.fn(),
@@ -61,9 +63,22 @@ describe('Question Component', () => {
             maxAIAttempts: 3,
             hasEnded: jest.fn().mockReturnValue(false)
         },
-        startTimer: jest.fn(),
-        pauseTimer: jest.fn(),
-        resetTimer: jest.fn()
+        timeLeft,
+        startTimer: jest.fn(() => {
+            const interval = setInterval(() => {
+                if (timeLeft > 0) {
+                    timeLeft -= 1;
+                } else {
+                    clearInterval(interval);
+                }
+            }, 1000);
+        }),
+        pauseTimer: jest.fn(() => {
+            jest.clearAllTimers();
+        }),
+        resetTimer: jest.fn(() => {
+            timeLeft = 60;
+        })
     };
 
     const mockUserCookie = JSON.stringify({ token: 'fake-jwt-token' });
@@ -114,7 +129,11 @@ describe('Question Component', () => {
     test('fetches a question on initial render', async () => {
         render(<Question statisticsUpdater={mockStatisticsUpdater} />);
 
-        expect(axios.get).toHaveBeenCalledWith('http://test-gateway.com/question/random');
+        expect(axios.get).toHaveBeenCalledWith('http://test-gateway.com/question/random', {
+            headers: {
+                Authorization: 'Bearer fake-jwt-token'
+            }
+        });
 
         await waitFor(() => {
             expect(mockGameContext.setQuestion).toHaveBeenCalled();
