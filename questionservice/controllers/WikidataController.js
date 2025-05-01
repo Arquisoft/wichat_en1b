@@ -4,19 +4,26 @@ const wbk = WBK({
     sparqlEndpoint: 'https://query.wikidata.org/sparql' // Required to use `sparqlQuery` and `getReverseClaims` functions, optional otherwise
 })
 const questionTypes = require('./questionTypes');
+const axios = require('axios')
 
 const WikidataItemRepository = require('../repositories/WikidataItemRepository');
 const QuestionRepository = require('../repositories/QuestionRepository');
+const QuestionOfTheDayRepository = require('../repositories/QuestionOfTheDayRepository');
 
 const ANSWERS_PER_QUESTION = 4
 const INCORRECT_NAME_REGEX = /[QL]\d+/;
-
 class WikidataController {
 
     constructor() {
         this.wikidataItemRepository = new WikidataItemRepository();
         this.questionRepository = new QuestionRepository();
+        this.questionOfTheDayRepository = new QuestionOfTheDayRepository();
         this.getTestQuestions = true;
+    }
+
+    async initialRun() {
+        await this.preSaveWikidataItems();
+        await this.checkInitialQuestionOfTheDay();
     }
 
     setTestQuestions(value) {
@@ -42,12 +49,12 @@ class WikidataController {
         //Constructing the url for the wikidata request
         let url = wbk.sparqlQuery(query);
 
-        const response = await fetch(url, {
+        const response = await axios.get(url, {
             headers: {
                 "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36"
             }
         });
-        const data = await response.json();
+        const data = response.data;
         return data.results.bindings;
     }
 
@@ -71,7 +78,7 @@ class WikidataController {
      */
     async getQuestionAndImages(queryName) {
 
-        if (queryName == "random") {
+        if (queryName == "random" || !queryName) {
             queryName = this.getRandomQuestionType();
         }
 
@@ -103,8 +110,21 @@ class WikidataController {
         };
     }
 
-    async isQuestionCorrect(questionId, answer) {
-        return await this.questionRepository.isAnswerCorrect(questionId, answer);
+    async getQuestionOfTheDay() {
+        const questionOfTheDay = await this.questionOfTheDayRepository.getQuestionOfTheDay();
+        const rawQuestion = questionOfTheDay.question;
+        const question = {
+            id: rawQuestion._id,
+            imageType: rawQuestion.imageType,
+            relation: rawQuestion.relation,
+            topic: rawQuestion.topic,
+            images: rawQuestion.images
+        }
+        return question;
+    }
+
+    async getCorrectOption(questionId) {
+        return await this.questionRepository.getCorrectOption(questionId);
     }
 
     async preSaveWikidataItems(explicitQuestionTypes = null) {
@@ -133,6 +153,23 @@ class WikidataController {
             }
         }
         return resultReport;
+    }
+
+    /**
+     * Sets the question of the day to the question
+     * Question of the day is updated every day at 02:00 AM
+     */
+    async setQuestionOfTheDay(defaultQuestionType = "random") {
+        const question = await this.getQuestionAndImages(defaultQuestionType);
+        return await this.questionOfTheDayRepository.createQuestionOfTheDay(question.id);
+    }
+
+    async checkInitialQuestionOfTheDay(defaultQuestionType = null) {
+        const questionOfTheDay = await this.questionOfTheDayRepository.getQuestionOfTheDay();
+        if (!questionOfTheDay) {
+            return await this.setQuestionOfTheDay(defaultQuestionType);
+        }
+        return questionOfTheDay;
     }
 
 }

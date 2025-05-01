@@ -176,6 +176,11 @@
             "correspondsToThe": "corresponde a la",
             "isA": "ye un",
             "belongsTo": "pertenece a"
+        },
+        "timeUp": "¡Se acabó el tiempu!",
+        "endScreen": {
+            "title": "Fin del xuegu",
+            "reportTitle": "Informe de xuegu"
         }
     },
     "gameModes": {

@@ -75,8 +75,8 @@
             "invalidImage": "El archivo subido no es una imagen."
         },
         "errorStates": {
-                "retry": "Reintentar",
-                "goBackToMenu": "Volver al menú"
+            "retry": "Reintentar",
+            "goBackToMenu": "Volver al menú"
         },
         "settings": {
             "updateProfile": "Actualizar tu perfil",
@@ -176,6 +176,11 @@
             "correspondsToThe": "corresponde al/la",
             "isA": "es un(a)",
             "belongsTo": "pertenece a"
+        },
+        "timeUp": "¡Tiempo agotado!",
+        "endScreen": {
+            "title": "Fin del juego",
+            "reportTitle": "Reporte de juego"
         }
     },
     "gameModes": {

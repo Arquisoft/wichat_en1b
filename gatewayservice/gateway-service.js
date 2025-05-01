@@ -219,10 +219,28 @@ app.get('/question/:questionType', async (req, res) => {
   }
 });
 
-app.post('/answer', async (req, res) => {
+app.get('/question-of-the-day', authMiddleware, async (req, res) => {
+  try {
+    const questionResponse = await axios.get(`${questionServiceUrl}/question-of-the-day`, {
+      headers: {
+        'username': req.user
+      }
+    });
+    res.json(questionResponse.data);
+  } catch (error) {
+    manageError(res, error);
+  }
+});
+
+
+app.post('/answer', authMiddleware, async (req, res) => {
   try {
     //Forward the answer for validation to the question service
-    const answerResponse = await axios.post(`${questionServiceUrl}/answer`, req.body);
+    const answerResponse = await axios.post(`${questionServiceUrl}/answer`, req.body, {
+      headers: {
+        'username': req.user
+      }
+    });
     res.json(answerResponse.data);
   } catch (error) {
     manageError(res, error);

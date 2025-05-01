@@ -55,7 +55,7 @@
             "correctAnswerRate": "Correct Answer Rate",
             "maxScore": "Max Score",
             "maxScorePoints_one": "{{count}} point",
-            "maxScorePoints_other": "{{count}} points" 
+            "maxScorePoints_other": "{{count}} points"
         },
         "answerDistribution": {
             "answerDistribution": "Answer Distribution",
@@ -176,6 +176,11 @@
             "correspondsToThe": "corresponds to the",
             "isA": "is a",
             "belongsTo": "belongs to"
+        },
+        "timeUp": "Time's up!",
+        "endScreen": {
+            "title": "Game Ended",
+            "reportTitle": "Game Report"
         }
     },
     "gameModes": {
