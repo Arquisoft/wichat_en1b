@@ -42,6 +42,7 @@ const AccountSettingsDialog = ({
             <FormControlLabel
               control={
                 <Checkbox 
+                  data-testid="username-checkbox"
                   checked={isUsernameChecked} 
                   onChange={(e) => setIsUsernameChecked(e.target.checked)} 
                 />
@@ -49,6 +50,7 @@ const AccountSettingsDialog = ({
               sx={{ mr: 2 }}
             />
             <TextField 
+              id="username-textfield"
               label={t("profile.settings.newUsername")} 
               variant="outlined" 
               fullWidth 
@@ -62,6 +64,7 @@ const AccountSettingsDialog = ({
             <FormControlLabel
               control={
                 <Checkbox 
+                  data-testid="password-checkbox"
                   checked={isPasswordChecked} 
                   onChange={(e) => setIsPasswordChecked(e.target.checked)} 
                 />
