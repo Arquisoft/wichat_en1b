@@ -48,6 +48,7 @@ export const Login = () => {
             <TextField
               margin="normal"
               fullWidth
+              data-testid="log-username"
               label={t("logIn.username")}
               value={username}
               onChange={(e) => setUsername(e.target.value)}
@@ -59,6 +60,7 @@ export const Login = () => {
               fullWidth
               label={t("logIn.password")}
               type="password"
+              data-testid="log-password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
             />

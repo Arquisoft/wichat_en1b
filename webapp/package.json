@@ -13,6 +13,7 @@
     "@mui/system": "^7.0.1",
     "ai": "^4.1.63",
     "axios": "^1.7.9",
+    "cross-env": "^7.0.3",
     "date-fns": "^4.1.0",
     "i18next": "^23.16.8",
     "i18next-browser-languagedetector": "^8.0.4",
@@ -31,7 +32,7 @@
   },
   "scripts": {
     "start": "react-scripts start",
-    "build": "CI=false react-scripts build",
+    "build": "cross-env CI=false react-scripts build",
     "prod": "serve -s build",
     "test": "react-scripts test --transformIgnorePatterns 'node_modules/(?!axios)/'",
     "test:e2e": "start-server-and-test 'node e2e/test-environment-setup.js' http://localhost:8000/health prod 3000 \"cd e2e && jest\"",

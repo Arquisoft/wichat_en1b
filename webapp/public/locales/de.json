@@ -176,6 +176,11 @@
             "correspondsToThe": "entspricht dem",
             "isA": "ist ein",
             "belongsTo": "gehört zu"
+        },
+        "timeUp": "Zeit abgelaufen!",
+        "endScreen": {
+            "title": "Spiel beendet",
+            "reportTitle": "Spielbericht"
         }
     },
     "gameModes": {
