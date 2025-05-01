@@ -9,9 +9,7 @@ import { useRef } from "react";
 const GameContext = createContext();
 
 export const GameProvider = ({ children, selectedModeId }) => {
-    //console.log("GameProvider: selectedModeId", selectedModeId);
     const [gameMode, setGameMode] = useState(selectedModeId || 'classical');
-    //console.log("GameProvider: gameMode", gameMode);
     const [question, setQuestion] = useState({ question: "Pregunta", images: [] });
     const [gameEnded, setGameEnded] = useState(false);
     const [questionType, setQuestionType] = useState("random");
@@ -37,7 +35,7 @@ export const GameProvider = ({ children, selectedModeId }) => {
         window.addEventListener('storage', handleStorageChange);
         return () => window.removeEventListener('storage', handleStorageChange);
     }, []);
-    //console.log("GameProvider: customSettings", customSettings);
+
     const strategy = useMemo(() => {
         return getGameStrategy({
             gameMode,
