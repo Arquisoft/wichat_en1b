@@ -17,7 +17,6 @@ defineFeature(feature, (test) => {
       : await puppeteer.launch({ headless: false, slowMo: 30 });
 
     page = await browser.newPage();
-    setDefaultOptions({ timeout: 10000 });
     process.env.JWT_SECRET='test-secret'
 
     await page.setViewport({ width: 1580, height: 800 });
@@ -50,6 +49,26 @@ defineFeature(feature, (test) => {
 
     await expect(page).toClick('[data-testid="signup"]');
 
+    await page.waitForXPath("//button[contains(text(), 'Sign out')]");
+    const [signOutButton] = await page.$x("//button[contains(text(), 'Sign out')]");
+    await signOutButton.click();
+
+    let AAProfileUser = "AAProfileUser";
+    let password = "Password123!";
+
+    await page.waitForSelector('button[data-testid="signup-button"]');
+    await page.click('button[data-testid="signup-button"]');
+
+    const otherusernameInput = await page.$('[data-testid="reg-username"] input');
+    const otherpasswordInput = await page.$('[data-testid="reg-password"] input');
+    const otherconfirmpasswordInput = await page.$('[data-testid="reg-confirmpassword"] input');
+
+    await otherusernameInput.type(AAProfileUser);
+    await otherpasswordInput.type(password);
+    await otherconfirmpasswordInput.type(password);
+
+    await expect(page).toClick('button[data-testid="signup"]');
+    //Don't need to sign out because the first test already does it
   });
 
   afterAll(async () => {
@@ -83,9 +102,19 @@ defineFeature(feature, (test) => {
 
     when("Logging in", async () => {
         
-        await page.waitForXPath("//button[contains(text(), 'Sign out')]");
-        const [signOutButton] = await page.$x("//button[contains(text(), 'Sign out')]");
-        
+      await page.waitForXPath("//button[contains(text(), 'Sign out')]");
+      const [signOutButton] = await page.$x("//button[contains(text(), 'Sign out')]");
+      await signOutButton.click();
+
+      await page.waitForXPath('//button[contains(text(), "Log in")]');
+      
+      const loginUsernameInput = await page.$('[data-testid="log-username"] input');
+      const loginPasswordInput = await page.$('[data-testid="log-password"] input');
+      
+      await loginUsernameInput.type(username);
+      await loginPasswordInput.type(password);
+      await expect(page).toClick('button[type="submit"]');  
+
     });
 
     then("Should be seen the home window", async () => {
@@ -249,4 +278,147 @@ defineFeature(feature, (test) => {
         }
     });
   });
+
+  test("Show other players profile", ({ given, when, then, and }) => {
+    let usernameText="";
+    given("User in the home pannel", async () => {
+
+      await page.waitForXPath('//button[contains(text(), "Home")]');
+      const [homeButton] = await page.$x('//button[contains(text(), "Home")]');
+      await homeButton.click();
+
+    });
+
+    when("Entering the statistics pannel", async () => {
+
+      await page.waitForXPath('//button[contains(text(), "Statistics")]');
+      const [statsbutton] = await page.$x('//button[contains(text(), "Statistics")]');
+      await statsbutton.click();
+
+    });
+
+    then("Click on other players name", async () => {
+
+      await page.waitForXPath('//button[contains(text(), "Reset Filters")]');
+
+      const [searchResult] = await page.$x('//a[contains(text(), "AAProfileUser")]');
+      await searchResult.click();
+
+    });
+
+    and("Show the profile", async () => {
+
+      const [profileTitle] = await page.$x('//h1[contains(text(), "AAProfileUser")]');
+      const text = await page.evaluate(el => el.textContent, profileTitle);
+      expect(text).toMatch("AAProfileUser");
+
+    });
+
+    and("Account details button doesnt exist", async () => {
+
+      const editButton = await page.$x('//button[contains(text(), "Account Settings")]');
+      expect(editButton.length).toBe(0);
+
+    });
+
+  });
+
+  test("The profile visits are visible but not for other users", ({ given, when, then, and }) => {
+
+    let username;
+    let password;
+
+    given("Two registered users", async () => {
+
+      username="AAProfileUser";
+      password="Password123!"
+
+      await page.waitForXPath("//button[contains(text(), 'Sign out')]");
+      const [signOutButton] = await page.$x("//button[contains(text(), 'Sign out')]");
+      await signOutButton.click();
+
+      await page.waitForXPath('//button[contains(text(), "Log in")]');
+
+      const aaUsernameInput = await page.$('[data-testid="log-username"] input');
+      const aaPasswordInput = await page.$('[data-testid="log-password"] input');
+      await aaUsernameInput.type(username);
+      await aaPasswordInput.type(password);
+
+      await expect(page).toClick('button[type="submit"]');  
+
+      
+
+    });
+
+    when("Enter in the statistics pannel", async () => {
+      
+      await page.waitForXPath('//button[contains(text(), "Statistics")]');
+      const [statsbutton] = await page.$x('//button[contains(text(), "Statistics")]');
+      await statsbutton.click();
+
+    });
+
+    then("Visits another profile and cant see the profile visits", async () => {
+      
+      await page.waitForXPath('//a[contains(text(), "UsernameChanged")]');
+      const [otherUser] = await page.$x('//a[contains(text(), "UsernameChanged")]');
+      await otherUser.click();
+
+      const [profileTitle] = await page.$x('//h1[contains(text(), "UsernameChanged")]');
+      const text = await page.evaluate(el => el.textContent, profileTitle);
+      expect(text).toMatch("UsernameChanged");
+
+      const profileVisits = await page.$x('//h2[contains(text(), "Profile visitors")]');
+      expect(profileVisits.length).toBe(0);
+
+
+    });
+
+    and("Sign out and login as the other user", async () => {
+
+      const [signOut] = await page.$x('//button[contains(text(), "Sign out")]');
+      await signOut.click();
+
+      await page.waitForXPath('//button[contains(text(), "Log in")]');
+
+      await page.waitForXPath('//button[contains(text(), "Log in")]');
+
+      const chUsernameInput = await page.$('[data-testid="log-username"] input');
+      const chPasswordInput = await page.$('[data-testid="log-password"] input');
+
+      await chUsernameInput.type("UsernameChanged");
+      await chPasswordInput.type("Password123!");
+
+      await expect(page).toClick('button[type="submit"]');
+
+    });
+    
+    and("Show the profile", async () => {
+
+      await page.waitForXPath('//button[contains(text(), "Profile")]');
+      const [statsbutton] = await page.$x('//button[contains(text(), "Profile")]');
+      await statsbutton.click();
+      
+    });
+    
+    and("List of users that view your profile is visible", async () => {
+
+      await page.waitForXPath('//button[contains(text(), "Account Settings")]');
+
+      const [profileVisits] = await page.$x('//h2[contains(text(), "Profile visitors")]');
+      await page.evaluate(el => el.scrollIntoView(), profileVisits); 
+
+      const profileText = await page.evaluate(el => el.textContent, profileVisits);
+      expect(profileText).toMatch("Profile visitors");
+
+      const [userOfVisit] = await page.$x('//span[contains(text(), "AAProfileUser")]');
+
+      const userText = await page.evaluate(el => el.textContent, userOfVisit);      
+      expect(userText).toMatch("AAProfileUser");
+      
+      
+    });
+
+  });
+
 });
