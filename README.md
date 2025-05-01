@@ -53,6 +53,12 @@ GEMINI_API_KEY=YOUR-API-KEY
 # JWT secret to sign tokens, locally it can be random
 JWT_SECRET=YOUR-JWT-SECRET
 ```
+
+To test the correct functionality of the E2E tests some preparation is needed, In order to run the e2e tests of the webapp module, another .env file in the webapp directory is needed. As it is local the value to sign tokens can be random, it should contain the following field:
+```ini
+# JWT secret to sign tokens, locally it can be random
+JWT_SECRET=YOUR-JWT-SECRET
+```
 #### ⚠️ IMPORTANT
 Note that this file must **NOT** be uploaded to the github repository (it is excluded in the `.gitignore`).
 
