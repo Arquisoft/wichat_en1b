@@ -57,7 +57,9 @@ const GameModes = () => {
     useEffect(() => {
         // Actualiza el topic si el valor actual no coincide con las claves disponibles
         if (!QUESTION_TYPES_KEYS.map(o => o.value).includes(topic)) {
-            setTopic(QUESTION_TYPES_KEYS[0].value);
+            const defaultTopic = QUESTION_TYPES_KEYS[0].value;
+            setTopic(defaultTopic);
+            localStorage.setItem('topic', defaultTopic);
         }
     }, [t]);
 
@@ -152,6 +154,7 @@ const GameModes = () => {
                             color="primary"
                             onClick={() => handleGameModeClick(mode.route)}
                             sx={{ marginTop: 'auto' }}
+                            data-testid={`start-game-${mode.route}`}
                         >
                             {t("gameModes.startGame")}
                         </Button>
