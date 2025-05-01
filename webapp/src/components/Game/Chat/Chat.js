@@ -19,7 +19,7 @@ export function Chat() {
 
     const { question, gameEnded, setGameEnded, AIAttempts, setAIAttempts, maxAIAttempts } = useGame();
     const { t } = useTranslation();
-    
+
     // Adjust in function of the height of the navbar
     const navbarHeight = 64
     const gatewayEndpoint = process.env.REACT_APP_API_ENDPOINT || "http://localhost:8000"
@@ -35,7 +35,7 @@ export function Chat() {
         if (gameEnded) {
             setMessages([]);
             setIsDisabled(false);
-            setGameEnded(false);
+            // setGameEnded(false);
             setAIAttempts(0);
         }
     }, [gameEnded]);
@@ -98,7 +98,7 @@ export function Chat() {
             setMessages((prevMessages) => [...prevMessages, errorMessage])
         } finally {
             setIsLoading(false)
-            if (AIAttempts < maxAIAttempts-1) {
+            if (AIAttempts < maxAIAttempts - 1) {
                 setIsDisabled(false)
             }
         }
@@ -136,7 +136,7 @@ export function Chat() {
                     },
                     name: "toggleSidebar",
                 }}
-                aria-label= "toggleSidebar"
+                aria-label="toggleSidebar"
             >
                 {isOpen ? <ChevronRightIcon /> : <ChevronLeftIcon />}
             </IconButton>
@@ -270,11 +270,11 @@ export function Chat() {
                     <div ref={messagesEndRef} />
                 </Box>
                 <Divider />
-                    <Typography variant="caption" sx={{ padding: 1, textAlign: "center", color: "text.secondary" }}>
-                        {t("game.chat.attemptsUsed", { used: AIAttempts, total: maxAIAttempts })} {AIAttempts>0 && (<Typography variant="caption" sx={{ padding: 1, textAlign: "center", color: "text.secondary" }}>
-                            {t("game.chat.pointsConsumed", { points: 100*AIAttempts })}
-                            </Typography>)}
-                    </Typography>
+                <Typography variant="caption" sx={{ padding: 1, textAlign: "center", color: "text.secondary" }}>
+                    {t("game.chat.attemptsUsed", { used: AIAttempts, total: maxAIAttempts })} {AIAttempts > 0 && (<Typography variant="caption" sx={{ padding: 1, textAlign: "center", color: "text.secondary" }}>
+                        {t("game.chat.pointsConsumed", { points: 100 * AIAttempts })}
+                    </Typography>)}
+                </Typography>
                 <Divider />
 
                 {/* Input */}

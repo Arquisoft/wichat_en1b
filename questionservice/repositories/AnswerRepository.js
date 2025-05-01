@@ -1,8 +1,8 @@
 const Answer = require('../models/answer-model');
 
 class AnswerRepository {
-    async createAnswer(questionId, username, answer, isCorrect) {
-        return Answer.create({ questionId, username, answer, isCorrect });
+    async createAnswer(questionId, username, answer, isCorrect, correctOption) {
+        return Answer.create({ questionId, username, answer, isCorrect, correctOption });
     }
 
     async findAnswer(questionId, username) {

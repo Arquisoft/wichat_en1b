@@ -59,7 +59,7 @@ paths:
                     type: string
                     description: An error for the localized template telling some field is missing.
                     example: "logIn.errors.missingFields"
-        '401':
+        "401":
           description: Invalid credentials.
           content:
             application/json:
@@ -70,7 +70,7 @@ paths:
                     type: string
                     description: A messaage with the localization for the invalid credentials message.
                     example: "logIn.errors.invalidCredentials"
-        '500':
+        "500":
           description: Some error ocurred in the server when processing the request.
           content:
             application/json:
@@ -208,7 +208,7 @@ paths:
                   description: Confirmation of the new password.
                   example: newPassword123!
       responses:
-        '200':
+        "200":
           description: User updated successfully.
           content:
             application/json:
@@ -231,7 +231,7 @@ paths:
                     type: string
                     description: Message describing the result.
                     example: User updated successfully
-        '400':
+        "400":
           description: Invalid request parameters. (Passwords don't match, invalid username/password, etc...)
           content:
             application/json:
@@ -242,7 +242,7 @@ paths:
                     type: string
                     description: Error information.
                     example: Invalid input data.
-        '401':
+        "401":
           description: User token is missing or invalid.
           content:
             application/json:
@@ -253,7 +253,7 @@ paths:
                     type: string
                     description: Error information.
                     example: Authorization header missing
-        '403':
+        "403":
           description: Invalid user modifying the data. (username is not the same as the one in the token)
           content:
             application/json:
@@ -264,7 +264,7 @@ paths:
                     type: string
                     description: Error information.
                     example: You can only update your own account.
-        '500':
+        "500":
           description: Failed to update user due to a server error.
           content:
             application/json:
@@ -659,6 +659,10 @@ paths:
                     type: boolean
                     description: Whether the answer was correct or not.
                     example: true
+                  correctOption:
+                    type: string
+                    description: The correct option for the question.
+                    example: http://commons.wikimedia.org/wiki/Special:FilePath/Flag%20of%20Vietnam.svg
         "500":
           description: The answer could not be validated.
           content:
@@ -786,7 +790,7 @@ paths:
       summary: Retrieves the question of the day.
       operationId: getQuestionOfTheDay
       responses:
-        '200':
+        "200":
           description: The question of the day was retrieved correctly.
           content:
             application/json:
@@ -808,11 +812,11 @@ paths:
                       type: string
                       format: uri
                     example:
-                      - 'http://commons.wikimedia.org/wiki/Special:FilePath/Flag%20of%20Nepal.svg'
-                      - 'http://commons.wikimedia.org/wiki/Special:FilePath/Flag%20of%20Myanmar.svg'
-                      - 'http://commons.wikimedia.org/wiki/Special:FilePath/Flag%20of%20Costa%20Rica.svg'
-                      - 'http://commons.wikimedia.org/wiki/Special:FilePath/Flag%20of%20Yemen.svg'
-        '500':
+                      - "http://commons.wikimedia.org/wiki/Special:FilePath/Flag%20of%20Nepal.svg"
+                      - "http://commons.wikimedia.org/wiki/Special:FilePath/Flag%20of%20Myanmar.svg"
+                      - "http://commons.wikimedia.org/wiki/Special:FilePath/Flag%20of%20Costa%20Rica.svg"
+                      - "http://commons.wikimedia.org/wiki/Special:FilePath/Flag%20of%20Yemen.svg"
+        "500":
           description: The question of the day could not be retrieved.
           content:
             application/json:

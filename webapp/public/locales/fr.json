@@ -176,7 +176,11 @@
             "isA": "est un",
             "belongsTo": "appartient à"
         },
-        "timeUp": "Temps écoulé !"
+        "timeUp": "Temps écoulé !",
+        "endScreen": {
+            "title": "Fin du jeu",
+            "reportTitle": "Rapport de jeu"
+        }
     },
     "gameModes": {
         "selectGameMode": "Sélectionner un mode de jeu",
