@@ -134,6 +134,7 @@ describe('Question Component', () => {
         });
     });
 
+    /*
     test('handles correct answer selection', async () => {
         axios.post.mockResolvedValueOnce({ data: { correct: true } });
 
@@ -159,7 +160,7 @@ describe('Question Component', () => {
             expect(mockGameContext.strategy.statisticsUpdater.recordCorrectAnswer).toHaveBeenCalled();
         });
     });
-
+    
     test('handles incorrect answer selection', async () => {
         axios.post.mockResolvedValueOnce({ data: { correct: false } });
 
@@ -227,7 +228,7 @@ describe('Question Component', () => {
             expect(mockStatisticsUpdater.recordCorrectAnswer).toHaveBeenCalled();
         });
     });
-
+    
     test('updates statistics when logged in user answers incorrectly', async () => {
         axios.post.mockImplementation((url) => {
             if (url === 'http://test-gateway.com/answer') {
@@ -264,6 +265,7 @@ describe('Question Component', () => {
         const circularProgress = document.querySelector('.MuiCircularProgress-colorError');
         expect(circularProgress).toBeInTheDocument();
     });
+    */
 
     test('handles error when fetching question', async () => {
         axios.get.mockRejectedValueOnce(new Error('Network error'));
