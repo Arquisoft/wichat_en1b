@@ -248,14 +248,13 @@ export const Question = () => {
                                     t("game.modes.QOD")}
                 </Typography>
                 {/* Round counter */}
-                <Typography variant="p" component="p" align="center" sx={{ my: 3, fontWeight: 500 }}>
+                <Typography variant="p" component="p" align="center" sx={{ my: 3, fontWeight: 500, fontSize: "1.5rem" }}>
                     {round} {strategy.maxRounds != Infinity ? `/ ${strategy.maxRounds}` : ""}
                     {streak >= 3 && (
-                        <Typography variant="span" component="span" align="center" sx={{ my: 3, fontWeight: 500, color: "red" }}>
+                        <Typography variant="span" component="span" align="center" sx={{ ml: 3, fontWeight: 500, color: "red" }}>
                             {streak} 🔥
                         </Typography>
-                    )
-                    }
+                    )}
                 </Typography>
                 {/* Large Timer at the top */}
                 <Box sx={{
