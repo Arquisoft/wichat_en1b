@@ -12,6 +12,15 @@ jest.mock('../GameContext', () => ({
     useGame: jest.fn()
 }));
 jest.mock('../components/StatisticsUpdater');
+jest.mock('../../hooks/useTimer', () => jest.fn(() => ({
+    timeLeft: 60,
+    isRunning: false,
+    start: jest.fn(),
+    pause: jest.fn(),
+    reset: jest.fn(),
+    setInitialTime: jest.fn(),
+    initialTime: 60
+})));
 
 global.Image = function imageFunction() {
     setTimeout(() => {
@@ -42,7 +51,19 @@ describe('Question Component', () => {
         AIAttempts: 0,
         setAIAttempts: jest.fn(),
         maxAIAttempts: 3,
-        setMaxAIAttempts: jest.fn()
+        setMaxAIAttempts: jest.fn(),
+        strategy: {
+            id: 'classical',
+            timerMode: 'perQuestion',
+            timePerQuestion: 60,
+            totalGameTime: 300,
+            maxRounds: 10,
+            maxAIAttempts: 3,
+            hasEnded: jest.fn().mockReturnValue(false)
+        },
+        startTimer: jest.fn(),
+        pauseTimer: jest.fn(),
+        resetTimer: jest.fn()
     };
 
     const mockUserCookie = JSON.stringify({ token: 'fake-jwt-token' });
@@ -57,7 +78,6 @@ describe('Question Component', () => {
     beforeEach(() => {
         jest.clearAllMocks();
 
-        useGame.mockReturnValue(mockGameContext);
         Cookies.get.mockImplementation((name) => {
             if (name === 'user') return mockUserCookie;
             return null;
@@ -73,6 +93,8 @@ describe('Question Component', () => {
         mockStatisticsUpdater.incrementGamesPlayed.mockClear();
         mockStatisticsUpdater.recordCorrectAnswer.mockClear();
         mockStatisticsUpdater.recordIncorrectAnswer.mockClear();
+
+        useGame.mockReturnValue(mockGameContext);
     });
 
     afterEach(() => {

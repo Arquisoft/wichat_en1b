@@ -151,8 +151,6 @@ describe('Chat Component', () => {
         rerender(<Chat />);
 
         expect(screen.getByText('Ask me anything about the question!')).toBeInTheDocument();
-
-        expect(mockGameContext.setGameEnded).toHaveBeenCalledWith(false);
     });
 
     test('disables input and send button when loading', async () => {
