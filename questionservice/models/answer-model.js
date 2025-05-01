@@ -17,6 +17,10 @@ const answerSchema = new mongoose.Schema({
     isCorrect: {
         type: Boolean,
         required: true
+    },
+    correctOption: {
+        type: String,
+        required: true
     }
 });
 

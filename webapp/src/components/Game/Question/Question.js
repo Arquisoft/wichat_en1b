@@ -30,6 +30,7 @@ export const Question = () => {
     const gatewayEndpoint = process.env.REACT_APP_API_ENDPOINT || 'http://localhost:8000';
 
     const [selectedAnswer, setSelectedAnswer] = useState(null);
+    const [correctOption, setCorrectOption] = useState(null);
     const [totalTime, setTotalTime] = useState(initialTime); // Set initial time based on the strategy
     //console.log("Question: totalTime", totalTime);
     const [isCorrect, setIsCorrect] = useState(false);
@@ -72,6 +73,7 @@ export const Question = () => {
 
             if (questionResponse.data.recordedAnswer) {
                 setSelectedAnswer(questionResponse.data.recordedAnswer.answer);
+                setCorrectOption(questionResponse.data.recordedAnswer.correctOption);
                 processAnswerResponse(questionResponse.data.recordedAnswer.isCorrect, false);
             }
 
@@ -161,6 +163,7 @@ export const Question = () => {
             });
 
             const isCorrectAnswer = response.data.correct === true;
+            setCorrectOption(response.data.correctOption);
             processAnswerResponse(isCorrectAnswer);
         } catch (error) {
             console.error("Error checking answer:", error);
@@ -392,21 +395,24 @@ export const Question = () => {
                                             backgroundColor:
                                                 selectedAnswer === image && isCorrect ? "success.main" :
                                                     selectedAnswer === image && isIncorrect ? "error.main" :
-                                                        selectedAnswer === image ? "primary.main" :
-                                                            "transparent",
+                                                        image === correctOption && isIncorrect ? "warning.main" :
+                                                            selectedAnswer === image ? "primary.main" :
+                                                                "transparent",
                                             '&:hover': {
                                                 backgroundColor:
                                                     selectedAnswer === image && isCorrect ? "success.dark" :
                                                         selectedAnswer === image && isIncorrect ? "error.dark" :
-                                                            selectedAnswer === image ? "primary.dark" :
-                                                                "transparent"
+                                                            image === correctOption && isIncorrect ? "warning.dark" :
+                                                                selectedAnswer === image ? "primary.dark" :
+                                                                    "transparent"
                                             },
                                             '&.Mui-disabled': {
                                                 backgroundColor:
                                                     selectedAnswer === image && isCorrect ? "success.main" :
                                                         selectedAnswer === image && isIncorrect ? "error.main" :
-                                                            selectedAnswer === image ? "primary.main" :
-                                                                "transparent",
+                                                            image === correctOption && isIncorrect ? "warning.main" :
+                                                                selectedAnswer === image ? "primary.main" :
+                                                                    "transparent",
                                                 opacity: 1
                                             }
                                         }}

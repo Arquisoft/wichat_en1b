@@ -123,8 +123,8 @@ class WikidataController {
         return question;
     }
 
-    async isQuestionCorrect(questionId, answer) {
-        return await this.questionRepository.isAnswerCorrect(questionId, answer);
+    async getCorrectOption(questionId) {
+        return await this.questionRepository.getCorrectOption(questionId);
     }
 
     async preSaveWikidataItems(explicitQuestionTypes = null) {

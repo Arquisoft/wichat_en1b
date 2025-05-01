@@ -5,10 +5,10 @@ class QuestionRepository {
         return Question.create(question);
     }
 
-    async isAnswerCorrect(questionId, answer) {
+    async getCorrectOption(questionId) {
         const question = await Question.findById(questionId);
         if (!question) return false;
-        return question.correctOption === answer;
+        return question.correctOption;
     }
 
 }
