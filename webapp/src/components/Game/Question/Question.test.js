@@ -5,14 +5,13 @@ import { Question } from './Question';
 import axios from 'axios';
 import Cookies from 'js-cookie';
 import { useGame } from '../GameContext';
-import StatisticsUpdater from './StatisticsUpdater';
 
 jest.mock('axios');
 jest.mock('js-cookie');
 jest.mock('../GameContext', () => ({
     useGame: jest.fn()
 }));
-jest.mock('./StatisticsUpdater');
+jest.mock('../components/StatisticsUpdater');
 
 global.Image = function imageFunction() {
     setTimeout(() => {
