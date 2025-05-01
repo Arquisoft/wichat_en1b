@@ -176,7 +176,11 @@
             "isA": "ist ein",
             "belongsTo": "gehört zu"
         },
-        "timeUp": "Zeit abgelaufen!"
+        "timeUp": "Zeit abgelaufen!",
+        "endScreen": {
+            "title": "Spiel beendet",
+            "reportTitle": "Spielbericht"
+        }
     },
     "gameModes": {
         "selectGameMode": "Wähle Spielmodus",

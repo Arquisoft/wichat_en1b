@@ -11,6 +11,7 @@ import GameWrapper from './components/Game/GameWrapper';
 import GameModes from './components/GameModes/GameModes';
 import { ProtectedLayout, PublicLayout } from './components/layouts/ProtectedLayout';
 import { useTranslation } from 'react-i18next';
+import { GameEndScreen } from './components/Game/Question/GameEndScreen';
 
 function App() {
   useEffect(() => {
@@ -46,6 +47,7 @@ function App() {
                   <Route path="timeTrial" element={<GameWrapper type="timeTrial" />} />
                   <Route path="qod" element={<GameWrapper type="qod" />} />
                   <Route path="custom" element={<GameWrapper type="custom" />} />
+                  <Route path="end-game" element={<GameEndScreen />} />
                 </Route>
               </Route>
 

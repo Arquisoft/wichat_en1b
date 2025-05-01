@@ -7,7 +7,7 @@ import { useGame } from "../GameContext";
 import Cookies from "js-cookie";
 import { t, useTranslation } from "react-i18next";
 import { retrieveUserToken } from "../../utils/utils";
-
+import { Navigate } from "react-router-dom";
 
 // Create a theme with the blue color from the login screen
 const theme = createTheme({
@@ -20,7 +20,8 @@ const theme = createTheme({
 
 
 export const Question = () => {
-    const { question, setQuestion, setGameEnded,
+
+    const { question, setQuestion, setGameEnded, gameEnded,
         AIAttempts, setAIAttempts, setMaxAIAttempts,
         statisticsUpdater, gameMode, round, nextRound, resetRounds, isGameEnded,
         timeLeft, isRunning, startTimer, pauseTimer, resetTimer, strategy, initialTime } = useGame();
@@ -39,6 +40,8 @@ export const Question = () => {
     const [score, setScore] = useState(0); // Track the score
     const [currentScore, setCurrentScore] = useState(0); // Track the current score
     const [t, i18n] = useTranslation(); // Initialize i18next for translations
+    const [endGameData, setEndGameData] = useState(null);
+
     const questionType = localStorage.getItem("topic") || "random"; // Default to "random" if not set
 
 
@@ -53,20 +56,48 @@ export const Question = () => {
 
     const progressPercentage = (timeLeft / totalTime) * 100;
 
-
     const requestQuestion = async (isInitialLoad = false) => {
         pauseTimer(); // Stop the timer before fetching a new question
         try {
-            let questionResponse = await axios.get(`${gatewayEndpoint}/question/${questionType}`);
-            setQuestion(questionResponse.data);
-
+            const token = retrieveUserToken();
+            let endpoint = gameMode == "qod" ? `${gatewayEndpoint}/question-of-the-day` : `${gatewayEndpoint}/question/${questionType}`;
+            let questionResponse = await axios.get(endpoint, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
             if (isInitialLoad) {
                 strategy.statisticsUpdater.newGame();
             }
+            setQuestion(questionResponse.data);
+            setSelectedAnswer(null);
+
+            if (questionResponse.data.recordedAnswer) {
+                setSelectedAnswer(questionResponse.data.recordedAnswer.answer);
+                processAnswerResponse(questionResponse.data.recordedAnswer.isCorrect, false);
+            }
+
         } catch (error) {
             console.error("Error fetching question: ", error)
         }
         setImagesLoaded(false);
+    };
+
+    const handleEndGame = async (shouldRecord = true) => {
+        try {
+            const resultGameData = await strategy.statisticsUpdater.endGame(shouldRecord);
+            setEndGameData(resultGameData);
+
+            setTimeout(() => {
+                setGameEnded(true);
+            }, 2000);
+        } catch (error) {
+            console.error("Error ending game:", error.message);
+        }
+
+        // setTimeout(() => {
+        //     strategy.statisticsUpdater.newGame();
+        //     resetGame();
+        //     setIsTimeUp(false);
+        // }, 2000);
     };
 
     useEffect(() => {
@@ -81,7 +112,6 @@ export const Question = () => {
 
             Promise.all(imagePromises).then(() => {
                 setImagesLoaded(true);
-                setSelectedAnswer(null);
                 startTimer(); // <-- Start context timer
             });
         }
@@ -96,24 +126,7 @@ export const Question = () => {
                 totalTimeLeft: timeLeft,
             });
             if (strategy.timerMode === 'perGame' || !continueGame) {
-                setGameEnded(true);
                 setIsTimeUp(true);
-
-
-                const handleEndGame = async () => {
-                    try {
-                        await strategy.statisticsUpdater.endGame();
-                    } catch (error) {
-                        console.error("Error ending game:", error.message);
-                    }
-
-                    setTimeout(() => {
-                        strategy.statisticsUpdater.newGame();
-                        resetGame();
-                        setIsTimeUp(false);
-                    }, 2000);
-                };
-
                 handleEndGame();
             } else {
 
@@ -148,61 +161,57 @@ export const Question = () => {
             });
 
             const isCorrectAnswer = response.data.correct === true;
-            const score = strategy.calculateScore({
-                isCorrect: isCorrectAnswer,
-                timeLeft,
-                AIAttempts,
-                streak,
-                round,
-            });
-
-            setScore(score);
-            setCurrentScore(prev => prev + score);
-            setStreak(prev => isCorrectAnswer ? prev + 1 : 0);
-
-            if (isCorrectAnswer) {
-                strategy.statisticsUpdater.recordCorrectAnswer(score);
-                setIsCorrect(true);
-            } else {
-                strategy.statisticsUpdater.recordIncorrectAnswer();
-                setIsIncorrect(true);
-            }
-
-            const continueGame = strategy.shouldContinue({
-                isCorrect: isCorrectAnswer,
-                round,
-                totalTimeLeft: timeLeft,
-            });
-
-            setAIAttempts(0); // Reset AI attempts for next question
-
-            if (!continueGame || isGameEnded()) {
-                setGameEnded(true);
-                try {
-                    await strategy.statisticsUpdater.endGame();
-                } catch (error) {
-                    console.error("Error ending game:", error.message);
-                }
-
-                setTimeout(() => {
-                    strategy.statisticsUpdater.newGame();
-                    resetGame();
-                }, 2000);
-            } else {
-                setTimeout(() => {
-                    setIsCorrect(false);
-                    setIsIncorrect(false);
-                    requestQuestion(false);
-                    nextRound();
-                    if (strategy.timerMode === 'perQuestion') {
-                        resetTimer();
-                    }
-                }, 2000);
-            }
+            processAnswerResponse(isCorrectAnswer);
         } catch (error) {
             console.error("Error checking answer:", error);
         }
     };
+
+    const processAnswerResponse = (isCorrectAnswer, shouldRecord = true) => {
+        const score = strategy.calculateScore({
+            isCorrect: isCorrectAnswer,
+            timeLeft,
+            AIAttempts,
+            streak,
+            round,
+        });
+
+        setScore(score);
+        setCurrentScore(prev => prev + score);
+        setStreak(prev => isCorrectAnswer ? prev + 1 : 0);
+
+        if (isCorrectAnswer) {
+            strategy.statisticsUpdater.recordCorrectAnswer(score);
+            setIsCorrect(true);
+        } else {
+            strategy.statisticsUpdater.recordIncorrectAnswer();
+            setIsIncorrect(true);
+        }
+
+        const continueGame = strategy.shouldContinue({
+            isCorrect: isCorrectAnswer,
+            round,
+            totalTimeLeft: timeLeft,
+        });
+
+        setAIAttempts(0); // Reset AI attempts for next question
+
+        if (!continueGame || isGameEnded()) {
+            handleEndGame(shouldRecord);
+        } else {
+            setTimeout(() => {
+                setIsCorrect(false);
+                setIsIncorrect(false);
+                requestQuestion(false);
+                nextRound();
+                if (strategy.timerMode === 'perQuestion') {
+                    resetTimer();
+                }
+            }, 2000);
+        }
+    }
+
+
 
     const resetGame = () => {
         resetRounds();             // From useGame context
@@ -235,6 +244,10 @@ export const Question = () => {
             question: updatedQuestionText,
         }));
     }, [i18n.language, question.id]);
+
+    if (gameEnded && endGameData) {
+        return <Navigate to="/game/end-game" state={{ data: endGameData }} />
+    }
 
     return (
         <ThemeProvider theme={theme}>
@@ -371,17 +384,30 @@ export const Question = () => {
                                         variant={selectedAnswer === image ? "contained" : "outlined"}
                                         color="primary"
                                         onClick={() => handleAnswerSelect(image)}
+                                        disabled={!!selectedAnswer}
                                         sx={{
                                             py: 1.5,
                                             textTransform: "none",
                                             justifyContent: "center",
-                                            backgroundColor: selectedAnswer === image && isCorrect ? "success.main" :
-                                                selectedAnswer === image && isIncorrect ? "error.main" :
-                                                    undefined,
+                                            backgroundColor:
+                                                selectedAnswer === image && isCorrect ? "success.main" :
+                                                    selectedAnswer === image && isIncorrect ? "error.main" :
+                                                        selectedAnswer === image ? "primary.main" :
+                                                            "transparent",
                                             '&:hover': {
-                                                backgroundColor: selectedAnswer === image && isCorrect ? "success.dark" :
-                                                    selectedAnswer === image && isIncorrect ? "error.dark" :
-                                                        undefined
+                                                backgroundColor:
+                                                    selectedAnswer === image && isCorrect ? "success.dark" :
+                                                        selectedAnswer === image && isIncorrect ? "error.dark" :
+                                                            selectedAnswer === image ? "primary.dark" :
+                                                                "transparent"
+                                            },
+                                            '&.Mui-disabled': {
+                                                backgroundColor:
+                                                    selectedAnswer === image && isCorrect ? "success.main" :
+                                                        selectedAnswer === image && isIncorrect ? "error.main" :
+                                                            selectedAnswer === image ? "primary.main" :
+                                                                "transparent",
+                                                opacity: 1
                                             }
                                         }}
                                     >

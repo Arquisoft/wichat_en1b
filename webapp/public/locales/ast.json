@@ -176,7 +176,11 @@
             "isA": "ye un",
             "belongsTo": "pertenece a"
         },
-        "timeUp": "¡Se acabó el tiempu!"
+        "timeUp": "¡Se acabó el tiempu!",
+        "endScreen": {
+            "title": "Fin del xuegu",
+            "reportTitle": "Informe de xuegu"
+        }
     },
     "gameModes": {
         "selectGameMode": "Selecciona un modo de xuegu",

@@ -4,7 +4,7 @@ import { retrieveUserToken } from "../../utils/utils";
 
 class StatisticsUpdater {
 
-    constructor(type) {    
+    constructor(type) {
         this.apiUrl = process.env.REACT_APP_API_ENDPOINT || 'http://localhost:8000';
         this.type = type || 'classical';
         this.statsData = {
@@ -43,32 +43,34 @@ class StatisticsUpdater {
     getCurrentScore() {
         return this.statsData.score;
     }
-    
-    async endGame() {
+
+    async endGame(shouldRecord = true) {
         this.statsData.endDate = Date.now();
-        try {
-            const token = retrieveUserToken();
-            
-            // Make a POST request to the gateway with the authorization token
-            console.log("Recording game with data:", this.statsData);
-            const response = await axios.post(
-                `${this.apiUrl}/recordGame`, 
-                this.statsData,
-                {
-                    headers: {
-                        'Authorization': `Bearer ${token}`
+        if (shouldRecord) {
+            try {
+                const token = retrieveUserToken();
+
+                // Make a POST request to the gateway with the authorization token
+                console.log("Recording game with data:", this.statsData);
+                const response = await axios.post(
+                    `${this.apiUrl}/recordGame`,
+                    this.statsData,
+                    {
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
                     }
+                );
+                console.log("Game recorded successfully:", response.data);
+            } catch (error) {
+                console.error("Error updating statistics:", error);
+                if (error.response?.status === 401 || error.response?.status === 403) {
+                    throw new Error("statistics.errors.sessionExpired");
                 }
-            );
-            console.log("Game recorded successfully:", response.data);
-            return response.data;
-        } catch (error) {
-            console.error("Error updating statistics:", error);
-            if (error.response?.status === 401 || error.response?.status === 403) {
-                throw new Error("statistics.errors.sessionExpired");
+                throw new Error(error.response?.data?.error || "statistics.errors.failedToUpdate");
             }
-            throw new Error(error.response?.data?.error || "statistics.errors.failedToUpdate");
         }
+        return this.statsData;
     }
 }
 
