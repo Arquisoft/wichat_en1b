@@ -376,7 +376,14 @@ export const Question = () => {
                                             py: 1.5,
                                             textTransform: "none",
                                             justifyContent: "center",
-                                            backgroundColor: selectedAnswer === image && isCorrect ? "green" : selectedAnswer === image && isIncorrect ? "red" : undefined,
+                                            backgroundColor: selectedAnswer === image && isCorrect ? "success.main" :
+                                                selectedAnswer === image && isIncorrect ? "error.main" :
+                                                    undefined,
+                                            '&:hover': {
+                                                backgroundColor: selectedAnswer === image && isCorrect ? "success.dark" :
+                                                    selectedAnswer === image && isIncorrect ? "error.dark" :
+                                                        undefined
+                                            }
                                         }}
                                     >
                                         <Box
