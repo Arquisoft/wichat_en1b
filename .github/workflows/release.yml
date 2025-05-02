@@ -87,7 +87,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
           registry: ghcr.io
           workdir: users/authservice
-          platforms: linux/amd64,linux/arm64q
+          platforms: linux/amd64,linux/arm64
           
   docker-push-userservice:
     name: Push user service Docker Image to GitHub Packages
