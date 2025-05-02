@@ -13,19 +13,22 @@ class EmpathyController {
     }
 
     async _sendRequest(messages) {
-        console.log(messages);
-        const response = await axios.post('https://empathyai.prod.empathy.co/v1/chat/completions', {
-            model: "mistralai/Mistral-7B-Instruct-v0.3",
-            messages: messages
-        },
-            {
-                headers: {
-                    'Authorization': `Bearer ${this.apiKey}`,
-                    'Content-Type': 'application/json'
+        try {
+            const response = await axios.post('https://empathyai.prod.empathy.co/v1/chat/completions', {
+                model: "mistralai/Mistral-7B-Instruct-v0.3",
+                messages: messages
+            },
+                {
+                    headers: {
+                        'Authorization': `Bearer ${this.apiKey}`,
+                        'Content-Type': 'application/json'
+                    }
                 }
-            }
-        );
-        return response.data.choices[0]?.message?.content;
+            );
+            return response.data.choices[0]?.message?.content;
+        } catch (error) {
+            console.error(`Empathy API error: ${error.message}`);
+        }
     }
 
     async sendQuestionToLLM(gameQuestion, userQuestion) {
