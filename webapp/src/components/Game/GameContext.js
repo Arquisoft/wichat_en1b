@@ -19,6 +19,7 @@ export const GameProvider = ({ children, selectedModeId }) => {
     const [maxAIAttempts, setMaxAIAttempts] = useState(0);
     const [statisticsUpdater, setStatisticsUpdater] = useState(new StatisticsUpdater(gameMode));
     const lastAnswerRef = useRef(true); // used in suddenDeath if needed
+    const [clearMessages, setClearMessages] = useState(false);
 
     const [customSettings, setCustomSettings] = useState(() => {
         const savedSettings = localStorage.getItem('customSettings');
@@ -123,8 +124,9 @@ export const GameProvider = ({ children, selectedModeId }) => {
             initialTime,
             gameMode,
             setGameMode,
-            statisticsUpdater,
             strategy,
+            clearMessages,
+            setClearMessages,
         }}>
             {children}
         </GameContext.Provider>

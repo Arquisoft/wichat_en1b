@@ -17,7 +17,7 @@ export function Chat() {
     const messagesEndRef = useRef(null)
     const [isDisabled, setIsDisabled] = useState(false)
 
-    const { question, gameEnded, setGameEnded, AIAttempts, setAIAttempts, maxAIAttempts } = useGame();
+    const { question, gameEnded, AIAttempts, setAIAttempts, maxAIAttempts, clearMessages, setClearMessages } = useGame();
     const { t } = useTranslation();
 
     // Adjust in function of the height of the navbar
@@ -39,6 +39,13 @@ export function Chat() {
             setAIAttempts(0);
         }
     }, [gameEnded]);
+
+    useEffect(() => {
+        if (clearMessages) {
+            setMessages([]);
+            setClearMessages(false);
+        }
+    }, [clearMessages]);
 
     const toggleSidebar = () => {
         setIsOpen(!isOpen)
