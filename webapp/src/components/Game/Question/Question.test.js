@@ -45,9 +45,18 @@ describe('Question Component', () => {
 
     // Mock StatisticsUpdater instance with jest functions
     const mockStatisticsUpdater = {
+        newGame: jest.fn().mockResolvedValue({}),
+        endGame: jest.fn().mockResolvedValue({}),
+        shouldContinue: jest.fn(),
         incrementGamesPlayed: jest.fn().mockResolvedValue({}),
         recordCorrectAnswer: jest.fn().mockResolvedValue({}),
         recordIncorrectAnswer: jest.fn().mockResolvedValue({})
+    };
+
+    const strategy = {
+        calculateScore: jest.fn(),
+        shouldContinue: jest.fn(),
+        statisticsUpdater: mockStatisticsUpdater
     };
     
     const mockGameContext = {
@@ -61,9 +70,7 @@ describe('Question Component', () => {
         setAIAttempts: jest.fn(),
         maxAIAttempts: 3,
         setMaxAIAttempts: jest.fn(),
-        strategy: {
-            statisticsUpdater: mockStatisticsUpdater
-        },
+        strategy,
         timeLeft,
         startTimer: jest.fn(() => {
             const interval = setInterval(() => {
@@ -134,7 +141,6 @@ describe('Question Component', () => {
         });
     });
 
-    /*
     test('handles correct answer selection', async () => {
         axios.post.mockResolvedValueOnce({ data: { correct: true } });
 
@@ -188,23 +194,23 @@ describe('Question Component', () => {
     });
 
     test('handles time running out', async () => {
+        const mockHandleTimeUp = jest.fn();
+        useGame.mockReturnValue({
+            ...mockGameContext,
+            handleTimeUp: mockHandleTimeUp,
+            timeLeft: 0
+        });
+
         render(<Question statisticsUpdater={mockStatisticsUpdater} />);
 
         await waitFor(() => {
             expect(screen.queryByText('Loading images...')).not.toBeInTheDocument();
         });
+        
 
-        act(() => {
-            jest.advanceTimersByTime(60000);
-        });
+        expect(screen.getByText("Time's up!")).toBeInTheDocument();
 
-        expect(screen.getByText('You ran out of time!')).toBeInTheDocument();
-
-        act(() => {
-            jest.advanceTimersByTime(2000);
-        });
-
-        expect(axios.get).toHaveBeenCalledTimes(2);
+        expect(axios.get).toHaveBeenCalledTimes(1);
     });
 
     test('updates statistics when logged in user answers correctly', async () => {
@@ -252,20 +258,20 @@ describe('Question Component', () => {
     });
 
     test('shows timer in red when time is running low', async () => {
+        useGame.mockReturnValue({
+            ...mockGameContext,
+            timeLeft: 5
+        });
+
         render(<Question statisticsUpdater={mockStatisticsUpdater} />);
 
         await waitFor(() => {
             expect(screen.queryByText('Loading images...')).not.toBeInTheDocument();
         });
 
-        act(() => {
-            jest.advanceTimersByTime(50000);
-        });
-
         const circularProgress = document.querySelector('.MuiCircularProgress-colorError');
         expect(circularProgress).toBeInTheDocument();
     });
-    */
 
     test('handles error when fetching question', async () => {
         axios.get.mockRejectedValueOnce(new Error('Network error'));
