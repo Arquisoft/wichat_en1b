@@ -45,6 +45,10 @@ const dynamicSendToLLM = async (gameQuestion, userQuestion) => {
         timeoutPromise
       ]);
 
+      if (!response) {
+        throw new Error('No response from llm controller');
+      }
+
       return response; // If successful, return the response
     } catch (error) {
       console.error(`Error with controller ${currentControllerIndex}:`, error);
