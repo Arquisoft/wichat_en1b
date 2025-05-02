@@ -4,8 +4,9 @@ import AdditionalInsights from "./AdditionalInsights";
 import { Grid, Typography } from "@mui/material";
 import { useTranslation } from "react-i18next";
 
-export const Insights = ({statistics, registrationDate, title}) => {
+export const Insights = ({statistics, registrationDate, title, type}) => {
 
+    console.log("Insights: statistics", statistics);
     const getSuccessRate = () => {
         if (!statistics) return 0;
         const total = statistics.correctAnswers + statistics.incorrectAnswers;
@@ -58,6 +59,8 @@ export const Insights = ({statistics, registrationDate, title}) => {
                 avgQuestionsPerGame={getAverageQuestionsPerGame()}
                 successRate={getSuccessRate()}
                 maxScore={statistics.maxScore || 0}
+                type={type}
+                maxStreak={statistics.maxCorrectAnswers || 0}
             />
         </>
     )
