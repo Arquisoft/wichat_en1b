@@ -351,6 +351,7 @@ app.get('/statistics/:username', async (req, res) => {
       incorrectAnswers: targetUser.games.reduce((acc, game) => acc + game.incorrectAnswers, 0),
       maxScore: Math.max(...targetUser.games.map(game => game.score)) || 0,
       gamesPlayed: targetUser.games.length,
+      maxCorrectAnswers: Math.max(...targetUser.games.map(game => game.correctAnswers)) || 0,
     },
     classicalStatistics: {
       questionsAnswered: targetUser.games.filter(game => game.gameType === 'classical').reduce((acc, game) => acc + game.questionsAnswered, 0),
@@ -358,6 +359,7 @@ app.get('/statistics/:username', async (req, res) => {
       incorrectAnswers: targetUser.games.filter(game => game.gameType === 'classical').reduce((acc, game) => acc + game.incorrectAnswers, 0),
       maxScore: Math.max(...targetUser.games.filter(game => game.gameType === 'classical').map(game => game.score)) || 0,
       gamesPlayed: targetUser.games.filter(game => game.gameType === 'classical').length,
+      maxCorrectAnswers: Math.max(...targetUser.games.filter(game => game.gameType === 'classical').map(game => game.correctAnswers)) || 0,
     },
     suddenDeathStatistics: {
       questionsAnswered: targetUser.games.filter(game => game.gameType === 'suddenDeath').reduce((acc, game) => acc + game.questionsAnswered, 0),
@@ -365,6 +367,7 @@ app.get('/statistics/:username', async (req, res) => {
       incorrectAnswers: targetUser.games.filter(game => game.gameType === 'suddenDeath').reduce((acc, game) => acc + game.incorrectAnswers, 0),
       maxScore: Math.max(...targetUser.games.filter(game => game.gameType === 'suddenDeath').map(game => game.score)) || 0,
       gamesPlayed: targetUser.games.filter(game => game.gameType === 'suddenDeath').length,
+      maxCorrectAnswers: Math.max(...targetUser.games.filter(game => game.gameType === 'suddenDeath').map(game => game.correctAnswers)) || 0,
     },
     timeTrialStatistics: {
       questionsAnswered: targetUser.games.filter(game => game.gameType === 'timeTrial').reduce((acc, game) => acc + game.questionsAnswered, 0),
@@ -372,6 +375,7 @@ app.get('/statistics/:username', async (req, res) => {
       incorrectAnswers: targetUser.games.filter(game => game.gameType === 'timeTrial').reduce((acc, game) => acc + game.incorrectAnswers, 0),
       maxScore: Math.max(...targetUser.games.filter(game => game.gameType === 'timeTrial').map(game => game.score)) || 0,
       gamesPlayed: targetUser.games.filter(game => game.gameType === 'timeTrial').length,
+      maxCorrectAnswers: Math.max(...targetUser.games.filter(game => game.gameType === 'timeTrial').map(game => game.correctAnswers)) || 0,
     },
     customStatistics: {
       questionsAnswered: targetUser.games.filter(game => game.gameType === 'custom').reduce((acc, game) => acc + game.questionsAnswered, 0),
@@ -379,6 +383,7 @@ app.get('/statistics/:username', async (req, res) => {
       incorrectAnswers: targetUser.games.filter(game => game.gameType === 'custom').reduce((acc, game) => acc + game.incorrectAnswers, 0),
       maxScore: Math.max(...targetUser.games.filter(game => game.gameType === 'custom').map(game => game.score)) || 0,
       gamesPlayed: targetUser.games.filter(game => game.gameType === 'custom').length,
+      maxCorrectAnswers: Math.max(...targetUser.games.filter(game => game.gameType === 'custom').map(game => game.correctAnswers)) || 0,
     },
     qodStatistics: {
       questionsAnswered: targetUser.games.filter(game => game.gameType === 'qod').reduce((acc, game) => acc + game.questionsAnswered, 0),
@@ -386,6 +391,8 @@ app.get('/statistics/:username', async (req, res) => {
       incorrectAnswers: targetUser.games.filter(game => game.gameType === 'qod').reduce((acc, game) => acc + game.incorrectAnswers, 0),
       maxScore: Math.max(...targetUser.games.filter(game => game.gameType === 'qod').map(game => game.score)) || 0,
       gamesPlayed: targetUser.games.filter(game => game.gameType === 'qod').length,
+      maxCorrectAnswers: Math.max(...targetUser.games.filter(game => game.gameType === 'qod').map(game => game.correctAnswers)) || 0,
+
     }
   }
 
