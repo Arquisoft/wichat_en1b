@@ -119,7 +119,7 @@ export const Statistics = () => {
           {t(getTabTitle())}
         </Typography>
 
-        {error && <ErrorMessage message={error} />}
+        {error && <ErrorMessage message={t(error)} />}
 
         {loading ? (
           <LoadingSpinner />
