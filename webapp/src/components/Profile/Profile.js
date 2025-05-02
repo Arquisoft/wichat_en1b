@@ -211,22 +211,22 @@ export const Profile = () => {
                             </Box>
                             <Box sx={{ mt: 2 }}>
                                 {statistics.selectedTab === 0 && (
-                                    <Insights statistics={statistics.globalStatistics} registrationDate={registrationDate} title={t("profile.statisticTypes.insights.global")} />
+                                    <Insights statistics={statistics.globalStatistics} registrationDate={registrationDate} title={t("profile.statisticTypes.insights.global")} type={"global"} />
                                 )}
                                 {statistics.selectedTab === 1 && (
-                                    <Insights statistics={statistics.classicalStatistics} registrationDate={registrationDate} title={t("profile.statisticTypes.insights.classical")} />
+                                    <Insights statistics={statistics.classicalStatistics} registrationDate={registrationDate} title={t("profile.statisticTypes.insights.classical")} type={"classical"}/>
                                 )}
                                 {statistics.selectedTab === 2 && (
-                                    <Insights statistics={statistics.suddenDeathStatistics} registrationDate={registrationDate} title={t("profile.statisticTypes.insights.suddenDeath")} />
+                                    <Insights statistics={statistics.suddenDeathStatistics} registrationDate={registrationDate} title={t("profile.statisticTypes.insights.suddenDeath")} type={"suddenDeath"}/>
                                 )}
                                 {statistics.selectedTab === 3 && (
-                                    <Insights statistics={statistics.timeTrialStatistics} registrationDate={registrationDate} title={t("profile.statisticTypes.insights.timeTrial")} />
+                                    <Insights statistics={statistics.timeTrialStatistics} registrationDate={registrationDate} title={t("profile.statisticTypes.insights.timeTrial")} type={"timeTrial"} />
                                 )}
                                 {statistics.selectedTab === 4 && (
-                                    <Insights statistics={statistics.customStatistics} registrationDate={registrationDate} title={t("profile.statisticTypes.insights.custom")} />
+                                    <Insights statistics={statistics.customStatistics} registrationDate={registrationDate} title={t("profile.statisticTypes.insights.custom")} type={"custom"}/>
                                 )}
                                 {statistics.selectedTab === 5 && (
-                                    <Insights statistics={statistics.qodStatistics} registrationDate={registrationDate} title={t("profile.statisticTypes.insights.QOD")} />
+                                    <Insights statistics={statistics.qodStatistics} registrationDate={registrationDate} title={t("profile.statisticTypes.insights.QOD")} type={"qod"}/>
                                 )}
                             </Box>
                         </Paper>

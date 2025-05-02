@@ -84,16 +84,36 @@ export const Navbar = () => {
     }
 
     const navLinks = isLoggedIn
-        ? [ { title: t("navBar.home"), path: "/home" },
-            { title: t("navBar.profile"), path: `/profile/${username}` },
-            { title: t("navBar.classicalGame"), path: "/game" },
-            { title: t("navBar.statistics"), path: "/statistics" },
-            { title: t("navBar.gameModes"), path: "/game-modes" },
-            { title: t("navBar.signOut"), action: handleSignOut }]
+        ? [{ title: t("navBar.home"), path: "/home" },
+        { title: t("navBar.profile"), path: `/profile/${username}` },
+        { title: t("navBar.classicalGame"), path: "/game" },
+        { title: t("navBar.statistics"), path: "/statistics" },
+        { title: t("navBar.gameModes"), path: "/game-modes" },
+        { title: t("navBar.signOut"), action: handleSignOut }]
         : [
             { title: t("navBar.logIn"), path: "/login" },
             { title: t("navBar.signUp"), path: "/signup" },
         ]
+
+    const languageSelector = (
+        <Select
+            value={i18n.resolvedLanguage}
+            onChange={handleLanguageChange}
+            sx={{
+                fontSize: "1rem",
+                color: "#1976d2",
+                "& .MuiSelect-select": {
+                    padding: "0.5rem 1rem",
+                },
+            }}
+        >
+            {Object.keys(langs).map(lang => (
+                <MenuItem key={lang} value={lang}>
+                    {langs[lang].nativeName}
+                </MenuItem>
+            ))}
+        </Select>
+    )
 
     const mobileDrawer = (
         <Box
@@ -107,8 +127,10 @@ export const Navbar = () => {
                 },
             }}
         >
+            {languageSelector}
             <List>
                 {navLinks.map((item) => (
+
                     <ListItem key={item.title} sx={{ p: 0 }}>
                         <Button
                             onClick={item.action || (() => handleNavigation(item.path))}
@@ -126,12 +148,12 @@ export const Navbar = () => {
                                     border: item.title !== t("navBar.signUp") ? "1px solid #1565c0" : "none",
                                 },
                             }}
-                            data-testid= {item.title === "Sign up"
-                            ? "signup-button"
-                            : item.title === "Log in"
-                            ? "login-button"
-                            : undefined
-                        }
+                            data-testid={item.title === "Sign up"
+                                ? "signup-button"
+                                : item.title === "Log in"
+                                    ? "login-button"
+                                    : undefined
+                            }
                         >
                             {item.title}
                         </Button>
@@ -194,23 +216,7 @@ export const Navbar = () => {
                         </>
                     ) : (
                         <Box sx={{ display: "flex", gap: 2, alignItems: "center" }}>
-                            <Select
-                                value={i18n.resolvedLanguage}
-                                onChange={handleLanguageChange}
-                                sx={{
-                                    fontSize: "1rem",
-                                    color: "#1976d2",
-                                    "& .MuiSelect-select": {
-                                        padding: "0.5rem 1rem",
-                                    },
-                                }}
-                            >
-                                { Object.keys(langs).map(lang => (
-                                    <MenuItem key={lang} value={lang}>
-                                        {langs[lang].nativeName}
-                                    </MenuItem>
-                                ))}
-                            </Select>
+                            {languageSelector}
                             {navLinks.map((item) => (
                                 <Button
                                     key={item.title}
@@ -231,8 +237,8 @@ export const Navbar = () => {
                                     data-testid={item.title === "Sign up"
                                         ? "signup-button"
                                         : item.title === "Log in"
-                                        ? "login-button"
-                                        : undefined
+                                            ? "login-button"
+                                            : undefined
                                     }
                                 >
                                     {item.title}

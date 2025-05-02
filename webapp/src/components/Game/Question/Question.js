@@ -22,9 +22,9 @@ const theme = createTheme({
 export const Question = () => {
 
     const { question, setQuestion, setGameEnded, gameEnded,
-        AIAttempts, setAIAttempts, setMaxAIAttempts,
-        statisticsUpdater, gameMode, round, nextRound, resetRounds, isGameEnded,
-        timeLeft, isRunning, startTimer, pauseTimer, resetTimer, strategy, initialTime } = useGame();
+        AIAttempts, setAIAttempts, setClearMessages,
+        gameMode, round, nextRound, resetRounds, isGameEnded,
+        timeLeft, startTimer, pauseTimer, resetTimer, strategy, initialTime } = useGame();
     //console.log("Question: strategy: ", strategy)
     //console.log("Question: questionType: ", questionType)
     const gatewayEndpoint = process.env.REACT_APP_API_ENDPOINT || 'http://localhost:8000';
@@ -121,6 +121,7 @@ export const Question = () => {
 
     useEffect(() => {
         if (timeLeft === 0) {
+            setClearMessages(true);
             strategy.statisticsUpdater.recordIncorrectAnswer();
             const continueGame = strategy.shouldContinue({
                 isCorrect: false,
@@ -206,6 +207,7 @@ export const Question = () => {
                 setIsCorrect(false);
                 setIsIncorrect(false);
                 requestQuestion(false);
+                setClearMessages(true);
                 nextRound();
                 if (strategy.timerMode === 'perQuestion') {
                     resetTimer();
