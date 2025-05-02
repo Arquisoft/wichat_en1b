@@ -1,18 +1,26 @@
 import React from 'react';
-import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { Question } from './Question';
 import axios from 'axios';
 import Cookies from 'js-cookie';
 import { useGame } from '../GameContext';
-import StatisticsUpdater from './StatisticsUpdater';
 
 jest.mock('axios');
 jest.mock('js-cookie');
 jest.mock('../GameContext', () => ({
     useGame: jest.fn()
 }));
-jest.mock('./StatisticsUpdater');
+jest.mock('../components/StatisticsUpdater');
+jest.mock('../../hooks/useTimer', () => jest.fn(() => ({
+    timeLeft: 60,
+    isRunning: false,
+    start: jest.fn(),
+    pause: jest.fn(),
+    reset: jest.fn(),
+    setInitialTime: jest.fn(),
+    initialTime: 60
+})));
 
 global.Image = function imageFunction() {
     setTimeout(() => {
@@ -33,6 +41,24 @@ describe('Question Component', () => {
         ]
     };
 
+    let timeLeft = 60;
+
+    // Mock StatisticsUpdater instance with jest functions
+    const mockStatisticsUpdater = {
+        newGame: jest.fn().mockResolvedValue({}),
+        endGame: jest.fn().mockResolvedValue({}),
+        shouldContinue: jest.fn(),
+        incrementGamesPlayed: jest.fn().mockResolvedValue({}),
+        recordCorrectAnswer: jest.fn().mockResolvedValue({}),
+        recordIncorrectAnswer: jest.fn().mockResolvedValue({})
+    };
+
+    const strategy = {
+        calculateScore: jest.fn(),
+        shouldContinue: jest.fn(),
+        statisticsUpdater: mockStatisticsUpdater
+    };
+    
     const mockGameContext = {
         question: mockQuestion,
         setQuestion: jest.fn(),
@@ -43,22 +69,31 @@ describe('Question Component', () => {
         AIAttempts: 0,
         setAIAttempts: jest.fn(),
         maxAIAttempts: 3,
-        setMaxAIAttempts: jest.fn()
+        setMaxAIAttempts: jest.fn(),
+        strategy,
+        timeLeft,
+        startTimer: jest.fn(() => {
+            const interval = setInterval(() => {
+                if (timeLeft > 0) {
+                    timeLeft -= 1;
+                } else {
+                    clearInterval(interval);
+                }
+            }, 1000);
+        }),
+        pauseTimer: jest.fn(() => {
+            jest.clearAllTimers();
+        }),
+        resetTimer: jest.fn(() => {
+            timeLeft = 60;
+        })
     };
 
     const mockUserCookie = JSON.stringify({ token: 'fake-jwt-token' });
 
-    // Mock StatisticsUpdater instance with jest functions
-    const mockStatisticsUpdater = {
-        incrementGamesPlayed: jest.fn().mockResolvedValue({}),
-        recordCorrectAnswer: jest.fn().mockResolvedValue({}),
-        recordIncorrectAnswer: jest.fn().mockResolvedValue({})
-    };
-
     beforeEach(() => {
         jest.clearAllMocks();
 
-        useGame.mockReturnValue(mockGameContext);
         Cookies.get.mockImplementation((name) => {
             if (name === 'user') return mockUserCookie;
             return null;
@@ -74,6 +109,8 @@ describe('Question Component', () => {
         mockStatisticsUpdater.incrementGamesPlayed.mockClear();
         mockStatisticsUpdater.recordCorrectAnswer.mockClear();
         mockStatisticsUpdater.recordIncorrectAnswer.mockClear();
+
+        useGame.mockReturnValue(mockGameContext);
     });
 
     afterEach(() => {
@@ -93,27 +130,15 @@ describe('Question Component', () => {
     test('fetches a question on initial render', async () => {
         render(<Question statisticsUpdater={mockStatisticsUpdater} />);
 
-        expect(axios.get).toHaveBeenCalledWith('http://test-gateway.com/question/random');
+        expect(axios.get).toHaveBeenCalledWith('http://test-gateway.com/question/random', {
+            headers: {
+                Authorization: 'Bearer fake-jwt-token'
+            }
+        });
 
         await waitFor(() => {
             expect(mockGameContext.setQuestion).toHaveBeenCalled();
         });
-    });
-
-    test('loads images and starts timer when question is set', async () => {
-        render(<Question statisticsUpdater={mockStatisticsUpdater} />);
-
-        await waitFor(() => {
-            expect(screen.queryByText('Loading images...')).not.toBeInTheDocument();
-        });
-
-        expect(screen.getByText('01:00')).toBeInTheDocument();
-
-        act(() => {
-            jest.advanceTimersByTime(5000);
-        });
-
-        expect(screen.getByText('00:55')).toBeInTheDocument();
     });
 
     test('handles correct answer selection', async () => {
@@ -129,15 +154,19 @@ describe('Question Component', () => {
         fireEvent.click(images[0].closest('button'));
 
         expect(axios.post).toHaveBeenCalledWith('http://test-gateway.com/answer', {
+            answer: 'https://example.com/cat.jpg',
             questionId: '123',
-            answer: 'https://example.com/cat.jpg'
+        }, {
+            headers: {
+                Authorization: 'Bearer fake-jwt-token'
+            }
         });
 
         await waitFor(() => {
-            expect(mockStatisticsUpdater.recordCorrectAnswer).toHaveBeenCalled();
+            expect(mockGameContext.strategy.statisticsUpdater.recordCorrectAnswer).toHaveBeenCalled();
         });
     });
-
+    
     test('handles incorrect answer selection', async () => {
         axios.post.mockResolvedValueOnce({ data: { correct: false } });
 
@@ -152,32 +181,36 @@ describe('Question Component', () => {
 
         expect(axios.post).toHaveBeenCalledWith('http://test-gateway.com/answer', {
             questionId: '123',
-            answer: 'https://example.com/dog.jpg'
+            answer: 'https://example.com/dog.jpg',
+        }, {
+            headers: {
+                Authorization: 'Bearer fake-jwt-token'
+            }
         });
 
         await waitFor(() => {
-            expect(mockStatisticsUpdater.recordIncorrectAnswer).toHaveBeenCalled();
+            expect(strategy.statisticsUpdater.recordIncorrectAnswer).toHaveBeenCalled();
         });
     });
 
     test('handles time running out', async () => {
+        const mockHandleTimeUp = jest.fn();
+        useGame.mockReturnValue({
+            ...mockGameContext,
+            handleTimeUp: mockHandleTimeUp,
+            timeLeft: 0
+        });
+
         render(<Question statisticsUpdater={mockStatisticsUpdater} />);
 
         await waitFor(() => {
             expect(screen.queryByText('Loading images...')).not.toBeInTheDocument();
         });
+        
 
-        act(() => {
-            jest.advanceTimersByTime(60000);
-        });
+        expect(screen.getByText("You ran out of time!")).toBeInTheDocument();
 
-        expect(screen.getByText('You ran out of time!')).toBeInTheDocument();
-
-        act(() => {
-            jest.advanceTimersByTime(2000);
-        });
-
-        expect(axios.get).toHaveBeenCalledTimes(2);
+        expect(axios.get).toHaveBeenCalledTimes(1);
     });
 
     test('updates statistics when logged in user answers correctly', async () => {
@@ -201,7 +234,7 @@ describe('Question Component', () => {
             expect(mockStatisticsUpdater.recordCorrectAnswer).toHaveBeenCalled();
         });
     });
-
+    
     test('updates statistics when logged in user answers incorrectly', async () => {
         axios.post.mockImplementation((url) => {
             if (url === 'http://test-gateway.com/answer') {
@@ -220,44 +253,21 @@ describe('Question Component', () => {
         fireEvent.click(images[1].closest('button'));
 
         await waitFor(() => {
-            expect(mockStatisticsUpdater.recordIncorrectAnswer).toHaveBeenCalled();
+            expect(strategy.statisticsUpdater.recordIncorrectAnswer).toHaveBeenCalled();
         });
-    });
-
-    test('increments games played on initial load', async () => {
-        render(<Question statisticsUpdater={mockStatisticsUpdater} />);
-
-        await waitFor(() => {
-            expect(mockStatisticsUpdater.incrementGamesPlayed).toHaveBeenCalledTimes(1);
-        });
-    });
-
-    test('handles request new question button click', async () => {
-        render(<Question statisticsUpdater={mockStatisticsUpdater} />);
-
-        await waitFor(() => {
-            expect(screen.queryByText('Loading images...')).not.toBeInTheDocument();
-        });
-
-        const requestButton = screen.getByText('Request new question');
-        fireEvent.click(requestButton);
-
-        expect(axios.get).toHaveBeenCalledTimes(2);
-        expect(mockGameContext.setGameEnded).toHaveBeenCalledWith(true);
     });
 
     test('shows timer in red when time is running low', async () => {
+        useGame.mockReturnValue({
+            ...mockGameContext,
+            timeLeft: 5
+        });
+
         render(<Question statisticsUpdater={mockStatisticsUpdater} />);
 
         await waitFor(() => {
             expect(screen.queryByText('Loading images...')).not.toBeInTheDocument();
         });
-
-        act(() => {
-            jest.advanceTimersByTime(50000);
-        });
-
-        expect(screen.getByText('00:10')).toBeInTheDocument();
 
         const circularProgress = document.querySelector('.MuiCircularProgress-colorError');
         expect(circularProgress).toBeInTheDocument();

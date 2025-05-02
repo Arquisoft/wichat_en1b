@@ -7,9 +7,13 @@ const GameModes = () => {
     const navigate = useNavigate();
     const { t } = useTranslation();
 
-    const QUESTION_TYPES_KEYS = ["gameModes.categories.random", "gameModes.categories.flags", "gameModes.categories.animals", "gameModes.categories.monuments", "gameModes.categories.foods"];
+    const QUESTION_TYPES_KEYS = [{key: "gameModes.categories.random", value:"random"}, 
+        {key: "gameModes.categories.flags", value:"flags"},
+        {key: "gameModes.categories.animals", value:"animals"}, 
+        {key: "gameModes.categories.monuments", value:"monuments"},
+        {key: "gameModes.categories.foods", value:"foods"}];
 
-    const [topic, setTopic] = useState(localStorage.getItem('topic') || QUESTION_TYPES_KEYS[0]);
+    const [topic, setTopic] = useState(localStorage.getItem('topic') || QUESTION_TYPES_KEYS[0].value);
     const [customSettings, setCustomSettings] = useState(localStorage.getItem('customSettings') ? JSON.parse(localStorage.getItem('customSettings')) : {
         rounds: 5,
         timePerQuestion: 30,
@@ -52,8 +56,10 @@ const GameModes = () => {
 
     useEffect(() => {
         // Actualiza el topic si el valor actual no coincide con las claves disponibles
-        if (!QUESTION_TYPES_KEYS.includes(topic)) {
-            setTopic(QUESTION_TYPES_KEYS[0]);
+        if (!QUESTION_TYPES_KEYS.map(o => o.value).includes(topic)) {
+            const defaultTopic = QUESTION_TYPES_KEYS[0].value;
+            setTopic(defaultTopic);
+            localStorage.setItem('topic', defaultTopic);
         }
     }, [t]);
 
@@ -65,9 +71,9 @@ const GameModes = () => {
             <Box sx={{ marginBottom: 2 }}>
                 <Typography variant="subtitle1">{t("gameModes.categories.title")}</Typography>
                 <Select value={topic} onChange={handleCategoryChange} fullWidth>
-                    {QUESTION_TYPES_KEYS.map((key) => (
-                        <MenuItem key={key} value={key}>
-                            {capitalizaFirstLetter(t(key))}
+                    {QUESTION_TYPES_KEYS.map((typeQuest) => (
+                        <MenuItem key={typeQuest.key} value={typeQuest.value}>
+                            {capitalizaFirstLetter(t(typeQuest.key))}
                         </MenuItem>
                     ))}
                 </Select>
@@ -148,6 +154,7 @@ const GameModes = () => {
                             color="primary"
                             onClick={() => handleGameModeClick(mode.route)}
                             sx={{ marginTop: 'auto' }}
+                            data-testid={`start-game-${mode.route}`}
                         >
                             {t("gameModes.startGame")}
                         </Button>

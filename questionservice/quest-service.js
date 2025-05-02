@@ -71,11 +71,12 @@ app.post("/answer", [
             const { questionId, answer } = req.body;
             const recordedAnswer = await answerRepository.findAnswer(questionId, username);
             if (recordedAnswer) {
-                return res.json({ correct: recordedAnswer.isCorrect })
+                return res.json({ correct: recordedAnswer.isCorrect, correctOption: recordedAnswer.correctOption })
             }
-            const isCorrect = await wikidataController.isQuestionCorrect(questionId, answer)
-            await answerRepository.createAnswer(questionId, username, answer, isCorrect)
-            res.json({ correct: isCorrect })
+            const correctOption = await wikidataController.getCorrectOption(questionId, answer);
+            const isCorrect = answer === correctOption;
+            await answerRepository.createAnswer(questionId, username, answer, isCorrect, correctOption)
+            res.json({ correct: isCorrect, correctOption: correctOption })
         } catch (error) {
             console.error(error)
             res.status(500).json({ error: "Failed to validate answer" })
@@ -87,7 +88,7 @@ app.get("/question-of-the-day", async (req, res) => {
     try {
         const username = req.headers['username'];
         const question = await wikidataController.getQuestionOfTheDay();
-        const recordedAnswer = await answerRepository.findAnswer(question._id, username);
+        const recordedAnswer = await answerRepository.findAnswer(question.id, username);
         delete question.correctOption;
         const questionOfTheDay = {
             ...question,

@@ -75,8 +75,8 @@
             "invalidImage": "El archivo subido no es una imagen."
         },
         "errorStates": {
-                "retry": "Reintentar",
-                "goBackToMenu": "Volver al menú"
+            "retry": "Reintentar",
+            "goBackToMenu": "Volver al menú"
         },
         "settings": {
             "updateProfile": "Actualizar tu perfil",
@@ -148,6 +148,7 @@
         "correctAnswer": "¡Correcto! +{{score}} puntos",
         "incorrectAnswer": "Incorrecto",
         "question": "¿Cuál de las siguientes {{imageType}} {{relation}} {{topic}}?",
+        "timeUp": "¡Se te acabó el tiempo!",
         "chat": {
             "thinking": "Pensando...",
             "you": "Tú",
@@ -175,6 +176,14 @@
             "correspondsToThe": "corresponde al/la",
             "isA": "es un(a)",
             "belongsTo": "pertenece a"
+        },
+        "endScreen": {
+            "title": "Juego terminado",
+            "reportTitle": "Informe del juego",
+            "totalScore": "💯 Puntuación total: {{score}}",
+            "rounds": "🔢 Rondas: {{count}}",
+            "correct": "✅ Correctas: {{count}}",
+            "incorrect": "❌ Incorrectas: {{count}}"
         }
     },
     "gameModes": {

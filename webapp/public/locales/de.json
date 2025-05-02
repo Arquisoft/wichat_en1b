@@ -148,6 +148,7 @@
         "correctAnswer": "Richtig! +{{score}} Punkte",
         "incorrectAnswer": "Falsch",
         "question": "Welches der folgenden {{imageType}} {{relation}} {{topic}}?",
+        "timeUp": "Die Zeit ist abgelaufen!",
         "chat": {
             "thinking": "Denke nach...",
             "you": "Du",
@@ -175,6 +176,14 @@
             "correspondsToThe": "entspricht dem",
             "isA": "ist ein",
             "belongsTo": "gehört zu"
+        },
+        "endScreen": {
+            "title": "Spiel beendet",
+            "reportTitle": "Spielbericht",
+            "totalScore": "💯 Gesamtpunktzahl: {{score}}",
+            "rounds": "🔢 Runden: {{count}}",
+            "correct": "✅ Richtig: {{count}}",
+            "incorrect": "❌ Falsch: {{count}}"
         }
     },
     "gameModes": {

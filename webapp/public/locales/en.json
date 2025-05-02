@@ -55,7 +55,7 @@
             "correctAnswerRate": "Correct Answer Rate",
             "maxScore": "Max Score",
             "maxScorePoints_one": "{{count}} point",
-            "maxScorePoints_other": "{{count}} points" 
+            "maxScorePoints_other": "{{count}} points"
         },
         "answerDistribution": {
             "answerDistribution": "Answer Distribution",
@@ -148,6 +148,7 @@
         "correctAnswer": "Correct! +{{score}} points",
         "incorrectAnswer": "Incorrect",
         "question": "Which of the following {{imageType}} {{relation}} {{topic}}?",
+        "timeUp": "You ran out of time!",
         "chat": {
             "thinking": "Thinking...",
             "you": "You",
@@ -175,6 +176,14 @@
             "correspondsToThe": "corresponds to the",
             "isA": "is a",
             "belongsTo": "belongs to"
+        },
+        "endScreen": {
+            "title": "Game Ended",
+            "reportTitle": "Game Report",
+            "totalScore": "💯 Total Score: {{score}}",
+            "rounds": "🔢 Rounds: {{count}}",
+            "correct": "✅ Correct: {{count}}",
+            "incorrect": "❌ Incorrect: {{count}}"
         }
     },
     "gameModes": {

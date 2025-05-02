@@ -1,11 +1,13 @@
-import { useState, useEffect } from "react"
-import { Typography, Box, Grid, Button, Container, Paper, CircularProgress } from "@mui/material"
-import { createTheme, ThemeProvider } from "@mui/material/styles"
-import AccessTimeIcon from "@mui/icons-material/AccessTime"
+import { useState, useEffect } from "react";
+import { Typography, Box, Grid, Button, Container, Paper, CircularProgress } from "@mui/material";
+import { createTheme, ThemeProvider } from "@mui/material/styles";
+import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import axios from 'axios';
 import { useGame } from "../GameContext";
-import StatisticsUpdater from "./StatisticsUpdater";
-import { useTranslation } from "react-i18next"
+import Cookies from "js-cookie";
+import { t, useTranslation } from "react-i18next";
+import { retrieveUserToken } from "../../utils/utils";
+import { Navigate } from "react-router-dom";
 
 // Create a theme with the blue color from the login screen
 const theme = createTheme({
@@ -14,227 +16,225 @@ const theme = createTheme({
             main: "#1976d2",
         },
     },
-})
+});
 
-// Create a default statistics updater instance
-const defaultStatisticsUpdater = new StatisticsUpdater('classical');
 
-export const Question = ({ statisticsUpdater = defaultStatisticsUpdater, type = 'random' }) => {
-    let maxRounds = 10;
-    const basePoints = 1000; // Base points for a correct answer
-    let totalTime = 60;
+export const Question = () => {
 
-    const [selectedAnswer, setSelectedAnswer] = useState(null)
-    const [timeLeft, setTimeLeft] = useState(totalTime)
+    const { question, setQuestion, setGameEnded, gameEnded,
+        AIAttempts, setAIAttempts, setMaxAIAttempts,
+        statisticsUpdater, gameMode, round, nextRound, resetRounds, isGameEnded,
+        timeLeft, isRunning, startTimer, pauseTimer, resetTimer, strategy, initialTime } = useGame();
+    //console.log("Question: strategy: ", strategy)
+    //console.log("Question: questionType: ", questionType)
+    const gatewayEndpoint = process.env.REACT_APP_API_ENDPOINT || 'http://localhost:8000';
+
+    const [selectedAnswer, setSelectedAnswer] = useState(null);
+    const [correctOption, setCorrectOption] = useState(null);
+    const [totalTime, setTotalTime] = useState(initialTime); // Set initial time based on the strategy
+    //console.log("Question: totalTime", totalTime);
     const [isCorrect, setIsCorrect] = useState(false);
-    const [isTimeUp, setIsTimeUp] = useState(false);
     const [isIncorrect, setIsIncorrect] = useState(false);
+    const [isTimeUp, setIsTimeUp] = useState(false);
     const [imagesLoaded, setImagesLoaded] = useState(false);
-    const [isPaused, setIsPaused] = useState(false);
-    const [round, setRound] = useState(1); // Track the round number
-    const [isGameEnded, setIsGameEnded] = useState(false); // Track if the game has ended
     const [streak, setStreak] = useState(0); // Track the streak of correct answers
     const [score, setScore] = useState(0); // Track the score
     const [currentScore, setCurrentScore] = useState(0); // Track the current score
-    const { t, i18n } = useTranslation();
+    const { t, i18n } = useTranslation(); // Initialize i18next for translations
+    const [endGameData, setEndGameData] = useState(null);
 
-    const { question, setQuestion, setGameEnded, questionType, setQuestionType, AIAttempts, setAIAttempts, maxAIAttempts, setMaxAIAttempts } = useGame();
-    const gatewayEndpoint = process.env.REACT_APP_API_ENDPOINT || 'http://localhost:8000';
+    const questionType = localStorage.getItem("topic") || "random"; // Default to "random" if not set
 
-    const topic = (() => {
-        const storedTopic = localStorage.getItem("topic");
-        return storedTopic ? storedTopic.substring(storedTopic.lastIndexOf('.') + 1) : "random";
-    })();
-
-    setQuestionType(topic);
-
-    const [customSettings, setCustomSettings] = useState(localStorage.getItem('customSettings') ? JSON.parse(localStorage.getItem('customSettings')) : {
-        rounds: 5,
-        timePerQuestion: 30,
-        aiAttempts: 3,
-    });
 
     useEffect(() => {
+        resetTimer();
+        pauseTimer();
         const fetchInitialQuesiton = async () => {
-            await requestQuestion(true); // Pass true to indicate it's the initial load
+            await requestQuestion(true);
         }
         fetchInitialQuesiton();
-        if (topic === 'custom') {
-            maxRounds = customSettings.rounds;
-            totalTime = customSettings.timePerQuestion;
-            setMaxAIAttempts(customSettings.aiAttempts);
-        } else {
-            setMaxAIAttempts(3); // Reset AI attempts for non-custom modes
-        }
-    }, [questionType])
+    }, []); // Empty deps array since this should only run on mount
 
-    const progressPercentage = (timeLeft / totalTime) * 100
-
-    // Timer effect
-    useEffect(() => {
-        if (timeLeft <= 0 && !isTimeUp) {
-            setIsTimeUp(true);
-            setTimeout(() => {
-                requestQuestion(false).finally(() => {
-                    setIsTimeUp(false); // Reset isTimeUp after the question is fetched
-                });
-            }, 2000); // Show "time up" message for 2 seconds before restarting
-            return;
-        }
-
-        if (isPaused || isTimeUp) return; // Pause the timer if isPaused is true
-
-        const timerId = setInterval(() => {
-            setTimeLeft((prevTime) => prevTime - 1)
-        }, 1000)
-
-        // Cleanup timer on unmount
-        return () => clearInterval(timerId)
-    }, [timeLeft, isPaused])
+    const progressPercentage = (timeLeft / totalTime) * 100;
 
     const requestQuestion = async (isInitialLoad = false) => {
-        setIsPaused(true);
-        setGameEnded(true);
+        pauseTimer(); // Stop the timer before fetching a new question
         try {
-            const questionResponse = await axios.get(`${gatewayEndpoint}/question/${questionType}`);
-            const questionText = t("game.question", {
-                imageType: t(questionResponse.data.imageType),
-                relation: t(questionResponse.data.relation),
-                topic: questionResponse.data.topic,
+            const token = retrieveUserToken();
+            let endpoint = gameMode == "qod" ? `${gatewayEndpoint}/question-of-the-day` : `${gatewayEndpoint}/question/${questionType}`;
+            let questionResponse = await axios.get(endpoint, {
+                headers: { 'Authorization': `Bearer ${token}` }
             });
-
-            setQuestion({
-                question: questionText,
-                images: questionResponse.data.images,
-                id: questionResponse.data.id,
-                imageType: questionResponse.data.imageType,
-                relation: questionResponse.data.relation,
-                topic: questionResponse.data.topic,
-            });
-
-            // Update gamesPlayed only on the first load
             if (isInitialLoad) {
-                try {
-                    statisticsUpdater.newGame();
-                } catch (error) {
-                    console.error("Error incrementing games played:", error.message);
-                }
+                strategy.statisticsUpdater.newGame();
             }
+            setQuestion(questionResponse.data);
+            setSelectedAnswer(null);
+
+            if (questionResponse.data.recordedAnswer) {
+                setSelectedAnswer(questionResponse.data.recordedAnswer.answer);
+                setCorrectOption(questionResponse.data.recordedAnswer.correctOption);
+                processAnswerResponse(questionResponse.data.recordedAnswer.isCorrect, false);
+            }
+
         } catch (error) {
-            console.error("Error fetching question: ", error);
+            console.error("Error fetching question: ", error)
         }
         setImagesLoaded(false);
-    }
+    };
+
+    const handleEndGame = async (shouldRecord = true) => {
+        try {
+            const resultGameData = await strategy.statisticsUpdater.endGame(shouldRecord);
+            setEndGameData(resultGameData);
+
+            setTimeout(() => {
+                setGameEnded(true);
+            }, 2000);
+        } catch (error) {
+            console.error("Error ending game:", error.message);
+        }
+
+        // setTimeout(() => {
+        //     strategy.statisticsUpdater.newGame();
+        //     resetGame();
+        //     setIsTimeUp(false);
+        // }, 2000);
+    };
 
     useEffect(() => {
-        if (question.images?.length > 0) {
-            const imagePromises = question.images.map((image) => {
-                return new Promise((resolve) => {
+        if (question.images?.length) {
+            const imagePromises = question.images.map(src => {
+                return new Promise(resolve => {
                     const img = new Image();
-                    img.src = image;
+                    img.src = src;
                     img.onload = resolve;
                 });
             });
 
             Promise.all(imagePromises).then(() => {
                 setImagesLoaded(true);
-                setTimeLeft(totalTime); // Reset time left to total time
-                setSelectedAnswer(null);    // Fix the problem of having selected an image from the previous round
-                setIsPaused(false);         // Resume the timer after images are loaded
+                startTimer(); // <-- Start context timer
             });
         }
     }, [question.images]);
 
-    const handleAnswerSelect = async (answer) => {
-        if (isCorrect || isIncorrect || isTimeUp) {
-            return;
+    useEffect(() => {
+        if (timeLeft === 0) {
+            strategy.statisticsUpdater.recordIncorrectAnswer();
+            const continueGame = strategy.shouldContinue({
+                isCorrect: false,
+                round,
+                totalTimeLeft: timeLeft,
+            });
+            if (strategy.timerMode === 'perGame' || !continueGame) {
+                setIsTimeUp(true);
+                handleEndGame();
+            } else {
+
+                setIsTimeUp(true);
+                pauseTimer();
+                setTimeout(() => {
+                    requestQuestion(false).finally(() => {
+                        setIsTimeUp(false);
+                        resetTimer();
+                        startTimer();
+                    });
+                }, 2000);
+            }
         }
+    }, [timeLeft]);
+
+
+    const handleAnswerSelect = async (answer) => {
+        if (selectedAnswer || isCorrect || isIncorrect || isTimeUp) return;
 
         setSelectedAnswer(answer);
-        setIsPaused(true); // Pause the timer when an answer is selected
+        if (strategy.timerMode === 'perQuestion') pauseTimer();
 
         try {
-            let response = await axios.post(`${gatewayEndpoint}/answer`, { questionId: question.id, answer: answer });
+            const token = retrieveUserToken();
 
-            if (response.data.correct) {
-                // Update statistics for correct answer
-                setStreak((prevStreak) => prevStreak + 1);// Increment streak on correct answer
-                const newScore = basePoints - (((totalTime - timeLeft) * 600) / totalTime) - AIAttempts * 100 + getStreakBonus();
-                setScore(newScore); // Use functional update to ensure the latest score is used
-                try {
-                    statisticsUpdater.recordCorrectAnswer(score); // Assuming 1000 is the score for a correct answer
-                } catch (error) {
-                    console.error("Error recording correct answer:", error.message);
-                }
+            const response = await axios.post(`${gatewayEndpoint}/answer`, {
+                questionId: question.id,
+                answer: answer,
+            }, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
 
-                setIsCorrect(true);
-                setCurrentScore((prevScore) => prevScore + newScore); // Update current score
-            } else {
-                // Update statistics for incorrect answer
-                try {
-                    statisticsUpdater.recordIncorrectAnswer(); // Assuming no score for incorrect answer
-                    setStreak(0); // Reset streak on incorrect answer
-                } catch (error) {
-                    console.error("Error recording incorrect answer:", error.message);
-                }
+            const isCorrectAnswer = response.data.correct === true;
+            setCorrectOption(response.data.correctOption);
+            processAnswerResponse(isCorrectAnswer);
+        } catch (error) {
+            console.error("Error checking answer:", error);
+        }
+    };
 
-                setIsIncorrect(true);
-            }
-            setAIAttempts(0); // Reset AI attempts on each question
-            if (round == maxRounds) {
-                setGameEnded(true); // Notify the game context that the game has ended
-                const endGameAndSaveResults = async () => {
-                    try {
-                        await statisticsUpdater.endGame(); // Record the game statistics
-                    } catch (error) {
-                        console.error("Error recording game:", error.message);
-                    }
-                }
-                endGameAndSaveResults();
-                setTimeout(() => {
-                    statisticsUpdater.newGame(); // Reset statistics for a new game
-                    setGameEnded(false); // Reset game ended state
-                    setRound(1); // Reset round count
-                    setStreak(0); // Reset streak count
-                    setCurrentScore(0); // Reset current score
-                }, 2000); // Show message for 2 seconds before resetting
+    const processAnswerResponse = (isCorrectAnswer, shouldRecord = true) => {
+        const score = strategy.calculateScore({
+            isCorrect: isCorrectAnswer,
+            timeLeft,
+            AIAttempts,
+            streak,
+            round,
+        });
 
-            } else {
-                setRound(round + 1); // Increment round count
-            }
+        setScore(score);
+        setCurrentScore(prev => prev + score);
+        setStreak(prev => isCorrectAnswer ? prev + 1 : 0);
+
+        if (isCorrectAnswer) {
+            strategy.statisticsUpdater.recordCorrectAnswer(score);
+            setIsCorrect(true);
+        } else {
+            strategy.statisticsUpdater.recordIncorrectAnswer();
+            setIsIncorrect(true);
+        }
+
+        const continueGame = strategy.shouldContinue({
+            isCorrect: isCorrectAnswer,
+            round,
+            totalTimeLeft: timeLeft,
+        });
+
+        setAIAttempts(0); // Reset AI attempts for next question
+
+        if (!continueGame || isGameEnded()) {
+            handleEndGame(shouldRecord);
+        } else {
             setTimeout(() => {
                 setIsCorrect(false);
                 setIsIncorrect(false);
-                requestQuestion(false); // Not the first question
+                requestQuestion(false);
+                nextRound();
+                if (strategy.timerMode === 'perQuestion') {
+                    resetTimer();
+                }
             }, 2000);
-        } catch (error) {
-            console.error("Error checking answer: ", error);
         }
     }
 
 
-    useEffect(() => {
-        if (isGameEnded) {
-            // Handle game end logic here, e.g., show a message or redirect to a different page
-            console.log("Game has ended. Show final score or redirect.");
-            // You can also reset the game state here if needed
-            // For example, you might want to reset the question and score
 
-        }
-    }, [isGameEnded])
+    const resetGame = () => {
+        resetRounds();             // From useGame context
+        resetTimer();              // Reset the timer to initial value
+        setCurrentScore(0);
+        setScore(0);
+        setStreak(0);
+        setIsCorrect(false);
+        setIsIncorrect(false);
+        requestQuestion(false);
+        setSelectedAnswer(null);
+        setGameEnded(false);   // From useGame context
+    };
 
-    // Format time as MM:SS
+
     const formatTime = (seconds) => {
-        const mins = Math.floor(seconds / 60)
-        const secs = seconds % 60
-        return `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`
-    }
-
-    const getStreakBonus = () => {
-        if (streak < 3) return 0; // No bonus for streaks less than 3
-        let base = 50;
-        return base + 15 * (streak - 3); // 50 points for 3 streak, 15 points for each additional streak
-    }
+        const mins = Math.floor(seconds / 60);
+        const secs = seconds % 60;
+        return `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
+    };
 
     useEffect(() => {
         const updatedQuestionText = t("game.question", {
@@ -246,27 +246,31 @@ export const Question = ({ statisticsUpdater = defaultStatisticsUpdater, type = 
             ...prev,
             question: updatedQuestionText,
         }));
-    }, [i18n.language]);
+    }, [i18n.language, question.id]);
+
+    if (gameEnded && endGameData) {
+        return <Navigate to="/game/end-game" state={{ data: endGameData }} />
+    }
 
     return (
         <ThemeProvider theme={theme}>
             <Container maxWidth="md" sx={{ py: 4 }}>
                 {/* Game title */}
                 <Typography variant="h4" component="h1" align="center" sx={{ mb: 3, fontWeight: 500 }}>
-                    {type === 'custom' ? t("game.modes.custom") :
-                        type === 'suddenDeath' ? t("game.modes.suddenDeath") :
-                            type === 'classical' ? t("game.modes.classical") :
-                                type === 'timeTrial' ? t("game.modes.timeTrial") :
-                                    t("game.modes.QOD") }
+                    {gameMode === 'custom' ? t("game.modes.custom") :
+                        gameMode === 'suddenDeath' ? t("game.modes.suddenDeath") :
+                            gameMode === 'classical' ? t("game.modes.classical") :
+                                gameMode === 'timeTrial' ? t("game.modes.timeTrial") :
+                                    t("game.modes.QOD")}
                 </Typography>
                 {/* Round counter */}
-                <Typography variant="p" component="p" align="center" sx={{ my: 3, fontWeight: 500 }}>
-                    {round} / {maxRounds} {streak >= 3 && (
-                        <Typography variant="span" component="span" align="center" sx={{ my: 3, fontWeight: 500, color: "red" }}>
+                <Typography variant="p" component="p" align="center" sx={{ my: 3, fontWeight: 500, fontSize: "1.5rem" }}>
+                    {round} {strategy.maxRounds != Infinity ? `/ ${strategy.maxRounds}` : ""}
+                    {streak >= 3 && (
+                        <Typography variant="span" component="span" align="center" sx={{ ml: 3, fontWeight: 500, color: "red" }}>
                             {streak} 🔥
                         </Typography>
-                    )
-                    }
+                    )}
                 </Typography>
                 {/* Large Timer at the top */}
                 <Box sx={{
@@ -351,9 +355,10 @@ export const Question = ({ statisticsUpdater = defaultStatisticsUpdater, type = 
                     </Paper>
                 </Box>
 
-                <Typography variant="h5" component="h2" align="center" sx={{ my: 3, fontWeight: 500 }}>
-                    {question.question}
-                </Typography>
+                {imagesLoaded ? (
+                    <Typography variant="h5" component="h2" align="center" sx={{ my: 3, fontWeight: 500 }}>
+                        {question.question}
+                    </Typography>) : (<></>)}
 
                 {isCorrect && (
                     <Typography variant="h6" component="p" align="center" sx={{ my: 2, color: "green" }}>
@@ -382,11 +387,34 @@ export const Question = ({ statisticsUpdater = defaultStatisticsUpdater, type = 
                                         variant={selectedAnswer === image ? "contained" : "outlined"}
                                         color="primary"
                                         onClick={() => handleAnswerSelect(image)}
+                                        disabled={!!selectedAnswer}
                                         sx={{
                                             py: 1.5,
                                             textTransform: "none",
                                             justifyContent: "center",
-                                            backgroundColor: selectedAnswer === image && isCorrect ? "green" : selectedAnswer === image && isIncorrect ? "red" : undefined,
+                                            backgroundColor:
+                                                selectedAnswer === image && isCorrect ? "success.main" :
+                                                    selectedAnswer === image && isIncorrect ? "error.main" :
+                                                        image === correctOption && isIncorrect ? "warning.main" :
+                                                            selectedAnswer === image ? "primary.main" :
+                                                                "transparent",
+                                            '&:hover': {
+                                                backgroundColor:
+                                                    selectedAnswer === image && isCorrect ? "success.dark" :
+                                                        selectedAnswer === image && isIncorrect ? "error.dark" :
+                                                            image === correctOption && isIncorrect ? "warning.dark" :
+                                                                selectedAnswer === image ? "primary.dark" :
+                                                                    "transparent"
+                                            },
+                                            '&.Mui-disabled': {
+                                                backgroundColor:
+                                                    selectedAnswer === image && isCorrect ? "success.main" :
+                                                        selectedAnswer === image && isIncorrect ? "error.main" :
+                                                            image === correctOption && isIncorrect ? "warning.main" :
+                                                                selectedAnswer === image ? "primary.main" :
+                                                                    "transparent",
+                                                opacity: 1
+                                            }
                                         }}
                                     >
                                         <Box
