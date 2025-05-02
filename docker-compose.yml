@@ -12,7 +12,7 @@ services:
 
   authservice:
     container_name: authservice-wichat_en1b
-    image: ghcr.io/arquisoft/wichat_en1b/authservice:159-deploy-the-application
+    image: ghcr.io/arquisoft/wichat_en1b/authservice:255-reverse-proxy-nginx-to-create-https-connections
     profiles: ["dev", "prod"]
     env_file:
       - .env
@@ -39,7 +39,7 @@ services:
 
   userservice:
     container_name: userservice-wichat_en1b
-    image: ghcr.io/arquisoft/wichat_en1b/userservice:159-deploy-the-application
+    image: ghcr.io/arquisoft/wichat_en1b/userservice:255-reverse-proxy-nginx-to-create-https-connections
     profiles: ["dev", "prod"]
     env_file:
       - .env
@@ -68,7 +68,7 @@ services:
 
   llmservice:
     container_name: llmservice-wichat_en1b
-    image: ghcr.io/arquisoft/wichat_en1b/llmservice:159-deploy-the-application
+    image: ghcr.io/arquisoft/wichat_en1b/llmservice:255-reverse-proxy-nginx-to-create-https-connections
     profiles: ["dev", "prod"]
     env_file:
       - .env
@@ -92,7 +92,7 @@ services:
 
   questionservice:
     container_name: questionservice-wichat_en1b
-    image: ghcr.io/arquisoft/wichat_en1b/questionservice:159-deploy-the-application
+    image: ghcr.io/arquisoft/wichat_en1b/questionservice:255-reverse-proxy-nginx-to-create-https-connections
     profiles: ["dev", "prod"]
     env_file:
       - .env
@@ -119,7 +119,7 @@ services:
     
   statisticservice:
     container_name: statisticservice-wichat_en1b
-    image: ghcr.io/arquisoft/wichat_en1b/statisticservice:159-deploy-the-application
+    image: ghcr.io/arquisoft/wichat_en1b/statisticservice:255-reverse-proxy-nginx-to-create-https-connections
     profiles: ["dev", "prod"]
     env_file:
       - .env
@@ -147,7 +147,7 @@ services:
 
   gatewayservice:
     container_name: gatewayservice-wichat_en1b
-    image: ghcr.io/arquisoft/wichat_en1b/gatewayservice:159-deploy-the-application
+    image: ghcr.io/arquisoft/wichat_en1b/gatewayservice:255-reverse-proxy-nginx-to-create-https-connections
     profiles: ["dev", "prod"]
     env_file:
       - .env
@@ -183,7 +183,7 @@ services:
 
   webapp:
     container_name: webapp-wichat_en1b
-    image: ghcr.io/arquisoft/wichat_en1b/webapp:159-deploy-the-application
+    image: ghcr.io/arquisoft/wichat_en1b/webapp:255-reverse-proxy-nginx-to-create-https-connections
     profiles: ["dev", "prod"]
     env_file:
       - .env
