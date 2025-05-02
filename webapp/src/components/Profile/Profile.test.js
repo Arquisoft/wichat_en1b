@@ -26,6 +26,22 @@ jest.mock("react-router-dom", () => ({
   useNavigate: jest.fn(),
 }));
 
+// Mock RecordRetrieverProfile
+jest.mock("./RecordRetrieverProfile", () => {
+  return jest.fn().mockImplementation(() => {
+    return {
+      getRecords: jest.fn(),
+    };
+  });
+});
+
+import RecordRetrieverProfile from "./RecordRetrieverProfile";
+
+const mockGetRecords = jest.fn();
+RecordRetrieverProfile.mockImplementation(() => ({
+  getRecords: mockGetRecords,
+}));
+
 describe("Profile Component", () => {
   const mockNavigate = jest.fn();
 
@@ -236,18 +252,20 @@ describe("Profile Component", () => {
   });
   */
  
-  /*
   it("handles basic rendering with registration date", async () => {
-    // Use a simple fixed date value instead of complex date manipulation
     const mockData = {
-      correctAnswers: 75,
-      incorrectAnswers: 25,
-      gamesPlayed: 10,
-      questionsAnswered: 100,
-      registrationDate: "2023-01-01T00:00:00Z",
+      statsData: {
+        correctAnswers: 75,
+        incorrectAnswers: 25,
+        gamesPlayed: 10,
+        questionsAnswered: 100,
+        registrationDate: "2023-01-01T00:00:00Z",
+      },
+      username: "TestUser",
+      currentUser: "TestUser",
     };
 
-    axios.get.mockResolvedValueOnce({ data: mockData });
+    mockGetRecords.mockResolvedValueOnce(mockData);
 
     render(
       <MemoryRouter>
@@ -259,11 +277,10 @@ describe("Profile Component", () => {
       expect(screen.queryByText(/Loading your statistics/i)).not.toBeInTheDocument();
     });
 
-    // Simple verification that stats were displayed
     expect(screen.getByText("75")).toBeInTheDocument();
     expect(screen.getByText("25")).toBeInTheDocument();
   });
-  */
+
  
   it("handles null data scenario correctly", async () => {
     // Mock the axios response with null data
