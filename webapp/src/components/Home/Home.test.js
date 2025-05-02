@@ -10,10 +10,6 @@ describe('Home Component Render Tests', () => {
         // Clear cookies before each test to ensure clean state
         Cookies.remove('user');
     });
-
-    it('should work', () => {
-        expect(true).toBe(true);
-    });
        
     
     it('should render Home component for non-logged-in users', () => {

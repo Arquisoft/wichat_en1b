@@ -48,7 +48,6 @@ export const Statistics = () => {
 
   useEffect(() => {
     fetchStatistics();
-    // eslint-disable-next-line
   }, [filters]);
 
   const fetchStatistics = async () => {
@@ -134,7 +133,7 @@ export const Statistics = () => {
             onPageChange={handlePageChange}
             currentOffset={pagination.offset}
             limit={pagination.limit}
-            getImageUrl={recordRetriever.getStaticProfileImageUrl.bind(recordRetriever)}
+            getImageUrl={(username) => recordRetriever.getStaticProfileImageUrl(username)}
           />
         )}
       </Paper>
