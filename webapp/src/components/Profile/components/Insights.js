@@ -5,7 +5,6 @@ import { Grid, Typography } from "@mui/material";
 
 export const Insights = ({statistics, registrationDate, title, type}) => {
 
-    console.log("Insights: statistics", statistics);
     const getSuccessRate = () => {
         if (!statistics) return 0;
         const total = statistics.correctAnswers + statistics.incorrectAnswers;
