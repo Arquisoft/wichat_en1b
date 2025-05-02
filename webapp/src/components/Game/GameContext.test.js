@@ -94,3 +94,24 @@ describe("GameContext - handleRoundChange", () => {
         expect(result.current.strategy.hasEnded).toHaveBeenCalled();
     });
 });
+
+describe("GameContext - Storage Event Handling", () => {
+    it("updates custom settings when storage event is triggered", () => {
+        const mockSettings = { theme: "dark", difficulty: "hard" };
+        localStorage.setItem("customSettings", JSON.stringify(mockSettings));
+
+        const { result } = renderHook(() => useGame(), {
+            wrapper: ({ children }) => <GameProvider>{children}</GameProvider>,
+        });
+
+        act(() => {
+            const storageEvent = new StorageEvent("storage", {
+                key: "customSettings",
+                newValue: JSON.stringify(mockSettings),
+            });
+            window.dispatchEvent(storageEvent);
+        });
+
+        expect(result.current.customSettings).toEqual(mockSettings);
+    });
+});

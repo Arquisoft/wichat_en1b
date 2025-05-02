@@ -1,7 +1,6 @@
 import { createContext, useContext, useState, useEffect, useMemo } from "react";
 import useTimer from "../hooks/useTimer";
 import { useRounds } from "../hooks/useRounds";
-import { GameModesConfig } from "../GameModes/gameModesConfiguration";
 import StatisticsUpdater from "./components/StatisticsUpdater";
 import { getGameStrategy } from "../GameModes/strategyFactory";
 import { useRef } from "react";
@@ -123,6 +122,8 @@ export const GameProvider = ({ children, selectedModeId }) => {
             setGameMode,
             statisticsUpdater,
             strategy,
+            customSettings,
+            setCustomSettings
         }}>
             {children}
         </GameContext.Provider>
