@@ -55,7 +55,8 @@
             "correctAnswerRate": "Correct Answer Rate",
             "maxScore": "Max Score",
             "maxScorePoints_one": "{{count}} point",
-            "maxScorePoints_other": "{{count}} points"
+            "maxScorePoints_other": "{{count}} points",
+            "maxStreak": "Max Streak"
         },
         "answerDistribution": {
             "answerDistribution": "Answer Distribution",
