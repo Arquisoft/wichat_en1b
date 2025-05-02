@@ -86,7 +86,7 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
           registry: ghcr.io
-          workdir: users/authservice
+          workdir: users/authservicea
           platforms: linux/amd64,linux/arm64
           
   docker-push-userservice:
