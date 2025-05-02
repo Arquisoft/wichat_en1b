@@ -30,16 +30,16 @@ export const GameEndScreen = () => {
                             <Typography variant="h5" gutterBottom>{t("game.endScreen.reportTitle")}</Typography>
                             <Divider sx={{ mb: 2 }} />
                             <Typography variant="body1" gutterBottom sx={{ fontWeight: 500, fontSize: "1.2rem" }}>
-                                💯 {t("statistics.totalScore")}: {data.score}
+                                {t("game.endScreen.totalScore", { score: data.score })}
                             </Typography>
                             <Typography variant="body1" gutterBottom sx={{ fontWeight: 500, fontSize: "1.2rem" }}>
-                                🔢 {t("gameModes.custom.settings.rounds")}: {data.questionsAnswered}
+                                {t("game.endScreen.rounds", { count: data.questionsAnswered })}
                             </Typography>
                             <Typography variant="body1" gutterBottom sx={{ fontWeight: 500, fontSize: "1.2rem" }}>
-                                ✅ {t("profile.answerDistribution.correct")}: {data.correctAnswers}
+                                {t("game.endScreen.correct", { count: data.correctAnswers })}
                             </Typography>
                             <Typography variant="body1" gutterBottom sx={{ fontWeight: 500, fontSize: "1.2rem" }}>
-                                ❌ {t("profile.answerDistribution.incorrect")}: {data.incorrectAnswers}
+                                {t("game.endScreen.incorrect", { count: data.incorrectAnswers })}
                             </Typography>
                         </CardContent>
                     </Card>

@@ -12,14 +12,19 @@ class GeminiController {
     }
 
     async _sendRequest(contents) {
-        const response = await axios.post(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${this.apiKey}`, {
-            "contents": contents,
-            "generationConfig": {
-                "temperature": 0.5,
-                "responseMimeType": "text/plain",
-            },
-        })
-        return response.data.candidates[0].content?.parts[0]?.text;
+        try {
+            const response = await axios.post(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${this.apiKey}`, {
+                "contents": contents,
+                "generationConfig": {
+                    "temperature": 0.5,
+                    "responseMimeType": "text/plain",
+                },
+            })
+            return response.data.candidates[0].content?.parts[0]?.text;
+        } catch (error) {
+            console.error(`Gemini API error: ${error.message}`);
+        }
+
     }
 
     async sendQuestionToLLM(gameQuestion, userQuestion) {

@@ -19,11 +19,18 @@ export const useAuth = () => {
                 ? { username, password, confirmpassword }
                 : { username, password };
 
+            console.log(apiEndpoint);
+
             const response = await axios.post(`${apiEndpoint}/${action}`, payload);
 
             const oneHourAfter = new Date(new Date().getTime() + (1 * 60 * 60 * 1000));
             Cookies.set('user', JSON.stringify({ username: response.data.username, token: response.data.token }),
-                { expires: oneHourAfter, secure: true });
+                {
+                    expires: oneHourAfter,
+                    secure: false,
+                    sameSite: 'Lax',
+                    path: '/'
+                });
             navigate('/home');
             window.location.reload();
         } catch (error) {

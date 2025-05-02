@@ -149,6 +149,7 @@
         "correctAnswer": "Correct! +{{score}} points",
         "incorrectAnswer": "Incorrect",
         "question": "Which of the following {{imageType}} {{relation}} {{topic}}?",
+        "timeUp": "You ran out of time!",
         "chat": {
             "thinking": "Thinking...",
             "you": "You",
@@ -177,10 +178,13 @@
             "isA": "is a",
             "belongsTo": "belongs to"
         },
-        "timeUp": "Time's up!",
         "endScreen": {
             "title": "Game Ended",
-            "reportTitle": "Game Report"
+            "reportTitle": "Game Report",
+            "totalScore": "💯 Total Score: {{score}}",
+            "rounds": "🔢 Rounds: {{count}}",
+            "correct": "✅ Correct: {{count}}",
+            "incorrect": "❌ Incorrect: {{count}}"
         }
     },
     "gameModes": {

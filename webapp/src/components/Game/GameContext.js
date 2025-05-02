@@ -1,7 +1,6 @@
 import { createContext, useContext, useState, useEffect, useMemo } from "react";
 import useTimer from "../hooks/useTimer";
 import { useRounds } from "../hooks/useRounds";
-import { GameModesConfig } from "../GameModes/gameModesConfiguration";
 import StatisticsUpdater from "./components/StatisticsUpdater";
 import { getGameStrategy } from "../GameModes/strategyFactory";
 import { useRef } from "react";
@@ -9,9 +8,7 @@ import { useRef } from "react";
 const GameContext = createContext();
 
 export const GameProvider = ({ children, selectedModeId }) => {
-    //console.log("GameProvider: selectedModeId", selectedModeId);
     const [gameMode, setGameMode] = useState(selectedModeId || 'classical');
-    //console.log("GameProvider: gameMode", gameMode);
     const [question, setQuestion] = useState({ question: "Pregunta", images: [] });
     const [gameEnded, setGameEnded] = useState(false);
     const [questionType, setQuestionType] = useState("random");
@@ -38,7 +35,7 @@ export const GameProvider = ({ children, selectedModeId }) => {
         window.addEventListener('storage', handleStorageChange);
         return () => window.removeEventListener('storage', handleStorageChange);
     }, []);
-    //console.log("GameProvider: customSettings", customSettings);
+
     const strategy = useMemo(() => {
         return getGameStrategy({
             gameMode,
@@ -127,6 +124,8 @@ export const GameProvider = ({ children, selectedModeId }) => {
             strategy,
             clearMessages,
             setClearMessages,
+            customSettings,
+            setCustomSettings
         }}>
             {children}
         </GameContext.Provider>

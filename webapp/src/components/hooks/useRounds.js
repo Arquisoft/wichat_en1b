@@ -5,7 +5,7 @@ export const useRounds = ({maxRounds, onRoundChange = () => {console.log("UseRou
     const [round, setRound] = useState(1);
 
     const nextRound = () => {
-        //onRoundChange();
+        onRoundChange();
         setRound((prev) => prev + 1);
     };
 
