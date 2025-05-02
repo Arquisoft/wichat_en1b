@@ -3,7 +3,7 @@ name: Push Docker Images to GitHub Packages
 on:
   push:
     branches:
-      - 159-deploy-the-application
+      - 255-reverse-proxy-nginx-to-create-https-connections
 
 jobs:
   docker-push-webapp:
@@ -146,6 +146,6 @@ jobs:
         user: ${{ secrets.DEPLOY_USER }}
         key: ${{ secrets.DEPLOY_KEY }}
         command: |
-          wget https://raw.githubusercontent.com/arquisoft/wichat_en1b/159-deploy-the-application/docker-compose.yml -O docker-compose.yml
+          wget https://raw.githubusercontent.com/arquisoft/wichat_en1b/255-reverse-proxy-nginx-to-create-https-connections/docker-compose.yml -O docker-compose.yml
           docker compose --profile prod down
           docker compose --profile prod up -d --pull always
