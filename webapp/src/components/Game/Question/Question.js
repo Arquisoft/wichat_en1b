@@ -40,7 +40,7 @@ export const Question = () => {
     const [streak, setStreak] = useState(0); // Track the streak of correct answers
     const [score, setScore] = useState(0); // Track the score
     const [currentScore, setCurrentScore] = useState(0); // Track the current score
-    const [t, i18n] = useTranslation(); // Initialize i18next for translations
+    const { t, i18n } = useTranslation(); // Initialize i18next for translations
     const [endGameData, setEndGameData] = useState(null);
 
     const questionType = localStorage.getItem("topic") || "random"; // Default to "random" if not set

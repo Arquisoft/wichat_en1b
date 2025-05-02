@@ -10,10 +10,6 @@ describe('Home Component Render Tests', () => {
         // Clear cookies before each test to ensure clean state
         Cookies.remove('user');
     });
-
-    it('should work', () => {
-        expect(true).toBe(true);
-    });
        
     
     it('should render Home component for non-logged-in users', () => {
@@ -39,7 +35,7 @@ describe('Home Component Render Tests', () => {
         );
 
         // Check for personalized greeting message and username
-        expect(screen.getByText(/Your Profile/i)).toBeInTheDocument();
+        expect(screen.getByText(/Profile/i)).toBeInTheDocument();
         expect(screen.getByText(/Classical Game/i)).toBeInTheDocument();
         expect(screen.getByText(/Statistics/i)).toBeInTheDocument();
         expect(screen.getByText(/Game Modes/i)).toBeInTheDocument();

@@ -36,7 +36,7 @@ export const Profile = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [currentUsername, setCurrentUsername] = useState("");
-    const [isProfileOwner, setIsProfileOwner] = useState(false);  // This is determined by backend
+    const [isProfileOwner, setIsProfileOwner] = useState(false);
     const [registrationDate, setRegistrationDate] = useState(null);
     const [profileImage, setProfileImage] = useState("");
     const [settingsOpen, setSettingsOpen] = useState(false);
@@ -114,8 +114,13 @@ export const Profile = () => {
                 try {
                     const { statsData, username: fetchedUsername } = await retriever.getRecords(profileUsernameParam);
 
-                    setStatistics(statsData);
-                    
+                    setStatistics((prevStatistics) => {
+                        if (JSON.stringify(prevStatistics) !== JSON.stringify(statsData)) {
+                            return statsData;
+                        }
+                        return prevStatistics;
+                    });
+
                     // Determine which profile to load
                     setIsProfileOwner(statsData.isProfileOwner);
 

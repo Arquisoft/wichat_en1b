@@ -68,7 +68,7 @@ const ProfileHeader = ({
         {registrationDate && (
         <Typography variant="body1" color="text.secondary" sx={{ mb: 1, display: 'flex', alignItems: 'center' }}>
           <CalendarTodayIcon sx={{ fontSize: 18, mr: 1 }} />
-          {t("profile.header.since", { date: formatDate(registrationDate, 'MMMM d, yyyy') })}
+          {t("profile.header.since", { date: formatDate(registrationDate) })}
         </Typography>
         )}
         

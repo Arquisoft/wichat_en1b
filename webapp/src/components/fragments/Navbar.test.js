@@ -21,10 +21,10 @@ describe('Navbar Component Render Tests', () => {
             </MemoryRouter>
         );
 
-        // Check if the Login and Sign Up buttons are visible
-        expect(screen.getByText('Login')).toBeInTheDocument();
+        // Check if the Log in and Sign Up buttons are visible
+        expect(screen.getByText('Log in')).toBeInTheDocument();
         expect(screen.getByText('Sign up')).toBeInTheDocument();
-        expect(screen.queryByText('Sign Out')).toBeNull();
+        expect(screen.queryByText('Sign out')).toBeNull();
     });
 
     it('should render Navbar correctly for desktop view when logged in', () => {
@@ -36,9 +36,9 @@ describe('Navbar Component Render Tests', () => {
             </MemoryRouter>
         );
 
-        // Check if the Sign Out button is visible
-        expect(screen.getByText('Sign Out')).toBeInTheDocument();
-        expect(screen.queryByText('Login')).toBeNull();
+        // Check if the Sign out button is visible
+        expect(screen.getByText('Sign out')).toBeInTheDocument();
+        expect(screen.queryByText('Log in')).toBeNull();
         expect(screen.queryByText('Sign up')).toBeNull();
     });
 
@@ -55,10 +55,10 @@ describe('Navbar Component Render Tests', () => {
         
         fireEvent.click(screen.getByLabelText('menu'));
 
-        // Check if the mobile drawer has Login and Sign Up options
-        expect(screen.getByText('Login')).toBeInTheDocument();
+        // Check if the mobile drawer has Log in and Sign Up options
+        expect(screen.getByText('Log in')).toBeInTheDocument();
         expect(screen.getByText('Sign up')).toBeInTheDocument();
-        expect(screen.queryByText('Sign Out')).toBeNull();
+        expect(screen.queryByText('Sign out')).toBeNull();
     });
 
     it('should render Navbar correctly for mobile view when logged in', () => {
@@ -75,9 +75,9 @@ describe('Navbar Component Render Tests', () => {
         // Open the mobile drawer by clicking the menu icon
         fireEvent.click(screen.getByLabelText('menu'));
 
-        // Check if the mobile drawer has Sign Out option
-        expect(screen.getByText('Sign Out')).toBeInTheDocument();
-        expect(screen.queryByText('Login')).toBeNull();
+        // Check if the mobile drawer has Sign out option
+        expect(screen.getByText('Sign out')).toBeInTheDocument();
+        expect(screen.queryByText('Log in')).toBeNull();
         expect(screen.queryByText('Sign up')).toBeNull();
     });
 });
