@@ -208,7 +208,7 @@ describe('Question Component', () => {
         });
         
 
-        expect(screen.getByText("Time's up!")).toBeInTheDocument();
+        expect(screen.getByText("You ran out of time!")).toBeInTheDocument();
 
         expect(axios.get).toHaveBeenCalledTimes(1);
     });

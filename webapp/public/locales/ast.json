@@ -177,10 +177,13 @@
             "isA": "ye un",
             "belongsTo": "pertenece a"
         },
-        "timeUp": "¡Se acabó el tiempu!",
         "endScreen": {
-            "title": "Fin del xuegu",
-            "reportTitle": "Informe de xuegu"
+            "title": "Xuegu acabáu",
+            "reportTitle": "Informe del xuegu",
+            "totalScore": "💯 Puntuación total: {{score}}",
+            "rounds": "🔢 Rondes: {{count}}",
+            "correct": "✅ Acierte: {{count}}",
+            "incorrect": "❌ Fallaes: {{count}}"
         }
     },
     "gameModes": {

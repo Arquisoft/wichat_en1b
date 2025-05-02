@@ -177,10 +177,13 @@
             "isA": "ist ein",
             "belongsTo": "gehört zu"
         },
-        "timeUp": "Zeit abgelaufen!",
         "endScreen": {
             "title": "Spiel beendet",
-            "reportTitle": "Spielbericht"
+            "reportTitle": "Spielbericht",
+            "totalScore": "💯 Gesamtpunktzahl: {{score}}",
+            "rounds": "🔢 Runden: {{count}}",
+            "correct": "✅ Richtig: {{count}}",
+            "incorrect": "❌ Falsch: {{count}}"
         }
     },
     "gameModes": {

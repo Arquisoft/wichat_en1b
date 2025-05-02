@@ -177,10 +177,13 @@
             "isA": "est un",
             "belongsTo": "appartient à"
         },
-        "timeUp": "Temps écoulé !",
         "endScreen": {
-            "title": "Fin du jeu",
-            "reportTitle": "Rapport de jeu"
+            "title": "Jeu terminé",
+            "reportTitle": "Rapport de jeu",
+            "totalScore": "💯 Score total : {{score}}",
+            "rounds": "🔢 Manches : {{count}}",
+            "correct": "✅ Bonnes réponses : {{count}}",
+            "incorrect": "❌ Mauvaises réponses : {{count}}"
         }
     },
     "gameModes": {
