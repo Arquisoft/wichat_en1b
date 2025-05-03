@@ -403,14 +403,14 @@ export const Question = () => {
                                             backgroundColor:
                                                 selectedAnswer === image && isCorrect ? "success.main" :
                                                     selectedAnswer === image && isIncorrect ? "error.main" :
-                                                        image === correctOption && isIncorrect ? "warning.main" :
+                                                        image === correctOption && isIncorrect ? "success.main" :
                                                             selectedAnswer === image ? "primary.main" :
                                                                 "background.paper",
                                             '&:hover': {
                                                 backgroundColor:
                                                     selectedAnswer === image && isCorrect ? "success.dark" :
                                                         selectedAnswer === image && isIncorrect ? "error.dark" :
-                                                            image === correctOption && isIncorrect ? "warning.dark" :
+                                                            image === correctOption && isIncorrect ? "success.dark" :
                                                                 selectedAnswer === image ? "primary.dark" :
                                                                     "grey.100"
                                             },
@@ -418,7 +418,7 @@ export const Question = () => {
                                                 backgroundColor:
                                                     selectedAnswer === image && isCorrect ? "success.main" :
                                                         selectedAnswer === image && isIncorrect ? "error.main" :
-                                                            image === correctOption && isIncorrect ? "warning.main" :
+                                                            image === correctOption && isIncorrect ? "success.main" :
                                                                 selectedAnswer === image ? "primary.main" :
                                                                     "background.paper",
                                                 opacity: 1
