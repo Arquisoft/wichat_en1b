@@ -392,22 +392,27 @@ export const Question = () => {
                                         disabled={!!selectedAnswer}
                                         sx={{
                                             width: "100%",
-                                            aspectRatio: "1 / 1",
-                                            padding: 0,
+                                            aspectRatio: {
+                                                xs: "4 / 3", // Wider on small screens
+                                                sm: "1 / 1" // Square on larger screens
+                                            },
+                                            padding: 1.5,
                                             overflow: "hidden",
+                                            borderRadius: 3,
+                                            boxShadow: 2,
                                             backgroundColor:
                                                 selectedAnswer === image && isCorrect ? "success.main" :
                                                     selectedAnswer === image && isIncorrect ? "error.main" :
                                                         image === correctOption && isIncorrect ? "warning.main" :
                                                             selectedAnswer === image ? "primary.main" :
-                                                                "transparent",
+                                                                "background.paper",
                                             '&:hover': {
                                                 backgroundColor:
                                                     selectedAnswer === image && isCorrect ? "success.dark" :
                                                         selectedAnswer === image && isIncorrect ? "error.dark" :
                                                             image === correctOption && isIncorrect ? "warning.dark" :
                                                                 selectedAnswer === image ? "primary.dark" :
-                                                                    "transparent"
+                                                                    "grey.100"
                                             },
                                             '&.Mui-disabled': {
                                                 backgroundColor:
@@ -415,11 +420,12 @@ export const Question = () => {
                                                         selectedAnswer === image && isIncorrect ? "error.main" :
                                                             image === correctOption && isIncorrect ? "warning.main" :
                                                                 selectedAnswer === image ? "primary.main" :
-                                                                    "transparent",
+                                                                    "background.paper",
                                                 opacity: 1
                                             }
                                         }}
                                     >
+                                        {/* Image inside the button */}
                                         <Box
                                             sx={{
                                                 width: "100%",
@@ -427,15 +433,18 @@ export const Question = () => {
                                                 display: "flex",
                                                 justifyContent: "center",
                                                 alignItems: "center",
+                                                backgroundColor: "white",
+                                                borderRadius: 2
                                             }}
                                         >
+                                            {/* Image element */}
                                             <Box
                                                 component="img"
                                                 src={image || "/placeholder.svg"}
                                                 alt="Game Option"
                                                 sx={{
-                                                    maxWidth: "100%",
-                                                    maxHeight: "100%",
+                                                    maxWidth: "90%",
+                                                    maxHeight: "90%",
                                                     objectFit: "contain",
                                                     display: "block"
                                                 }}
