@@ -210,7 +210,7 @@ services:
   prometheus:
     image: prom/prometheus
     container_name: prometheus-wichat_en1b
-    profiles: ["dev"]
+    profiles: ["dev", "prod"]
     env_file:
       - .env
     networks:
@@ -226,7 +226,7 @@ services:
   grafana:
     image: grafana/grafana
     container_name: grafana-wichat_en1b
-    profiles: ["dev"]
+    profiles: ["dev", "prod"]
     env_file:
       - .env
     networks:
