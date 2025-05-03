@@ -287,6 +287,131 @@ describe('User Service Custom Image Upload', () => {
   });
 });
 
+describe('User Service Custom Image Rename on Username Update', () => {
+  it('should rename custom image files when username is updated', async () => {
+    process.env.JWT_SECRET = 'testsecret';
+    
+    // Create a user with a custom image
+    const oldUsername = 'imageuser';
+    const newUsername = 'newimageuser';
+    const user = {
+      username: oldUsername,
+      passwordHash: 'hashedpassword',
+      image: `/images/custom/${oldUsername}-oldimage.png`
+    };
+    await User.create(user);
+    
+    // Create the actual image file in the filesystem
+    const customImagesDir = path.join(__dirname, 'public', 'images', 'custom');
+    fs.mkdirSync(customImagesDir, { recursive: true });
+    
+    const oldImagePath = path.join(__dirname, 'public', user.image);
+    fs.writeFileSync(oldImagePath, 'test image content');
+    
+    // Verify the old image exists
+    expect(fs.existsSync(oldImagePath)).toBe(true);
+    
+    // Update the username
+    const response = await request(app)
+      .patch(`/users/${oldUsername}`)
+      .send({ newUser: newUsername });
+    
+    // Assertions
+    expect(response.status).toBe(200);
+    expect(response.body).toHaveProperty('success', true);
+    expect(response.body).toHaveProperty('newUsername', newUsername);
+    
+    // Verify the user in database has been updated
+    const updatedUser = await User.findOne({ username: newUsername });
+    expect(updatedUser).not.toBeNull();
+    expect(updatedUser.image).toMatch(new RegExp(`^/images/custom/${newUsername}-\\d+\\.png$`));
+    
+    // Verify old image no longer exists
+    expect(fs.existsSync(oldImagePath)).toBe(false);
+    
+    // Verify new image exists
+    const newImagePath = path.join(__dirname, 'public', updatedUser.image);
+    expect(fs.existsSync(newImagePath)).toBe(true);
+    
+    // Verify the content of the image was preserved
+    const imageContent = fs.readFileSync(newImagePath, 'utf8');
+    expect(imageContent).toBe('test image content');
+    
+    // Clean up
+    fs.unlinkSync(newImagePath);
+  });
+  
+  it('should handle updating username for user with default image', async () => {
+    // Setup
+    process.env.JWT_SECRET = 'testsecret';
+    
+    // Create a user with a default image
+    const oldUsername = 'defaultimageuser';
+    const newUsername = 'newdefaultimageuser';
+    const user = {
+      username: oldUsername,
+      passwordHash: 'hashedpassword',
+      image: '/images/default/image_3.png'
+    };
+    await User.create(user);
+    
+    // Update the username
+    const response = await request(app)
+      .patch(`/users/${oldUsername}`)
+      .send({ newUser: newUsername });
+    
+    // Assertions
+    expect(response.status).toBe(200);
+    expect(response.body).toHaveProperty('success', true);
+    expect(response.body).toHaveProperty('newUsername', newUsername);
+    
+    // Verify the user in database has been updated
+    const updatedUser = await User.findOne({ username: newUsername });
+    expect(updatedUser).not.toBeNull();
+    
+    // Default image path should remain unchanged
+    expect(updatedUser.image).toBe('/images/default/image_3.png');
+  });
+  
+  it('should handle if the custom image file does not exist during username update', async () => {
+    // Setup
+    process.env.JWT_SECRET = 'testsecret';
+    
+    // Create a user with a custom image path, but the file doesn't exist
+    const oldUsername = 'nofileuser';
+    const newUsername = 'newnofileuser';
+    const user = {
+      username: oldUsername,
+      passwordHash: 'hashedpassword',
+      image: `/images/custom/${oldUsername}-nonexistent.png`
+    };
+    await User.create(user);
+    
+    // Make sure custom images directory exists
+    const customImagesDir = path.join(__dirname, 'public', 'images', 'custom');
+    fs.mkdirSync(customImagesDir, { recursive: true });
+    
+    // The old image path (which doesn't actually exist on disk)
+    const oldImagePath = path.join(__dirname, 'public', user.image);
+    
+    // Update the username
+    const response = await request(app)
+      .patch(`/users/${oldUsername}`)
+      .send({ newUser: newUsername });
+    
+    expect(response.status).toBe(200);
+    expect(response.body).toHaveProperty('success', true);
+    expect(response.body).toHaveProperty('newUsername', newUsername);
+    
+    // Verify the user in database has been updated
+    const updatedUser = await User.findOne({ username: newUsername });
+    expect(updatedUser).not.toBeNull();
+    
+    // Verify the image path has been updated, even though file didn't exist
+    expect(updatedUser.image).toMatch(new RegExp(`^/images/custom/${newUsername}-\\d+\\.png$`));
+  });
+});
+
 describe('User Service Default Image Update', () => {
   it('should update the default image for a user', async () => {
     const user = {

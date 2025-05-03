@@ -12,9 +12,10 @@ defineFeature(feature, (test) => {
     browser = process.env.GITHUB_ACTIONS
       ? await puppeteer.launch({
           headless: "new",
+          slowMo: 50,
           args: ["--no-sandbox", "--disable-setuid-sandbox"],
         })
-      : await puppeteer.launch({ headless: false, slowMo: 30 });
+      : await puppeteer.launch({ headless: false, slowMo: 50 });
 
     page = await browser.newPage();
     process.env.JWT_SECRET='test-secret'

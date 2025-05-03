@@ -36,7 +36,7 @@ export const Profile = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [currentUsername, setCurrentUsername] = useState("");
-    const [isProfileOwner, setIsProfileOwner] = useState(false);  // This is determined by backend
+    const [isProfileOwner, setIsProfileOwner] = useState(false);
     const [registrationDate, setRegistrationDate] = useState(null);
     const [profileImage, setProfileImage] = useState("");
     const [settingsOpen, setSettingsOpen] = useState(false);

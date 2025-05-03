@@ -4,7 +4,6 @@ import { useTranslation } from "react-i18next";
 
 const AdditionalInsights = ({ avgQuestionsPerGame, successRate, maxScore, type, maxStreak }) => {
   const { t } = useTranslation();
-  console.log("AdditionalInsights: type", type);
 
   return (
     <Grid container spacing={3} sx={{ mb: 3 }}>

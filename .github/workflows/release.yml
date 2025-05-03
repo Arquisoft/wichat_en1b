@@ -48,6 +48,10 @@ jobs:
     - run: npm --prefix webapp install
     - run: npm --prefix webapp run build
     - run: npm --prefix webapp run test:e2e
+    env:
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
   docker-push-webapp:
     name: Push webapp Docker Image to GitHub Packages
     runs-on: ubuntu-latest

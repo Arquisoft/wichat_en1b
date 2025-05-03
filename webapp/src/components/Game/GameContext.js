@@ -122,10 +122,10 @@ export const GameProvider = ({ children, selectedModeId }) => {
             gameMode,
             setGameMode,
             strategy,
-            customSettings,
-            setCustomSettings,
             clearMessages,
             setClearMessages,
+            customSettings,
+            setCustomSettings
         }}>
             {children}
         </GameContext.Provider>
