@@ -87,7 +87,7 @@ Core quiz questions.
 |-------|------|-------------|
 | `_id` | ObjectId [pk] | Auto-generated identifier |
 | `imageType` | String | Required image type |
-| `relation` | String | Required relation type |
+| `relation` | String | Required relation to the question ('its an', 'relates to'...) |
 | `topic` | String | Required topic of the question |
 | `images` | String[] | Required image URLs |
 | `correctOption` | String | Required correct answer |
