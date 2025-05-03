@@ -184,7 +184,9 @@
             "totalScore": "💯 Score total : {{score}}",
             "rounds": "🔢 Manches : {{count}}",
             "correct": "✅ Bonnes réponses : {{count}}",
-            "incorrect": "❌ Mauvaises réponses : {{count}}"
+            "incorrect": "❌ Mauvaises réponses : {{count}}",
+            "goHome": "Accueil", 
+            "playAgain":"Rejouer"
         }
     },
     "gameModes": {

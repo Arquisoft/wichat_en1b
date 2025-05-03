@@ -184,7 +184,9 @@
             "totalScore": "💯 Puntuación total: {{score}}",
             "rounds": "🔢 Rondes: {{count}}",
             "correct": "✅ Acierte: {{count}}",
-            "incorrect": "❌ Fallaes: {{count}}"
+            "incorrect": "❌ Fallaes: {{count}}",
+            "goHome":"Iniciu",
+            "playAgain":"Xugar de nuevu"
         }
     },
     "gameModes": {

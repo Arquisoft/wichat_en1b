@@ -184,7 +184,9 @@
             "totalScore": "💯 Total Score: {{score}}",
             "rounds": "🔢 Rounds: {{count}}",
             "correct": "✅ Correct: {{count}}",
-            "incorrect": "❌ Incorrect: {{count}}"
+            "incorrect": "❌ Incorrect: {{count}}",
+            "goHome":"Home",
+            "playAgain":"Play again"
         }
     },
     "gameModes": {
