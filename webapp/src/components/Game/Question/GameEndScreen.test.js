@@ -1,6 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import { GameEndScreen } from "./GameEndScreen";
+import { userEvent } from "@testing-library/user-event";
 
 class ResizeObserverMock {
     observe() {}
@@ -60,5 +61,41 @@ describe("GameEndScreen", () => {
         expect(screen.getByText("🔢 Rounds: 10")).toBeInTheDocument();
         expect(screen.getByText("✅ Correct: 5")).toBeInTheDocument();
         expect(screen.getByText("❌ Incorrect: 3")).toBeInTheDocument();
+        expect(screen.getByText("Play again")).toBeInTheDocument();
+        expect(screen.getByText("Home")).toBeInTheDocument();
+    });
+    
+    it("should navigate to /game-modes when 'Play again' button is clicked", async () => {
+        useLocationMock.mockReturnValue({ state: { data: {
+            score: 5000,
+            questionsAnswered: 10,
+            correctAnswers: 5,
+            incorrectAnswers: 3
+        }}});
+
+        render(
+            <MemoryRouter>
+                <GameEndScreen />
+            </MemoryRouter>
+        );
+
+        await userEvent.click(screen.getByText("Play again"));
+    });
+
+    it("should navigate to /game-modes when 'Play again' button is clicked", async () => {
+        useLocationMock.mockReturnValue({ state: { data: {
+            score: 5000,
+            questionsAnswered: 10,
+            correctAnswers: 5,
+            incorrectAnswers: 3
+        }}});
+
+        render(
+            <MemoryRouter>
+                <GameEndScreen />
+            </MemoryRouter>
+        );
+
+        await userEvent.click(screen.getByText("Home"));
     });
 });

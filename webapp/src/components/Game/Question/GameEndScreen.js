@@ -1,12 +1,13 @@
 import { useTranslation } from "react-i18next";
-import { Grid, Typography, Card, CardContent, Divider } from "@mui/material";
+import { Grid, Typography, Card, CardContent, Divider, Button } from "@mui/material";
 import AnswerDistribution from "../../Profile/components/AnswerDistribution";
-import { Navigate, useLocation } from "react-router-dom";
+import { Navigate, useLocation, useNavigate } from "react-router-dom";
 
 export const GameEndScreen = () => {
     const { t } = useTranslation();
     const location = useLocation();
     const data = location.state?.data;
+    const navigate = useNavigate();
 
     if (!data) return <Navigate to="/game-modes" />;
 
@@ -17,6 +18,7 @@ export const GameEndScreen = () => {
         ];
     };
 
+    
     return (
         <>
             <Typography variant="h4" component="h1" align="center" sx={{ mb: 3, fontWeight: 500 }}>
@@ -47,6 +49,20 @@ export const GameEndScreen = () => {
 
                 <Grid item xs={12} md={6}>
                     <AnswerDistribution chartData={getPieChartData()} />
+                </Grid>
+            </Grid>
+
+            {/* Botones de acción */}
+            <Grid container spacing={2} justifyContent="center">
+            <Grid item>
+                    <Button variant="outlined" color="primary" onClick={()=>navigate("/game-modes")}>
+                        {t("game.endScreen.playAgain")}
+                    </Button>
+                </Grid>
+                <Grid item>
+                    <Button variant="outlined" color="primary" onClick={()=>navigate("/home")}>
+                        {t("game.endScreen.goHome")}
+                    </Button>
                 </Grid>
             </Grid>
         </>
