@@ -10,22 +10,28 @@ jest.mock('express', () => {
     return mockedExpress;
 });
 
-// Mock the controllers
-jest.mock('./controllers/EmpathyController', () => {
+// Helper functions for mocking controllers
+const mockEmpathyController = (overrides = {}) => {
     return jest.fn().mockImplementation(() => ({
         hasApiKey: jest.fn().mockReturnValue(true),
         sendQuestionToLLM: jest.fn().mockResolvedValue('empathy llmanswer'),
         sendSimpleMessageToLLM: jest.fn().mockResolvedValue('empathy simple response'),
+        ...overrides,
     }));
-});
+};
 
-jest.mock('./controllers/GeminiController', () => {
+const mockGeminiController = (overrides = {}) => {
     return jest.fn().mockImplementation(() => ({
         hasApiKey: jest.fn().mockReturnValue(true),
         sendQuestionToLLM: jest.fn().mockResolvedValue('gemini llmanswer'),
         sendSimpleMessageToLLM: jest.fn().mockResolvedValue('gemini simple response'),
+        ...overrides,
     }));
-});
+};
+
+// Mock the controllers
+jest.mock('./controllers/EmpathyController', () => mockEmpathyController());
+jest.mock('./controllers/GeminiController', () => mockGeminiController());
 
 const request = require('supertest');
 const axios = require('axios');
@@ -214,10 +220,7 @@ describe('LLM Service Error Handling', () => {
 
     it('Returns 500 if Gemini API key is missing', async () => {
         jest.doMock('./controllers/GeminiController', () => {
-            return jest.fn().mockImplementation(() => ({
-                hasApiKey: () => false,
-                sendQuestionToLLM: jest.fn()
-            }));
+            return mockGeminiController({ hasApiKey: () => false });
         });
 
         jest.resetModules();
@@ -237,10 +240,7 @@ describe('LLM Service Error Handling', () => {
 
     it('Returns 500 if Empathy API key is missing', async () => {
         jest.doMock('./controllers/EmpathyController', () => {
-            return jest.fn().mockImplementation(() => ({
-                hasApiKey: () => false,
-                sendQuestionToLLM: jest.fn()
-            }));
+            return mockEmpathyController({ hasApiKey: () => false });
         });
 
         jest.resetModules();
@@ -260,17 +260,11 @@ describe('LLM Service Error Handling', () => {
 
     it('Returns 500 if no controller has API key for simpleMessage', async () => {
         jest.doMock('./controllers/EmpathyController', () => {
-            return jest.fn().mockImplementation(() => ({
-                hasApiKey: () => false,
-                sendSimpleMessageToLLM: jest.fn()
-            }));
+            return mockEmpathyController({ hasApiKey: () => false });
         });
 
         jest.doMock('./controllers/GeminiController', () => {
-            return jest.fn().mockImplementation(() => ({
-                hasApiKey: () => false,
-                sendSimpleMessageToLLM: jest.fn()
-            }));
+            return mockGeminiController({ hasApiKey: () => false });
         });
 
         jest.resetModules();
