@@ -96,6 +96,10 @@ Lastly, go to the webapp directory and launch this component with `npm install` 
 
 After all the components are launched, the app should be available in **localhost** in port **3000**.
 
+### Load testing (Gatling)
+
+We use Gatling as the tool for load testing our application. For detailed information about how to run and configure the load tests, please refer to the [Gatling README](load-testing/README.md).
+
 ## Deployment
 For the deployment, we have several options. The first and more flexible is to deploy to a virtual machine using SSH. This will work with any cloud service (or with our own server). Other options include using the container services that all the cloud services provide. This means, deploying our Docker containers directly. Here I am going to use the first approach. I am going to create a virtual machine in a cloud service and after installing docker and docker-compose, deploy our containers there using GitHub Actions and SSH.
 
@@ -152,7 +156,3 @@ This action uses three secrets that must be configured in the repository:
 - `DEPLOY_KEY`: key to authenticate the user in the remote machine.
 
 Note that this action logs in the remote machine and downloads the docker-compose file from the repository and launches it. Obviously, previous actions have been executed which have uploaded the docker images to the GitHub Packages repository.
-
-### Load testing (Gatling)
-
-We use Gatling as the tool for load testing our application. For detailed information about how to run and configure the load tests, please refer to the [Gatling README](load-testing/README.md).

@@ -65,20 +65,41 @@ For multiple environments or alternative deployments please copy and adapt this 
 
 [plantuml,"Deployment view L1",png]
 ----
-node "Client Side" {
-  component WC as "Web Client"
+skinparam linetype ortho
+skinparam componentStyle rectangle
+
+cloud "Azure Cloud" as AZ {
+  node "Server Infrastructure" as SI {
+    component "Firewall" as FW
+    component "Docker Host" as DH
+    component "Monitoring" as MON
+  }
 }
 
-node "Server Side"{
-  component GS as "Gateway Service"
-  component WA as "Web Application"
+node "Client Side" as CS {
+  component "Web Client" as WC
 }
 
-WA-[dashed]->GS
-WC-[dashed]->WA
-WA-[dashed]->WC
-WC-[dashed]->GS
+node "GitHub" as GH {
+  component "GitHub Actions" as GA
+  component "GitHub Packages" as GP
+}
 
+node "External Services" as EXT {
+  component "Wikidata" as WD
+  component "LLM API" as ELLM
+}
+
+WC -down-> FW : HTTP/HTTPS
+
+FW -down-> DH
+DH -down-> MON : Metrics
+
+GA -down-> GP : Push Images
+GP -right-> DH : Pull Images
+
+DH -right-> WD : API Calls
+DH -right-> ELLM : API Calls
 ----
 
 
@@ -87,7 +108,7 @@ WC-[dashed]->GS
 
 Motivation::
 
-    * The diagram above illustrates the initial version of our architecture and the delineation among its components. Our approach adopts a straightforward client-server architecture, where the server interacts with external services such as Wikidata or Empathy LLM. This division enforces a clear separation between the client/frontend and the server/backend. Such separation benefits the entire system by ensuring that as long as the common API is implemented, the specific implementations can remain interchangeable.
+    * The diagram above illustrates the initial version of our architecture and the delineation among its components. Our approach adopts a straightforward client-server architecture, where the server interacts with external services such as Wikidata or Empathy / Gemini LLM. This division enforces a clear separation between the client/frontend and the server/backend. Such separation benefits the entire system by ensuring that as long as the common API is implemented, the specific implementations can remain interchangeable.
 
     * Utilizing an Ubuntu server on Azure provides us with an isolated environment equipped with the essential configurations and installations necessary for running our services. By hosting our server on Azure, we can minimize costs associated with machine uptime while alleviating responsibilities such as security, availability, and maintenance.
 
@@ -108,41 +129,60 @@ Here you can see the internal structure of (some) infrastructure elements from l
 ==== _Server Side_
 [plantuml,"Deployment view L2",png]
 ----
-node "Server Side" {
-  component WA as "Web Application"
-  component GS as "Gateway Service"
-  component QS as "Question Service"
-  component US as "User Service"
-  component LLMS as "LLM Service"
-  component AS as "Authorization Service"
-  component SS as "Statistics Service"
-  database MDB as "Mongo DB"
+skinparam linetype ortho
+skinparam componentStyle rectangle
 
-  GS -[dashed]-> WA
-  WA -[dashed]-> GS
-
-  GS -[dashed]-> US
-  US -[dashed]-> GS
-
-  GS -[dashed]-> AS
-  AS -[dashed]-> GS
-
-  GS -[dashed]-> QS
-  QS -[dashed]-> GS
-
-  GS -[dashed]-> LLMS
-  LLMS -[dashed]-> GS
-
-  GS -[dashed]-> SS
-  SS -[dashed]-> GS
-
-  US -[dashed]-> MDB
-  AS -[dashed]-> MDB
-  SS -[dashed]-> MDB
-  QS -[dashed]-> MDB
+node "Docker Host" as DH {
+  package "Container Network" {
+    [Gateway Service] as GS
+    [Web Application] as WA
+    [User Service] as US
+    [Auth Service] as AS
+    [Question Service] as QS
+    [LLM Service] as LLMS
+    [Stats Service] as SS
+    [MongoDB] as MDB
+    [Prometheus] as PROM
+    [Grafana] as GRAF
+  }
 }
+
+database "MongoDB Data" as MDB_DATA
+database "User Images" as IMG_DATA
+database "Prometheus Data" as PROM_DATA
+database "Grafana Data" as GRAF_DATA
+
+WA -down-> GS : HTTP/HTTPS
+GS -down-> US : HTTP/HTTPS
+GS -down-> AS : HTTP/HTTPS
+GS -down-> QS : HTTP/HTTPS
+GS -down-> LLMS : HTTP/HTTPS
+GS -down-> SS : HTTP/HTTPS
+
+US -down-> MDB
+AS -down-> MDB
+QS -down-> MDB
+SS -down-> MDB
+
+PROM -down-> GRAF : Dashboard Data
+
+MDB -down-> MDB_DATA
+US -down-> IMG_DATA
+PROM -down-> PROM_DATA
+GRAF -down-> GRAF_DATA
+
 ----
 
 The gateway service works as an adapter between the micro services and the web client. The web application is the main interface for the user to interact with the system.
 
 We've opted for a microservices architecture using Docker containers instead of a monolithic setup. Each service has its own Docker image. This Docker-based approach streamlines deployment, management, and resource utilization while enhancing the overall flexibility and scalability of our system.
+
+=== Periodic Background Jobs
+
+The Question Service executes the following periodic jobs:
+
+    * Every hour: Updates the local cache of Wikidata items.
+
+    * Every day at 02:00 AM: Selects and stores the "Question of the Day".
+
+These jobs ensure the freshness and availability of quiz content for users.
