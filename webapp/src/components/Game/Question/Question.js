@@ -391,9 +391,10 @@ export const Question = () => {
                                         onClick={() => handleAnswerSelect(image)}
                                         disabled={!!selectedAnswer}
                                         sx={{
-                                            py: 1.5,
-                                            textTransform: "none",
-                                            justifyContent: "center",
+                                            width: "100%",
+                                            aspectRatio: "1 / 1",
+                                            padding: 0,
+                                            overflow: "hidden",
                                             backgroundColor:
                                                 selectedAnswer === image && isCorrect ? "success.main" :
                                                     selectedAnswer === image && isIncorrect ? "error.main" :
@@ -420,16 +421,26 @@ export const Question = () => {
                                         }}
                                     >
                                         <Box
-                                            component="img"
-                                            src={image || "/placeholder.svg"}
-                                            alt="Game Question"
                                             sx={{
                                                 width: "100%",
-                                                height: "150px",
-                                                objectFit: "cover",
-                                                borderRadius: "4px",
+                                                height: "100%",
+                                                display: "flex",
+                                                justifyContent: "center",
+                                                alignItems: "center",
                                             }}
-                                        />
+                                        >
+                                            <Box
+                                                component="img"
+                                                src={image || "/placeholder.svg"}
+                                                alt="Game Option"
+                                                sx={{
+                                                    maxWidth: "100%",
+                                                    maxHeight: "100%",
+                                                    objectFit: "contain",
+                                                    display: "block"
+                                                }}
+                                            />
+                                        </Box>
                                     </Button>
                                 </Grid>
                             ))
