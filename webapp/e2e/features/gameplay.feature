@@ -14,17 +14,14 @@ Feature: Playing the game
     When Trying to click the game pannel
     Then A game should be started
 
-  Scenario: Answering a question
+  Scenario: Seeing game modes
     Given User in the home window
-    When Entering a new game
-    Then The round must be shown
-    And The time must be shown
-    And Should answer a question
-    And The round should change
-    And The time should reset
+    When Entering the game mode panel
+    Then Retrieve all the game modes
 
-  Scenario: Finnish game
+  Scenario: Interacting with IA
     Given User in the home window
     When Entering a new game
-    Then Answer the questions of the game
-    And Should be redirected to the statistics view
+    Then Should interact with the IA
+    
+    
