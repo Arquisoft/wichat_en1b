@@ -136,17 +136,18 @@ Table User {
   passwordHash varchar
   image varchar
   registrationDate datetime
-  gamesPlayed [ref: > Game._id]
+  gamesPlayed varchar[]
   questionsAnswered int
   correctAnswers int
   incorrectAnswers int
+  profileVisits varchar[]
   totalVisits int
 }
 
 Table Game {
   _id ObjectId [pk]
   username varchar
-  gameType varchar
+  gameType GameType
   questionsAnswered int
   correctAnswers int
   incorrectAnswers int
@@ -157,7 +158,7 @@ Table Game {
 
 Table Visit {
   _id ObjectId [pk]
-  visitorUsername varchar
+  visitorUsername varchar [ref : > User.username]
   visitDate datetime
 }
 
@@ -172,9 +173,26 @@ Table WikidataItem {
 
 Table Question {
   _id ObjectId [pk]
-  question varchar
+  imageType varchar
+  relation varchar
+  topic varchar
   images varchar[]
   correctOption varchar
+}
+
+Table Answer {
+  _id ObjectId [pk]
+  questionId ObjectId [ref : > Question._id]
+  username varchar
+  answer varchar
+  isCorrect boolean
+  correctOption varchar
+}
+
+Table QuestionOfDay {
+  _id ObjectId [pk]
+  questionId ObjectId [ref : > Question._id]
+  date datetime
 }
 
 Enum GameType {
@@ -185,5 +203,7 @@ Enum GameType {
   custom
 }
 
-Ref: User.profileVisits > Visit
+Ref : User.gamesPlayed > Game._id
+Ref : User.profileVisits > Visit._id
+
 ```
