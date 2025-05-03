@@ -391,45 +391,65 @@ export const Question = () => {
                                         onClick={() => handleAnswerSelect(image)}
                                         disabled={!!selectedAnswer}
                                         sx={{
-                                            py: 1.5,
-                                            textTransform: "none",
-                                            justifyContent: "center",
+                                            width: "100%",
+                                            aspectRatio: {
+                                                xs: "4 / 3", // Wider on small screens
+                                                sm: "1 / 1" // Square on larger screens
+                                            },
+                                            padding: 1.5,
+                                            overflow: "hidden",
+                                            borderRadius: 3,
+                                            boxShadow: 2,
                                             backgroundColor:
                                                 selectedAnswer === image && isCorrect ? "success.main" :
                                                     selectedAnswer === image && isIncorrect ? "error.main" :
-                                                        image === correctOption && isIncorrect ? "warning.main" :
+                                                        image === correctOption && isIncorrect ? "success.main" :
                                                             selectedAnswer === image ? "primary.main" :
-                                                                "transparent",
+                                                                "background.paper",
                                             '&:hover': {
                                                 backgroundColor:
                                                     selectedAnswer === image && isCorrect ? "success.dark" :
                                                         selectedAnswer === image && isIncorrect ? "error.dark" :
-                                                            image === correctOption && isIncorrect ? "warning.dark" :
+                                                            image === correctOption && isIncorrect ? "success.dark" :
                                                                 selectedAnswer === image ? "primary.dark" :
-                                                                    "transparent"
+                                                                    "grey.100"
                                             },
                                             '&.Mui-disabled': {
                                                 backgroundColor:
                                                     selectedAnswer === image && isCorrect ? "success.main" :
                                                         selectedAnswer === image && isIncorrect ? "error.main" :
-                                                            image === correctOption && isIncorrect ? "warning.main" :
+                                                            image === correctOption && isIncorrect ? "success.main" :
                                                                 selectedAnswer === image ? "primary.main" :
-                                                                    "transparent",
+                                                                    "background.paper",
                                                 opacity: 1
                                             }
                                         }}
                                     >
+                                        {/* Image inside the button */}
                                         <Box
-                                            component="img"
-                                            src={image || "/placeholder.svg"}
-                                            alt="Game Question"
                                             sx={{
                                                 width: "100%",
-                                                height: "150px",
-                                                objectFit: "cover",
-                                                borderRadius: "4px",
+                                                height: "100%",
+                                                display: "flex",
+                                                justifyContent: "center",
+                                                alignItems: "center",
+                                                backgroundColor: "white",
+                                                borderRadius: 2
                                             }}
-                                        />
+                                        >
+                                            {/* Image element */}
+                                            <Box
+                                                component="img"
+                                                src={image || "/placeholder.svg"}
+                                                alt="Game Option"
+                                                sx={{
+                                                    maxWidth: "90%",
+                                                    maxHeight: "90%",
+                                                    objectFit: "contain",
+                                                    display: "block"
+                                                }}
+                                            />
+                                        </Box>
                                     </Button>
                                 </Grid>
                             ))
