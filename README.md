@@ -152,3 +152,7 @@ This action uses three secrets that must be configured in the repository:
 - `DEPLOY_KEY`: key to authenticate the user in the remote machine.
 
 Note that this action logs in the remote machine and downloads the docker-compose file from the repository and launches it. Obviously, previous actions have been executed which have uploaded the docker images to the GitHub Packages repository.
+
+### Load testing (Gatling)
+
+We use Gatling as the tool for load testing our application. For detailed information about how to run and configure the load tests, please refer to the [Gatling README](load-testing/README.md).
