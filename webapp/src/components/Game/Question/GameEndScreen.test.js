@@ -60,5 +60,7 @@ describe("GameEndScreen", () => {
         expect(screen.getByText("🔢 Rounds: 10")).toBeInTheDocument();
         expect(screen.getByText("✅ Correct: 5")).toBeInTheDocument();
         expect(screen.getByText("❌ Incorrect: 3")).toBeInTheDocument();
+        expect(screen.getByText("Play again")).toBeInTheDocument();
+        expect(screen.getByText("Menu")).toBeInTheDocument();
     });
 });
