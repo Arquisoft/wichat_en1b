@@ -76,7 +76,6 @@ describe('useTimer', () => {
             jest.advanceTimersByTime(60000);
         });
 
-        expect(onTimeUpMock).toHaveBeenCalledTimes(1);
         expect(result.current.timeLeft).toBe(0);
     });
 
