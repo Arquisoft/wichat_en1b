@@ -36,6 +36,26 @@ This section provides a summary of the tests performed, tools used, and results 
     - **Login with non-existing user**: Tests login with a username that doesn’t exist in the system, expecting an error message to be displayed.
   - Tests include necessary setup such as language selection, user registration, and log-in functionality with visual confirmation of alerts in case of errors.
 
+* *Load tests*
+  - Load testing is performed using Gatling, a high-performance load testing tool, to evaluate the system's behavior under various load conditions. Our load tests focus on key user interactions:
+    - **LoginSimulation**: Tests the login workflow with 10 concurrent users per second over a 60-second period. This simulation includes:
+      - Initial page load and resource fetching
+      - Navigation to the login page
+      - Performing login with credentials
+      - Verifying successful redirection to the home page after login
+    - **QODSimulation**: Simulates accessing the Question of the Day feature with 25 concurrent users per second over a 30-second period. This test validates:
+      - Accessing the game modes page
+      - Loading required static resources
+      - Authenticated API requests to fetch the daily question
+    - **CustomGameSimulation**: Tests the custom game creation and gameplay flow with varying user loads. This simulation covers:
+      - Game creation with specific parameters
+      - Joining custom games
+      - Playing through game rounds
+      - Evaluating server response times for game actions
+    - **UploadProfileImgSimulation**: Tests the profile image upload functionality under load, evaluating:
+      - File upload performance
+      - Server processing of image uploads
+
 === 13.2 CI/CD Integration
 
 Automated tests are executed through GitHub Actions as part of the continuous integration pipeline. Each push to the `main` branch triggers workflows for:
@@ -76,6 +96,8 @@ This table provides a summary of the test results, detailing the tools used, the
 * The LLM hint generation may exceed the 3-second threshold in edge cases (see quality scenario <<section-10.2>> FS-1). This was mitigated by adding a second LLM to process the requests if one was slower.
 * End-to-end tests occasionally fail in CI due to timing issues with page rendering delays. This was mitigated with additional retries and slowmo incrementation on GitHub Actions.
 * Some edge cases involving the interaction with storage events may not be consistently handled due to browser quirks. These are being tracked for future improvements.
+* During load testing, occasional timeouts were observed in the profile image upload simulation with large files (>5MB). A size limit and frontend validation were implemented as mitigation.
+* The Question of the Day endpoint showed excellent performance even under high load, consistently responding within the acceptable time threshold.
 
 === 13.6 Test Environment
 
@@ -85,6 +107,7 @@ The testing environment for the application consists of the following components
 - **Backend**: Backend tests are executed using Jest and Supertest, with MongoDB mocked to simulate database interactions and verify API endpoint behavior.
 - **E2E**: End-to-end tests are run using Puppeteer with Jest-Cucumber, simulating real-world user behavior and interactions through a browser.
 - **CI/CD**: Automated tests are integrated into the CI/CD pipeline using GitHub Actions to ensure that all tests are executed for each change pushed to the `main` branch and for each pull request.
+- **Load Testing**: Gatling is used for load testing with Maven for build automation. The tests are run against a deployed instance of the application on Azure, simulating realistic user behavior patterns and measuring response times and throughput.
 
 === 13.7 Future Improvements
 
