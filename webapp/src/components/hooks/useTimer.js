@@ -5,14 +5,23 @@ function useTimer({ initialTimeParam, onTimeUp, autoStart = true }) {
     const [isRunning, setIsRunning] = useState(autoStart);
     const [initialTime, setInitialTime] = useState(initialTimeParam);
     const timerRef = useRef(null);
+    const onTimeUpRef = useRef(onTimeUp);
+
+    // Update ref when onTimeUp changes
+    useEffect(() => {
+        onTimeUpRef.current = onTimeUp;
+    }, [onTimeUp]);
 
     useEffect(() => {
         if (isRunning) {
             timerRef.current = setInterval(() => {
                 setTimeLeft(prev => {
-                    if (prev <= 1) {
+                    if (prev === 0) {
                         clearInterval(timerRef.current);
-                        onTimeUp(); // Call the callback when time is up
+                        if (timerRef.current !== null) {
+                            onTimeUpRef.current(); // Call the callback when time is up
+                            timerRef.current = null; // Mark as called to prevent multiple calls
+                        }
                         return 0;
                     }
                     return prev - 1;
@@ -20,7 +29,7 @@ function useTimer({ initialTimeParam, onTimeUp, autoStart = true }) {
             }, 1000);
         }
         return () => clearInterval(timerRef.current);
-    }, [isRunning, onTimeUp]);
+    }, [isRunning]); // Remove onTimeUp from dependencies
 
     const start = () => setIsRunning(true);
     const pause = () => setIsRunning(false);
@@ -28,6 +37,7 @@ function useTimer({ initialTimeParam, onTimeUp, autoStart = true }) {
         clearInterval(timerRef.current);
         setTimeLeft(newTime);
         setIsRunning(false);
+        timerRef.current = null; // Reset the ref to allow future callbacks
     };
 
     return {
