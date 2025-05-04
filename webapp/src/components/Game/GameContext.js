@@ -17,12 +17,13 @@ export const GameProvider = ({ children, selectedModeId }) => {
     const [statisticsUpdater, setStatisticsUpdater] = useState(new StatisticsUpdater(gameMode));
     const lastAnswerRef = useRef(true); // used in suddenDeath if needed
     const [clearMessages, setClearMessages] = useState(false);
+    const [onTimeUpHandler, setOnTimeUpHandler] = useState(null);
 
     const [customSettings, setCustomSettings] = useState(() => {
         const savedSettings = localStorage.getItem('customSettings');
         return savedSettings ? JSON.parse(savedSettings) : { rounds: 5, timePerQuestion: 30, aiAttempts: 3 };
     });
-    
+
     // Optionally, listen for changes in `localStorage`
     useEffect(() => {
         const handleStorageChange = () => {
@@ -31,7 +32,7 @@ export const GameProvider = ({ children, selectedModeId }) => {
                 setCustomSettings(JSON.parse(savedSettings));
             }
         };
-    
+
         window.addEventListener('storage', handleStorageChange);
         return () => window.removeEventListener('storage', handleStorageChange);
     }, []);
@@ -43,7 +44,7 @@ export const GameProvider = ({ children, selectedModeId }) => {
             injectedRefs: { lastAnswerRef }
         });
     }, [gameMode, customSettings]);
-    
+
     useEffect(() => {
         //console.log('Strategy recomputed:', strategy);
     }, [strategy]);
@@ -56,8 +57,9 @@ export const GameProvider = ({ children, selectedModeId }) => {
     });
 
     const { round, nextRound, isGameEnded, resetRounds } = useRounds({
-        maxRounds: strategy.maxRounds ?? 10, 
-        onRoundChange: () => handleRoundChange() });
+        maxRounds: strategy.maxRounds ?? 10,
+        onRoundChange: () => handleRoundChange()
+    });
 
     // 🎯 Handle gameMode changes
     useEffect(() => {
@@ -71,7 +73,6 @@ export const GameProvider = ({ children, selectedModeId }) => {
 
     // ⏰ When time is up
     const handleTimeUp = () => {
-        
         if (strategy.timerMode === 'perQuestion') {
             if (isGameEnded()) {
                 console.log("Game ended, no more rounds left.");
@@ -85,6 +86,13 @@ export const GameProvider = ({ children, selectedModeId }) => {
         } else {
             setGameEnded(true);
             pause();
+        }
+
+        if (onTimeUpHandler) {
+            // this is to avoid calling the handler multiple times
+            setTimeout(() => {
+                onTimeUpHandler();
+            }, 0);
         }
     };
 
@@ -124,6 +132,7 @@ export const GameProvider = ({ children, selectedModeId }) => {
             strategy,
             clearMessages,
             setClearMessages,
+            setOnTimeUpHandler,
             customSettings,
             setCustomSettings
         }}>

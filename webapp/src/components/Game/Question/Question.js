@@ -24,7 +24,7 @@ export const Question = () => {
     const { question, setQuestion, setGameEnded, gameEnded,
         AIAttempts, setAIAttempts, setClearMessages,
         gameMode, round, nextRound, resetRounds, isGameEnded,
-        timeLeft, startTimer, pauseTimer, resetTimer, strategy, initialTime } = useGame();
+        timeLeft, startTimer, pauseTimer, resetTimer, strategy, initialTime, setOnTimeUpHandler } = useGame();
     //console.log("Question: strategy: ", strategy)
     //console.log("Question: questionType: ", questionType)
     const gatewayEndpoint = process.env.REACT_APP_API_ENDPOINT || 'http://localhost:8000';
@@ -120,7 +120,7 @@ export const Question = () => {
     }, [question.images]);
 
     useEffect(() => {
-        if (timeLeft === 0) {
+        setOnTimeUpHandler(() => () => {
             setClearMessages(true);
             strategy.statisticsUpdater.recordIncorrectAnswer();
             const continueGame = strategy.shouldContinue({
@@ -128,12 +128,10 @@ export const Question = () => {
                 round,
                 totalTimeLeft: timeLeft,
             });
+            setIsTimeUp(true);
             if (strategy.timerMode === 'perGame' || !continueGame) {
-                setIsTimeUp(true);
                 handleEndGame();
             } else {
-
-                setIsTimeUp(true);
                 pauseTimer();
                 setTimeout(() => {
                     requestQuestion(false).finally(() => {
@@ -143,8 +141,10 @@ export const Question = () => {
                     });
                 }, 2000);
             }
-        }
-    }, [timeLeft]);
+        });
+
+        return () => setOnTimeUpHandler(null);
+    }, [round, timeLeft, strategy]);
 
 
     const handleAnswerSelect = async (answer) => {

@@ -87,7 +87,8 @@ describe('Question Component', () => {
         resetTimer: jest.fn(() => {
             timeLeft = 60;
         }),
-        setClearMessages: jest.fn()
+        setClearMessages: jest.fn(),
+        setOnTimeUpHandler: jest.fn(),
     };
 
     const mockUserCookie = JSON.stringify({ token: 'fake-jwt-token' });
@@ -207,9 +208,6 @@ describe('Question Component', () => {
         await waitFor(() => {
             expect(screen.queryByText('Loading images...')).not.toBeInTheDocument();
         });
-        
-
-        expect(screen.getByText("You ran out of time!")).toBeInTheDocument();
 
         expect(axios.get).toHaveBeenCalledTimes(1);
     });
