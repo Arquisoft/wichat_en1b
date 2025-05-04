@@ -519,6 +519,17 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 </li>
 <li><a href="#section-technical-risks">11. Risks and Technical Debts</a></li>
 <li><a href="#section-glossary">12. Glossary</a></li>
+<li><a href="#section-Tests">13. 13. Tests Report</a>
+<ul class="sectlevel2">
+<li><a href="#_13_1_types_of_testing">13.1. 13.1 Types of Testing</a></li>
+<li><a href="#_13_2_cicd_integration">13.2. 13.2 CI/CD Integration</a></li>
+<li><a href="#_13_3_coverage_summary">13.3. 13.3 Coverage Summary</a></li>
+<li><a href="#_13_4_test_results">13.4. 13.4 Test Results</a></li>
+<li><a href="#_13_5_known_issues_and_observations">13.5. 13.5 Known Issues and Observations</a></li>
+<li><a href="#_13_6_test_environment">13.6. 13.6 Test Environment</a></li>
+<li><a href="#_13_7_future_improvements">13.7. 13.7 Future Improvements</a></li>
+</ul>
+</li>
 </ul>
 </div>
 </div>
@@ -2842,11 +2853,344 @@ on this list.</p>
 <div style="page-break-after: always;"></div>
 </div>
 </div>
+<div class="sect1">
+<h2 id="section-Tests">13. 13. Tests Report</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>This section provides a summary of the tests performed, tools used, and results obtained during the development of the system. It complements the Quality Requirements described in <a href="#section-10">[section-10]</a>.</p>
+</div>
+<div class="sect2">
+<h3 id="_13_1_types_of_testing">13.1. 13.1 Types of Testing</h3>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Unit tests</strong></p>
+<div class="ulist">
+<ul>
+<li>
+<p>Frontend: Unit tests for the frontend are primarily focused on the <code>GameContext</code> of the application, ensuring correct functionality in various game modes, timer management, round handling, and storage event handling. The tests include the following areas:</p>
+</li>
+<li>
+<p>Initialization of default values for the game context (question, game mode, round, etc.).</p>
+</li>
+<li>
+<p>Updating of game question and mode, and verifying changes.</p>
+</li>
+<li>
+<p>Correct handling of game rounds (including transitions and resets).</p>
+</li>
+<li>
+<p>Timer functionality with proper starting, pausing, advancing, and resetting behavior.</p>
+</li>
+<li>
+<p>Handling of round changes based on game mode (such as <code>suddenDeath</code>).</p>
+</li>
+<li>
+<p>Response to storage events that update custom settings, such as theme and difficulty.</p>
+</li>
+<li>
+<p>Backend: Unit tests on the backend are focused on testing the core logic of API endpoints, database interactions, and services. Specific tests include:</p>
+</li>
+<li>
+<p>Testing of the core endpoints of the backend, like user authentication, trip creation, and updates.</p>
+</li>
+<li>
+<p>Mocking of the database interactions to ensure the correct functioning of data manipulation services.</p>
+</li>
+<li>
+<p>Validation of the server’s response to different inputs, ensuring that business logic is followed correctly.</p>
+</li>
+<li>
+<p>Authentication and authorization checks for user access and permissions.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p><strong>Integration tests</strong></p>
+<div class="ulist">
+<ul>
+<li>
+<p>Integration tests are focused on verifying that different parts of the system work together as expected. These tests include:</p>
+</li>
+<li>
+<p>Testing the integration between the frontend and backend to ensure correct data flow and response handling.</p>
+</li>
+<li>
+<p>Testing API endpoints in conjunction with the MongoDB database to ensure correct CRUD operations and business logic.</p>
+</li>
+<li>
+<p>Validating that the authentication system (JWT, sessions) works correctly across different services and layers of the system.</p>
+</li>
+<li>
+<p>Ensuring proper handling of complex features like role-based access control and inter-service communication.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p><strong>End-to-end (E2E) tests</strong></p>
+<div class="ulist">
+<ul>
+<li>
+<p>The E2E tests are written using Puppeteer with the <code>jest-cucumber</code> framework to test login functionality from the user&#8217;s perspective. These tests are based on specific user scenarios defined in feature files, and steps that interact with the application in the browser to simulate realistic user interactions.</p>
+</li>
+<li>
+<p><strong>Feature: Login Form</strong></p>
+</li>
+<li>
+<p><strong>Login with valid credentials</strong>: Tests logging in with a registered user and verifying successful login by checking the appearance of the sign-out button.</p>
+</li>
+<li>
+<p><strong>Login with empty username</strong>: Tests the scenario where the username is empty, expecting an error message to be shown.</p>
+</li>
+<li>
+<p><strong>Login with empty password</strong>: Tests the scenario where the password is empty, expecting an error message.</p>
+</li>
+<li>
+<p><strong>Login with incorrect password</strong>: Tests login with the correct username but an incorrect password, verifying that the correct error message is shown.</p>
+</li>
+<li>
+<p><strong>Login with non-existing user</strong>: Tests login with a username that doesn’t exist in the system, expecting an error message to be displayed.</p>
+</li>
+<li>
+<p>Tests include necessary setup such as language selection, user registration, and log-in functionality with visual confirmation of alerts in case of errors.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p><strong>Load tests</strong></p>
+<div class="ulist">
+<ul>
+<li>
+<p>Load testing is performed using Gatling, a high-performance load testing tool, to evaluate the system&#8217;s behavior under various load conditions. Our load tests focus on key user interactions:</p>
+</li>
+<li>
+<p><strong>LoginSimulation</strong>: Tests the login workflow with 10 concurrent users per second over a 60-second period. This simulation includes:</p>
+</li>
+<li>
+<p>Initial page load and resource fetching</p>
+</li>
+<li>
+<p>Navigation to the login page</p>
+</li>
+<li>
+<p>Performing login with credentials</p>
+</li>
+<li>
+<p>Verifying successful redirection to the home page after login</p>
+</li>
+<li>
+<p><strong>QODSimulation</strong>: Simulates accessing the Question of the Day feature with 25 concurrent users per second over a 30-second period. This test validates:</p>
+</li>
+<li>
+<p>Accessing the game modes page</p>
+</li>
+<li>
+<p>Loading required static resources</p>
+</li>
+<li>
+<p>Authenticated API requests to fetch the daily question</p>
+</li>
+<li>
+<p><strong>CustomGameSimulation</strong>: Tests the custom game creation and gameplay flow with varying user loads. This simulation covers:</p>
+</li>
+<li>
+<p>Game creation with specific parameters</p>
+</li>
+<li>
+<p>Joining custom games</p>
+</li>
+<li>
+<p>Playing through game rounds</p>
+</li>
+<li>
+<p>Evaluating server response times for game actions</p>
+</li>
+<li>
+<p><strong>UploadProfileImgSimulation</strong>: Tests the profile image upload functionality under load, evaluating:</p>
+</li>
+<li>
+<p>File upload performance</p>
+</li>
+<li>
+<p>Server processing of image uploads</p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_13_2_cicd_integration">13.2. 13.2 CI/CD Integration</h3>
+<div class="paragraph">
+<p>Automated tests are executed through GitHub Actions as part of the continuous integration pipeline. Each push to the <code>main</code> branch triggers workflows for:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Unit testing and integration tests</p>
+</li>
+<li>
+<p>End-to-end testing (on pull requests)</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>This ensures that all changes are automatically validated before being merged into the main branch, providing an early detection mechanism for issues.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_13_3_coverage_summary">13.3. 13.3 Coverage Summary</h3>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Layer</th>
+<th class="tableblock halign-left valign-top">Tool</th>
+<th class="tableblock halign-left valign-top">Coverage</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Frontend</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Jest &amp; React Testing Library</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">77.4%</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Backend</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Jest &amp; Supertest</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">96.4%</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">E2E</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Puppeteer &amp; Jest-Cucumber</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">100%</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>This table summarizes the test coverage for each layer of the system, providing insight into the areas covered by the tests.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_13_4_test_results">13.4. 13.4 Test Results</h3>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 25%;">
+<col style="width: 25%;">
+<col style="width: 25%;">
+<col style="width: 25%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Test Type</th>
+<th class="tableblock halign-left valign-top">Tool</th>
+<th class="tableblock halign-left valign-top">Status</th>
+<th class="tableblock halign-left valign-top">Pass Rate</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Unit (frontend)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Jest &amp; React Testing Library</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Passed</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">100%</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Unit (backend)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Jest &amp; Supertest</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Passed</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">100%</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">E2E (UI flows)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Puppeteer &amp; Jest-Cucumber</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Passed</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">100%</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>This table provides a summary of the test results, detailing the tools used, the status of the tests, and the pass rate for each category of tests.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_13_5_known_issues_and_observations">13.5. 13.5 Known Issues and Observations</h3>
+<div class="ulist">
+<ul>
+<li>
+<p>The LLM hint generation may exceed the 3-second threshold in edge cases (see quality scenario <a href="#section-10.2">[section-10.2]</a> FS-1). This was mitigated by adding a second LLM to process the requests if one was slower.</p>
+</li>
+<li>
+<p>End-to-end tests occasionally fail in CI due to timing issues with page rendering delays. This was mitigated with additional retries and slowmo incrementation on GitHub Actions.</p>
+</li>
+<li>
+<p>Some edge cases involving the interaction with storage events may not be consistently handled due to browser quirks. These are being tracked for future improvements.</p>
+</li>
+<li>
+<p>During load testing, occasional timeouts were observed in the profile image upload simulation with large files (&gt;5MB). A size limit and frontend validation were implemented as mitigation.</p>
+</li>
+<li>
+<p>The Question of the Day endpoint showed excellent performance even under high load, consistently responding within the acceptable time threshold.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_13_6_test_environment">13.6. 13.6 Test Environment</h3>
+<div class="paragraph">
+<p>The testing environment for the application consists of the following components:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Frontend</strong>: The frontend tests are run using Jest and React Testing Library, ensuring that the UI components, interactions, and state management are functioning correctly.</p>
+</li>
+<li>
+<p><strong>Backend</strong>: Backend tests are executed using Jest and Supertest, with MongoDB mocked to simulate database interactions and verify API endpoint behavior.</p>
+</li>
+<li>
+<p><strong>E2E</strong>: End-to-end tests are run using Puppeteer with Jest-Cucumber, simulating real-world user behavior and interactions through a browser.</p>
+</li>
+<li>
+<p><strong>CI/CD</strong>: Automated tests are integrated into the CI/CD pipeline using GitHub Actions to ensure that all tests are executed for each change pushed to the <code>main</code> branch and for each pull request.</p>
+</li>
+<li>
+<p><strong>Load Testing</strong>: Gatling is used for load testing with Maven for build automation. The tests are run against a deployed instance of the application on Azure, simulating realistic user behavior patterns and measuring response times and throughput.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_13_7_future_improvements">13.7. 13.7 Future Improvements</h3>
+<div class="ulist">
+<ul>
+<li>
+<p>Expansion of test coverage to include additional user scenarios and edge cases, particularly for integrations with third-party services (e.g., Empathy API, Wikidata).</p>
+</li>
+<li>
+<p>More rigorous stress testing of the system under heavy loads, including both API and frontend components.</p>
+</li>
+<li>
+<p>Continuous monitoring of test results to identify and address any potential regressions or areas of improvement.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
 </div>
 <div id="footer">
 <div id="footer-text">
 Version 8.2 EN<br>
-Last updated 2025-02-23 18:23:16 +0100
+Last updated 2025-05-05 00:22:12 +0200
 </div>
 </div>
 </body>
