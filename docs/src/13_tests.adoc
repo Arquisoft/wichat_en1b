@@ -1,0 +1,116 @@
+[[section-Tests]]
+== 13. Tests Report
+
+This section provides a summary of the tests performed, tools used, and results obtained during the development of the system. It complements the Quality Requirements described in <<section-10>>.
+
+=== 13.1 Types of Testing
+
+* *Unit tests* 
+  - Frontend: Unit tests for the frontend are primarily focused on the `GameContext` of the application, ensuring correct functionality in various game modes, timer management, round handling, and storage event handling. The tests include the following areas:
+    - Initialization of default values for the game context (question, game mode, round, etc.).
+    - Updating of game question and mode, and verifying changes.
+    - Correct handling of game rounds (including transitions and resets).
+    - Timer functionality with proper starting, pausing, advancing, and resetting behavior.
+    - Handling of round changes based on game mode (such as `suddenDeath`).
+    - Response to storage events that update custom settings, such as theme and difficulty.
+  - Backend: Unit tests on the backend are focused on testing the core logic of API endpoints, database interactions, and services. Specific tests include:
+    - Testing of the core endpoints of the backend, like user authentication, trip creation, and updates.
+    - Mocking of the database interactions to ensure the correct functioning of data manipulation services.
+    - Validation of the server’s response to different inputs, ensuring that business logic is followed correctly.
+    - Authentication and authorization checks for user access and permissions.
+
+* *Integration tests* 
+  - Integration tests are focused on verifying that different parts of the system work together as expected. These tests include:
+    - Testing the integration between the frontend and backend to ensure correct data flow and response handling.
+    - Testing API endpoints in conjunction with the MongoDB database to ensure correct CRUD operations and business logic.
+    - Validating that the authentication system (JWT, sessions) works correctly across different services and layers of the system.
+    - Ensuring proper handling of complex features like role-based access control and inter-service communication.
+
+* *End-to-end (E2E) tests*  
+  - The E2E tests are written using Puppeteer with the `jest-cucumber` framework to test login functionality from the user's perspective. These tests are based on specific user scenarios defined in feature files, and steps that interact with the application in the browser to simulate realistic user interactions.
+  - **Feature: Login Form**
+    - **Login with valid credentials**: Tests logging in with a registered user and verifying successful login by checking the appearance of the sign-out button.
+    - **Login with empty username**: Tests the scenario where the username is empty, expecting an error message to be shown.
+    - **Login with empty password**: Tests the scenario where the password is empty, expecting an error message.
+    - **Login with incorrect password**: Tests login with the correct username but an incorrect password, verifying that the correct error message is shown.
+    - **Login with non-existing user**: Tests login with a username that doesn’t exist in the system, expecting an error message to be displayed.
+  - Tests include necessary setup such as language selection, user registration, and log-in functionality with visual confirmation of alerts in case of errors.
+
+* *Load tests*
+  - Load testing is performed using Gatling, a high-performance load testing tool, to evaluate the system's behavior under various load conditions. Our load tests focus on key user interactions:
+    - **LoginSimulation**: Tests the login workflow with 10 concurrent users per second over a 60-second period. This simulation includes:
+      - Initial page load and resource fetching
+      - Navigation to the login page
+      - Performing login with credentials
+      - Verifying successful redirection to the home page after login
+    - **QODSimulation**: Simulates accessing the Question of the Day feature with 25 concurrent users per second over a 30-second period. This test validates:
+      - Accessing the game modes page
+      - Loading required static resources
+      - Authenticated API requests to fetch the daily question
+    - **CustomGameSimulation**: Tests the custom game creation and gameplay flow with varying user loads. This simulation covers:
+      - Game creation with specific parameters
+      - Joining custom games
+      - Playing through game rounds
+      - Evaluating server response times for game actions
+    - **UploadProfileImgSimulation**: Tests the profile image upload functionality under load, evaluating:
+      - File upload performance
+      - Server processing of image uploads
+
+=== 13.2 CI/CD Integration
+
+Automated tests are executed through GitHub Actions as part of the continuous integration pipeline. Each push to the `main` branch triggers workflows for:
+
+- Unit testing and integration tests
+- End-to-end testing (on pull requests)
+
+This ensures that all changes are automatically validated before being merged into the main branch, providing an early detection mechanism for issues.
+
+=== 13.3 Coverage Summary
+
+[cols="1,1,1", options="header"]
+|===
+| Layer         | Tool      | Coverage
+
+| Frontend      | Jest & React Testing Library | 77.4%
+| Backend       | Jest & Supertest | 96.4%
+| E2E           | Puppeteer & Jest-Cucumber | 100%
+|===
+
+This table summarizes the test coverage for each layer of the system, providing insight into the areas covered by the tests.
+
+=== 13.4 Test Results
+
+[cols="1,1,1,1", options="header"]
+|===
+| Test Type       | Tool     | Status           | Pass Rate
+
+| Unit (frontend) | Jest & React Testing Library | Passed | 100%
+| Unit (backend)  | Jest & Supertest | Passed | 100%
+| E2E (UI flows)  | Puppeteer & Jest-Cucumber | Passed | 100%
+|===
+
+This table provides a summary of the test results, detailing the tools used, the status of the tests, and the pass rate for each category of tests.
+
+=== 13.5 Known Issues and Observations
+
+* The LLM hint generation may exceed the 3-second threshold in edge cases (see quality scenario <<section-10.2>> FS-1). This was mitigated by adding a second LLM to process the requests if one was slower.
+* End-to-end tests occasionally fail in CI due to timing issues with page rendering delays. This was mitigated with additional retries and slowmo incrementation on GitHub Actions.
+* Some edge cases involving the interaction with storage events may not be consistently handled due to browser quirks. These are being tracked for future improvements.
+* During load testing, occasional timeouts were observed in the profile image upload simulation with large files (>5MB). A size limit and frontend validation were implemented as mitigation.
+* The Question of the Day endpoint showed excellent performance even under high load, consistently responding within the acceptable time threshold.
+
+=== 13.6 Test Environment
+
+The testing environment for the application consists of the following components:
+
+- **Frontend**: The frontend tests are run using Jest and React Testing Library, ensuring that the UI components, interactions, and state management are functioning correctly.
+- **Backend**: Backend tests are executed using Jest and Supertest, with MongoDB mocked to simulate database interactions and verify API endpoint behavior.
+- **E2E**: End-to-end tests are run using Puppeteer with Jest-Cucumber, simulating real-world user behavior and interactions through a browser.
+- **CI/CD**: Automated tests are integrated into the CI/CD pipeline using GitHub Actions to ensure that all tests are executed for each change pushed to the `main` branch and for each pull request.
+- **Load Testing**: Gatling is used for load testing with Maven for build automation. The tests are run against a deployed instance of the application on Azure, simulating realistic user behavior patterns and measuring response times and throughput.
+
+=== 13.7 Future Improvements
+
+* Expansion of test coverage to include additional user scenarios and edge cases, particularly for integrations with third-party services (e.g., Empathy API, Wikidata).
+* More rigorous stress testing of the system under heavy loads, including both API and frontend components.
+* Continuous monitoring of test results to identify and address any potential regressions or areas of improvement.
