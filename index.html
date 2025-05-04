@@ -494,6 +494,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <ul class="sectlevel2">
 <li><a href="#_infrastructure_level_1">7.1. Infrastructure Level 1</a></li>
 <li><a href="#_infrastructure_level_2">7.2. Infrastructure Level 2</a></li>
+<li><a href="#_periodic_background_jobs">7.3. Periodic Background Jobs</a></li>
 </ul>
 </li>
 <li><a href="#section-concepts">8. Cross-cutting Concepts</a>
@@ -1300,7 +1301,7 @@ conventions (e.g. programming or versioning guidelines, documentation or naming 
 </div>
 <div class="imageblock">
 <div class="content">
-<img src="./images/System%20Context%20Diagram.png" alt="System Context Diagram" width="487" height="538">
+<img src="./images/System%20Context%20Diagram.png" alt="System Context Diagram" width="469" height="550">
 </div>
 </div>
 </div>
@@ -1361,7 +1362,7 @@ conventions (e.g. programming or versioning guidelines, documentation or naming 
 </div>
 <div class="imageblock">
 <div class="content">
-<img src="./images/Deployment%20Diagram.png" alt="Deployment Diagram" width="547" height="542">
+<img src="./images/Deployment%20Diagram.png" alt="Deployment Diagram" width="520" height="556">
 </div>
 </div>
 <div class="paragraph">
@@ -2079,7 +2080,7 @@ You will mainly capture scenarios in your documentation to communicate your arch
 <h4 id="_sign_up_flow">6.1.1. Sign up Flow</h4>
 <div class="imageblock">
 <div class="content">
-<img src="./images/Authentication%20Sign%20Up%20Sequence.png" alt="Authentication Sign Up Sequence" width="1009" height="899">
+<img src="./images/Authentication%20Sign%20Up%20Sequence.png" alt="Authentication Sign Up Sequence" width="940" height="926">
 </div>
 </div>
 <div class="paragraph">
@@ -2090,7 +2091,7 @@ You will mainly capture scenarios in your documentation to communicate your arch
 <h4 id="_log_in_flow">6.1.2. Log in Flow</h4>
 <div class="imageblock">
 <div class="content">
-<img src="./images/Authentication%20Log%20In%20Sequence.png" alt="Authentication Log In Sequence" width="887" height="858">
+<img src="./images/Authentication%20Log%20In%20Sequence.png" alt="Authentication Log In Sequence" width="829" height="885">
 </div>
 </div>
 <div class="paragraph">
@@ -2102,7 +2103,7 @@ You will mainly capture scenarios in your documentation to communicate your arch
 <h3 id="_quiz_question_retrieval_flow">6.2. Quiz Question Retrieval Flow</h3>
 <div class="imageblock">
 <div class="content">
-<img src="./images/Quiz%20Question%20Retrieval.png" alt="Quiz Question Retrieval" width="1155" height="892">
+<img src="./images/Quiz%20Question%20Retrieval.png" alt="Quiz Question Retrieval" width="1076" height="918">
 </div>
 </div>
 <div class="paragraph">
@@ -2113,7 +2114,7 @@ You will mainly capture scenarios in your documentation to communicate your arch
 <h3 id="_llm_chat_interaction_flow">6.3. LLM Chat Interaction Flow</h3>
 <div class="imageblock">
 <div class="content">
-<img src="./images/LLM%20Chat%20Interaction.png" alt="LLM Chat Interaction" width="854" height="592">
+<img src="./images/LLM%20Chat%20Interaction.png" alt="LLM Chat Interaction" width="794" height="609">
 </div>
 </div>
 <div class="paragraph">
@@ -2124,7 +2125,7 @@ You will mainly capture scenarios in your documentation to communicate your arch
 <h3 id="_question_game_interaction_flow">6.4. Question Game Interaction Flow</h3>
 <div class="imageblock">
 <div class="content">
-<img src="./images/Question%20Game%20Interaction.png" alt="Question Game Interaction" width="1227" height="853">
+<img src="./images/Question%20Game%20Interaction.png" alt="Question Game Interaction" width="1162" height="878">
 </div>
 </div>
 </div>
@@ -2132,7 +2133,7 @@ You will mainly capture scenarios in your documentation to communicate your arch
 <h3 id="_statistics_interaction_flow">6.5. Statistics Interaction Flow</h3>
 <div class="imageblock">
 <div class="content">
-<img src="./images/Statistics%20Interaction.png" alt="Statistics Interaction" width="920" height="621">
+<img src="./images/Statistics%20Interaction.png" alt="Statistics Interaction" width="852" height="639">
 </div>
 </div>
 <div style="page-break-after: always;"></div>
@@ -2236,7 +2237,7 @@ We have configured in github a set of secrets: DEPLOY_HOST (the IP address of th
 </div>
 <div class="imageblock">
 <div class="content">
-<img src="./images/Deployment%20view%20L1.png" alt="Deployment view L1" width="390" height="230">
+<img src="./images/Deployment%20view%20L1.png" alt="Deployment view L1" width="717" height="497">
 </div>
 </div>
 <div class="dlist">
@@ -2246,7 +2247,7 @@ We have configured in github a set of secrets: DEPLOY_HOST (the IP address of th
 <div class="ulist">
 <ul>
 <li>
-<p>The diagram above illustrates the initial version of our architecture and the delineation among its components. Our approach adopts a straightforward client-server architecture, where the server interacts with external services such as Wikidata or Empathy LLM. This division enforces a clear separation between the client/frontend and the server/backend. Such separation benefits the entire system by ensuring that as long as the common API is implemented, the specific implementations can remain interchangeable.</p>
+<p>The diagram above illustrates the initial version of our architecture and the delineation among its components. Our approach adopts a straightforward client-server architecture, where the server interacts with external services such as Wikidata or Empathy / Gemini LLM. This division enforces a clear separation between the client/frontend and the server/backend. Such separation benefits the entire system by ensuring that as long as the common API is implemented, the specific implementations can remain interchangeable.</p>
 </li>
 <li>
 <p>Utilizing an Ubuntu server on Azure provides us with an isolated environment equipped with the essential configurations and installations necessary for running our services. By hosting our server on Azure, we can minimize costs associated with machine uptime while alleviating responsibilities such as security, availability, and maintenance.</p>
@@ -2277,7 +2278,7 @@ We have configured in github a set of secrets: DEPLOY_HOST (the IP address of th
 <h4 id="_server_side">7.2.1. <em>Server Side</em></h4>
 <div class="imageblock">
 <div class="content">
-<img src="./images/Deployment%20view%20L2.png" alt="Deployment view L2" width="934" height="442">
+<img src="./images/Deployment%20view%20L2.png" alt="Deployment view L2" width="923" height="571">
 </div>
 </div>
 <div class="paragraph">
@@ -2286,8 +2287,27 @@ We have configured in github a set of secrets: DEPLOY_HOST (the IP address of th
 <div class="paragraph">
 <p>We&#8217;ve opted for a microservices architecture using Docker containers instead of a monolithic setup. Each service has its own Docker image. This Docker-based approach streamlines deployment, management, and resource utilization while enhancing the overall flexibility and scalability of our system.</p>
 </div>
-<div style="page-break-after: always;"></div>
 </div>
+</div>
+<div class="sect2">
+<h3 id="_periodic_background_jobs">7.3. Periodic Background Jobs</h3>
+<div class="paragraph">
+<p>The Question Service executes the following periodic jobs:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Every hour: Updates the local cache of Wikidata items.</p>
+</li>
+<li>
+<p>Every day at 02:00 AM: Selects and stores the "Question of the Day".</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>These jobs ensure the freshness and availability of quiz content for users.</p>
+</div>
+<div style="page-break-after: always;"></div>
 </div>
 </div>
 </div>
@@ -2568,7 +2588,7 @@ on this list.</p>
 <h3 id="_quality_tree">10.1. Quality Tree</h3>
 <div class="imageblock">
 <div class="content">
-<img src="./images/Quality%20Tree.png" alt="Quality Tree" width="236" height="774">
+<img src="./images/Quality%20Tree.png" alt="Quality Tree" width="224" height="784">
 </div>
 </div>
 </div>
@@ -2826,7 +2846,7 @@ on this list.</p>
 <div id="footer">
 <div id="footer-text">
 Version 8.2 EN<br>
-Last updated 2025-02-23 22:33:11 +0100
+Last updated 2025-02-23 18:23:16 +0100
 </div>
 </div>
 </body>
