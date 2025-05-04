@@ -48,7 +48,8 @@ describe('GET /statistics', () => {
       totalVisits: 0,
       games: [
         { username: 'bob', gameType: 'classical', score: 60, questionsAnswered: 1, correctAnswers: 1, incorrectAnswers: 0 },
-        { username: 'bob', gameType: 'classical', score: 70, questionsAnswered: 1, correctAnswers: 1, incorrectAnswers: 0 }
+        { username: 'bob', gameType: 'classical', score: 70, questionsAnswered: 1, correctAnswers: 1, incorrectAnswers: 0 },
+        { username: 'bob', gameType: 'suddenDeath', score: 50, questionsAnswered: 2, correctAnswers: 1, incorrectAnswers: 1 }
       ]
     }
   ];
@@ -76,7 +77,7 @@ describe('GET /statistics', () => {
   it('should filter by minGames', async () => {
     await User.insertMany(users);
 
-    const res = await request(server).get('/statistics?minGames=2');
+    const res = await request(server).get('/statistics?minGames=3');
     expect(res.status).toBe(200);
     expect(res.body.users).toHaveLength(1);
     expect(res.body.users[0].username).toBe('bob');
@@ -169,8 +170,10 @@ describe('GET /statistics', () => {
   });
 
   it('should combine multiple filters', async () => {
+    await User.deleteMany({});
+    
     const now = new Date();
-    const yesterday = new Date(now.getTime() - 24 * 60 * 60 * 1000); // yesterday
+    const yesterday = new Date(now.getTime() - 24 * 60 * 60 * 1000);      // yesterday
     const twoDaysAgo = new Date(now.getTime() - (24 * 60 * 60 * 1000)*2); // two days ago
 
     const dateUsers = [
@@ -182,7 +185,7 @@ describe('GET /statistics', () => {
         registrationDate: twoDaysAgo,
         totalVisits: 0,
         games: [
-          { username: 'alice', gameType: 'classical', score: 50, questionsAnswered: 1, correctAnswers: 1, incorrectAnswers: 0 }
+          { username: 'alice', gameType: 'classical', score: 50, questionsAnswered: 2, correctAnswers: 1, incorrectAnswers: 1 }
         ]
       },
       {

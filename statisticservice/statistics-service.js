@@ -20,38 +20,6 @@ if (mongoose.connection.readyState === 0) {
 }
 
 /**
- * Helper: Build registration date filter for MongoDB $match
- */
-function buildRegistrationDateFilter(before, after) {
-  const filter = {};
-
-  if (before) {
-    if (!isValidDateString(before)) {
-      throw new Error('Invalid registeredBefore date format');
-    }
-    filter.registrationDate = filter.registrationDate || {};
-    filter.registrationDate.$lte = new Date(before);
-  }
-  if (after) {
-    if (!isValidDateString(after)) {
-      throw new Error('Invalid registeredAfter date format');
-    }
-    filter.registrationDate = filter.registrationDate || {};
-    filter.registrationDate.$gte = new Date(after);
-  }
-  return filter;
-}
-
-/**
- * Helper: Build gameType filter for MongoDB $match
- * Only matches users who have at least one game of the specified type
- */
-function buildGameTypeFilter(gameType) {
-  if (!gameType) return {};
-  return { "games.gameType": gameType };
-}
-
-/**
  * Helper: Build minGames and minScore filters for MongoDB $match
  * These are applied after statistics are calculated
  */
@@ -62,7 +30,31 @@ function buildMinFilters(minGames, minScore) {
   return filter;
 }
 
+function buildRegistrationDateFilter(before, after) {
+  const filter = {};
+
+  if (before) {
+    if (!isValidDateString(before)) {
+      throw new Error('Invalid registeredBefore date format');
+    }
+    filter.registrationDate = filter.registrationDate || {};
+    filter.registrationDate.$lt = new Date(before);
+  }
+  
+  if (after) {
+    if (!isValidDateString(after)) {
+      throw new Error('Invalid registeredAfter date format');
+    }
+    filter.registrationDate = filter.registrationDate || {};
+    filter.registrationDate.$gte = new Date(after);
+  }
+  
+  return filter;
+}
+
 function isValidDateString(dateString) {
+  if (dateString instanceof Date) return !isNaN(dateString.getTime());
+  
   // Accepts only yyyy-mm-dd or yyyy-mm-ddTHH:MM:SS(.sss)Z
   const isoDateRegex = /^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2}:\d{2}(\.\d{3})?Z)?$/;
   if (!isoDateRegex.test(dateString)) return false;
@@ -85,7 +77,7 @@ function isValidDateString(dateString) {
 
 // Get statistics for all users (ordered)
 app.get('/statistics', async (req, res) => {
-
+  
   const validSortFields = [
     'username', 'gamesPlayed', 'questionsAnswered',
     'correctAnswers', 'incorrectAnswers', 'accuracy',
@@ -106,8 +98,8 @@ app.get('/statistics', async (req, res) => {
       registeredAfter
     } = req.query;
 
-
-    const validGameTypes = ['classical', 'suddenDeath', 'timeTrial', 'qod', 'custom'];
+    // Empty means global stats
+    const validGameTypes = ['', 'classical', 'suddenDeath', 'timeTrial', 'custom', 'qod']; 
 
     if (!validSortFields.includes(sort)) return res.status(400).json({ error: 'Invalid sort field' });
     if (!['asc', 'desc'].includes(order)) return res.status(400).json({ error: 'Invalid sort order' });
@@ -123,6 +115,7 @@ app.get('/statistics', async (req, res) => {
       return res.status(400).json({ error: 'Invalid minimum score value' });
     }
 
+    // Validation for dates
     if (registeredBefore && !isValidDateString(registeredBefore)) {
       return res.status(400).json({ error: 'Invalid registeredBefore date format' });
     }
@@ -137,14 +130,32 @@ app.get('/statistics', async (req, res) => {
       return res.status(400).json({ error: 'Invalid offset value, must be non-negative' });
     }
 
+    // Build initial match criteria
+    let initialMatch = {};
+    
+    // Handle date filtering directly to ensure proper conversion
+    if (registeredBefore) {
+      initialMatch.registrationDate = initialMatch.registrationDate || {};
+      initialMatch.registrationDate.$lt = new Date(registeredBefore);
+      console.log(`Filter: registeredBefore=${registeredBefore}, converted to:`, initialMatch.registrationDate.$lt);
+    }
+    
+    if (registeredAfter) {
+      initialMatch.registrationDate = initialMatch.registrationDate || {};
+      initialMatch.registrationDate.$gte = new Date(registeredAfter);
+      console.log(`Filter: registeredAfter=${registeredAfter}, converted to:`, initialMatch.registrationDate.$gte);
+    }
+    
+    // If there's a gameType filter, add a condition to only include users with at least one game of that type
+    if (gameType) {
+      initialMatch["games.gameType"] = gameType;
+    }
+
     // Build the aggregation pipeline for MongoDB
     const pipeline = [
-      // 1. Filter users by registration date and gameType (if provided)
+      // 1. Initial filter for registration date and game type existence
       {
-        $match: {
-          ...buildRegistrationDateFilter(registeredBefore, registeredAfter),
-          ...buildGameTypeFilter(gameType)
-        }
+        $match: initialMatch
       },
       // 2. Project only the needed fields (for performance)
       {
@@ -153,9 +164,9 @@ app.get('/statistics', async (req, res) => {
           registrationDate: 1,
           games: 1,
           // Denormalized (pre-computed) fields for global stats
-          denormGamesPlayed: "$gamesPlayed",
-          denormCorrect: "$correctAnswers",
-          denormQuestions: "$questionsAnswered"
+          gamesPlayed: { $ifNull: ["$gamesPlayed", 0] },
+          correctAnswers: { $ifNull: ["$correctAnswers", 0] },
+          questionsAnswered: { $ifNull: ["$questionsAnswered", 0] }
         }
       },
       // 3. If a gameType filter is set, create a filteredGames array with only those games
@@ -170,18 +181,33 @@ app.get('/statistics', async (req, res) => {
           } : "$games"
         }
       },
-      // 4. Calculate statistics for each user
+      // 4. Calculate statistics based on filtered games
       {
         $addFields: {
-          // If gameType is set, calculate stats from filteredGames; otherwise, use denormalized fields
-          gamesPlayed: gameType ? { $size: "$filteredGames" } : "$denormGamesPlayed",
-          correctAnswers: gameType ? { $sum: "$filteredGames.correctAnswers" } : "$denormCorrect",
-          questionsAnswered: gameType ? { $sum: "$filteredGames.questionsAnswered" } : "$denormQuestions",
-          totalScore: { $sum: "$filteredGames.score" },
-          maxScore: { $max: "$filteredGames.score" }
+          gameSpecificStats: {
+            gamesPlayed: { $size: { $ifNull: ["$filteredGames", []] } },
+            correctAnswers: { $sum: { $ifNull: ["$filteredGames.correctAnswers", [0]] } },
+            questionsAnswered: { $sum: { $ifNull: ["$filteredGames.questionsAnswered", [0]] } },
+            totalScore: { $sum: { $ifNull: ["$filteredGames.score", [0]] } },
+            maxScore: { $max: { $ifNull: ["$filteredGames.score", [0]] } }
+          }
         }
       },
-      // 5. Calculate incorrectAnswers and accuracy
+      // 5. Choose the right stats based on whether we're filtering by game type
+      {
+        $addFields: {
+          gamesPlayed: { $cond: [{ $eq: [gameType, ""] }, "$gamesPlayed", "$gameSpecificStats.gamesPlayed"] },
+          correctAnswers: { $cond: [{ $eq: [gameType, ""] }, "$correctAnswers", "$gameSpecificStats.correctAnswers"] },
+          questionsAnswered: { $cond: [{ $eq: [gameType, ""] }, "$questionsAnswered", "$gameSpecificStats.questionsAnswered"] },
+          totalScore: { $cond: [{ $eq: [gameType, ""] }, 
+                              { $sum: "$games.score" }, 
+                              "$gameSpecificStats.totalScore"] },
+          maxScore: { $cond: [{ $eq: [gameType, ""] }, 
+                            { $max: "$games.score" }, 
+                            "$gameSpecificStats.maxScore"] }
+        }
+      },
+      // 6. Calculate incorrectAnswers and accuracy
       {
         $addFields: {
           incorrectAnswers: { $subtract: ["$questionsAnswered", "$correctAnswers"] },
@@ -194,11 +220,11 @@ app.get('/statistics', async (req, res) => {
           }
         }
       },
-      // 6. Filter out users who don't meet minGames or minScore requirements (if provided)
+      // 7. Apply minGames and minScore filters
       {
         $match: buildMinFilters(minGames, minScore)
       },
-      // 7. Facet for pagination and total count
+      // 8. Facet for pagination and total count
       {
         $facet: {
           metadata: [{ $count: "total" }],
@@ -208,7 +234,7 @@ app.get('/statistics', async (req, res) => {
             { $limit: Number(limit) },
             {
               $project: {
-                _id: 0,
+                _id: 1,
                 username: 1,
                 registrationDate: 1,
                 gamesPlayed: 1,
