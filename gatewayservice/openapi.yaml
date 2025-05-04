@@ -184,7 +184,7 @@ paths:
         - name: username
           in: path
           required: true
-          description: The username of the account to update.
+          description: The username of the account to update. Must match the authenticated user.
           schema:
             type: string
             example: currentUsername
@@ -202,11 +202,11 @@ paths:
                 password:
                   type: string
                   description: The new password, if wanted to be modified.
-                  example: newPassword123!
+                  example: "NewPassword123!"
                 passwordRepeat:
                   type: string
                   description: Confirmation of the new password.
-                  example: newPassword123!
+                  example: "NewPassword123!"
       responses:
         "200":
           description: User updated successfully.
@@ -219,20 +219,20 @@ paths:
                     type: boolean
                     description: Indicates if the operation was successful.
                     example: true
-                  currentUsername:
+                  newUsername:
                     type: string
-                    description: The accout username after the operations.
+                    description: The account username after the operations.
                     example: newUsername
                   token:
                     type: string
-                    description: New user token after the operations.
+                    description: New JWT token (only provided if username was changed).
                     example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2N2VhYTkyM2FlZTYxNThkZTJjOGEyMDciLCJpYXQiOjE3NDM0MzE5NzEsImV4cCI6MTc0MzQzNTU3MX0.7lC7CSStyWlxOYxwgU7N1iPodiKHTD9Jq7e09Wa-VFc
                   message:
                     type: string
                     description: Message describing the result.
                     example: User updated successfully
         "400":
-          description: Invalid request parameters. (Passwords don't match, invalid username/password, etc...)
+          description: Invalid request parameters.
           content:
             application/json:
               schema:
@@ -241,9 +241,9 @@ paths:
                   error:
                     type: string
                     description: Error information.
-                    example: Invalid input data.
+                    example: "signUp.errors.passwordsDoNotMatch"
         "401":
-          description: User token is missing or invalid.
+          description: User token is missing.
           content:
             application/json:
               schema:
@@ -252,9 +252,9 @@ paths:
                   error:
                     type: string
                     description: Error information.
-                    example: Authorization header missing
+                    example: "Authorization header missing"
         "403":
-          description: Invalid user modifying the data. (username is not the same as the one in the token)
+          description: Invalid user modifying the data (username is not the same as the one in the token).
           content:
             application/json:
               schema:
@@ -263,7 +263,18 @@ paths:
                   error:
                     type: string
                     description: Error information.
-                    example: You can only update your own account.
+                    example: "You can only update your own account"
+        "404":
+          description: User not found.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    description: Error information.
+                    example: "User not found"
         "500":
           description: Failed to update user due to a server error.
           content:
@@ -274,16 +285,16 @@ paths:
                   error:
                     type: string
                     description: Error information.
-                    example: Internal Server Error
+                    example: "Internal Server Error"
   /users/{username}/image:
     get:
-      summary: Retrieve the profile image of some user.
+      summary: Retrieve the profile image of a user.
       operationId: userImage
       parameters:
         - name: username
           in: path
           required: true
-          description: The username of the user to recover their image.
+          description: The username of the user whose image is to be retrieved.
           schema:
             type: string
             example: student
@@ -291,13 +302,13 @@ paths:
         "200":
           description: Image retrieved correctly.
           content:
-            image/*:
+            image/png:
               schema:
                 type: string
                 format: binary
-                description: The image data.
+                description: The binary image data.
         "404":
-          description: User is not found.
+          description: User is not found or image path is invalid.
           content:
             application/json:
               schema:
@@ -320,13 +331,13 @@ paths:
                     example: Internal Server Error
   /users/{username}/default-image:
     post:
-      summary: Updates the image of some user to a default one.
+      summary: Updates a user's profile image to one of the default images.
       operationId: defaultUserImage
       parameters:
         - name: username
           in: path
           required: true
-          description: The username of the user to recover their image.
+          description: The username of the user whose image will be updated. Must match the authenticated user.
           schema:
             type: string
             example: student
@@ -374,6 +385,28 @@ paths:
                     type: string
                     description: Error information.
                     example: No default image provided
+        "401":
+          description: User token is missing.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    description: Error message.
+                    example: Authorization header missing
+        "403":
+          description: User is trying to update another user's image.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    description: Error message.
+                    example: You can only update your own account
         "404":
           description: User is not found.
           content:
@@ -398,13 +431,13 @@ paths:
                     example: Internal Server Error
   /users/{username}/custom-image:
     post:
-      summary: Updates the image of some user, uploading a new one.
+      summary: Updates a user's profile image by uploading a new one.
       operationId: customUserImage
       parameters:
         - name: username
           in: path
           required: true
-          description: The username of the user to recover their image.
+          description: The username of the user whose image will be updated. Must match the authenticated user.
           schema:
             type: string
             example: student
@@ -440,7 +473,7 @@ paths:
                   imagePath:
                     type: string
                     description: Path to the updated image.
-                    example: /images/default/image_13.png
+                    example: /images/custom/student-1715014891234.png
         "400":
           description: File is missing or is not an image.
           content:
@@ -451,7 +484,29 @@ paths:
                   error:
                     type: string
                     description: Error information.
-                    example: Uploaded file is not an image
+                    example: profile.errors.invalidImage
+        "401":
+          description: User token is missing.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    description: Error message.
+                    example: Authorization header missing
+        "403":
+          description: User is trying to update another user's image.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    description: Error message.
+                    example: You can only update your own account
         "404":
           description: User is not found.
           content:
@@ -474,6 +529,257 @@ paths:
                     type: string
                     description: Error information.
                     example: Internal Server Error
+    /profile/{username}:
+      get:
+        summary: Retrieves profile statistics of a specific user.
+        operationId: userProfile
+        security:
+          - bearerAuth: []
+        parameters:
+          - name: username
+            in: path
+            required: true
+            description: The username of the user to retrieve the profile.
+            schema:
+              type: string
+              example: student
+        responses:
+          "200":
+            description: Profile retrieved correctly.
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    username:
+                      type: string
+                      description: User ID.
+                      example: student
+                    gamesPlayed:
+                      type: integer
+                      description: Total number of games played.
+                      example: 42
+                    registrationDate:
+                      type: string
+                      format: date-time
+                      description: When the user registered.
+                      example: "2025-03-31T14:39:31.025Z"
+                    totalVisits:
+                      type: integer
+                      description: Number of profile visits by other users.
+                      example: 157
+                    isProfileOwner:
+                      type: boolean
+                      description: Whether the requesting user is the profile owner.
+                      example: true
+                    globalStatistics:
+                      type: object
+                      description: Aggregated game statistics across all game types.
+                      properties:
+                        questionsAnswered:
+                          type: integer
+                          description: Total questions answered.
+                          example: 520
+                        correctAnswers:
+                          type: integer
+                          description: Total correct answers.
+                          example: 372
+                        incorrectAnswers:
+                          type: integer
+                          description: Total incorrect answers.
+                          example: 148
+                        maxScore:
+                          type: integer
+                          description: Highest score achieved in any game.
+                          example: 950
+                        gamesPlayed:
+                          type: integer
+                          description: Total games played.
+                          example: 42
+                        maxCorrectAnswers:
+                          type: integer
+                          description: Most correct answers in a single game.
+                          example: 23
+                    classicalStatistics:
+                      type: object
+                      description: Statistics for classical game mode.
+                      properties:
+                        questionsAnswered:
+                          type: integer
+                          example: 210
+                        correctAnswers:
+                          type: integer
+                          example: 168
+                        incorrectAnswers:
+                          type: integer
+                          example: 42
+                        maxScore:
+                          type: integer
+                          example: 840
+                        gamesPlayed:
+                          type: integer
+                          example: 21
+                        maxCorrectAnswers:
+                          type: integer
+                          example: 20
+                    suddenDeathStatistics:
+                      type: object
+                      description: Statistics for sudden death game mode.
+                      properties:
+                        questionsAnswered:
+                          type: integer
+                          example: 95
+                        correctAnswers:
+                          type: integer
+                          example: 95
+                        incorrectAnswers:
+                          type: integer
+                          example: 0
+                        maxScore:
+                          type: integer
+                          example: 950
+                        gamesPlayed:
+                          type: integer
+                          example: 8
+                        maxCorrectAnswers:
+                          type: integer
+                          example: 23
+                    timeTrialStatistics:
+                      type: object
+                      description: Statistics for time trial game mode.
+                      properties:
+                        questionsAnswered:
+                          type: integer
+                          example: 175
+                        correctAnswers:
+                          type: integer
+                          example: 82
+                        incorrectAnswers:
+                          type: integer
+                          example: 93
+                        maxScore:
+                          type: integer
+                          example: 410
+                        gamesPlayed:
+                          type: integer
+                          example: 7
+                        maxCorrectAnswers:
+                          type: integer
+                          example: 12
+                    customStatistics:
+                      type: object
+                      description: Statistics for custom game mode.
+                      properties:
+                        questionsAnswered:
+                          type: integer
+                          example: 24
+                        correctAnswers:
+                          type: integer
+                          example: 16
+                        incorrectAnswers:
+                          type: integer
+                          example: 8
+                        maxScore:
+                          type: integer
+                          example: 160
+                        gamesPlayed:
+                          type: integer
+                          example: 3
+                        maxCorrectAnswers:
+                          type: integer
+                          example: 8
+                    qodStatistics:
+                      type: object
+                      description: Statistics for question of the day mode.
+                      properties:
+                        questionsAnswered:
+                          type: integer
+                          example: 16
+                        correctAnswers:
+                          type: integer
+                          example: 11
+                        incorrectAnswers:
+                          type: integer
+                          example: 5
+                        maxScore:
+                          type: integer
+                          example: 10
+                        gamesPlayed:
+                          type: integer
+                          example: 16
+                        maxCorrectAnswers:
+                          type: integer
+                          example: 1
+                    recentVisitors:
+                      type: array
+                      description: List of recent profile visitors (only available to profile owner).
+                      items:
+                        type: object
+                        properties:
+                          username:
+                            type: string
+                            description: Username of the visitor.
+                            example: "visitor123"
+                          date:
+                            type: string
+                            format: date-time
+                            description: When the visit occurred.
+                            example: "2025-05-01T11:42:53.217Z"
+          "400":
+            description: Invalid username format.
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    error:
+                      type: string
+                      description: Error information.
+                      example: Invalid username format
+          "401":
+            description: Authentication required.
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    error:
+                      type: string
+                      description: Error information.
+                      example: Authorization header missing
+          "403":
+            description: Invalid or expired token.
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    error:
+                      type: string
+                      description: Error information.
+                      example: Invalid or expired token
+          "404":
+            description: User not found.
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    error:
+                      type: string
+                      description: Error information.
+                      example: statistics.errors.userNotFound
+          "500":
+            description: Server error when processing the request.
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    error:
+                      type: string
+                      description: Error information.
+                      example: Internal Server Error
   /askllm:
     post:
       summary: Send a question to the LLM.
@@ -829,49 +1135,185 @@ paths:
                     example: Failed to fetch question of the day
   /statistics:
     get:
-      summary: Retrieves the statistics for the user in session.
+      summary: Retrieves statistics for all users with filtering and pagination.
       operationId: statistics
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: sort
+          in: query
+          required: false
+          description: Field to sort by.
+          schema:
+            type: string
+            enum: [username, gamesPlayed, questionsAnswered, correctAnswers, incorrectAnswers, accuracy, totalScore, maxScore, registrationDate]
+            default: totalScore
+        - name: order
+          in: query
+          required: false
+          description: Sort order.
+          schema:
+            type: string
+            enum: [asc, desc]
+            default: desc
+        - name: limit
+          in: query
+          required: false
+          description: Maximum number of results to return (1-100).
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 50
+        - name: offset
+          in: query
+          required: false
+          description: Number of results to skip for pagination.
+          schema:
+            type: integer
+            minimum: 0
+            default: 0
+        - name: gameType
+          in: query
+          required: false
+          description: Filter by game type.
+          schema:
+            type: string
+            enum: [classical, suddenDeath, timeTrial, qod, custom]
+        - name: minGames
+          in: query
+          required: false
+          description: Filter by minimum number of games played.
+          schema:
+            type: integer
+            minimum: 0
+        - name: minScore
+          in: query
+          required: false
+          description: Filter by minimum total score.
+          schema:
+            type: integer
+            minimum: 0
+        - name: registeredBefore
+          in: query
+          required: false
+          description: Filter users registered before this date (YYYY-MM-DD or ISO format).
+          schema:
+            type: string
+            format: date-time
+        - name: registeredAfter
+          in: query
+          required: false
+          description: Filter users registered after this date (YYYY-MM-DD or ISO format).
+          schema:
+            type: string
+            format: date-time
       responses:
         "200":
-          description: The statistics were retrieved correctly.
+          description: Statistics retrieved successfully.
           content:
             application/json:
               schema:
                 type: object
                 properties:
-                  gamesPlayed:
-                    type: integer
-                    description: Number of games played.
-                    example: 17
-                  questionsAnswered:
-                    type: integer
-                    description: Number of questions answered.
-                    example: 34
-                  correctAnswers:
-                    type: integer
-                    description: Number of correct answers.
-                    example: 26
-                  incorrectAnswers:
-                    type: integer
-                    description: Number of incorrect answers.
-                    example: 8
+                  users:
+                    type: array
+                    description: List of user statistics.
+                    items:
+                      type: object
+                      properties:
+                        username:
+                          type: string
+                          description: Username.
+                          example: "player123"
+                        registrationDate:
+                          type: string
+                          format: date-time
+                          description: When the user registered.
+                          example: "2025-03-31T14:39:31.025Z"
+                        gamesPlayed:
+                          type: integer
+                          description: Total number of games played.
+                          example: 42
+                        questionsAnswered:
+                          type: integer
+                          description: Total questions answered.
+                          example: 520
+                        correctAnswers:
+                          type: integer
+                          description: Total correct answers.
+                          example: 372
+                        incorrectAnswers:
+                          type: integer
+                          description: Total incorrect answers.
+                          example: 148
+                        accuracy:
+                          type: number
+                          format: float
+                          description: Percentage of correct answers.
+                          example: 71.53
+                        totalScore:
+                          type: integer
+                          description: Total score across all games.
+                          example: 3720
+                        maxScore:
+                          type: integer
+                          description: Highest score in a single game.
+                          example: 950
+                  pagination:
+                    type: object
+                    properties:
+                      total:
+                        type: integer
+                        description: Total number of users matching the filters.
+                        example: 127
+                      limit:
+                        type: integer
+                        description: Number of results per page.
+                        example: 50
+                      offset:
+                        type: integer
+                        description: Number of results skipped.
+                        example: 0
+                      hasMore:
+                        type: boolean
+                        description: Whether there are more results available.
+                        example: true
+        "400":
+          description: Invalid query parameters.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    description: Error message.
+                    example: "Invalid sort field"
+        "401":
+          description: Authentication required.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    description: Error message.
+                    example: "Authorization header missing"
         "403":
-          description: The user could not be validated.
+          description: Invalid or expired token.
           content:
             application/json:
               schema:
                 type: object
                 properties:
-                  authorized:
-                    type: boolean
-                    description: A boolean wether the user is authorized or not. Currently always false.
-                    example: false
                   error:
                     type: string
-                    description: The error message.
-                    example: Invalid token or outdated
+                    description: Error message.
+                    example: "Invalid or expired token"
         "500":
-          description: Some error ocurred in the server when processing the request.
+          description: Server error when processing the request.
           content:
             application/json:
               schema:
@@ -879,11 +1321,36 @@ paths:
                 properties:
                   error:
                     type: string
-                    description: The error message.
-                    example: Internal Server Error
+                    description: Error message.
+                    example: "Internal Server Error"
     post:
       summary: Updates the user in session's statistics.
       operationId: statisticsUpdate
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                gamesPlayed:
+                  type: integer
+                  description: Number of games to add to the user's total.
+                  example: 1
+                questionsAnswered:
+                  type: integer
+                  description: Number of questions to add to the user's total.
+                  example: 10
+                correctAnswers:
+                  type: integer
+                  description: Number of correct answers to add to the user's total.
+                  example: 7
+                incorrectAnswers:
+                  type: integer
+                  description: Number of incorrect answers to add to the user's total.
+                  example: 3
       responses:
         "200":
           description: The statistics were updated correctly and are retrieved back.
@@ -894,19 +1361,19 @@ paths:
                 properties:
                   gamesPlayed:
                     type: integer
-                    description: Number of games played.
+                    description: Updated total number of games played.
                     example: 17
                   questionsAnswered:
                     type: integer
-                    description: Number of questions answered.
+                    description: Updated total number of questions answered.
                     example: 34
                   correctAnswers:
                     type: integer
-                    description: Number of correct answers.
+                    description: Updated total number of correct answers.
                     example: 26
                   incorrectAnswers:
                     type: integer
-                    description: Number of incorrect answers.
+                    description: Updated total number of incorrect answers.
                     example: 8
         "400":
           description: The user input is invalid. Some statistic is not a number.
@@ -929,7 +1396,7 @@ paths:
                   error:
                     type: string
                     description: The error message.
-                    example: Token missing
+                    example: "Authorization header missing"
         "403":
           description: User token is invalid or expired.
           content:
@@ -940,9 +1407,9 @@ paths:
                   error:
                     type: string
                     description: The error message.
-                    example: Invalid or expired token
-        "500":
-          description: Some error ocurred in the server when processing the request.
+                    example: "Invalid or expired token"
+        "404":
+          description: User not found.
           content:
             application/json:
               schema:
@@ -951,6 +1418,124 @@ paths:
                   error:
                     type: string
                     description: The error message.
+                    example: "statistics.errors.userNotFound"
+        "500":
+          description: Some error occurred in the server when processing the request.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    description: The error message.
+                    example: "Internal Server Error"
+  /recordGame:
+    post:
+      summary: Records a game played by the user.
+      operationId: recordGame
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - gameType
+                - score
+                - questionsAnswered
+                - correctAnswers
+                - incorrectAnswers
+              properties:
+                gameType:
+                  type: string
+                  description: Type of game played.
+                  enum: [classical, suddenDeath, timeTrial, qod, custom]
+                  example: classical
+                score:
+                  type: integer
+                  description: Score achieved in the game.
+                  example: 850
+                questionsAnswered:
+                  type: integer
+                  description: Total questions attempted in this game.
+                  example: 20
+                correctAnswers:
+                  type: integer
+                  description: Number of correct answers in the game.
+                  example: 15
+                incorrectAnswers:
+                  type: integer
+                  description: Number of incorrect answers in the game.
+                  example: 5
+      responses:
+        "200":
+          description: The game was recorded successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Confirmation message.
+                    example: Game recorded successfully
+        "400":
+          description: Invalid input data for recording the game.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    description: Error message.
+                    example: Invalid input data for recording the game.
+        "401":
+          description: User token is missing.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    description: Error message.
+                    example: Authorization header missing
+        "403":
+          description: User token is invalid or expired.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    description: Error message.
+                    example: Invalid or expired token
+        "404":
+          description: User not found.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    description: Error message.
+                    example: statistics.errors.userNotFound
+        "500":
+          description: Server error when processing the request.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    description: Error message.
                     example: Internal Server Error
   /health:
     get:
