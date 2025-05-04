@@ -1,4 +1,9 @@
-### Monitoring (Prometheus and Grafana)
+## Endpoint Documentation
+The endpoint documentation of all the APIs we use in our gateway service can be accessed in the following link.
+
+http://wichat-en1b.francecentral.cloudapp.azure.com:8000/api-doc/
+
+## Monitoring (Prometheus and Grafana)
 In this step we are going use [Prometheus](https://prometheus.io/) and [Grafana](https://grafana.com/) to monitor the restapi. First step is modifying the restapi launch to capture profiling data. In nodejs this is very easy. After installing the required packages (express-prom-bundle and prom-client), we need to modify the `gatewayservice/gateway-service.js` in order to capture the profiling data adding:
 ```javascript
 const metricsMiddleware = promBundle({includeMethod: true});
